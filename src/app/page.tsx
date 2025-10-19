@@ -1,4 +1,5 @@
 import { VideoGrid } from '@/components/videos/video-grid';
+import { UserMenu } from '@/components/user-menu';
 import videos from '@/data/videos.json';
 import Image from 'next/image';
 
@@ -8,22 +9,25 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 relative">
-              <Image
-                src="/logo.svg"
-                alt="Ladder Legends Academy"
-                width={64}
-                height={64}
-                className="object-contain"
-              />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 relative">
+                <Image
+                  src="/logo.svg"
+                  alt="Ladder Legends Academy"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                  Ladder Legends Academy
+                </h1>
+                <p className="text-muted-foreground">Master Starcraft 2 with Expert Coaching</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                Ladder Legends Academy
-              </h1>
-              <p className="text-muted-foreground">Master Starcraft 2 with Expert Coaching</p>
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>

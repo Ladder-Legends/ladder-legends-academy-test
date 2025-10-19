@@ -4,83 +4,43 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Cyberpunk/Neon Theme Colors */
+  --color-background: hsl(220 25% 6%);
+  --color-foreground: hsl(210 100% 90%);
+  --color-card: hsl(220 20% 10%);
+  --color-card-foreground: hsl(210 100% 90%);
+  --color-popover: hsl(220 25% 8%);
+  --color-popover-foreground: hsl(210 100% 90%);
+  --color-primary: hsl(290 80% 60%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(190 100% 50%);
+  --color-secondary-foreground: hsl(220 25% 6%);
+  --color-muted: hsl(220 20% 18%);
+  --color-muted-foreground: hsl(210 40% 70%);
+  --color-accent: hsl(290 80% 60%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-border: hsl(220 20% 20%);
+  --color-input: hsl(220 20% 18%);
+  --color-ring: hsl(290 80% 60%);
+
+  /* Starcraft race colors */
+  --color-chart-1: hsl(290 80% 60%);
+  --color-chart-2: hsl(30 100% 50%);
+  --color-chart-3: hsl(280 100% 40%);
+  --color-chart-4: hsl(190 100% 50%);
+  --color-chart-5: hsl(320 80% 60%);
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
 
-:root {
-  --radius: 0.5rem;
-
-  /* Cyberpunk/Neon Theme - Dark by default */
-  --background: 220 25% 6%;  /* Very dark blue-tinted background */
-  --foreground: 210 100% 90%;  /* Light cyan-tinted white */
-
-  --card: 220 20% 10%;  /* Slightly lighter dark blue */
-  --card-foreground: 210 100% 90%;
-
-  --popover: 220 25% 8%;
-  --popover-foreground: 210 100% 90%;
-
-  --primary: 290 80% 60%;  /* Bright purple/magenta */
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 190 100% 50%;  /* Bright cyan */
-  --secondary-foreground: 220 25% 6%;
-
-  --muted: 220 20% 18%;
-  --muted-foreground: 210 40% 70%;
-
-  --accent: 290 80% 60%;  /* Purple accent */
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 220 20% 20%;
-  --input: 220 20% 18%;
-  --ring: 290 80% 60%;  /* Purple ring */
-
-  /* Starcraft race colors for charts/tags */
-  --chart-1: 290 80% 60%;  /* Purple for Protoss */
-  --chart-2: 30 100% 50%;  /* Orange/gold for Terran */
-  --chart-3: 280 100% 40%;  /* Deep purple for Zerg */
-  --chart-4: 190 100% 50%;  /* Cyan */
-  --chart-5: 320 80% 60%;  /* Pink */
+  /* Radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
 @layer base {
@@ -89,5 +49,26 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(at 0% 0%, hsl(290 80% 20% / 0.3) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsl(190 100% 30% / 0.2) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(290 80% 20% / 0.3) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(190 100% 30% / 0.2) 0px, transparent 50%);
+  }
+
+  /* Cyberpunk glow effects */
+  .glow-primary {
+    text-shadow: 0 0 20px hsl(290 80% 60% / 0.5);
+  }
+
+  .glow-secondary {
+    text-shadow: 0 0 20px hsl(190 100% 50% / 0.5);
+  }
+
+  /* Neon border effect */
+  .neon-border {
+    box-shadow:
+      0 0 5px hsl(290 80% 60% / 0.5),
+      inset 0 0 5px hsl(290 80% 60% / 0.2);
   }
 }

@@ -10,12 +10,43 @@ A Starcraft 2 coaching website featuring a filterable video catalog with a cyber
 - 📱 Responsive design with smooth animations
 - ⚡ Built with Next.js 15, React 19, and Tailwind CSS 4
 - 🎯 shadcn/ui components for consistent UI
+- 🔐 Discord OAuth authentication with role-based access control
 
 ## Getting Started
+
+### Prerequisites
+
+Before you start, you'll need to set up Discord OAuth:
+
+1. **Create a Discord Application**
+   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
+   - Click "New Application" and give it a name
+   - Go to the "OAuth2" section
+   - Add redirect URL: `http://localhost:3000/api/auth/callback/discord` (and your production URL when deploying)
+   - Copy your Client ID and Client Secret
+
+2. **Create a Discord Bot** (for role verification)
+   - In the same Discord application, go to the "Bot" section
+   - Click "Add Bot"
+   - Copy the bot token
+   - Invite the bot to your Discord server with "Read Messages/View Channels" permissions
+   - Bot invite URL format: `https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=67584&scope=bot`
+
+3. **Set up environment variables**
+   - Copy `.env.example` to `.env.local`
+   - Fill in your Discord credentials:
+   ```bash
+   AUTH_SECRET=$(openssl rand -base64 32)
+   AUTH_URL=http://localhost:3000
+   AUTH_DISCORD_ID=your-discord-client-id
+   AUTH_DISCORD_SECRET=your-discord-client-secret
+   DISCORD_BOT_TOKEN=your-discord-bot-token
+   ```
 
 ### Development
 
 ```bash
+npm install
 npm run dev
 ```
 
@@ -27,6 +58,15 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 npm run build
 npm start
 ```
+
+## Authentication
+
+The site requires users to:
+1. Sign in with Discord
+2. Be a member of the Ladder Legends Academy Discord server (ID: `1386735340517195959`)
+3. Have the "Subscriber" role in that server
+
+Users without the required role will see an error message with a link to join the server.
 
 ## Adding Videos
 
@@ -76,7 +116,15 @@ Replace `public/logo.svg` with your own logo file. You can use PNG, SVG, or othe
 3. Click "New Project"
 4. Import your GitHub repository
 5. Vercel will auto-detect Next.js and configure the build settings
-6. Click "Deploy"
+6. **Add Environment Variables** in the Vercel project settings:
+   - `AUTH_SECRET` - Generate with `openssl rand -base64 32`
+   - `AUTH_URL` - Your production URL (e.g., `https://your-site.vercel.app`)
+   - `AUTH_DISCORD_ID` - Your Discord Client ID
+   - `AUTH_DISCORD_SECRET` - Your Discord Client Secret
+   - `DISCORD_BOT_TOKEN` - Your Discord Bot Token
+7. **Update Discord OAuth redirect URL** to include your production URL:
+   - `https://your-site.vercel.app/api/auth/callback/discord`
+8. Click "Deploy"
 
 Your site will be live in minutes with automatic deployments on every push to main.
 
@@ -86,6 +134,8 @@ Your site will be live in minutes with automatic deployments on every push to ma
 npm install -g vercel
 vercel
 ```
+
+Remember to set the environment variables in your Vercel project settings.
 
 ## Project Structure
 
@@ -121,6 +171,7 @@ Adjust these values to customize the theme.
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
+- **Authentication**: Auth.js (NextAuth v5) with Discord OAuth
 - **Styling**: Tailwind CSS 4
 - **UI Components**: shadcn/ui
 - **Icons**: Lucide React
