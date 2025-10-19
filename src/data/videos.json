@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1",
+    "title": "Mastering Terran Macro Mechanics",
+    "description": "Learn the fundamentals of Terran macro with Coach Nico. This video covers production cycles, expansions, and army composition.",
+    "date": "2024-01-15",
+    "tags": ["terran", "macro", "coach nico"],
+    "youtubeId": "dQw4w9WgXcQ",
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+  },
+  {
+    "id": "2",
+    "title": "Protoss Micro: Blink Stalker Control",
+    "description": "GamerRichy demonstrates advanced blink stalker micro techniques to maximize your damage output while minimizing losses.",
+    "date": "2024-01-20",
+    "tags": ["protoss", "micro", "gamerrichy"],
+    "youtubeId": "dQw4w9WgXcQ",
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+  },
+  {
+    "id": "3",
+    "title": "Zerg Mentality: Staying Calm Under Pressure",
+    "description": "Coach Nico discusses the mental game of Zerg play and how to maintain composure during intense matches.",
+    "date": "2024-01-25",
+    "tags": ["zerg", "mentality", "coach nico"],
+    "youtubeId": "dQw4w9WgXcQ",
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+  },
+  {
+    "id": "4",
+    "title": "Terran vs Zerg: Early Game Strategies",
+    "description": "GamerRichy breaks down early game build orders and how to pressure your Zerg opponent effectively.",
+    "date": "2024-02-01",
+    "tags": ["terran", "zerg", "macro", "gamerrichy"],
+    "youtubeId": "dQw4w9WgXcQ",
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+  },
+  {
+    "id": "5",
+    "title": "Protoss Macro Fundamentals",
+    "description": "Essential macro principles for Protoss players. Learn proper chrono boost usage and gateway production.",
+    "date": "2024-02-05",
+    "tags": ["protoss", "macro", "coach nico"],
+    "youtubeId": "dQw4w9WgXcQ",
+    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+  }
+]

@@ -1,0 +1,22 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ladder shape with gradient -->
+  <defs>
+    <linearGradient id="ladderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:hsl(290, 80%, 60%);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:hsl(190, 100%, 50%);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ladder rungs -->
+  <rect x="14" y="10" width="36" height="4" rx="2" fill="url(#ladderGradient)"/>
+  <rect x="14" y="22" width="36" height="4" rx="2" fill="url(#ladderGradient)"/>
+  <rect x="14" y="34" width="36" height="4" rx="2" fill="url(#ladderGradient)"/>
+  <rect x="14" y="46" width="36" height="4" rx="2" fill="url(#ladderGradient)"/>
+
+  <!-- Side rails -->
+  <rect x="12" y="8" width="4" height="50" rx="2" fill="url(#ladderGradient)"/>
+  <rect x="48" y="8" width="4" height="50" rx="2" fill="url(#ladderGradient)"/>
+
+  <!-- Star at top -->
+  <path d="M32 2 L34 8 L40 8 L35 12 L37 18 L32 14 L27 18 L29 12 L24 8 L30 8 Z" fill="hsl(30, 100%, 50%)"/>
+</svg>
