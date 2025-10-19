@@ -3,7 +3,24 @@ import Discord from "next-auth/providers/discord";
 
 // Discord server ID for Ladder Legends Academy
 const GUILD_ID = "1386735340517195959";
-const REQUIRED_ROLE_NAME = "Subscriber";
+
+// Allowed role IDs - users with any of these roles can access the site
+const ALLOWED_ROLE_IDS = [
+  "1386739785283928124", // Owner
+  "1386739850731851817", // Moderator
+  "1387372036665643188", // Coach
+  "1387076312878813337", // Subscriber
+  "1386740453264724068", // Member
+];
+
+// Role name mapping for logging/debugging
+const ROLE_NAMES: Record<string, string> = {
+  "1386739785283928124": "Owner",
+  "1386739850731851817": "Moderator",
+  "1387372036665643188": "Coach",
+  "1387076312878813337": "Subscriber",
+  "1386740453264724068": "Member",
+};
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -102,35 +119,23 @@ async function checkUserRole(
 
     const memberData = await memberResponse.json();
 
-    // Get all roles for the guild to find the Subscriber role ID
-    const rolesResponse = await fetch(
-      `https://discord.com/api/v10/guilds/${targetGuild.id}/roles`,
-      {
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        },
-      }
+    // Check if user has any of the allowed roles
+    const userRoles = memberData.roles || [];
+    const matchedRoles = userRoles.filter((roleId: string) =>
+      ALLOWED_ROLE_IDS.includes(roleId)
     );
 
-    if (!rolesResponse.ok) {
-      console.error("Failed to fetch roles:", await rolesResponse.text());
-      return false;
+    if (matchedRoles.length > 0) {
+      // Log which role(s) granted access
+      const roleNames = matchedRoles
+        .map((roleId: string) => ROLE_NAMES[roleId] || roleId)
+        .join(", ");
+      console.log(`User ${userId} granted access with role(s): ${roleNames}`);
+      return true;
     }
 
-    const roles = await rolesResponse.json();
-    const subscriberRole = roles.find(
-      (role: any) => role.name === REQUIRED_ROLE_NAME
-    );
-
-    if (!subscriberRole) {
-      console.error(`Role "${REQUIRED_ROLE_NAME}" not found in server`);
-      return false;
-    }
-
-    // Check if user has the Subscriber role
-    const hasRole = memberData.roles.includes(subscriberRole.id);
-    console.log(`User ${userId} has Subscriber role:`, hasRole);
-    return hasRole;
+    console.log(`User ${userId} does not have any allowed roles`);
+    return false;
   } catch (error) {
     console.error("Error in checkUserRole:", error);
     return false;

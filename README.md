@@ -64,9 +64,14 @@ npm start
 The site requires users to:
 1. Sign in with Discord
 2. Be a member of the Ladder Legends Academy Discord server (ID: `1386735340517195959`)
-3. Have the "Subscriber" role in that server
+3. Have one of the following roles in that server:
+   - **Owner** (ID: `1386739785283928124`)
+   - **Moderator** (ID: `1386739850731851817`)
+   - **Coach** (ID: `1387372036665643188`)
+   - **Subscriber** (ID: `1387076312878813337`)
+   - **Member** (ID: `1386740453264724068`)
 
-Users without the required role will see an error message with a link to join the server.
+Users without any of these roles will see an error message with a link to join the server. The authentication system automatically checks for any of these roles and grants access if found.
 
 ## Adding Videos
 
