@@ -1,47 +1,314 @@
 [
   {
     "id": "1",
-    "title": "Mastering Terran Macro Mechanics",
-    "description": "Learn the fundamentals of Terran macro with Coach Nico. This video covers production cycles, expansions, and army composition.",
-    "date": "2024-01-15",
-    "tags": ["terran", "macro", "coach nico"],
-    "youtubeId": "dQw4w9WgXcQ",
-    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-18",
+    "tags": [],
+    "youtubeId": "SeCbT1S0lwc",
+    "thumbnail": "https://img.youtube.com/vi/SeCbT1S0lwc/maxresdefault.jpg"
   },
   {
     "id": "2",
-    "title": "Protoss Micro: Blink Stalker Control",
-    "description": "GamerRichy demonstrates advanced blink stalker micro techniques to maximize your damage output while minimizing losses.",
-    "date": "2024-01-20",
-    "tags": ["protoss", "micro", "gamerrichy"],
-    "youtubeId": "dQw4w9WgXcQ",
-    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+    "title": "New Patch, New ZERG STYLE",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-16",
+    "tags": [
+      "zerg"
+    ],
+    "youtubeId": "oIKSVTpF-eg",
+    "thumbnail": "https://img.youtube.com/vi/oIKSVTpF-eg/maxresdefault.jpg"
   },
   {
     "id": "3",
-    "title": "Zerg Mentality: Staying Calm Under Pressure",
-    "description": "Coach Nico discusses the mental game of Zerg play and how to maintain composure during intense matches.",
-    "date": "2024-01-25",
-    "tags": ["zerg", "mentality", "coach nico"],
-    "youtubeId": "dQw4w9WgXcQ",
-    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-14",
+    "tags": [],
+    "youtubeId": "9HNzKoMNCHk",
+    "thumbnail": "https://img.youtube.com/vi/9HNzKoMNCHk/maxresdefault.jpg"
   },
   {
     "id": "4",
-    "title": "Terran vs Zerg: Early Game Strategies",
-    "description": "GamerRichy breaks down early game build orders and how to pressure your Zerg opponent effectively.",
-    "date": "2024-02-01",
-    "tags": ["terran", "zerg", "macro", "gamerrichy"],
-    "youtubeId": "dQw4w9WgXcQ",
-    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+    "title": "New Patch, New ZERG STYLE",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-10",
+    "tags": [
+      "zerg"
+    ],
+    "youtubeId": "zOZIHS9ShLk",
+    "thumbnail": "https://img.youtube.com/vi/zOZIHS9ShLk/maxresdefault.jpg"
   },
   {
     "id": "5",
-    "title": "Protoss Macro Fundamentals",
-    "description": "Essential macro principles for Protoss players. Learn proper chrono boost usage and gateway production.",
-    "date": "2024-02-05",
-    "tags": ["protoss", "macro", "coach nico"],
-    "youtubeId": "dQw4w9WgXcQ",
-    "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+    "title": "Krystianers Khala- How to play like the Rank 1 Grandmaster",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-05",
+    "tags": [],
+    "youtubeId": "uuEGiblseBs",
+    "thumbnail": "https://img.youtube.com/vi/uuEGiblseBs/maxresdefault.jpg"
+  },
+  {
+    "id": "6",
+    "title": "New Patch, New ZERG STYLE",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-04",
+    "tags": [
+      "zerg"
+    ],
+    "youtubeId": "sSecT2uPlO0",
+    "thumbnail": "https://img.youtube.com/vi/sSecT2uPlO0/maxresdefault.jpg"
+  },
+  {
+    "id": "7",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-04",
+    "tags": [],
+    "youtubeId": "iYzl-AYAOr0",
+    "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/maxresdefault.jpg"
+  },
+  {
+    "id": "8",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-29",
+    "tags": [],
+    "youtubeId": "MTmqREZ4-KU",
+    "thumbnail": "https://img.youtube.com/vi/MTmqREZ4-KU/maxresdefault.jpg"
+  },
+  {
+    "id": "9",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-29",
+    "tags": [
+      "terran"
+    ],
+    "youtubeId": "zrort3y-fRc",
+    "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/maxresdefault.jpg"
+  },
+  {
+    "id": "10",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-25",
+    "tags": [],
+    "youtubeId": "QuNx1dUeF0I",
+    "thumbnail": "https://img.youtube.com/vi/QuNx1dUeF0I/maxresdefault.jpg"
+  },
+  {
+    "id": "11",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-24",
+    "tags": [],
+    "youtubeId": "LD4qZIo11LQ",
+    "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/maxresdefault.jpg"
+  },
+  {
+    "id": "12",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-22",
+    "tags": [],
+    "youtubeId": "VBksDLgd3hc",
+    "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/maxresdefault.jpg"
+  },
+  {
+    "id": "13",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-14",
+    "tags": [],
+    "youtubeId": "lhmCLqDoetY",
+    "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/maxresdefault.jpg"
+  },
+  {
+    "id": "14",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-14",
+    "tags": [],
+    "youtubeId": "1FlqiOloZfs",
+    "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/maxresdefault.jpg"
+  },
+  {
+    "id": "15",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-13",
+    "tags": [],
+    "youtubeId": "2jAprwtFPIQ",
+    "thumbnail": "https://img.youtube.com/vi/2jAprwtFPIQ/maxresdefault.jpg"
+  },
+  {
+    "id": "16",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-08",
+    "tags": [],
+    "youtubeId": "N7m0BHrQnGo",
+    "thumbnail": "https://img.youtube.com/vi/N7m0BHrQnGo/maxresdefault.jpg"
+  },
+  {
+    "id": "17",
+    "title": "Tips of The Week",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-02",
+    "tags": [],
+    "youtubeId": "2s-XW9kivEE",
+    "thumbnail": "https://img.youtube.com/vi/2s-XW9kivEE/maxresdefault.jpg"
+  },
+  {
+    "id": "18",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-01",
+    "tags": [],
+    "youtubeId": "Pewd9C8n_Ok",
+    "thumbnail": "https://img.youtube.com/vi/Pewd9C8n_Ok/maxresdefault.jpg"
+  },
+  {
+    "id": "19",
+    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-01",
+    "tags": [
+      "coach nico"
+    ],
+    "youtubeId": "xqTohXpzkQU",
+    "thumbnail": "https://img.youtube.com/vi/xqTohXpzkQU/maxresdefault.jpg"
+  },
+  {
+    "id": "20",
+    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-09-01",
+    "tags": [
+      "coach nico"
+    ],
+    "youtubeId": "pHi_OBQ0WPg",
+    "thumbnail": "https://img.youtube.com/vi/pHi_OBQ0WPg/maxresdefault.jpg"
+  },
+  {
+    "id": "21",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-30",
+    "tags": [],
+    "youtubeId": "H9RajuDOTVc",
+    "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/maxresdefault.jpg"
+  },
+  {
+    "id": "22",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-27",
+    "tags": [],
+    "youtubeId": "4ptStp8f1C8",
+    "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/maxresdefault.jpg"
+  },
+  {
+    "id": "23",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-21",
+    "tags": [],
+    "youtubeId": "T-hnKW0cAnM",
+    "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/maxresdefault.jpg"
+  },
+  {
+    "id": "24",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-15",
+    "tags": [],
+    "youtubeId": "tysHGsJTwqE",
+    "thumbnail": "https://img.youtube.com/vi/tysHGsJTwqE/maxresdefault.jpg"
+  },
+  {
+    "id": "25",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-08",
+    "tags": [],
+    "youtubeId": "bAKRVkDi1zY",
+    "thumbnail": "https://img.youtube.com/vi/bAKRVkDi1zY/maxresdefault.jpg"
+  },
+  {
+    "id": "26",
+    "title": "GamerRichy - 10+ years of Coaching experience",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-07",
+    "tags": [
+      "gamerrichy"
+    ],
+    "youtubeId": "6jRs9JIBqUM",
+    "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/maxresdefault.jpg"
+  },
+  {
+    "id": "27",
+    "title": "GamerRichy - 10+ years of Coaching experience",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-06",
+    "tags": [
+      "gamerrichy"
+    ],
+    "youtubeId": "Wi23Q3G1lPo",
+    "thumbnail": "https://img.youtube.com/vi/Wi23Q3G1lPo/maxresdefault.jpg"
+  },
+  {
+    "id": "28",
+    "title": "GamerRichy - 10+ years of Coaching experience",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-06",
+    "tags": [
+      "gamerrichy"
+    ],
+    "youtubeId": "glmN4_wiXhw",
+    "thumbnail": "https://img.youtube.com/vi/glmN4_wiXhw/maxresdefault.jpg"
+  },
+  {
+    "id": "29",
+    "title": "GamerRichy - 10+ years of Coaching experience",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-06",
+    "tags": [
+      "gamerrichy"
+    ],
+    "youtubeId": "_fshWRSTWJQ",
+    "thumbnail": "https://img.youtube.com/vi/_fshWRSTWJQ/maxresdefault.jpg"
+  },
+  {
+    "id": "30",
+    "title": "GamerRichy - 10+ years of Coaching experience",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-06",
+    "tags": [
+      "gamerrichy"
+    ],
+    "youtubeId": "CoLkQk6M0ao",
+    "thumbnail": "https://img.youtube.com/vi/CoLkQk6M0ao/maxresdefault.jpg"
+  },
+  {
+    "id": "31",
+    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-06",
+    "tags": [],
+    "youtubeId": "EN7Pfa9Xebk",
+    "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/maxresdefault.jpg"
+  },
+  {
+    "id": "32",
+    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-07-29",
+    "tags": [
+      "coach nico"
+    ],
+    "youtubeId": "9UxGYUQZzlM",
+    "thumbnail": "https://img.youtube.com/vi/9UxGYUQZzlM/maxresdefault.jpg"
   }
 ]
