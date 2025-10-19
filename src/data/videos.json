@@ -4,9 +4,11 @@
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-18",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "SeCbT1S0lwc",
-    "thumbnail": "https://img.youtube.com/vi/SeCbT1S0lwc/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/SeCbT1S0lwc/hqdefault.jpg"
   },
   {
     "id": "2",
@@ -14,19 +16,22 @@
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-16",
     "tags": [
-      "zerg"
+      "zerg",
+      "hino"
     ],
     "youtubeId": "oIKSVTpF-eg",
-    "thumbnail": "https://img.youtube.com/vi/oIKSVTpF-eg/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/oIKSVTpF-eg/hqdefault.jpg"
   },
   {
     "id": "3",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-14",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "9HNzKoMNCHk",
-    "thumbnail": "https://img.youtube.com/vi/9HNzKoMNCHk/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/9HNzKoMNCHk/hqdefault.jpg"
   },
   {
     "id": "4",
@@ -34,19 +39,22 @@
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-10",
     "tags": [
-      "zerg"
+      "zerg",
+      "hino"
     ],
     "youtubeId": "zOZIHS9ShLk",
-    "thumbnail": "https://img.youtube.com/vi/zOZIHS9ShLk/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/zOZIHS9ShLk/hqdefault.jpg"
   },
   {
     "id": "5",
     "title": "Krystianers Khala- How to play like the Rank 1 Grandmaster",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-05",
-    "tags": [],
+    "tags": [
+      "krystianer"
+    ],
     "youtubeId": "uuEGiblseBs",
-    "thumbnail": "https://img.youtube.com/vi/uuEGiblseBs/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/uuEGiblseBs/hqdefault.jpg"
   },
   {
     "id": "6",
@@ -54,28 +62,33 @@
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-04",
     "tags": [
-      "zerg"
+      "zerg",
+      "hino"
     ],
     "youtubeId": "sSecT2uPlO0",
-    "thumbnail": "https://img.youtube.com/vi/sSecT2uPlO0/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/sSecT2uPlO0/hqdefault.jpg"
   },
   {
     "id": "7",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-04",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "iYzl-AYAOr0",
-    "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg"
   },
   {
     "id": "8",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-29",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "MTmqREZ4-KU",
-    "thumbnail": "https://img.youtube.com/vi/MTmqREZ4-KU/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/MTmqREZ4-KU/hqdefault.jpg"
   },
   {
     "id": "9",
@@ -83,91 +96,110 @@
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-29",
     "tags": [
-      "terran"
+      "terran",
+      "groovy"
     ],
     "youtubeId": "zrort3y-fRc",
-    "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/hqdefault.jpg"
   },
   {
     "id": "10",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-25",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "QuNx1dUeF0I",
-    "thumbnail": "https://img.youtube.com/vi/QuNx1dUeF0I/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/QuNx1dUeF0I/hqdefault.jpg"
   },
   {
     "id": "11",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-24",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "LD4qZIo11LQ",
-    "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/hqdefault.jpg"
   },
   {
     "id": "12",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-22",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "VBksDLgd3hc",
-    "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/hqdefault.jpg"
   },
   {
     "id": "13",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-14",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "lhmCLqDoetY",
-    "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/hqdefault.jpg"
   },
   {
     "id": "14",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-14",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "1FlqiOloZfs",
-    "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/hqdefault.jpg"
   },
   {
     "id": "15",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-13",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "2jAprwtFPIQ",
-    "thumbnail": "https://img.youtube.com/vi/2jAprwtFPIQ/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/2jAprwtFPIQ/hqdefault.jpg"
   },
   {
     "id": "16",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-08",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "N7m0BHrQnGo",
-    "thumbnail": "https://img.youtube.com/vi/N7m0BHrQnGo/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/N7m0BHrQnGo/hqdefault.jpg"
   },
   {
     "id": "17",
     "title": "Tips of The Week",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-02",
-    "tags": [],
+    "tags": [
+      "drakka"
+    ],
     "youtubeId": "2s-XW9kivEE",
-    "thumbnail": "https://img.youtube.com/vi/2s-XW9kivEE/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/2s-XW9kivEE/hqdefault.jpg"
   },
   {
     "id": "18",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-01",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "Pewd9C8n_Ok",
-    "thumbnail": "https://img.youtube.com/vi/Pewd9C8n_Ok/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/Pewd9C8n_Ok/hqdefault.jpg"
   },
   {
     "id": "19",
@@ -178,7 +210,7 @@
       "coach nico"
     ],
     "youtubeId": "xqTohXpzkQU",
-    "thumbnail": "https://img.youtube.com/vi/xqTohXpzkQU/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/xqTohXpzkQU/hqdefault.jpg"
   },
   {
     "id": "20",
@@ -189,52 +221,62 @@
       "coach nico"
     ],
     "youtubeId": "pHi_OBQ0WPg",
-    "thumbnail": "https://img.youtube.com/vi/pHi_OBQ0WPg/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/pHi_OBQ0WPg/hqdefault.jpg"
   },
   {
     "id": "21",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-30",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "H9RajuDOTVc",
-    "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/hqdefault.jpg"
   },
   {
     "id": "22",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-27",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "4ptStp8f1C8",
-    "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/hqdefault.jpg"
   },
   {
     "id": "23",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-21",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "T-hnKW0cAnM",
-    "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/hqdefault.jpg"
   },
   {
     "id": "24",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-15",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "tysHGsJTwqE",
-    "thumbnail": "https://img.youtube.com/vi/tysHGsJTwqE/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/tysHGsJTwqE/hqdefault.jpg"
   },
   {
     "id": "25",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-08",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "bAKRVkDi1zY",
-    "thumbnail": "https://img.youtube.com/vi/bAKRVkDi1zY/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/bAKRVkDi1zY/hqdefault.jpg"
   },
   {
     "id": "26",
@@ -245,7 +287,7 @@
       "gamerrichy"
     ],
     "youtubeId": "6jRs9JIBqUM",
-    "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/hqdefault.jpg"
   },
   {
     "id": "27",
@@ -256,7 +298,7 @@
       "gamerrichy"
     ],
     "youtubeId": "Wi23Q3G1lPo",
-    "thumbnail": "https://img.youtube.com/vi/Wi23Q3G1lPo/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/Wi23Q3G1lPo/hqdefault.jpg"
   },
   {
     "id": "28",
@@ -267,7 +309,7 @@
       "gamerrichy"
     ],
     "youtubeId": "glmN4_wiXhw",
-    "thumbnail": "https://img.youtube.com/vi/glmN4_wiXhw/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/glmN4_wiXhw/hqdefault.jpg"
   },
   {
     "id": "29",
@@ -278,7 +320,7 @@
       "gamerrichy"
     ],
     "youtubeId": "_fshWRSTWJQ",
-    "thumbnail": "https://img.youtube.com/vi/_fshWRSTWJQ/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/_fshWRSTWJQ/hqdefault.jpg"
   },
   {
     "id": "30",
@@ -289,16 +331,18 @@
       "gamerrichy"
     ],
     "youtubeId": "CoLkQk6M0ao",
-    "thumbnail": "https://img.youtube.com/vi/CoLkQk6M0ao/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/CoLkQk6M0ao/hqdefault.jpg"
   },
   {
     "id": "31",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
-    "tags": [],
+    "tags": [
+      "groovy"
+    ],
     "youtubeId": "EN7Pfa9Xebk",
-    "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/hqdefault.jpg"
   },
   {
     "id": "32",
@@ -309,6 +353,6 @@
       "coach nico"
     ],
     "youtubeId": "9UxGYUQZzlM",
-    "thumbnail": "https://img.youtube.com/vi/9UxGYUQZzlM/maxresdefault.jpg"
+    "thumbnail": "https://img.youtube.com/vi/9UxGYUQZzlM/hqdefault.jpg"
   }
 ]
