@@ -67,7 +67,7 @@ export default async function LoginPage({
           {session && !session.user?.hasSubscriberRole && (
             <div className="p-4 bg-muted rounded-lg space-y-2">
               <p className="text-sm text-center">
-                You're signed in but don't have the required role.
+                You&apos;re signed in but don&apos;t have the required role.
               </p>
               <p className="text-sm text-muted-foreground text-center">
                 Make sure you have one of these roles in the Ladder Legends Academy Discord server:
@@ -103,7 +103,7 @@ export default async function LoginPage({
 
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              By signing in, you'll get access to:
+              By signing in, you&apos;ll get access to:
             </p>
             <ul className="text-sm space-y-1 text-muted-foreground">
               <li>✓ Exclusive coaching videos</li>

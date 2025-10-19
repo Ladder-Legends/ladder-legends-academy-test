@@ -98,9 +98,8 @@ async function checkUserRole(
     const guilds = await guildsResponse.json();
 
     // Find the Ladder Legends Academy server
-    // You might need to match by name or ID
     const targetGuild = guilds.find(
-      (g: any) => g.name === "Ladder Legends Academy" || g.id === GUILD_ID
+      (g: { name: string; id: string }) => g.name === "Ladder Legends Academy" || g.id === GUILD_ID
     );
 
     if (!targetGuild) {
