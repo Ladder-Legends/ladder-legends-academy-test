@@ -46,6 +46,19 @@
   },
   {
     "id": "5",
+    "title": "Defending cheeses as a Terran with the Nicosystem™",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-10-13",
+    "tags": [
+      "terran",
+      "coach nico",
+      "groovy"
+    ],
+    "youtubeId": "gIyt8YAVuKo",
+    "thumbnail": "https://img.youtube.com/vi/gIyt8YAVuKo/hqdefault.jpg"
+  },
+  {
+    "id": "6",
     "title": "New Patch, New ZERG STYLE",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-10",
@@ -57,7 +70,7 @@
     "thumbnail": "https://img.youtube.com/vi/zOZIHS9ShLk/hqdefault.jpg"
   },
   {
-    "id": "6",
+    "id": "7",
     "title": "Masterclass content",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-09",
@@ -68,7 +81,7 @@
     "thumbnail": "https://img.youtube.com/vi/UFcKAiUhpU0/hqdefault.jpg"
   },
   {
-    "id": "7",
+    "id": "8",
     "title": "Krystianers Khala- How to play like the Rank 1 Grandmaster",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-05",
@@ -79,7 +92,7 @@
     "thumbnail": "https://img.youtube.com/vi/uuEGiblseBs/hqdefault.jpg"
   },
   {
-    "id": "8",
+    "id": "9",
     "title": "New Patch, New ZERG STYLE",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-04",
@@ -91,7 +104,7 @@
     "thumbnail": "https://img.youtube.com/vi/sSecT2uPlO0/hqdefault.jpg"
   },
   {
-    "id": "9",
+    "id": "10",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-10-04",
@@ -102,7 +115,7 @@
     "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg"
   },
   {
-    "id": "10",
+    "id": "11",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-29",
@@ -114,7 +127,7 @@
     "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/hqdefault.jpg"
   },
   {
-    "id": "11",
+    "id": "12",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-29",
@@ -125,7 +138,7 @@
     "thumbnail": "https://img.youtube.com/vi/MTmqREZ4-KU/hqdefault.jpg"
   },
   {
-    "id": "12",
+    "id": "13",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-25",
@@ -136,7 +149,7 @@
     "thumbnail": "https://img.youtube.com/vi/QuNx1dUeF0I/hqdefault.jpg"
   },
   {
-    "id": "13",
+    "id": "14",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-24",
@@ -147,7 +160,7 @@
     "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/hqdefault.jpg"
   },
   {
-    "id": "14",
+    "id": "15",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-22",
@@ -158,7 +171,7 @@
     "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/hqdefault.jpg"
   },
   {
-    "id": "15",
+    "id": "16",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-14",
@@ -169,7 +182,7 @@
     "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/hqdefault.jpg"
   },
   {
-    "id": "16",
+    "id": "17",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-14",
@@ -180,7 +193,7 @@
     "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/hqdefault.jpg"
   },
   {
-    "id": "17",
+    "id": "18",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-13",
@@ -191,7 +204,7 @@
     "thumbnail": "https://img.youtube.com/vi/2jAprwtFPIQ/hqdefault.jpg"
   },
   {
-    "id": "18",
+    "id": "19",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-08",
@@ -202,7 +215,7 @@
     "thumbnail": "https://img.youtube.com/vi/N7m0BHrQnGo/hqdefault.jpg"
   },
   {
-    "id": "19",
+    "id": "20",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-05",
@@ -214,7 +227,7 @@
     "thumbnail": "https://img.youtube.com/vi/qvOEtJIDzkI/hqdefault.jpg"
   },
   {
-    "id": "20",
+    "id": "21",
     "title": "Tips of The Week",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-02",
@@ -225,7 +238,7 @@
     "thumbnail": "https://img.youtube.com/vi/2s-XW9kivEE/hqdefault.jpg"
   },
   {
-    "id": "21",
+    "id": "22",
     "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-01",
@@ -236,7 +249,7 @@
     "thumbnail": "https://img.youtube.com/vi/xqTohXpzkQU/hqdefault.jpg"
   },
   {
-    "id": "22",
+    "id": "23",
     "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-01",
@@ -247,7 +260,7 @@
     "thumbnail": "https://img.youtube.com/vi/pHi_OBQ0WPg/hqdefault.jpg"
   },
   {
-    "id": "23",
+    "id": "24",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-09-01",
@@ -258,7 +271,7 @@
     "thumbnail": "https://img.youtube.com/vi/Pewd9C8n_Ok/hqdefault.jpg"
   },
   {
-    "id": "24",
+    "id": "25",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-30",
@@ -269,7 +282,7 @@
     "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/hqdefault.jpg"
   },
   {
-    "id": "25",
+    "id": "26",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-27",
@@ -280,7 +293,7 @@
     "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/hqdefault.jpg"
   },
   {
-    "id": "26",
+    "id": "27",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-21",
@@ -291,7 +304,20 @@
     "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/hqdefault.jpg"
   },
   {
-    "id": "27",
+    "id": "28",
+    "title": "The Nicosystem™ Beginner Terran Builds",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-15",
+    "tags": [
+      "terran",
+      "build order",
+      "coach nico"
+    ],
+    "youtubeId": "yKT8fsweVwQ",
+    "thumbnail": "https://img.youtube.com/vi/yKT8fsweVwQ/hqdefault.jpg"
+  },
+  {
+    "id": "29",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-15",
@@ -302,7 +328,20 @@
     "thumbnail": "https://img.youtube.com/vi/tysHGsJTwqE/hqdefault.jpg"
   },
   {
-    "id": "28",
+    "id": "30",
+    "title": "Countering meta-playstyles with the Nicosystem",
+    "description": "Here's an indepth guide analysing one of my replays where I play against gateway opener into storm, along with discussing the things I did to put myself in a position to succeed, despite my sub-par...",
+    "date": "2025-08-14",
+    "tags": [
+      "terran",
+      "micro",
+      "coach nico"
+    ],
+    "youtubeId": "DG9kRNRAHZE",
+    "thumbnail": "https://img.youtube.com/vi/DG9kRNRAHZE/hqdefault.jpg"
+  },
+  {
+    "id": "31",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-08",
@@ -313,7 +352,19 @@
     "thumbnail": "https://img.youtube.com/vi/bAKRVkDi1zY/hqdefault.jpg"
   },
   {
-    "id": "29",
+    "id": "32",
+    "title": "The Nicosystem™ Beginner Terran Builds",
+    "description": "Coaching video for Starcraft 2",
+    "date": "2025-08-08",
+    "tags": [
+      "terran",
+      "coach nico"
+    ],
+    "youtubeId": "aLP0tR22PO0",
+    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg"
+  },
+  {
+    "id": "33",
     "title": "GamerRichy - 10+ years of Coaching experience",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-07",
@@ -324,7 +375,7 @@
     "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/hqdefault.jpg"
   },
   {
-    "id": "30",
+    "id": "34",
     "title": "GamerRichy - 10+ years of Coaching experience",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
@@ -335,7 +386,7 @@
     "thumbnail": "https://img.youtube.com/vi/glmN4_wiXhw/hqdefault.jpg"
   },
   {
-    "id": "31",
+    "id": "35",
     "title": "GamerRichy - 10+ years of Coaching experience",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
@@ -346,7 +397,7 @@
     "thumbnail": "https://img.youtube.com/vi/_fshWRSTWJQ/hqdefault.jpg"
   },
   {
-    "id": "32",
+    "id": "36",
     "title": "GamerRichy - 10+ years of Coaching experience",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
@@ -357,7 +408,7 @@
     "thumbnail": "https://img.youtube.com/vi/Wi23Q3G1lPo/hqdefault.jpg"
   },
   {
-    "id": "33",
+    "id": "37",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
@@ -368,7 +419,7 @@
     "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/hqdefault.jpg"
   },
   {
-    "id": "34",
+    "id": "38",
     "title": "GamerRichy - 10+ years of Coaching experience",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-08-06",
@@ -379,7 +430,7 @@
     "thumbnail": "https://img.youtube.com/vi/CoLkQk6M0ao/hqdefault.jpg"
   },
   {
-    "id": "35",
+    "id": "39",
     "title": "Untitled Video",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-31",
@@ -390,7 +441,7 @@
     "thumbnail": "https://img.youtube.com/vi/pPFwmoTwwHs/hqdefault.jpg"
   },
   {
-    "id": "36",
+    "id": "40",
     "title": "Untitled Video",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-31",
@@ -401,7 +452,7 @@
     "thumbnail": "https://img.youtube.com/vi/_5qzPVR7i1o/hqdefault.jpg"
   },
   {
-    "id": "37",
+    "id": "41",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-30",
@@ -413,7 +464,7 @@
     "thumbnail": "https://img.youtube.com/vi/xNb224IJD0g/hqdefault.jpg"
   },
   {
-    "id": "38",
+    "id": "42",
     "title": "Untitled Video",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-30",
@@ -424,7 +475,7 @@
     "thumbnail": "https://img.youtube.com/vi/i3y1pPoff2c/hqdefault.jpg"
   },
   {
-    "id": "39",
+    "id": "43",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-29",
@@ -436,7 +487,7 @@
     "thumbnail": "https://img.youtube.com/vi/wTnMLensxMY/hqdefault.jpg"
   },
   {
-    "id": "40",
+    "id": "44",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-29",
@@ -448,7 +499,7 @@
     "thumbnail": "https://img.youtube.com/vi/eKoUCkxJegA/hqdefault.jpg"
   },
   {
-    "id": "41",
+    "id": "45",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-29",
@@ -460,7 +511,7 @@
     "thumbnail": "https://img.youtube.com/vi/AglrgNltSxY/hqdefault.jpg"
   },
   {
-    "id": "42",
+    "id": "46",
     "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-29",
@@ -471,7 +522,7 @@
     "thumbnail": "https://img.youtube.com/vi/9UxGYUQZzlM/hqdefault.jpg"
   },
   {
-    "id": "43",
+    "id": "47",
     "title": "Untitled Video",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-28",
@@ -482,7 +533,7 @@
     "thumbnail": "https://img.youtube.com/vi/FtPleJIVkGE/hqdefault.jpg"
   },
   {
-    "id": "44",
+    "id": "48",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-11",
@@ -494,7 +545,7 @@
     "thumbnail": "https://img.youtube.com/vi/Sp1eOkMFt2A/hqdefault.jpg"
   },
   {
-    "id": "45",
+    "id": "49",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-11",
@@ -506,7 +557,7 @@
     "thumbnail": "https://img.youtube.com/vi/5AQWCNU8ovQ/hqdefault.jpg"
   },
   {
-    "id": "46",
+    "id": "50",
     "title": "The Nicosystem™ Ladder VOD compendium",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-09",
@@ -517,7 +568,7 @@
     "thumbnail": "https://img.youtube.com/vi/TIT8dP33keE/hqdefault.jpg"
   },
   {
-    "id": "47",
+    "id": "51",
     "title": "The Nicosystem™ Ladder VOD compendium",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-09",
@@ -528,7 +579,7 @@
     "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg"
   },
   {
-    "id": "48",
+    "id": "52",
     "title": "BattleB's Terran Ladder/Tournament VOD's",
     "description": "vs Serral:  vs Clem:  vs Reynor:",
     "date": "2025-07-08",
@@ -539,7 +590,7 @@
     "thumbnail": "https://img.youtube.com/vi/auC77c5PDyw/hqdefault.jpg"
   },
   {
-    "id": "49",
+    "id": "53",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-08",
@@ -551,7 +602,7 @@
     "thumbnail": "https://img.youtube.com/vi/TL5OpQbvl04/hqdefault.jpg"
   },
   {
-    "id": "50",
+    "id": "54",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-08",
@@ -563,7 +614,7 @@
     "thumbnail": "https://img.youtube.com/vi/P0krpJGgXGA/hqdefault.jpg"
   },
   {
-    "id": "51",
+    "id": "55",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-08",
@@ -575,7 +626,7 @@
     "thumbnail": "https://img.youtube.com/vi/Jpkqq1x1RUQ/hqdefault.jpg"
   },
   {
-    "id": "52",
+    "id": "56",
     "title": "BattleB's Terran Ladder/Tournament VOD's",
     "description": "vs Serral:  vs Clem:  vs Reynor:",
     "date": "2025-07-08",
@@ -586,7 +637,7 @@
     "thumbnail": "https://img.youtube.com/vi/G7XvAf6QNfA/hqdefault.jpg"
   },
   {
-    "id": "53",
+    "id": "57",
     "title": "Maplez- VODs/Replays",
     "description": "**2-1 vs Neeb in Dreamhack (Skip game 1 😉 ):  **",
     "date": "2025-07-08",
@@ -595,7 +646,7 @@
     "thumbnail": "https://img.youtube.com/vi/93cJmfZe0z8/hqdefault.jpg"
   },
   {
-    "id": "54",
+    "id": "58",
     "title": "Maplez- VODs/Replays",
     "description": "**2-1 vs Neeb in Dreamhack (Skip game 1 😉 ):  **",
     "date": "2025-07-08",
@@ -604,7 +655,7 @@
     "thumbnail": "https://img.youtube.com/vi/83k17_7jvVA/hqdefault.jpg"
   },
   {
-    "id": "55",
+    "id": "59",
     "title": "BattleB's Terran Ladder/Tournament VOD's",
     "description": "vs Serral:  vs Clem:  vs Reynor:",
     "date": "2025-07-08",
@@ -615,7 +666,7 @@
     "thumbnail": "https://img.youtube.com/vi/0VVzu_Ws79Y/hqdefault.jpg"
   },
   {
-    "id": "56",
+    "id": "60",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-06",
@@ -627,7 +678,7 @@
     "thumbnail": "https://img.youtube.com/vi/kGS4_1xBcJg/hqdefault.jpg"
   },
   {
-    "id": "57",
+    "id": "61",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-06",
@@ -639,7 +690,7 @@
     "thumbnail": "https://img.youtube.com/vi/k-j60WNHjyQ/hqdefault.jpg"
   },
   {
-    "id": "58",
+    "id": "62",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-06",
@@ -651,7 +702,7 @@
     "thumbnail": "https://img.youtube.com/vi/dv6EhFz-G1U/hqdefault.jpg"
   },
   {
-    "id": "59",
+    "id": "63",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-06",
@@ -663,7 +714,7 @@
     "thumbnail": "https://img.youtube.com/vi/crPnPIELWLY/hqdefault.jpg"
   },
   {
-    "id": "60",
+    "id": "64",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-06",
@@ -675,7 +726,7 @@
     "thumbnail": "https://img.youtube.com/vi/8442DlxTJtM/hqdefault.jpg"
   },
   {
-    "id": "61",
+    "id": "65",
     "title": "BattleB's Terran Ladder/Tournament VOD's",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-04",
@@ -686,7 +737,7 @@
     "thumbnail": "https://img.youtube.com/vi/0VwNVJ4zgHI/hqdefault.jpg"
   },
   {
-    "id": "62",
+    "id": "66",
     "title": "BattleB's Terran Ladder/Tournament VOD's",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-03",
@@ -697,7 +748,7 @@
     "thumbnail": "https://img.youtube.com/vi/Kez2NJDK9Qc/hqdefault.jpg"
   },
   {
-    "id": "63",
+    "id": "67",
     "title": "hinO GM Zerg VOD ladder",
     "description": "Coaching video for Starcraft 2",
     "date": "2025-07-02",
