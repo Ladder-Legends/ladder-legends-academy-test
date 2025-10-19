@@ -4,12 +4,6 @@ import { NextResponse } from "next/server";
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
-  // Development bypass - skip all auth checks if SKIP_AUTH is true
-  if (process.env.SKIP_AUTH === "true") {
-    console.log("🔓 SKIP_AUTH enabled - bypassing authentication");
-    return NextResponse.next();
-  }
-
   // Allow access to login page and auth routes
   if (pathname.startsWith("/login") || pathname.startsWith("/api/auth")) {
     return NextResponse.next();
@@ -21,6 +15,12 @@ export default auth((req) => {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
+  if (process.env.SKIP_ROLE_CHECK === "true") {
+    console.log("🔓 SKIP_ROLE_CHECK enabled - user authenticated, bypassing role check");
+    return NextResponse.next();
   }
 
   // Check if user has the required role

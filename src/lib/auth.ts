@@ -50,6 +50,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.user.discordId = token.discordId as string;
 
+      // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
+      if (process.env.SKIP_ROLE_CHECK === "true") {
+        console.log("🔓 SKIP_ROLE_CHECK enabled - granting access without role verification");
+        session.user.hasSubscriberRole = true;
+        return session;
+      }
+
       // Check if user has required role in the Discord server
       try {
         const hasRole = await checkUserRole(
