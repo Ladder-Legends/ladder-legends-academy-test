@@ -221,7 +221,7 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
               {replay.coachingVideoId && (
                 <Link
                   href={`/?videoId=${replay.coachingVideoId}`}
-                  className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/80 rounded-lg transition-colors font-medium"
+                  className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
                   Watch Coaching VOD

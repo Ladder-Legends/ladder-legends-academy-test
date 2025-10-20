@@ -258,7 +258,7 @@ export function BuildOrdersContent() {
                           href={`https://youtube.com/watch?v=${buildOrder.videoId}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm px-4 py-2 bg-muted hover:bg-muted/80 rounded-md transition-colors flex items-center gap-1.5 font-medium"
+                          className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Video className="h-3.5 w-3.5" />
                           Video

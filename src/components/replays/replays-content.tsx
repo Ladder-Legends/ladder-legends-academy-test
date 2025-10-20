@@ -273,7 +273,7 @@ export function ReplaysContent() {
                         <a
                           href={replay.downloadUrl}
                           download
-                          className="text-sm px-4 py-2 bg-muted hover:bg-muted/80 rounded-md transition-colors flex items-center gap-1.5 font-medium"
+                          className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Download className="h-3.5 w-3.5" />
                           Download
@@ -282,7 +282,7 @@ export function ReplaysContent() {
                       {replay.coachingVideoId && (
                         <Link
                           href={`/?videoId=${replay.coachingVideoId}`}
-                          className="text-sm px-4 py-2 bg-accent hover:bg-accent/80 rounded-md transition-colors flex items-center gap-1.5 font-medium"
+                          className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Video className="h-3.5 w-3.5" />
                           VOD
