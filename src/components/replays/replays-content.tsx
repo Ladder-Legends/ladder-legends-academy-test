@@ -128,15 +128,6 @@ export function ReplaysContent() {
     return filtered;
   }, [selectedItems, selectedTags]);
 
-  const getRaceColor = (race: string) => {
-    switch (race.toLowerCase()) {
-      case 'terran': return 'text-orange-500';
-      case 'zerg': return 'text-purple-500';
-      case 'protoss': return 'text-cyan-500';
-      default: return 'text-muted-foreground';
-    }
-  };
-
   return (
     <div className="flex flex-1">
       <FilterSidebar
@@ -232,7 +223,7 @@ export function ReplaysContent() {
                   <td className="px-6 py-4 text-sm">
                     <div className="space-y-1">
                       <div className={`flex items-center gap-2 ${replay.player1.result === 'win' ? 'font-semibold' : ''}`}>
-                        <span className={getRaceColor(replay.player1.race)}>
+                        <span>
                           {replay.player1.race.charAt(0).toUpperCase()}
                         </span>
                         <span>{replay.player1.name}</span>
@@ -241,7 +232,7 @@ export function ReplaysContent() {
                         )}
                       </div>
                       <div className={`flex items-center gap-2 ${replay.player2.result === 'win' ? 'font-semibold' : ''}`}>
-                        <span className={getRaceColor(replay.player2.race)}>
+                        <span>
                           {replay.player2.race.charAt(0).toUpperCase()}
                         </span>
                         <span>{replay.player2.name}</span>

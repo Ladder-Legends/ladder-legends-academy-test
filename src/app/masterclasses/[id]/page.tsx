@@ -22,15 +22,6 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
     notFound();
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner': return 'bg-green-500';
-      case 'intermediate': return 'bg-yellow-500';
-      case 'advanced': return 'bg-red-500';
-      default: return 'bg-muted';
-    }
-  };
-
   const getRaceColor = (race: string) => {
     switch (race.toLowerCase()) {
       case 'terran': return 'text-orange-500';

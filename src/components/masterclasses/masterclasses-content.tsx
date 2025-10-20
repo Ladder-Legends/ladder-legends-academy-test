@@ -63,24 +63,6 @@ export function MasterclassesContent() {
     return filtered;
   }, [selectedItems]);
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner': return 'text-green-500';
-      case 'intermediate': return 'text-yellow-500';
-      case 'advanced': return 'text-red-500';
-      default: return 'text-muted-foreground';
-    }
-  };
-
-  const getRaceColor = (race: string) => {
-    switch (race.toLowerCase()) {
-      case 'terran': return 'text-orange-500';
-      case 'zerg': return 'text-purple-500';
-      case 'protoss': return 'text-cyan-500';
-      default: return 'text-muted-foreground';
-    }
-  };
-
   return (
     <div className="flex flex-1">
       <FilterSidebar
@@ -138,11 +120,11 @@ export function MasterclassesContent() {
                         </p>
                       </td>
                       <td className="px-6 py-4 text-sm">{masterclass.coach}</td>
-                      <td className={`px-6 py-4 text-sm capitalize font-medium ${getRaceColor(masterclass.race)}`}>
+                      <td className="px-6 py-4 text-sm capitalize">
                         {masterclass.race}
                       </td>
                       <td className="px-6 py-4 text-sm">{masterclass.episodes.length}</td>
-                      <td className={`px-6 py-4 text-sm capitalize font-medium ${getDifficultyColor(masterclass.difficulty)}`}>
+                      <td className="px-6 py-4 text-sm capitalize">
                         {masterclass.difficulty}
                       </td>
                       <td className="px-6 py-4 text-sm">

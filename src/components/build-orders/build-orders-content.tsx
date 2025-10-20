@@ -131,26 +131,6 @@ export function BuildOrdersContent() {
     return filtered;
   }, [selectedItems, selectedTags]);
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner': return 'text-green-500';
-      case 'intermediate': return 'text-yellow-500';
-      case 'advanced': return 'text-red-500';
-      default: return 'text-muted-foreground';
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'macro': return 'bg-blue-500/10 text-blue-500';
-      case 'all-in': return 'bg-red-500/10 text-red-500';
-      case 'timing': return 'bg-purple-500/10 text-purple-500';
-      case 'cheese': return 'bg-orange-500/10 text-orange-500';
-      case 'defensive': return 'bg-green-500/10 text-green-500';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
-
   return (
     <div className="flex flex-1">
       <FilterSidebar
@@ -244,11 +224,11 @@ export function BuildOrdersContent() {
                     {buildOrder.race.charAt(0).toUpperCase()}v{buildOrder.vsRace.charAt(0).toUpperCase()}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`text-xs font-medium px-2.5 py-1.5 rounded-full ${getTypeColor(buildOrder.type)}`}>
+                    <span className="text-xs font-medium px-2.5 py-1.5 rounded-full bg-muted">
                       {buildOrder.type}
                     </span>
                   </td>
-                  <td className={`px-6 py-4 text-sm font-medium capitalize ${getDifficultyColor(buildOrder.difficulty)}`}>
+                  <td className="px-6 py-4 text-sm capitalize">
                     {buildOrder.difficulty}
                   </td>
                   <td className="px-6 py-4 text-sm">{buildOrder.coach}</td>
