@@ -1,5 +1,4 @@
 import type { Coach } from '@/types/coach';
-import { Video } from '@/types/video';
 import Link from 'next/link';
 
 interface CoachCardProps {

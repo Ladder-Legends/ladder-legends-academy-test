@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { CoachCard } from '@/components/coaches/coach-card';
-import coaches from '@/data/coaches.json';
+import type { Coach } from '@/types/coach';
+import coachesData from '@/data/coaches.json';
 import videos from '@/data/videos.json';
+
+const coaches = coachesData as Coach[];
 
 export function CoachesContent() {
   const [selectedRace, setSelectedRace] = useState<string>('all');
