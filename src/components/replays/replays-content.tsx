@@ -16,6 +16,7 @@ export function ReplaysContent() {
     protoss: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -95,9 +96,22 @@ export function ReplaysContent() {
     ];
   }, [selectedTags]);
 
-  // Filter replays based on selected filters and tags
+  // Filter replays based on search, selected filters, and tags
   const filteredReplays = useMemo(() => {
     let filtered = allReplays;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(r =>
+        r.title.toLowerCase().includes(query) ||
+        r.map.toLowerCase().includes(query) ||
+        r.player1.name.toLowerCase().includes(query) ||
+        r.player2.name.toLowerCase().includes(query) ||
+        (r.coach && r.coach.toLowerCase().includes(query)) ||
+        r.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
 
     // Collect all selected matchup filters from all race sections
     const allSelectedMatchups = [
@@ -126,11 +140,15 @@ export function ReplaysContent() {
     }
 
     return filtered;
-  }, [selectedItems, selectedTags]);
+  }, [selectedItems, selectedTags, searchQuery]);
 
   return (
     <div className="flex flex-1">
       <FilterSidebar
+        searchEnabled={true}
+        searchPlaceholder="Search replays..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}

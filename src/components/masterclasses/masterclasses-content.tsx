@@ -13,6 +13,7 @@ export function MasterclassesContent() {
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     coaches: [],
   });
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -51,9 +52,21 @@ export function MasterclassesContent() {
     ];
   }, []);
 
-  // Filter masterclasses based on selected coaches
+  // Filter masterclasses based on search and selected coaches
   const filteredMasterclasses = useMemo(() => {
     let filtered = allMasterclasses;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(mc =>
+        mc.title.toLowerCase().includes(query) ||
+        mc.description.toLowerCase().includes(query) ||
+        mc.coach.toLowerCase().includes(query) ||
+        mc.race.toLowerCase().includes(query) ||
+        (mc.tags && mc.tags.some(tag => tag.toLowerCase().includes(query)))
+      );
+    }
 
     const coachFilters = selectedItems.coaches || [];
     if (coachFilters.length > 0) {
@@ -61,11 +74,15 @@ export function MasterclassesContent() {
     }
 
     return filtered;
-  }, [selectedItems]);
+  }, [selectedItems, searchQuery]);
 
   return (
     <div className="flex flex-1">
       <FilterSidebar
+        searchEnabled={true}
+        searchPlaceholder="Search masterclasses..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}

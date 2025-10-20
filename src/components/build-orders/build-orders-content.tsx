@@ -16,6 +16,7 @@ export function BuildOrdersContent() {
     protoss: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -95,9 +96,20 @@ export function BuildOrdersContent() {
     ];
   }, [selectedTags]);
 
-  // Filter build orders based on selected filters and tags
+  // Filter build orders based on search, selected filters, and tags
   const filteredBuildOrders = useMemo(() => {
     let filtered = allBuildOrders;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(bo =>
+        bo.name.toLowerCase().includes(query) ||
+        bo.description.toLowerCase().includes(query) ||
+        bo.tags.some(tag => tag.toLowerCase().includes(query)) ||
+        bo.coach.toLowerCase().includes(query)
+      );
+    }
 
     // Collect all selected matchup filters from all race sections
     const allSelectedMatchups = [
@@ -129,11 +141,15 @@ export function BuildOrdersContent() {
     }
 
     return filtered;
-  }, [selectedItems, selectedTags]);
+  }, [selectedItems, selectedTags, searchQuery]);
 
   return (
     <div className="flex flex-1">
       <FilterSidebar
+        searchEnabled={true}
+        searchPlaceholder="Search build orders..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
