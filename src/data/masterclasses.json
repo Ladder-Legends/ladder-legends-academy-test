@@ -1,0 +1,104 @@
+[
+  {
+    "id": "mc-1",
+    "title": "Hino's Complete Zerg Fundamentals",
+    "description": "Comprehensive series covering everything from injects to late-game compositions for Zerg players.",
+    "coach": "Hino",
+    "coachId": "hino",
+    "race": "zerg",
+    "episodes": [
+      {
+        "episodeNumber": 1,
+        "title": "Inject Mechanics & Early Game",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "24:15",
+        "description": "Master inject timing and early game fundamentals"
+      },
+      {
+        "episodeNumber": 2,
+        "title": "Creep Spread Mastery",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "18:32",
+        "description": "Efficient creep spread patterns and queen management"
+      },
+      {
+        "episodeNumber": 3,
+        "title": "Roach/Ravager Timing Attacks",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "31:45",
+        "description": "Learn devastating mid-game timings"
+      }
+    ],
+    "totalDuration": "1h 14m",
+    "difficulty": "beginner",
+    "tags": ["fundamentals", "zerg", "mechanics"],
+    "createdAt": "2024-12-01",
+    "updatedAt": "2025-01-10"
+  },
+  {
+    "id": "mc-2",
+    "title": "Nico's Terran Bio Masterclass",
+    "description": "Advanced bio play from opening to late game, including splits, drops, and multitasking.",
+    "coach": "Nico",
+    "coachId": "coach nico",
+    "race": "terran",
+    "episodes": [
+      {
+        "episodeNumber": 1,
+        "title": "Bio Opening Fundamentals",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "28:12"
+      },
+      {
+        "episodeNumber": 2,
+        "title": "Marine Splits & Stutterstep",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "22:45"
+      },
+      {
+        "episodeNumber": 3,
+        "title": "Multi-Pronged Harassment",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "35:20"
+      },
+      {
+        "episodeNumber": 4,
+        "title": "Late Game Bio Composition",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "26:30"
+      }
+    ],
+    "totalDuration": "1h 52m",
+    "difficulty": "intermediate",
+    "tags": ["bio", "terran", "micro"],
+    "createdAt": "2024-11-15",
+    "updatedAt": "2025-01-05"
+  },
+  {
+    "id": "mc-3",
+    "title": "Groovy's Map Awareness Series",
+    "description": "Learn to read the map, scout effectively, and make better decisions across all matchups.",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "race": "all",
+    "episodes": [
+      {
+        "episodeNumber": 1,
+        "title": "Scouting Fundamentals",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "21:15"
+      },
+      {
+        "episodeNumber": 2,
+        "title": "Reading Your Opponent",
+        "videoId": "dQw4w9WgXcQ",
+        "duration": "19:45"
+      }
+    ],
+    "totalDuration": "41m",
+    "difficulty": "all",
+    "tags": ["macro", "strategy", "game sense"],
+    "createdAt": "2024-12-20",
+    "updatedAt": "2025-01-08"
+  }
+]

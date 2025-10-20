@@ -1,10 +1,10 @@
 import { UserMenu } from '@/components/user-menu';
-import { DashboardContent } from '@/components/dashboard/dashboard-content';
 import { MainNav } from '@/components/main-nav';
+import { BuildOrdersContent } from '@/components/build-orders/build-orders-content';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function BuildOrdersPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -24,7 +24,6 @@ export default function Home() {
                 <h1 className="text-2xl font-bold hidden lg:block">Ladder Legends Academy</h1>
               </Link>
 
-              {/* Navigation */}
               <MainNav />
             </div>
             <UserMenu />
@@ -33,7 +32,21 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <DashboardContent />
+      <main className="flex-1 px-8 py-8">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="space-y-6">
+            {/* Page Header */}
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Build Orders</h2>
+              <p className="text-muted-foreground">
+                Master proven build orders from our expert coaches. Each build includes detailed timings, supply counts, and linked video demonstrations.
+              </p>
+            </div>
+
+            <BuildOrdersContent />
+          </div>
+        </div>
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-border py-6 px-8">

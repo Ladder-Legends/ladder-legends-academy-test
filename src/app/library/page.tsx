@@ -1,10 +1,11 @@
+import { Suspense } from 'react';
 import { UserMenu } from '@/components/user-menu';
-import { DashboardContent } from '@/components/dashboard/dashboard-content';
+import { VideoLibrary } from '@/components/video-library';
 import { MainNav } from '@/components/main-nav';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function LibraryPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -33,12 +34,16 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <DashboardContent />
+      <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading...</div>}>
+        <VideoLibrary />
+      </Suspense>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8">
-        <div className="text-center text-sm text-muted-foreground">
-          © 2025 Ladder Legends Academy. All rights reserved.
+      <footer className="border-t border-border mt-24">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Ladder Legends Academy. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

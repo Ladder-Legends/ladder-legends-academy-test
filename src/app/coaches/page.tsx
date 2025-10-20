@@ -1,5 +1,6 @@
 import { CoachesContent } from '@/components/coaches-content';
 import { UserMenu } from '@/components/user-menu';
+import { MainNav } from '@/components/main-nav';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,24 +21,10 @@ export default function CoachesPage() {
                   className="object-contain"
                   priority
                 />
-                <h1 className="text-2xl font-bold">Ladder Legends Academy</h1>
+                <h1 className="text-2xl font-bold hidden lg:block">Ladder Legends Academy</h1>
               </Link>
 
-              {/* Navigation */}
-              <nav className="flex gap-4 ml-8">
-                <Link
-                  href="/"
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Videos
-                </Link>
-                <Link
-                  href="/coaches"
-                  className="px-4 py-2 text-sm font-medium text-foreground border-b-2 border-primary"
-                >
-                  Coaches
-                </Link>
-              </nav>
+              <MainNav />
             </div>
             <UserMenu />
           </div>

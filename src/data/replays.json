@@ -1,0 +1,77 @@
+[
+  {
+    "id": "replay-1",
+    "title": "Hino vs Diamond Terran - Roach/Ravager Defense",
+    "map": "Crimson Court LE",
+    "matchup": "ZvT",
+    "player1": {
+      "name": "Hino",
+      "race": "zerg",
+      "mmr": 5200,
+      "result": "win"
+    },
+    "player2": {
+      "name": "DiamondPlayer",
+      "race": "terran",
+      "mmr": 4100,
+      "result": "loss"
+    },
+    "duration": "14:23",
+    "gameDate": "2025-01-15",
+    "uploadDate": "2025-01-16",
+    "coach": "Hino",
+    "tags": ["roach", "ravager", "defense", "zvt"],
+    "patch": "5.0.14",
+    "notes": "Example of defending early tank push with roach/ravager"
+  },
+  {
+    "id": "replay-2",
+    "title": "Nico 1-1-1 Timing vs Masters Protoss",
+    "map": "Babylon LE",
+    "matchup": "TvP",
+    "player1": {
+      "name": "CoachNico",
+      "race": "terran",
+      "mmr": 5000,
+      "result": "win"
+    },
+    "player2": {
+      "name": "MastersP",
+      "race": "protoss",
+      "mmr": 4800,
+      "result": "loss"
+    },
+    "duration": "11:45",
+    "gameDate": "2025-01-14",
+    "uploadDate": "2025-01-15",
+    "coach": "Nico",
+    "tags": ["1-1-1", "timing", "tvp", "tank"],
+    "patch": "5.0.14",
+    "notes": "Clean execution of 1-1-1 tank timing"
+  },
+  {
+    "id": "replay-3",
+    "title": "Groovy Proxy 2 Gate Defense",
+    "map": "Ghost River LE",
+    "matchup": "PvP",
+    "player1": {
+      "name": "Groovy",
+      "race": "protoss",
+      "mmr": 5400,
+      "result": "win"
+    },
+    "player2": {
+      "name": "CheesyP",
+      "race": "protoss",
+      "mmr": 4900,
+      "result": "loss"
+    },
+    "duration": "6:32",
+    "gameDate": "2025-01-13",
+    "uploadDate": "2025-01-14",
+    "coach": "Groovy",
+    "tags": ["cheese defense", "pvp", "proxy"],
+    "patch": "5.0.14",
+    "notes": "Perfect defense vs proxy 2 gate"
+  }
+]
