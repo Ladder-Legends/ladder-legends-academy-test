@@ -26,9 +26,26 @@ export function MasterclassesContent() {
     });
   };
 
-  // Count masterclasses for each coach
+  // Count masterclasses for each coach with context-aware filtering
   const getCount = (coachId: string) => {
-    return allMasterclasses.filter(mc => mc.coachId === coachId).length;
+    return allMasterclasses.filter(mc => {
+      // Check if masterclass matches the coach we're counting
+      if (mc.coachId !== coachId) return false;
+
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+          mc.title.toLowerCase().includes(query) ||
+          mc.description.toLowerCase().includes(query) ||
+          mc.coach.toLowerCase().includes(query) ||
+          mc.race.toLowerCase().includes(query) ||
+          (mc.tags && mc.tags.some(tag => tag.toLowerCase().includes(query)));
+        if (!matchesSearch) return false;
+      }
+
+      return true;
+    }).length;
   };
 
   // Build filter sections with coaches
@@ -49,7 +66,7 @@ export function MasterclassesContent() {
         }),
       },
     ];
-  }, []);
+  }, [searchQuery]);
 
   // Filter masterclasses based on search and selected coaches
   const filteredMasterclasses = useMemo(() => {

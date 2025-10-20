@@ -46,14 +46,34 @@ export function BuildOrdersContent() {
     return Array.from(tagSet).sort();
   }, []);
 
-  // Count build orders for each filter
-  const getCount = (filterFn: (bo: BuildOrder) => boolean) => {
+  // Count build orders for each filter with context-aware filtering
+  const getCount = (filterFn: (bo: BuildOrder) => boolean, excludeSectionId?: string) => {
     return allBuildOrders.filter(bo => {
       if (!filterFn(bo)) return false;
 
       // Apply tag filter
       if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
         return false;
+      }
+
+      // Apply other race/matchup filters (excluding the current section being counted)
+      const allSelectedMatchups = [
+        ...(excludeSectionId === 'terran' ? [] : (selectedItems.terran || [])),
+        ...(excludeSectionId === 'zerg' ? [] : (selectedItems.zerg || [])),
+        ...(excludeSectionId === 'protoss' ? [] : (selectedItems.protoss || [])),
+      ];
+
+      if (allSelectedMatchups.length > 0) {
+        const matchesFilter = allSelectedMatchups.some(filterId => {
+          if (filterId.includes('-')) {
+            const [race, matchup] = filterId.split('-');
+            const vsRace = matchup.substring(matchup.length - 1);
+            const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
+            return bo.race === race && bo.vsRace === vsRaceMap[vsRace];
+          }
+          return false;
+        });
+        if (!matchesFilter) return false;
       }
 
       return true;
@@ -67,59 +87,56 @@ export function BuildOrdersContent() {
         id: 'terran',
         label: 'Terran',
         items: [
-          { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran') },
-          { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg') },
-          { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss') },
+          { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran', 'terran') },
+          { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg', 'terran') },
+          { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss', 'terran') },
         ],
       },
       {
         id: 'zerg',
         label: 'Zerg',
         items: [
-          { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran') },
-          { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg') },
-          { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss') },
+          { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran', 'zerg') },
+          { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg', 'zerg') },
+          { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss', 'zerg') },
         ],
       },
       {
         id: 'protoss',
         label: 'Protoss',
         items: [
-          { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran') },
-          { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg') },
-          { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss') },
+          { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran', 'protoss') },
+          { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg', 'protoss') },
+          { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss', 'protoss') },
         ],
       },
     ];
-  }, [selectedTags]);
+  }, [selectedTags, selectedItems]);
 
   // Filter build orders based on search, selected filters, and tags
   const filteredBuildOrders = useMemo(() => {
-    let filtered = allBuildOrders;
+    return allBuildOrders.filter(bo => {
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+          bo.name.toLowerCase().includes(query) ||
+          bo.description.toLowerCase().includes(query) ||
+          bo.tags.some(tag => tag.toLowerCase().includes(query)) ||
+          bo.coach.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
 
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(bo =>
-        bo.name.toLowerCase().includes(query) ||
-        bo.description.toLowerCase().includes(query) ||
-        bo.tags.some(tag => tag.toLowerCase().includes(query)) ||
-        bo.coach.toLowerCase().includes(query)
-      );
-    }
+      // Apply matchup filters with OR logic (selecting multiple matchups shows ANY match)
+      const allSelectedMatchups = [
+        ...(selectedItems.terran || []),
+        ...(selectedItems.zerg || []),
+        ...(selectedItems.protoss || []),
+      ];
 
-    // Collect all selected matchup filters from all race sections
-    const allSelectedMatchups = [
-      ...(selectedItems.terran || []),
-      ...(selectedItems.zerg || []),
-      ...(selectedItems.protoss || []),
-    ];
-
-    if (allSelectedMatchups.length > 0) {
-      filtered = filtered.filter(bo => {
-        return allSelectedMatchups.some(filterId => {
+      if (allSelectedMatchups.length > 0) {
+        const matchesAnyMatchup = allSelectedMatchups.some(filterId => {
           if (filterId.includes('-')) {
-            // Matchup filter like "terran-tvz"
             const [race, matchup] = filterId.split('-');
             const vsRace = matchup.substring(matchup.length - 1);
             const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
@@ -127,17 +144,16 @@ export function BuildOrdersContent() {
           }
           return false;
         });
-      });
-    }
+        if (!matchesAnyMatchup) return false;
+      }
 
-    // Apply tag filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter(bo =>
-        selectedTags.every(tag => bo.tags.includes(tag))
-      );
-    }
+      // Apply tag filters with AND logic (must have ALL selected tags)
+      if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
+        return false;
+      }
 
-    return filtered;
+      return true;
+    });
   }, [selectedItems, selectedTags, searchQuery]);
 
   return (

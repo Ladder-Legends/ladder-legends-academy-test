@@ -46,14 +46,31 @@ export function ReplaysContent() {
     return Array.from(tagSet).sort();
   }, []);
 
-  // Count replays for each filter
-  const getCount = (filterFn: (replay: Replay) => boolean) => {
+  // Count replays for each filter with context-aware filtering
+  const getCount = (filterFn: (replay: Replay) => boolean, excludeSectionId?: string) => {
     return allReplays.filter(replay => {
       if (!filterFn(replay)) return false;
 
       // Apply tag filter
       if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
         return false;
+      }
+
+      // Apply other race/matchup filters (excluding the current section being counted)
+      const allSelectedMatchups = [
+        ...(excludeSectionId === 'terran' ? [] : (selectedItems.terran || [])),
+        ...(excludeSectionId === 'zerg' ? [] : (selectedItems.zerg || [])),
+        ...(excludeSectionId === 'protoss' ? [] : (selectedItems.protoss || [])),
+      ];
+
+      if (allSelectedMatchups.length > 0) {
+        const matchesFilter = allSelectedMatchups.some(filterId => {
+          if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
+            return replay.matchup === filterId;
+          }
+          return false;
+        });
+        if (!matchesFilter) return false;
       }
 
       return true;
@@ -67,76 +84,72 @@ export function ReplaysContent() {
         id: 'terran',
         label: 'Terran',
         items: [
-          { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT') },
-          { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ') },
-          { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP') },
+          { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT', 'terran') },
+          { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ', 'terran') },
+          { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP', 'terran') },
         ],
       },
       {
         id: 'zerg',
         label: 'Zerg',
         items: [
-          { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT') },
-          { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ') },
-          { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP') },
+          { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT', 'zerg') },
+          { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ', 'zerg') },
+          { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP', 'zerg') },
         ],
       },
       {
         id: 'protoss',
         label: 'Protoss',
         items: [
-          { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT') },
-          { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ') },
-          { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP') },
+          { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT', 'protoss') },
+          { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ', 'protoss') },
+          { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP', 'protoss') },
         ],
       },
     ];
-  }, [selectedTags]);
+  }, [selectedTags, selectedItems]);
 
   // Filter replays based on search, selected filters, and tags
   const filteredReplays = useMemo(() => {
-    let filtered = allReplays;
+    return allReplays.filter(replay => {
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+          replay.title.toLowerCase().includes(query) ||
+          replay.map.toLowerCase().includes(query) ||
+          replay.player1.name.toLowerCase().includes(query) ||
+          replay.player2.name.toLowerCase().includes(query) ||
+          (replay.coach && replay.coach.toLowerCase().includes(query)) ||
+          replay.tags.some(tag => tag.toLowerCase().includes(query));
+        if (!matchesSearch) return false;
+      }
 
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(r =>
-        r.title.toLowerCase().includes(query) ||
-        r.map.toLowerCase().includes(query) ||
-        r.player1.name.toLowerCase().includes(query) ||
-        r.player2.name.toLowerCase().includes(query) ||
-        (r.coach && r.coach.toLowerCase().includes(query)) ||
-        r.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
+      // Apply matchup filters with OR logic (selecting multiple matchups shows ANY match)
+      const allSelectedMatchups = [
+        ...(selectedItems.terran || []),
+        ...(selectedItems.zerg || []),
+        ...(selectedItems.protoss || []),
+      ];
 
-    // Collect all selected matchup filters from all race sections
-    const allSelectedMatchups = [
-      ...(selectedItems.terran || []),
-      ...(selectedItems.zerg || []),
-      ...(selectedItems.protoss || []),
-    ];
-
-    if (allSelectedMatchups.length > 0) {
-      filtered = filtered.filter(replay => {
-        return allSelectedMatchups.some(filterId => {
-          // Check for exact matchup match (e.g., "TvT", "ZvP")
+      if (allSelectedMatchups.length > 0) {
+        const matchesAnyMatchup = allSelectedMatchups.some(filterId => {
           if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
             return replay.matchup === filterId;
           }
           return false;
         });
-      });
-    }
+        if (!matchesAnyMatchup) return false;
+      }
 
-    // Apply tag filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter(replay =>
-        selectedTags.every(tag => replay.tags.includes(tag))
-      );
-    }
+      // Apply tag filters with AND logic (must have ALL selected tags)
+      if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
+        return false;
+      }
 
-    return filtered;
+      return true;
+    });
   }, [selectedItems, selectedTags, searchQuery]);
 
   return (
