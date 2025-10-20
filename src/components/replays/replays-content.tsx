@@ -11,7 +11,9 @@ const allReplays = replaysData as Replay[];
 
 export function ReplaysContent() {
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
-    matchups: [],
+    terran: [],
+    zerg: [],
+    protoss: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -57,44 +59,37 @@ export function ReplaysContent() {
     }).length;
   };
 
-  // Build filter sections with race and matchup structure
+  // Build filter sections with race as top-level sections
   const filterSections = useMemo((): FilterSection[] => {
     return [
       {
-        id: 'matchups',
-        label: 'Race & Matchup',
-        icon: '🎮',
+        id: 'terran',
+        label: 'Terran',
+        icon: '🔴',
         items: [
-          {
-            id: 'terran',
-            label: 'Terran',
-            count: getCount(r => r.matchup.startsWith('T')),
-            children: [
-              { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT') },
-              { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ') },
-              { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP') },
-            ],
-          },
-          {
-            id: 'zerg',
-            label: 'Zerg',
-            count: getCount(r => r.matchup.startsWith('Z')),
-            children: [
-              { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT') },
-              { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ') },
-              { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP') },
-            ],
-          },
-          {
-            id: 'protoss',
-            label: 'Protoss',
-            count: getCount(r => r.matchup.startsWith('P')),
-            children: [
-              { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT') },
-              { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ') },
-              { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP') },
-            ],
-          },
+          { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT') },
+          { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ') },
+          { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP') },
+        ],
+      },
+      {
+        id: 'zerg',
+        label: 'Zerg',
+        icon: '🟣',
+        items: [
+          { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT') },
+          { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ') },
+          { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP') },
+        ],
+      },
+      {
+        id: 'protoss',
+        label: 'Protoss',
+        icon: '🔵',
+        items: [
+          { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT') },
+          { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ') },
+          { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP') },
         ],
       },
     ];
@@ -104,17 +99,21 @@ export function ReplaysContent() {
   const filteredReplays = useMemo(() => {
     let filtered = allReplays;
 
-    // Apply matchup filters
-    const matchupFilters = selectedItems.matchups || [];
-    if (matchupFilters.length > 0) {
+    // Collect all selected matchup filters from all race sections
+    const allSelectedMatchups = [
+      ...(selectedItems.terran || []),
+      ...(selectedItems.zerg || []),
+      ...(selectedItems.protoss || []),
+    ];
+
+    if (allSelectedMatchups.length > 0) {
       filtered = filtered.filter(replay => {
-        return matchupFilters.some(filterId => {
+        return allSelectedMatchups.some(filterId => {
           // Check for exact matchup match (e.g., "TvT", "ZvP")
           if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
             return replay.matchup === filterId;
           }
-          // Check for race match (e.g., "terran", "zerg", "protoss")
-          return replay.matchup.toLowerCase().startsWith(filterId.charAt(0));
+          return false;
         });
       });
     }
@@ -139,15 +138,23 @@ export function ReplaysContent() {
   };
 
   return (
-    <div className="flex gap-8">
+    <div className="flex flex-1">
       <FilterSidebar
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
       />
 
-      <div className="flex-1">
-        <div className="mb-4 space-y-4">
+      <main className="flex-1 px-8 py-8 overflow-y-auto">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold">Replays</h2>
+            <p className="text-muted-foreground">
+              Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket.
+            </p>
+          </div>
+
+          <div className="space-y-4">
           {/* Tag Filters */}
           {allTags.length > 0 && (
             <div className="space-y-2">
@@ -283,12 +290,13 @@ export function ReplaysContent() {
           </table>
         </div>
 
-        {filteredReplays.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>No replays found for this category.</p>
-          </div>
-        )}
-      </div>
+          {filteredReplays.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No replays found for this category.</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

@@ -32,21 +32,7 @@ export default function ReplaysPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-8 py-8">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="space-y-6">
-            {/* Page Header */}
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold">Replays</h2>
-              <p className="text-muted-foreground">
-                Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket.
-              </p>
-            </div>
-
-            <ReplaysContent />
-          </div>
-        </div>
-      </main>
+      <ReplaysContent />
 
       {/* Footer */}
       <footer className="border-t border-border py-6 px-8">

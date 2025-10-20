@@ -11,7 +11,9 @@ const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
-    races: [],
+    terran: [],
+    zerg: [],
+    protoss: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -57,44 +59,37 @@ export function BuildOrdersContent() {
     }).length;
   };
 
-  // Build filter sections with race and matchup structure
+  // Build filter sections with race as top-level sections
   const filterSections = useMemo((): FilterSection[] => {
     return [
       {
-        id: 'races',
-        label: 'Race & Matchup',
-        icon: '🎮',
+        id: 'terran',
+        label: 'Terran',
+        icon: '🔴',
         items: [
-          {
-            id: 'terran',
-            label: 'Terran',
-            count: getCount(bo => bo.race === 'terran'),
-            children: [
-              { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran') },
-              { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg') },
-              { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss') },
-            ],
-          },
-          {
-            id: 'zerg',
-            label: 'Zerg',
-            count: getCount(bo => bo.race === 'zerg'),
-            children: [
-              { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran') },
-              { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg') },
-              { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss') },
-            ],
-          },
-          {
-            id: 'protoss',
-            label: 'Protoss',
-            count: getCount(bo => bo.race === 'protoss'),
-            children: [
-              { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran') },
-              { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg') },
-              { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss') },
-            ],
-          },
+          { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran') },
+          { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg') },
+          { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss') },
+        ],
+      },
+      {
+        id: 'zerg',
+        label: 'Zerg',
+        icon: '🟣',
+        items: [
+          { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran') },
+          { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg') },
+          { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss') },
+        ],
+      },
+      {
+        id: 'protoss',
+        label: 'Protoss',
+        icon: '🔵',
+        items: [
+          { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran') },
+          { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg') },
+          { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss') },
         ],
       },
     ];
@@ -104,21 +99,24 @@ export function BuildOrdersContent() {
   const filteredBuildOrders = useMemo(() => {
     let filtered = allBuildOrders;
 
-    // Apply race/matchup filters
-    const raceFilters = selectedItems.races || [];
-    if (raceFilters.length > 0) {
+    // Collect all selected matchup filters from all race sections
+    const allSelectedMatchups = [
+      ...(selectedItems.terran || []),
+      ...(selectedItems.zerg || []),
+      ...(selectedItems.protoss || []),
+    ];
+
+    if (allSelectedMatchups.length > 0) {
       filtered = filtered.filter(bo => {
-        return raceFilters.some(filterId => {
+        return allSelectedMatchups.some(filterId => {
           if (filterId.includes('-')) {
             // Matchup filter like "terran-tvz"
             const [race, matchup] = filterId.split('-');
             const vsRace = matchup.substring(matchup.length - 1);
             const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
             return bo.race === race && bo.vsRace === vsRaceMap[vsRace];
-          } else {
-            // Race filter
-            return bo.race === filterId;
           }
+          return false;
         });
       });
     }
@@ -154,15 +152,23 @@ export function BuildOrdersContent() {
   };
 
   return (
-    <div className="flex gap-8">
+    <div className="flex flex-1">
       <FilterSidebar
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
       />
 
-      <div className="flex-1">
-        <div className="mb-4 space-y-4">
+      <main className="flex-1 px-8 py-8 overflow-y-auto">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold">Build Orders</h2>
+            <p className="text-muted-foreground">
+              Master proven build orders from our expert coaches. Each build includes detailed timings, supply counts, and linked video demonstrations.
+            </p>
+          </div>
+
+          <div className="space-y-4">
           {/* Tag Filters */}
           {allTags.length > 0 && (
             <div className="space-y-2">
@@ -273,12 +279,13 @@ export function BuildOrdersContent() {
           </table>
         </div>
 
-        {filteredBuildOrders.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>No build orders found for this category.</p>
-          </div>
-        )}
-      </div>
+          {filteredBuildOrders.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No build orders found for this category.</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

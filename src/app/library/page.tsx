@@ -39,11 +39,9 @@ export default function LibraryPage() {
       </Suspense>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-24">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Ladder Legends Academy. All rights reserved.</p>
-          </div>
+      <footer className="border-t border-border py-6 px-8">
+        <div className="text-center text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Ladder Legends Academy. All rights reserved.
         </div>
       </footer>
     </div>

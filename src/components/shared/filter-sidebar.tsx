@@ -41,11 +41,23 @@ export function FilterSidebar({
   selectedItems,
   onItemToggle,
 }: FilterSidebarProps) {
+  // All sections expanded by default
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(sections.map(s => s.id))
   );
 
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  // All items with children expanded by default
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
+    const initialExpanded = new Set<string>();
+    sections.forEach(section => {
+      section.items.forEach(item => {
+        if (item.children && item.children.length > 0) {
+          initialExpanded.add(item.id);
+        }
+      });
+    });
+    return initialExpanded;
+  });
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => {
