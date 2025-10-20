@@ -1,9 +1,12 @@
-import { auth, signOut } from "@/lib/auth";
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { handleSignOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
 
-export async function UserMenu() {
-  const session = await auth();
+export function UserMenu() {
+  const { data: session } = useSession();
 
   if (!session?.user) {
     return null;
@@ -17,12 +20,7 @@ export async function UserMenu() {
           {session.user.name || session.user.email}
         </span>
       </div>
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/login" });
-        }}
-      >
+      <form action={handleSignOut}>
         <Button
           type="submit"
           variant="outline"

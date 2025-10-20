@@ -1,10 +1,9 @@
-import { Suspense } from 'react';
+import { CoachesContent } from '@/components/coaches-content';
 import { UserMenu } from '@/components/user-menu';
-import { VideoLibrary } from '@/components/video-library';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function CoachesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -28,13 +27,13 @@ export default function Home() {
               <nav className="flex gap-4 ml-8">
                 <Link
                   href="/"
-                  className="px-4 py-2 text-sm font-medium text-foreground border-b-2 border-primary"
+                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Videos
                 </Link>
                 <Link
                   href="/coaches"
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-foreground border-b-2 border-primary"
                 >
                   Coaches
                 </Link>
@@ -46,9 +45,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading...</div>}>
-        <VideoLibrary />
-      </Suspense>
+      <CoachesContent />
 
       {/* Footer */}
       <footer className="border-t border-border mt-24">

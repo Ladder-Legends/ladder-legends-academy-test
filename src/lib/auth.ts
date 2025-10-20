@@ -1,11 +1,11 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 
-// Discord server ID for Ladder Legends Academy
-const GUILD_ID = "1386735340517195959";
+// Discord server ID - from environment variable
+const GUILD_ID = process.env.DISCORD_GUILD_ID || "1386735340517195959";
 
-// Allowed role IDs - users with any of these roles can access the site
-const ALLOWED_ROLE_IDS = [
+// Allowed role IDs - from environment variable (comma-separated)
+const ALLOWED_ROLE_IDS = process.env.ALLOWED_ROLE_IDS?.split(',') || [
   "1386739785283928124", // Owner
   "1386739850731851817", // Moderator
   "1387372036665643188", // Coach
@@ -20,6 +20,7 @@ const ROLE_NAMES: Record<string, string> = {
   "1387372036665643188": "Coach",
   "1387076312878813337": "Subscriber",
   "1386740453264724068": "Member",
+  "1429527193649938504": "Owner (Lotus)", // Local dev
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

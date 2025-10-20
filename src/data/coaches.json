@@ -1,0 +1,98 @@
+[
+  {
+    "id": "groovy",
+    "name": "groovy",
+    "displayName": "Groovy",
+    "race": "zerg",
+    "bio": "Grandmaster Random player with 5400+ MMR experience across all three races. Specializes in teaching game fundamentals and multi-race strategies.",
+    "specialties": [
+      "Ladder coaching",
+      "Game fundamentals",
+      "Zerg mechanics"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610500/calendar/12406500",
+    "socialLinks": {}
+  },
+  {
+    "id": "hino",
+    "name": "hino",
+    "displayName": "Hino",
+    "race": "zerg",
+    "bio": "Top 80 GM Zerg since 2015 with semi-pro tournament experience including Katowice and DreamHack. Over 500 hours of coaching experience with proven results.",
+    "specialties": [
+      "Advanced strategies",
+      "Meta gameplay",
+      "Zerg builds"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610394/calendar/12406470?locations=None",
+    "socialLinks": {}
+  },
+  {
+    "id": "coach-nico",
+    "name": "coach nico",
+    "displayName": "Coach Nico",
+    "race": "terran",
+    "bio": "Coach Wars winner and 5.3k aggressive Terran specialist. Expert in harassment, map control, and 2-base timing builds.",
+    "specialties": [
+      "Build orders",
+      "Terran mechanics",
+      "Strategic play"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610531/calendar/12406495",
+    "socialLinks": {}
+  },
+  {
+    "id": "gamerrichy",
+    "name": "gamerrichy",
+    "displayName": "GamerRichy",
+    "race": "all",
+    "bio": "5.5k NA Zerg with tournament experience since 2012. Focuses on flexible gameplay combining aggressive builds and strong macro.",
+    "specialties": [
+      "Multi-race coaching",
+      "Matchup analysis",
+      "Fundamentals"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/81934680/calendar/12364368?appointmentTypeIds[]=81934680",
+    "socialLinks": {}
+  },
+  {
+    "id": "battleb",
+    "name": "battleb",
+    "displayName": "BattleB",
+    "race": "all",
+    "bio": "Experienced high-level coach specializing in competitive play and rapid ladder improvement. Focuses on strategic gameplay and mental fortitude.",
+    "specialties": [
+      "Competitive play",
+      "Ladder climbing",
+      "Strategy"
+    ],
+    "socialLinks": {}
+  },
+  {
+    "id": "krystianer",
+    "name": "krystianer",
+    "displayName": "Krystianer",
+    "race": "all",
+    "bio": "Top 10 Protoss worldwide with 6943 MMR peak and 270+ tournament wins. Expert in solid macro play and build order execution.",
+    "specialties": [
+      "Player development",
+      "Improvement strategies",
+      "Analysis"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/82062409/calendar/12572587?appointmentTypeIds[]=82062409",
+    "socialLinks": {}
+  },
+  {
+    "id": "drakka",
+    "name": "drakka",
+    "displayName": "Drakka",
+    "race": "all",
+    "bio": "Skilled coach with expertise in micro and macro mechanics. Helps players refine their mechanical execution and game sense.",
+    "specialties": [
+      "Micro management",
+      "Macro management",
+      "Mechanics"
+    ],
+    "socialLinks": {}
+  }
+]

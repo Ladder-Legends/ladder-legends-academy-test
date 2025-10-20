@@ -4,33 +4,33 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Cyberpunk/Neon Theme Colors */
-  --color-background: hsl(220 25% 6%);
-  --color-foreground: hsl(210 100% 90%);
-  --color-card: hsl(220 20% 10%);
-  --color-card-foreground: hsl(210 100% 90%);
-  --color-popover: hsl(220 25% 8%);
-  --color-popover-foreground: hsl(210 100% 90%);
-  --color-primary: hsl(290 80% 60%);
+  /* Light Professional Theme with Red/Orange Accents */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(0 0% 5%);
+  --color-card: hsl(0 0% 98%);
+  --color-card-foreground: hsl(0 0% 5%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(0 0% 5%);
+  --color-primary: hsl(4 85% 55%);
   --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(190 100% 50%);
-  --color-secondary-foreground: hsl(220 25% 6%);
-  --color-muted: hsl(220 20% 18%);
-  --color-muted-foreground: hsl(210 40% 70%);
-  --color-accent: hsl(290 80% 60%);
+  --color-secondary: hsl(0 0% 95%);
+  --color-secondary-foreground: hsl(0 0% 5%);
+  --color-muted: hsl(0 0% 95%);
+  --color-muted-foreground: hsl(0 0% 35%);
+  --color-accent: hsl(4 85% 55%);
   --color-accent-foreground: hsl(0 0% 100%);
   --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 100%);
-  --color-border: hsl(220 20% 20%);
-  --color-input: hsl(220 20% 18%);
-  --color-ring: hsl(290 80% 60%);
+  --color-border: hsl(0 0% 88%);
+  --color-input: hsl(0 0% 95%);
+  --color-ring: hsl(4 85% 55%);
 
   /* Starcraft race colors */
-  --color-chart-1: hsl(290 80% 60%);
-  --color-chart-2: hsl(30 100% 50%);
-  --color-chart-3: hsl(280 100% 40%);
-  --color-chart-4: hsl(190 100% 50%);
-  --color-chart-5: hsl(320 80% 60%);
+  --color-chart-1: hsl(4 85% 55%);
+  --color-chart-2: hsl(30 90% 50%);
+  --color-chart-3: hsl(280 70% 50%);
+  --color-chart-4: hsl(15 80% 50%);
+  --color-chart-5: hsl(350 75% 55%);
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
@@ -50,25 +50,23 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(at 0% 0%, hsl(290 80% 20% / 0.3) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsl(190 100% 30% / 0.2) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsl(290 80% 20% / 0.3) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsl(190 100% 30% / 0.2) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsl(4 85% 95% / 0.4) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(30 90% 95% / 0.3) 0px, transparent 50%);
   }
 
-  /* Cyberpunk glow effects */
+  /* Subtle accent effects */
   .glow-primary {
-    text-shadow: 0 0 20px hsl(290 80% 60% / 0.5);
+    text-shadow: 0 0 10px hsl(4 85% 55% / 0.15);
   }
 
   .glow-secondary {
-    text-shadow: 0 0 20px hsl(190 100% 50% / 0.5);
+    text-shadow: 0 0 10px hsl(30 90% 50% / 0.15);
   }
 
-  /* Neon border effect */
+  /* Subtle border accent */
   .neon-border {
     box-shadow:
-      0 0 5px hsl(290 80% 60% / 0.5),
-      inset 0 0 5px hsl(290 80% 60% / 0.2);
+      0 0 2px hsl(4 85% 55% / 0.2),
+      inset 0 0 2px hsl(4 85% 55% / 0.1);
   }
 }

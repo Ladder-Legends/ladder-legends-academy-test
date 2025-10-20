@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "json-to-csv": "tsx scripts/json-to-csv.ts",
+    "csv-to-json": "tsx scripts/csv-to-json.ts"
   },
   "dependencies": {
     "@auth/core": "^0.41.0",
