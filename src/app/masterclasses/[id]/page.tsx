@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
-import { Play, ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { Play, ArrowLeft, Clock } from 'lucide-react';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 

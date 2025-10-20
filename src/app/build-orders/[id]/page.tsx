@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
-import { Video, ArrowLeft, Calendar } from 'lucide-react';
+import { Video, ArrowLeft } from 'lucide-react';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 

@@ -17,14 +17,9 @@ export function VideoCard({ video }: VideoCardProps) {
     });
   };
 
-  const getTagColor = (tag: string): string => {
-    const tagLower = tag.toLowerCase();
-    if (tagLower === 'protoss') return 'bg-[hsl(var(--chart-1))] hover:bg-[hsl(var(--chart-1))]/80';
-    if (tagLower === 'terran') return 'bg-[hsl(var(--chart-2))] hover:bg-[hsl(var(--chart-2))]/80';
-    if (tagLower === 'zerg') return 'bg-[hsl(var(--chart-3))] hover:bg-[hsl(var(--chart-3))]/80';
-    if (tagLower === 'macro') return 'bg-[hsl(var(--chart-4))] hover:bg-[hsl(var(--chart-4))]/80';
-    if (tagLower === 'micro') return 'bg-[hsl(var(--chart-5))] hover:bg-[hsl(var(--chart-5))]/80';
-    return 'bg-primary hover:bg-primary/80';
+  // Monochrome tags - no color coding
+  const getTagColor = (): string => {
+    return 'bg-muted hover:bg-muted/80 text-foreground';
   };
 
   return (
@@ -65,7 +60,7 @@ export function VideoCard({ video }: VideoCardProps) {
               <Badge
                 key={tag}
                 variant="secondary"
-                className={`${getTagColor(tag)} text-white border-0`}
+                className={`${getTagColor()} border-0`}
               >
                 {tag}
               </Badge>

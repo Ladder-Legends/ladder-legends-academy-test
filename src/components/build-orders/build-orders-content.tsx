@@ -5,7 +5,7 @@ import { CategorySidebar, Category } from '@/components/category-sidebar';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
-import { ExternalLink, Video, X } from 'lucide-react';
+import { Video, X } from 'lucide-react';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 

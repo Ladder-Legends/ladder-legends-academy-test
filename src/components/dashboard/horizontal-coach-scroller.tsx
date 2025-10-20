@@ -4,6 +4,7 @@ import { Coach } from '@/types/coach';
 import { CoachCard } from '@/components/coaches/coach-card';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import videos from '@/data/videos.json';
 
 interface HorizontalCoachScrollerProps {
   title: string;
@@ -16,6 +17,13 @@ export function HorizontalCoachScroller({
   coaches,
   viewAllHref
 }: HorizontalCoachScrollerProps) {
+  // Calculate video count for each coach
+  const getVideoCount = (coachId: string) => {
+    return videos.filter(video =>
+      video.tags.some(tag => tag.toLowerCase() === coachId.toLowerCase())
+    ).length;
+  };
+
   return (
     <section className="space-y-4">
       {/* Section Header */}
@@ -36,7 +44,7 @@ export function HorizontalCoachScroller({
           <div className="flex gap-4 min-w-max">
             {coaches.map((coach) => (
               <div key={coach.id} className="w-96 flex-shrink-0">
-                <CoachCard coach={coach} />
+                <CoachCard coach={coach} videoCount={getVideoCount(coach.id)} />
               </div>
             ))}
           </div>
