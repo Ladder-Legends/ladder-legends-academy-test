@@ -39,7 +39,6 @@ export function MasterclassesContent() {
       {
         id: 'coaches',
         label: 'Coaches',
-        icon: '👨‍🏫',
         items: coaches.map(coachId => {
           const coachMasterclass = allMasterclasses.find(mc => mc.coachId === coachId);
           return {

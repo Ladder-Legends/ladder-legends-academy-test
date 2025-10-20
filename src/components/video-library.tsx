@@ -78,7 +78,6 @@ export function VideoLibrary() {
       {
         id: 'races',
         label: 'Race-Specific',
-        icon: '🎮',
         items: races.map(race => ({
           id: race,
           label: race,
@@ -88,7 +87,6 @@ export function VideoLibrary() {
       {
         id: 'general',
         label: 'General',
-        icon: '📚',
         items: generalTopics.map(topic => ({
           id: topic,
           label: topic,
@@ -98,7 +96,6 @@ export function VideoLibrary() {
       {
         id: 'coaches',
         label: 'Coaches',
-        icon: '👨‍🏫',
         items: coaches.map(coach => ({
           id: coach,
           label: coach,

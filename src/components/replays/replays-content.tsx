@@ -66,7 +66,6 @@ export function ReplaysContent() {
       {
         id: 'terran',
         label: 'Terran',
-        icon: '🔴',
         items: [
           { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT') },
           { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ') },
@@ -76,7 +75,6 @@ export function ReplaysContent() {
       {
         id: 'zerg',
         label: 'Zerg',
-        icon: '🟣',
         items: [
           { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT') },
           { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ') },
@@ -86,7 +84,6 @@ export function ReplaysContent() {
       {
         id: 'protoss',
         label: 'Protoss',
-        icon: '🔵',
         items: [
           { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT') },
           { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ') },

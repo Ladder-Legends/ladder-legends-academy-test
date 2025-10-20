@@ -66,7 +66,6 @@ export function BuildOrdersContent() {
       {
         id: 'terran',
         label: 'Terran',
-        icon: '🔴',
         items: [
           { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran') },
           { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg') },
@@ -76,7 +75,6 @@ export function BuildOrdersContent() {
       {
         id: 'zerg',
         label: 'Zerg',
-        icon: '🟣',
         items: [
           { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran') },
           { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg') },
@@ -86,7 +84,6 @@ export function BuildOrdersContent() {
       {
         id: 'protoss',
         label: 'Protoss',
-        icon: '🔵',
         items: [
           { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran') },
           { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg') },
