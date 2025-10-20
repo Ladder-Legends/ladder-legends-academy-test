@@ -1,0 +1,176 @@
+'use client';
+
+import { useState } from 'react';
+import { ChevronDown, ChevronRight, Search, X } from 'lucide-react';
+
+export interface FilterSection {
+  id: string;
+  label: string;
+  icon?: string;
+  items: FilterItem[];
+}
+
+export interface FilterItem {
+  id: string;
+  label: string;
+  count?: number;
+  children?: FilterItem[];
+}
+
+interface FilterSidebarProps {
+  // Search
+  searchEnabled?: boolean;
+  searchPlaceholder?: string;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+
+  // Sections
+  sections: FilterSection[];
+
+  // Selection state
+  selectedItems: Record<string, string[]>;  // sectionId -> selected item IDs
+  onItemToggle: (sectionId: string, itemId: string) => void;
+}
+
+export function FilterSidebar({
+  searchEnabled = false,
+  searchPlaceholder = 'Search...',
+  searchQuery = '',
+  onSearchChange,
+  sections,
+  selectedItems,
+  onItemToggle,
+}: FilterSidebarProps) {
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(sections.map(s => s.id))
+  );
+
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) {
+        next.delete(sectionId);
+      } else {
+        next.add(sectionId);
+      }
+      return next;
+    });
+  };
+
+  const toggleItemExpansion = (itemId: string) => {
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      return next;
+    });
+  };
+
+  const renderItem = (sectionId: string, item: FilterItem, depth: number = 0) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const isExpanded = expandedItems.has(item.id);
+    const isSelected = selectedItems[sectionId]?.includes(item.id) || false;
+
+    return (
+      <div key={item.id}>
+        <button
+          onClick={() => onItemToggle(sectionId, item.id)}
+          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+            isSelected
+              ? 'bg-primary text-primary-foreground font-medium'
+              : 'hover:bg-muted text-muted-foreground'
+          }`}
+          style={{ paddingLeft: depth > 0 ? `${depth * 12 + 12}px` : undefined }}
+        >
+          <span className="flex items-center justify-between">
+            <span className="flex items-center gap-2 capitalize">
+              {item.label}
+              {hasChildren && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleItemExpansion(item.id);
+                  }}
+                  className="p-0.5 hover:bg-accent/50 rounded"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-3 w-3" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3" />
+                  )}
+                </button>
+              )}
+            </span>
+            {item.count !== undefined && (
+              <span className={`text-xs ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                {item.count}
+              </span>
+            )}
+          </span>
+        </button>
+
+        {hasChildren && isExpanded && (
+          <div className="mt-1 space-y-1">
+            {item.children!.map(child => renderItem(sectionId, child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <aside className="w-64 border-r border-border bg-card/30 p-4 space-y-6 overflow-y-auto">
+      {/* Search Input */}
+      {searchEnabled && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            placeholder={searchPlaceholder}
+            className="w-full pl-10 pr-10 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => onSearchChange?.('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Sections */}
+      {sections.map(section => {
+        const isSectionExpanded = expandedSections.has(section.id);
+
+        return (
+          <div key={section.id}>
+            <button
+              onClick={() => toggleSection(section.id)}
+              className="flex items-center justify-between w-full mb-3 font-semibold text-sm uppercase tracking-wide text-foreground hover:text-primary transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                {section.icon && <span>{section.icon}</span>}
+                {section.label}
+              </span>
+              {isSectionExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </button>
+            {isSectionExpanded && (
+              <div className="space-y-1">
+                {section.items.map(item => renderItem(section.id, item))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </aside>
+  );
+}

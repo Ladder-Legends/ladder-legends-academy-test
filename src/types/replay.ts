@@ -1,5 +1,5 @@
 export type Race = 'terran' | 'zerg' | 'protoss';
-export type Matchup = 'TvT' | 'TvZ' | 'TvP' | 'ZvZ' | 'ZvP' | 'PvP';
+export type Matchup = 'TvT' | 'TvZ' | 'TvP' | 'ZvT' | 'ZvZ' | 'ZvP' | 'PvT' | 'PvZ' | 'PvP';
 
 export interface ReplayPlayer {
   name: string;

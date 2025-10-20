@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { CategorySidebar, Category } from '@/components/category-sidebar';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
@@ -10,8 +10,29 @@ import { Video, X } from 'lucide-react';
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
+    races: [],
+  });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Handle filter toggle
+  const handleItemToggle = (sectionId: string, itemId: string) => {
+    setSelectedItems(prev => {
+      const current = prev[sectionId] || [];
+      const updated = current.includes(itemId)
+        ? current.filter(id => id !== itemId)
+        : [...current, itemId];
+      return { ...prev, [sectionId]: updated };
+    });
+  };
+
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
 
   // Extract all unique tags from build orders
   const allTags = useMemo(() => {
@@ -22,72 +43,84 @@ export function BuildOrdersContent() {
     return Array.from(tagSet).sort();
   }, []);
 
-  // Create categories based on race and matchup
-  const categories: Category[] = useMemo(() => {
-    const terranBuilds = allBuildOrders.filter(bo => bo.race === 'terran');
-    const zergBuilds = allBuildOrders.filter(bo => bo.race === 'zerg');
-    const protossBuilds = allBuildOrders.filter(bo => bo.race === 'protoss');
+  // Count build orders for each filter
+  const getCount = (filterFn: (bo: BuildOrder) => boolean) => {
+    return allBuildOrders.filter(bo => {
+      if (!filterFn(bo)) return false;
 
-    return [
-      {
-        id: 'terran',
-        label: 'Terran',
-        count: terranBuilds.length,
-        children: [
-          { id: 'terran-tvt', label: 'vs Terran', count: terranBuilds.filter(bo => bo.vsRace === 'terran').length },
-          { id: 'terran-tvz', label: 'vs Zerg', count: terranBuilds.filter(bo => bo.vsRace === 'zerg').length },
-          { id: 'terran-tvp', label: 'vs Protoss', count: terranBuilds.filter(bo => bo.vsRace === 'protoss').length },
-        ]
-      },
-      {
-        id: 'zerg',
-        label: 'Zerg',
-        count: zergBuilds.length,
-        children: [
-          { id: 'zerg-zvt', label: 'vs Terran', count: zergBuilds.filter(bo => bo.vsRace === 'terran').length },
-          { id: 'zerg-zvz', label: 'vs Zerg', count: zergBuilds.filter(bo => bo.vsRace === 'zerg').length },
-          { id: 'zerg-zvp', label: 'vs Protoss', count: zergBuilds.filter(bo => bo.vsRace === 'protoss').length },
-        ]
-      },
-      {
-        id: 'protoss',
-        label: 'Protoss',
-        count: protossBuilds.length,
-        children: [
-          { id: 'protoss-pvt', label: 'vs Terran', count: protossBuilds.filter(bo => bo.vsRace === 'terran').length },
-          { id: 'protoss-pvz', label: 'vs Zerg', count: protossBuilds.filter(bo => bo.vsRace === 'zerg').length },
-          { id: 'protoss-pvp', label: 'vs Protoss', count: protossBuilds.filter(bo => bo.vsRace === 'protoss').length },
-        ]
+      // Apply tag filter
+      if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
+        return false;
       }
-    ];
-  }, []);
 
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
+      return true;
+    }).length;
   };
 
-  // Filter build orders based on selected category and tags
+  // Build filter sections with race and matchup structure
+  const filterSections = useMemo((): FilterSection[] => {
+    return [
+      {
+        id: 'races',
+        label: 'Race & Matchup',
+        icon: '🎮',
+        items: [
+          {
+            id: 'terran',
+            label: 'Terran',
+            count: getCount(bo => bo.race === 'terran'),
+            children: [
+              { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran') },
+              { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg') },
+              { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss') },
+            ],
+          },
+          {
+            id: 'zerg',
+            label: 'Zerg',
+            count: getCount(bo => bo.race === 'zerg'),
+            children: [
+              { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran') },
+              { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg') },
+              { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss') },
+            ],
+          },
+          {
+            id: 'protoss',
+            label: 'Protoss',
+            count: getCount(bo => bo.race === 'protoss'),
+            children: [
+              { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran') },
+              { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg') },
+              { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss') },
+            ],
+          },
+        ],
+      },
+    ];
+  }, [selectedTags]);
+
+  // Filter build orders based on selected filters and tags
   const filteredBuildOrders = useMemo(() => {
     let filtered = allBuildOrders;
 
-    // Apply category filter
-    if (selectedCategory) {
-      if (selectedCategory.includes('-')) {
-        // Matchup subcategory
-        const [race, matchup] = selectedCategory.split('-');
-        const vsRace = matchup.substring(matchup.length - 1) as 'terran' | 'zerg' | 'protoss';
-        const vsRaceMap = { t: 'terran', z: 'zerg', p: 'protoss' };
-        filtered = filtered.filter(
-          bo => bo.race === race && bo.vsRace === vsRaceMap[vsRace as 't' | 'z' | 'p']
-        );
-      } else {
-        // Race category
-        filtered = filtered.filter(bo => bo.race === selectedCategory);
-      }
+    // Apply race/matchup filters
+    const raceFilters = selectedItems.races || [];
+    if (raceFilters.length > 0) {
+      filtered = filtered.filter(bo => {
+        return raceFilters.some(filterId => {
+          if (filterId.includes('-')) {
+            // Matchup filter like "terran-tvz"
+            const [race, matchup] = filterId.split('-');
+            const vsRace = matchup.substring(matchup.length - 1);
+            const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
+            return bo.race === race && bo.vsRace === vsRaceMap[vsRace];
+          } else {
+            // Race filter
+            return bo.race === filterId;
+          }
+        });
+      });
     }
 
     // Apply tag filter
@@ -98,7 +131,7 @@ export function BuildOrdersContent() {
     }
 
     return filtered;
-  }, [selectedCategory, selectedTags]);
+  }, [selectedItems, selectedTags]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -122,11 +155,10 @@ export function BuildOrdersContent() {
 
   return (
     <div className="flex gap-8">
-      <CategorySidebar
-        title="Build Orders"
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+      <FilterSidebar
+        sections={filterSections}
+        selectedItems={selectedItems}
+        onItemToggle={handleItemToggle}
       />
 
       <div className="flex-1">

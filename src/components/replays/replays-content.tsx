@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { CategorySidebar, Category } from '@/components/category-sidebar';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
@@ -10,8 +10,29 @@ import { Download, Video, X } from 'lucide-react';
 const allReplays = replaysData as Replay[];
 
 export function ReplaysContent() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
+    matchups: [],
+  });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Handle filter toggle
+  const handleItemToggle = (sectionId: string, itemId: string) => {
+    setSelectedItems(prev => {
+      const current = prev[sectionId] || [];
+      const updated = current.includes(itemId)
+        ? current.filter(id => id !== itemId)
+        : [...current, itemId];
+      return { ...prev, [sectionId]: updated };
+    });
+  };
+
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
 
   // Extract all unique tags from replays
   const allTags = useMemo(() => {
@@ -22,66 +43,80 @@ export function ReplaysContent() {
     return Array.from(tagSet).sort();
   }, []);
 
-  // Create categories based on matchup
-  const categories: Category[] = useMemo(() => {
-    const getMatchupCount = (matchup: string) =>
-      allReplays.filter(r => r.matchup === matchup).length;
+  // Count replays for each filter
+  const getCount = (filterFn: (replay: Replay) => boolean) => {
+    return allReplays.filter(replay => {
+      if (!filterFn(replay)) return false;
 
-    return [
-      {
-        id: 'terran',
-        label: 'Terran Replays',
-        children: [
-          { id: 'TvT', label: 'Terran vs Terran', count: getMatchupCount('TvT') },
-          { id: 'TvZ', label: 'Terran vs Zerg', count: getMatchupCount('TvZ') },
-          { id: 'TvP', label: 'Terran vs Protoss', count: getMatchupCount('TvP') },
-        ]
-      },
-      {
-        id: 'zerg',
-        label: 'Zerg Replays',
-        children: [
-          { id: 'ZvT', label: 'Zerg vs Terran', count: getMatchupCount('ZvT') },
-          { id: 'ZvZ', label: 'Zerg vs Zerg', count: getMatchupCount('ZvZ') },
-          { id: 'ZvP', label: 'Zerg vs Protoss', count: getMatchupCount('ZvP') },
-        ]
-      },
-      {
-        id: 'protoss',
-        label: 'Protoss Replays',
-        children: [
-          { id: 'PvT', label: 'Protoss vs Terran', count: getMatchupCount('PvT') },
-          { id: 'PvZ', label: 'Protoss vs Zerg', count: getMatchupCount('PvZ') },
-          { id: 'PvP', label: 'Protoss vs Protoss', count: getMatchupCount('PvP') },
-        ]
+      // Apply tag filter
+      if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
+        return false;
       }
-    ];
-  }, []);
 
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
+      return true;
+    }).length;
   };
 
-  // Filter replays based on selected category and tags
+  // Build filter sections with race and matchup structure
+  const filterSections = useMemo((): FilterSection[] => {
+    return [
+      {
+        id: 'matchups',
+        label: 'Race & Matchup',
+        icon: '🎮',
+        items: [
+          {
+            id: 'terran',
+            label: 'Terran',
+            count: getCount(r => r.matchup.startsWith('T')),
+            children: [
+              { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT') },
+              { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ') },
+              { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP') },
+            ],
+          },
+          {
+            id: 'zerg',
+            label: 'Zerg',
+            count: getCount(r => r.matchup.startsWith('Z')),
+            children: [
+              { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT') },
+              { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ') },
+              { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP') },
+            ],
+          },
+          {
+            id: 'protoss',
+            label: 'Protoss',
+            count: getCount(r => r.matchup.startsWith('P')),
+            children: [
+              { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT') },
+              { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ') },
+              { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP') },
+            ],
+          },
+        ],
+      },
+    ];
+  }, [selectedTags]);
+
+  // Filter replays based on selected filters and tags
   const filteredReplays = useMemo(() => {
     let filtered = allReplays;
 
-    // Apply category filter
-    if (selectedCategory) {
-      // Check if it's a matchup category (e.g., "TvT", "ZvP", etc.)
-      if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(selectedCategory)) {
-        filtered = filtered.filter(r => r.matchup === selectedCategory);
-      } else {
-        // Otherwise filter by race
-        filtered = filtered.filter(r => {
-          const matchup = r.matchup.toLowerCase();
-          return matchup.startsWith(selectedCategory.charAt(0));
+    // Apply matchup filters
+    const matchupFilters = selectedItems.matchups || [];
+    if (matchupFilters.length > 0) {
+      filtered = filtered.filter(replay => {
+        return matchupFilters.some(filterId => {
+          // Check for exact matchup match (e.g., "TvT", "ZvP")
+          if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
+            return replay.matchup === filterId;
+          }
+          // Check for race match (e.g., "terran", "zerg", "protoss")
+          return replay.matchup.toLowerCase().startsWith(filterId.charAt(0));
         });
-      }
+      });
     }
 
     // Apply tag filter
@@ -92,7 +127,7 @@ export function ReplaysContent() {
     }
 
     return filtered;
-  }, [selectedCategory, selectedTags]);
+  }, [selectedItems, selectedTags]);
 
   const getRaceColor = (race: string) => {
     switch (race.toLowerCase()) {
@@ -105,11 +140,10 @@ export function ReplaysContent() {
 
   return (
     <div className="flex gap-8">
-      <CategorySidebar
-        title="Replays"
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+      <FilterSidebar
+        sections={filterSections}
+        selectedItems={selectedItems}
+        onItemToggle={handleItemToggle}
       />
 
       <div className="flex-1">

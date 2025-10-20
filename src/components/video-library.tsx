@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VideoGrid } from '@/components/videos/video-grid';
-import { CategorySidebar } from '@/components/videos/category-sidebar';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import videos from '@/data/videos.json';
 import { X } from 'lucide-react';
 
@@ -11,13 +11,32 @@ export function VideoLibrary() {
   const searchParams = useSearchParams();
   const coachFromUrl = searchParams.get('coach');
 
-  const [selectedRaces, setSelectedRaces] = useState<string[]>([]);
-  const [selectedGeneral, setSelectedGeneral] = useState<string[]>([]);
-  const [selectedCoaches, setSelectedCoaches] = useState<string[]>(
-    coachFromUrl ? [coachFromUrl] : []
-  );
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
+    races: [],
+    general: [],
+    coaches: coachFromUrl ? [coachFromUrl] : [],
+  });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Handle filter toggle
+  const handleItemToggle = (sectionId: string, itemId: string) => {
+    setSelectedItems(prev => {
+      const current = prev[sectionId] || [];
+      const updated = current.includes(itemId)
+        ? current.filter(id => id !== itemId)
+        : [...current, itemId];
+      return { ...prev, [sectionId]: updated };
+    });
+  };
+
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
 
   // Extract all unique tags from videos
   const allTags = useMemo(() => {
@@ -28,22 +47,66 @@ export function VideoLibrary() {
     return Array.from(tagSet).sort();
   }, []);
 
-  const toggleFilter = (value: string, current: string[], setter: (val: string[]) => void) => {
-    console.log('toggleFilter called:', { value, current });
-    if (current.includes(value)) {
-      setter(current.filter(v => v !== value));
-    } else {
-      setter([...current, value]);
-    }
+  // Count videos for each filter with current filters applied
+  const getCount = (tag: string, sectionId: string) => {
+    return videos.filter(video => {
+      const videoTags = video.tags.map(t => t.toLowerCase());
+
+      // Check if video matches the tag we're counting
+      if (!videoTags.includes(tag.toLowerCase())) return false;
+
+      // Apply other active filters
+      const races = sectionId === 'races' ? [] : (selectedItems.races || []);
+      const general = sectionId === 'general' ? [] : (selectedItems.general || []);
+      const coaches = sectionId === 'coaches' ? [] : (selectedItems.coaches || []);
+
+      if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
+      if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
+      if (coaches.length > 0 && !coaches.some(c => videoTags.includes(c))) return false;
+
+      return true;
+    }).length;
   };
 
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
+  // Build filter sections
+  const filterSections = useMemo((): FilterSection[] => {
+    const races = ['terran', 'zerg', 'protoss'];
+    const generalTopics = ['mindset', 'fundamentals', 'meta', 'build order', 'micro', 'macro'];
+    const coaches = ['groovy', 'hino', 'coach nico', 'gamerrichy', 'battleb', 'krystianer', 'drakka'];
+
+    return [
+      {
+        id: 'races',
+        label: 'Race-Specific',
+        icon: '🎮',
+        items: races.map(race => ({
+          id: race,
+          label: race,
+          count: getCount(race, 'races'),
+        })),
+      },
+      {
+        id: 'general',
+        label: 'General',
+        icon: '📚',
+        items: generalTopics.map(topic => ({
+          id: topic,
+          label: topic,
+          count: getCount(topic, 'general'),
+        })).filter(item => item.count > 0),
+      },
+      {
+        id: 'coaches',
+        label: 'Coaches',
+        icon: '👨‍🏫',
+        items: coaches.map(coach => ({
+          id: coach,
+          label: coach,
+          count: getCount(coach, 'coaches'),
+        })).filter(item => item.count > 0),
+      },
+    ];
+  }, [selectedItems]);
 
   const filteredVideos = useMemo(() => {
     return videos.filter(video => {
@@ -59,20 +122,14 @@ export function VideoLibrary() {
         if (!matchesSearch) return false;
       }
 
-      // If any race filter is active, video must have at least one
-      if (selectedRaces.length > 0 && !selectedRaces.some(r => videoTags.includes(r))) {
-        return false;
-      }
+      // Apply sidebar filters
+      const races = selectedItems.races || [];
+      const general = selectedItems.general || [];
+      const coaches = selectedItems.coaches || [];
 
-      // If any general filter is active, video must have at least one
-      if (selectedGeneral.length > 0 && !selectedGeneral.some(g => videoTags.includes(g))) {
-        return false;
-      }
-
-      // If any coach filter is active, video must have at least one
-      if (selectedCoaches.length > 0 && !selectedCoaches.some(c => videoTags.includes(c))) {
-        return false;
-      }
+      if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
+      if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
+      if (coaches.length > 0 && !coaches.some(c => videoTags.includes(c))) return false;
 
       // If any tag filter is active, video must have all selected tags
       if (selectedTags.length > 0 && !selectedTags.every(tag => video.tags.includes(tag))) {
@@ -81,22 +138,25 @@ export function VideoLibrary() {
 
       return true;
     });
-  }, [selectedRaces, selectedGeneral, selectedCoaches, selectedTags, searchQuery]);
+  }, [selectedItems, selectedTags, searchQuery]);
 
-  const hasActiveFilters = selectedRaces.length > 0 || selectedGeneral.length > 0 || selectedCoaches.length > 0 || selectedTags.length > 0 || searchQuery.trim().length > 0;
+  const hasActiveFilters =
+    (selectedItems.races?.length || 0) > 0 ||
+    (selectedItems.general?.length || 0) > 0 ||
+    (selectedItems.coaches?.length || 0) > 0 ||
+    selectedTags.length > 0 ||
+    searchQuery.trim().length > 0;
 
   return (
     <div className="flex flex-1">
-      <CategorySidebar
-        videos={videos}
-        selectedRaces={selectedRaces}
-        selectedGeneral={selectedGeneral}
-        selectedCoaches={selectedCoaches}
+      <FilterSidebar
+        searchEnabled={true}
+        searchPlaceholder="Search videos..."
         searchQuery={searchQuery}
-        onRaceToggle={(race) => toggleFilter(race, selectedRaces, setSelectedRaces)}
-        onGeneralToggle={(topic) => toggleFilter(topic, selectedGeneral, setSelectedGeneral)}
-        onCoachToggle={(coach) => toggleFilter(coach, selectedCoaches, setSelectedCoaches)}
         onSearchChange={setSearchQuery}
+        sections={filterSections}
+        selectedItems={selectedItems}
+        onItemToggle={handleItemToggle}
       />
 
       <main className="flex-1 px-8 py-8 overflow-y-auto">
