@@ -38,9 +38,9 @@ export function DashboardContent() {
           </p>
         </div>
 
-        {/* Coaching VODs */}
+        {/* Latest VODs */}
         <HorizontalVideoScroller
-          title="Coaching VODs"
+          title="Latest VODs"
           videos={featuredVideos}
           viewAllHref="/library"
           viewAllLabel="View Full Library"
