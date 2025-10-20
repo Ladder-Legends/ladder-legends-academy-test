@@ -82,18 +82,6 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
             {/* Title Section */}
             <div className="space-y-4">
               <h1 className="text-4xl font-bold">{masterclass.title}</h1>
-              <div className="flex flex-wrap gap-3">
-                <span className={`px-3 py-1.5 text-sm font-medium text-white rounded-full ${getDifficultyColor(masterclass.difficulty)}`}>
-                  {masterclass.difficulty}
-                </span>
-                <span className={`px-3 py-1.5 text-sm font-medium rounded-full bg-muted capitalize ${getRaceColor(masterclass.race)}`}>
-                  {masterclass.race}
-                </span>
-                <span className="px-3 py-1.5 text-sm font-medium bg-muted rounded-full flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  {masterclass.totalDuration}
-                </span>
-              </div>
               <p className="text-lg text-muted-foreground leading-relaxed">{masterclass.description}</p>
             </div>
 

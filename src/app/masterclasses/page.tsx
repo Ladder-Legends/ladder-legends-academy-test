@@ -32,21 +32,7 @@ export default function MasterclassesPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-8 py-8">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="space-y-6">
-            {/* Page Header */}
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold">Masterclasses</h2>
-              <p className="text-muted-foreground">
-                In-depth series and structured courses from our coaches. Perfect for systematic improvement in specific areas.
-              </p>
-            </div>
-
-            <MasterclassesContent />
-          </div>
-        </div>
-      </main>
+      <MasterclassesContent />
 
       {/* Footer */}
       <footer className="border-t border-border py-6 px-8">
