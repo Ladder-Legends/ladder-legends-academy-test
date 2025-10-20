@@ -22,7 +22,9 @@
     "coach": "Hino",
     "tags": ["roach", "ravager", "defense", "zvt"],
     "patch": "5.0.14",
-    "notes": "Example of defending early tank push with roach/ravager"
+    "notes": "Example of defending early tank push with roach/ravager",
+    "downloadUrl": "https://example.com/replays/hino-zvt-roach-defense.SC2Replay",
+    "coachingVideoId": "dQw4w9WgXcQ"
   },
   {
     "id": "replay-2",
@@ -47,7 +49,8 @@
     "coach": "Nico",
     "tags": ["1-1-1", "timing", "tvp", "tank"],
     "patch": "5.0.14",
-    "notes": "Clean execution of 1-1-1 tank timing"
+    "notes": "Clean execution of 1-1-1 tank timing",
+    "downloadUrl": "https://example.com/replays/nico-tvp-111-timing.SC2Replay"
   },
   {
     "id": "replay-3",
