@@ -56,19 +56,6 @@
     "socialLinks": {}
   },
   {
-    "id": "battleb",
-    "name": "battleb",
-    "displayName": "BattleB",
-    "race": "all",
-    "bio": "Experienced high-level coach specializing in competitive play and rapid ladder improvement. Focuses on strategic gameplay and mental fortitude.",
-    "specialties": [
-      "Competitive play",
-      "Ladder climbing",
-      "Strategy"
-    ],
-    "socialLinks": {}
-  },
-  {
     "id": "krystianer",
     "name": "krystianer",
     "displayName": "Krystianer",
@@ -83,9 +70,9 @@
     "socialLinks": {}
   },
   {
-    "id": "drakka",
-    "name": "drakka",
-    "displayName": "Drakka",
+    "id": "eon",
+    "name": "eon",
+    "displayName": "Eon",
     "race": "all",
     "bio": "Skilled coach with expertise in micro and macro mechanics. Helps players refine their mechanical execution and game sense.",
     "specialties": [
