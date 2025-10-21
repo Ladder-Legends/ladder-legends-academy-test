@@ -22,7 +22,7 @@
       { "supply": 44, "time": "4:45", "action": "Roach production starts" },
       { "supply": 66, "time": "6:00", "action": "Move out with ~20 roaches" }
     ],
-    "tags": ["aggressive", "timing", "roach"],
+    "tags": ["aggressive", "timing", "roach", "intermediate"],
     "patch": "5.0.14",
     "updatedAt": "2025-01-15",
     "videoId": "dQw4w9WgXcQ"
@@ -51,7 +51,7 @@
       { "supply": 32, "time": "4:30", "action": "Medivac, Stim" },
       { "supply": 44, "time": "5:30", "action": "Move out with 2 tanks, 16 marines, 1 medivac" }
     ],
-    "tags": ["timing", "bio", "tank"],
+    "tags": ["timing", "bio", "tank", "intermediate"],
     "patch": "5.0.14",
     "updatedAt": "2025-01-10",
     "videoId": "jNQXAC9IVRw"
@@ -79,7 +79,7 @@
       { "supply": 30, "time": "4:15", "action": "Pylon x2" },
       { "supply": 44, "time": "5:00", "action": "Attack with 8-10 stalkers" }
     ],
-    "tags": ["all-in", "blink", "stalker"],
+    "tags": ["all-in", "blink", "stalker", "advanced"],
     "patch": "5.0.14",
     "updatedAt": "2025-01-12"
   }
