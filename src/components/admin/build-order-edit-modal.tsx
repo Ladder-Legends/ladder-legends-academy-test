@@ -23,6 +23,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [formData, setFormData] = useState<Partial<BuildOrder>>({});
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
+  const [showCoachDropdown, setShowCoachDropdown] = useState(false);
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -109,7 +110,18 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         coachId: coach.id,
       });
       setCoachSearch(coach.displayName);
+      setShowCoachDropdown(false);
     }
+  };
+
+  const clearCoach = () => {
+    setFormData({
+      ...formData,
+      coach: undefined,
+      coachId: undefined,
+    });
+    setCoachSearch('');
+    setShowCoachDropdown(false);
   };
 
   const addStep = () => {
@@ -202,16 +214,31 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           <div>
             <label className="block text-sm font-medium mb-1">Coach *</label>
             <div className="relative">
-              <input
-                type="text"
-                value={coachSearch}
-                onChange={(e) => setCoachSearch(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to search coaches..."
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={coachSearch}
+                  onChange={(e) => {
+                    setCoachSearch(e.target.value);
+                    setShowCoachDropdown(true);
+                  }}
+                  onFocus={() => setShowCoachDropdown(true)}
+                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
+                  placeholder="Type to search coaches..."
+                />
+                {formData.coach && formData.coachId && (
+                  <button
+                    type="button"
+                    onClick={clearCoach}
+                    className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
 
               {/* Coach dropdown */}
-              {coachSearch && filteredCoaches.length > 0 && (
+              {showCoachDropdown && filteredCoaches.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
                   {filteredCoaches.map((coach) => (
                     <button
