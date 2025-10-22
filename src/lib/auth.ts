@@ -28,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.AUTH_DISCORD_SECRET!,
       authorization: {
         params: {
-          scope: "identify email guilds guilds.members.read",
+          scope: "identify email guilds",
         },
       },
     }),
