@@ -75,9 +75,9 @@ export function DashboardContent() {
                       className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
                       {!masterclass.isFree && !hasSubscriberRole && (
-                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium z-20">
-                          <Lock className="w-3 h-3" />
-                          Subscriber Only
+                        <div className="absolute bottom-2 right-2 bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium z-20">
+                          <Lock className="w-2.5 h-2.5" />
+                          Premium
                         </div>
                       )}
                       <div className="space-y-3">
@@ -179,9 +179,9 @@ export function DashboardContent() {
                       className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
                       {!buildOrder.isFree && !hasSubscriberRole && (
-                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium z-20">
-                          <Lock className="w-3 h-3" />
-                          Subscriber Only
+                        <div className="absolute bottom-2 right-2 bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium z-20">
+                          <Lock className="w-2.5 h-2.5" />
+                          Premium
                         </div>
                       )}
                       <div className="space-y-3">

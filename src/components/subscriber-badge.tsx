@@ -25,9 +25,9 @@ export function SubscriberBadge({ isFree = false, className = '' }: SubscriberBa
   }
 
   return (
-    <span className={`bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium ${className}`}>
-      <Lock className="h-3 w-3" />
-      Subscriber Only
+    <span className={`bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap ${className}`}>
+      <Lock className="h-2.5 w-2.5" />
+      Premium
     </span>
   );
 }
