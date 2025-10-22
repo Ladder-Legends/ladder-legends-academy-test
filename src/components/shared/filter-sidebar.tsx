@@ -143,7 +143,7 @@ export function FilterSidebar({
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-card border border-border rounded-md shadow-lg hover:bg-muted transition-colors"
+        className="lg:hidden fixed top-20 left-4 z-40 p-2 bg-card border border-border rounded-md shadow-lg hover:bg-muted transition-colors"
         aria-label="Open filters"
       >
         <Menu className="w-5 h-5" />

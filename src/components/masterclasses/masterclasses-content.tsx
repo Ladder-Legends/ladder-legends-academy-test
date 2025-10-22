@@ -175,8 +175,8 @@ export function MasterclassesContent() {
               </p>
             </div>
 
-            <div className="border border-border rounded-lg overflow-hidden">
-              <table className="w-full">
+            <div className="border border-border rounded-lg overflow-x-auto">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
