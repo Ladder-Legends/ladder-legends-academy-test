@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { Video } from '@/types/video';
+import { Video, VideoRace } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import videos from '@/data/videos.json';
@@ -62,6 +62,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         youtubeId: '',
         date: new Date().toISOString().split('T')[0],
         tags: [],
+        race: 'terran',
         coach: '',
         coachId: '',
       });
@@ -110,16 +111,16 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const clearCoach = () => {
     setFormData({
       ...formData,
-      coach: undefined,
-      coachId: undefined,
+      coach: '',
+      coachId: '',
     });
     setCoachSearch('');
-    setShowCoachDropdown(false);
+    setShowCoachDropdown(true);
   };
 
   const handleSave = () => {
-    if (!formData.id || !formData.title || !formData.youtubeId) {
-      toast.error('Please fill in all required fields (Title, YouTube ID)');
+    if (!formData.id || !formData.title || !formData.youtubeId || !formData.race || !formData.coach || !formData.coachId) {
+      toast.error('Please fill in all required fields (Title, YouTube ID, Race, Coach)');
       return;
     }
 
@@ -131,6 +132,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       thumbnail: `https://img.youtube.com/vi/${formData.youtubeId}/hqdefault.jpg`,
       date: formData.date || new Date().toISOString().split('T')[0],
       tags: formData.tags || [],
+      race: formData.race,
       coach: formData.coach,
       coachId: formData.coachId,
     };
@@ -172,54 +174,70 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Coach (Optional)</label>
-          <div className="relative">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={coachSearch}
-                onChange={(e) => {
-                  setCoachSearch(e.target.value);
-                  setShowCoachDropdown(true);
-                }}
-                onFocus={() => setShowCoachDropdown(true)}
-                className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to search coaches..."
-              />
-              {formData.coach && formData.coachId && (
-                <button
-                  type="button"
-                  onClick={clearCoach}
-                  className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm"
-                >
-                  Clear
-                </button>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Race *</label>
+            <select
+              value={formData.race || 'terran'}
+              onChange={(e) => setFormData({ ...formData, race: e.target.value as VideoRace })}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            >
+              <option value="terran">Terran</option>
+              <option value="zerg">Zerg</option>
+              <option value="protoss">Protoss</option>
+              <option value="all">All Races</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Coach *</label>
+            <div className="relative">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={coachSearch}
+                  onChange={(e) => {
+                    setCoachSearch(e.target.value);
+                    setShowCoachDropdown(true);
+                  }}
+                  onFocus={() => setShowCoachDropdown(true)}
+                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
+                  placeholder="Type to search coaches..."
+                />
+                {formData.coach && formData.coachId && (
+                  <button
+                    type="button"
+                    onClick={clearCoach}
+                    className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Coach dropdown */}
+              {showCoachDropdown && filteredCoaches.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredCoaches.map((coach) => (
+                    <button
+                      key={coach.id}
+                      type="button"
+                      onClick={() => selectCoach(coach.id)}
+                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
+                    >
+                      <div className="font-medium">{coach.displayName}</div>
+                      <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-
-            {/* Coach dropdown */}
-            {showCoachDropdown && filteredCoaches.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {filteredCoaches.map((coach) => (
-                  <button
-                    key={coach.id}
-                    type="button"
-                    onClick={() => selectCoach(coach.id)}
-                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
-                  >
-                    <div className="font-medium">{coach.displayName}</div>
-                    <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
-                  </button>
-                ))}
-              </div>
+            {formData.coach && formData.coachId && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
+              </p>
             )}
           </div>
-          {formData.coach && formData.coachId && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
-            </p>
-          )}
         </div>
 
         <div>

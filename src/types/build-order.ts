@@ -1,4 +1,5 @@
 export type Race = 'terran' | 'zerg' | 'protoss';
+export type VsRace = 'terran' | 'zerg' | 'protoss' | 'all';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type BuildType = 'macro' | 'all-in' | 'timing' | 'cheese' | 'defensive';
 
@@ -13,7 +14,7 @@ export interface BuildOrder {
   id: string;
   name: string;
   race: Race;
-  vsRace: Race;
+  vsRace: VsRace;
   type: BuildType;
   difficulty: Difficulty;
   coach: string;

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { BuildOrder, BuildOrderStep, Race, Difficulty, BuildType } from '@/types/build-order';
+import { BuildOrder, BuildOrderStep, Race, VsRace, Difficulty, BuildType } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
@@ -24,12 +24,20 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
+  const [typeInput, setTypeInput] = useState('');
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
     const tagSet = new Set<string>();
     buildOrders.forEach(bo => bo.tags.forEach(tag => tagSet.add(tag)));
     return Array.from(tagSet).sort();
+  }, []);
+
+  // Get all unique types from existing build orders for autocomplete
+  const allExistingTypes = useMemo(() => {
+    const typeSet = new Set<string>();
+    buildOrders.forEach(bo => typeSet.add(bo.type));
+    return Array.from(typeSet).sort();
   }, []);
 
   // Filter tags based on input
@@ -40,6 +48,15 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
+
+  // Filter types based on input
+  const filteredTypes = useMemo(() => {
+    if (!typeInput.trim()) return allExistingTypes;
+    const input = typeInput.toLowerCase();
+    return allExistingTypes
+      .filter(type => type.toLowerCase().includes(input))
+      .slice(0, 5);
+  }, [typeInput, allExistingTypes]);
 
   // Filter coaches based on search input
   const filteredCoaches = useMemo(() => {
@@ -55,6 +72,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     if (buildOrder) {
       setFormData(buildOrder);
       setCoachSearch(buildOrder.coach || '');
+      setTypeInput(buildOrder.type || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -73,6 +91,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         updatedAt: new Date().toISOString().split('T')[0],
       });
       setCoachSearch('');
+      setTypeInput('macro');
     }
     setTagInput('');
   }, [buildOrder, isNew, isOpen]);
@@ -172,7 +191,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       name: formData.name,
       race: formData.race || 'terran',
       vsRace: formData.vsRace || 'terran',
-      type: formData.type || 'macro',
+      type: (typeInput.trim() as BuildType) || 'macro',
       difficulty: formData.difficulty || 'beginner',
       coach: formData.coach,
       coachId: formData.coachId,
@@ -302,28 +321,42 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             <label className="block text-sm font-medium mb-1">vs Race *</label>
             <select
               value={formData.vsRace || 'terran'}
-              onChange={(e) => setFormData({ ...formData, vsRace: e.target.value as Race })}
+              onChange={(e) => setFormData({ ...formData, vsRace: e.target.value as VsRace })}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
             >
               <option value="terran">Terran</option>
               <option value="zerg">Zerg</option>
               <option value="protoss">Protoss</option>
+              <option value="all">All</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Type *</label>
-            <select
-              value={formData.type || 'macro'}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as BuildType })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="macro">Macro</option>
-              <option value="all-in">All-In</option>
-              <option value="timing">Timing</option>
-              <option value="cheese">Cheese</option>
-              <option value="defensive">Defensive</option>
-            </select>
+            <div className="relative">
+              <input
+                type="text"
+                value={typeInput}
+                onChange={(e) => setTypeInput(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="macro, all-in, timing..."
+              />
+              {/* Type autocomplete dropdown */}
+              {filteredTypes.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                  {filteredTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setTypeInput(type)}
+                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm capitalize"
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div>

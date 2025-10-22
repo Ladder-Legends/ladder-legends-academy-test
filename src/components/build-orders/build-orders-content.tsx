@@ -112,7 +112,7 @@ export function BuildOrdersContent() {
             const [race, matchup] = filterId.split('-');
             const vsRace = matchup.substring(matchup.length - 1);
             const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-            return bo.race === race && bo.vsRace === vsRaceMap[vsRace];
+            return bo.race === race && (bo.vsRace === vsRaceMap[vsRace] || bo.vsRace === 'all');
           }
           return false;
         });
@@ -184,7 +184,7 @@ export function BuildOrdersContent() {
             const [race, matchup] = filterId.split('-');
             const vsRace = matchup.substring(matchup.length - 1);
             const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-            return bo.race === race && bo.vsRace === vsRaceMap[vsRace];
+            return bo.race === race && (bo.vsRace === vsRaceMap[vsRace] || bo.vsRace === 'all');
           }
           return false;
         });
