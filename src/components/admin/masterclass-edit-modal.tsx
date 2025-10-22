@@ -100,7 +100,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       duration: formData.duration,
       difficulty: formData.difficulty || 'beginner',
       tags: formData.tags || [],
-      thumbnail: `https://i.ytimg.com/vi/${formData.videoId}/hqdefault.jpg`,
+      thumbnail: `https://img.youtube.com/vi/${formData.videoId}/hqdefault.jpg`,
       createdAt: formData.createdAt || new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
     };

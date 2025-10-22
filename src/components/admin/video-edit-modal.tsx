@@ -88,7 +88,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       title: formData.title,
       description: formData.description || '',
       youtubeId: formData.youtubeId,
-      thumbnail: `https://i.ytimg.com/vi/${formData.youtubeId}/hqdefault.jpg`,
+      thumbnail: `https://img.youtube.com/vi/${formData.youtubeId}/hqdefault.jpg`,
       date: formData.date || new Date().toISOString().split('T')[0],
       tags: formData.tags || [],
     };
