@@ -55,6 +55,18 @@ function getRoles(session: Session | null): string[] {
   if (emulatedRoles) {
     return emulatedRoles;
   }
+
+  // Hardcoded owner fallback - always grant owner role to this specific Discord user ID
+  // when EMULATE_ROLE is not set (works in both dev and production)
+  const HARDCODED_OWNER_ID = "161384451518103552";
+  if (session?.user?.discordId === HARDCODED_OWNER_ID) {
+    const roles = session?.user?.roles || [];
+    // Add owner role if not already present
+    if (!roles.includes(ROLE_IDS.OWNER)) {
+      return [...roles, ROLE_IDS.OWNER];
+    }
+  }
+
   return session?.user?.roles || [];
 }
 
