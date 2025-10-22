@@ -55,19 +55,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (process.env.SKIP_ROLE_CHECK === "true") {
         console.log("🔓 SKIP_ROLE_CHECK enabled - granting access without role verification");
         session.user.hasSubscriberRole = true;
+        session.user.roles = ["1386739785283928124"]; // Grant owner role in dev
         return session;
       }
 
       // Check if user has required role in the Discord server
       try {
-        const hasRole = await checkUserRole(
+        const userRoles = await checkUserRole(
           token.accessToken as string,
           token.discordId as string
         );
-        session.user.hasSubscriberRole = hasRole;
+        session.user.hasSubscriberRole = userRoles.length > 0;
+        session.user.roles = userRoles;
       } catch (error) {
         console.error("Error checking user role:", error);
         session.user.hasSubscriberRole = false;
+        session.user.roles = [];
       }
 
       return session;
@@ -82,7 +85,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 async function checkUserRole(
   accessToken: string,
   userId: string
-): Promise<boolean> {
+): Promise<string[]> {
   try {
     // First, get the user's guilds to find the server ID
     const guildsResponse = await fetch("https://discord.com/api/v10/users/@me/guilds", {
@@ -93,7 +96,7 @@ async function checkUserRole(
 
     if (!guildsResponse.ok) {
       console.error("Failed to fetch guilds:", await guildsResponse.text());
-      return false;
+      return [];
     }
 
     const guilds = await guildsResponse.json();
@@ -105,7 +108,7 @@ async function checkUserRole(
 
     if (!targetGuild) {
       console.log("User is not in the Ladder Legends Academy server");
-      return false;
+      return [];
     }
 
     // Get member details including roles using bot token
@@ -121,7 +124,7 @@ async function checkUserRole(
 
     if (!memberResponse.ok) {
       console.error("Failed to fetch member data:", await memberResponse.text());
-      return false;
+      return [];
     }
 
     const memberData = await memberResponse.json();
@@ -138,13 +141,13 @@ async function checkUserRole(
         .map((roleId: string) => ROLE_NAMES[roleId] || roleId)
         .join(", ");
       console.log(`User ${userId} granted access with role(s): ${roleNames}`);
-      return true;
+      return matchedRoles;
     }
 
     console.log(`User ${userId} does not have any allowed roles`);
-    return false;
+    return [];
   } catch (error) {
     console.error("Error in checkUserRole:", error);
-    return false;
+    return [];
   }
 }

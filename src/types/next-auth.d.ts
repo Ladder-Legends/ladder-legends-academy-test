@@ -6,11 +6,13 @@ declare module "next-auth" {
     user: {
       discordId?: string;
       hasSubscriberRole?: boolean;
+      roles?: string[]; // Discord role IDs
     } & DefaultSession["user"];
   }
 
   interface JWT {
     accessToken?: string;
     discordId?: string;
+    roles?: string[];
   }
 }
