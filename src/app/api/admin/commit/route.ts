@@ -15,7 +15,7 @@ type Operation = 'create' | 'update' | 'delete';
 interface CommitRequest {
   contentType: ContentType;
   operation: Operation;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 /**
@@ -97,20 +97,20 @@ export async function POST(request: NextRequest) {
     );
 
     // 7. Apply operation
-    let updatedContent: any[];
+    let updatedContent: Record<string, unknown>[];
     switch (operation) {
       case 'create':
         updatedContent = [...currentContent, data];
         break;
 
       case 'update':
-        updatedContent = currentContent.map((item: any) =>
+        updatedContent = currentContent.map((item: Record<string, unknown>) =>
           item.id === data.id ? data : item
         );
         break;
 
       case 'delete':
-        updatedContent = currentContent.filter((item: any) => item.id !== data.id);
+        updatedContent = currentContent.filter((item: Record<string, unknown>) => item.id !== data.id);
         break;
 
       default:

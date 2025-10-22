@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
@@ -27,7 +27,7 @@ export function MasterclassesContent() {
   };
 
   // Count masterclasses for each coach with context-aware filtering
-  const getCount = (coachId: string) => {
+  const getCount = useCallback((coachId: string) => {
     return allMasterclasses.filter(mc => {
       // Check if masterclass matches the coach we're counting
       if (mc.coachId !== coachId) return false;
@@ -46,7 +46,7 @@ export function MasterclassesContent() {
 
       return true;
     }).length;
-  };
+  }, [searchQuery]);
 
   // Build filter sections with coaches
   const filterSections = useMemo((): FilterSection[] => {
@@ -66,7 +66,7 @@ export function MasterclassesContent() {
         }),
       },
     ];
-  }, [searchQuery]);
+  }, [searchQuery, getCount]);
 
   // Filter masterclasses based on search and selected coaches
   const filteredMasterclasses = useMemo(() => {

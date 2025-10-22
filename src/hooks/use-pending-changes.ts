@@ -8,7 +8,7 @@ export interface PendingChange {
   id: string;
   contentType: ContentType;
   operation: 'create' | 'update' | 'delete';
-  data: any;
+  data: Record<string, unknown>;
   timestamp: number;
 }
 

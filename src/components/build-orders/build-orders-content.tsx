@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
@@ -48,7 +48,7 @@ export function BuildOrdersContent() {
   }, []);
 
   // Count build orders for each filter with context-aware filtering
-  const getCount = (filterFn: (bo: BuildOrder) => boolean, excludeSectionId?: string) => {
+  const getCount = useCallback((filterFn: (bo: BuildOrder) => boolean, excludeSectionId?: string) => {
     return allBuildOrders.filter(bo => {
       if (!filterFn(bo)) return false;
 
@@ -79,7 +79,7 @@ export function BuildOrdersContent() {
 
       return true;
     }).length;
-  };
+  }, [selectedTags, selectedItems]);
 
   // Build filter sections with race as top-level sections
   const filterSections = useMemo((): FilterSection[] => {
@@ -112,7 +112,7 @@ export function BuildOrdersContent() {
         ],
       },
     ];
-  }, [selectedTags, selectedItems]);
+  }, [selectedTags, selectedItems, getCount]);
 
   // Filter build orders based on search, selected filters, and tags
   const filteredBuildOrders = useMemo(() => {

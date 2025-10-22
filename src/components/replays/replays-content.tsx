@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
@@ -48,7 +48,7 @@ export function ReplaysContent() {
   }, []);
 
   // Count replays for each filter with context-aware filtering
-  const getCount = (filterFn: (replay: Replay) => boolean, excludeSectionId?: string) => {
+  const getCount = useCallback((filterFn: (replay: Replay) => boolean, excludeSectionId?: string) => {
     return allReplays.filter(replay => {
       if (!filterFn(replay)) return false;
 
@@ -76,7 +76,7 @@ export function ReplaysContent() {
 
       return true;
     }).length;
-  };
+  }, [selectedTags, selectedItems]);
 
   // Build filter sections with race as top-level sections
   const filterSections = useMemo((): FilterSection[] => {
@@ -109,7 +109,7 @@ export function ReplaysContent() {
         ],
       },
     ];
-  }, [selectedTags, selectedItems]);
+  }, [selectedTags, selectedItems, getCount]);
 
   // Filter replays based on search, selected filters, and tags
   const filteredReplays = useMemo(() => {

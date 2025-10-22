@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VideoGrid } from '@/components/videos/video-grid';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
@@ -91,7 +91,7 @@ export function VideoLibrary() {
   }, []);
 
   // Count videos for each filter with current filters applied
-  const getCount = (tag: string, sectionId: string) => {
+  const getCount = useCallback((tag: string, sectionId: string) => {
     return videos.filter(video => {
       const videoTags = video.tags.map(t => t.toLowerCase());
 
@@ -109,7 +109,7 @@ export function VideoLibrary() {
 
       return true;
     }).length;
-  };
+  }, [selectedItems]);
 
   // Build filter sections
   const filterSections = useMemo((): FilterSection[] => {
@@ -146,7 +146,7 @@ export function VideoLibrary() {
         })).filter(item => item.count > 0),
       },
     ];
-  }, [selectedItems]);
+  }, [selectedItems, getCount]);
 
   const filteredVideos = useMemo(() => {
     return videos.filter(video => {

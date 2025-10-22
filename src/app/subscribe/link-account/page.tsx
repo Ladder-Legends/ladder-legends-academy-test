@@ -28,7 +28,7 @@ export default function LinkAccountPage() {
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold mb-2">Subscribe on Whop</h2>
                   <p className="text-muted-foreground mb-4">
-                    Purchase your subscription through Whop if you haven't already.
+                    Purchase your subscription through Whop if you haven&apos;t already.
                   </p>
                   <Link
                     href="https://whop.com/ladder-legends/"
@@ -56,10 +56,10 @@ export default function LinkAccountPage() {
                     After purchasing, Whop will prompt you to connect your Discord account. This is required to access the Ladder Legends Academy Discord server.
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                    <li>Click "Connect Discord" in your Whop dashboard</li>
+                    <li>Click &quot;Connect Discord&quot; in your Whop dashboard</li>
                     <li>Authorize Whop to access your Discord account</li>
-                    <li>You'll automatically be added to the Ladder Legends Academy Discord server</li>
-                    <li>You'll receive the "Subscriber" role in Discord</li>
+                    <li>You&apos;ll automatically be added to the Ladder Legends Academy Discord server</li>
+                    <li>You&apos;ll receive the &quot;Subscriber&quot; role in Discord</li>
                   </ul>
                   <Link
                     href="https://discord.gg/kpA3RZeg"
@@ -105,7 +105,7 @@ export default function LinkAccountPage() {
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold mb-2">Access Premium Content</h2>
                   <p className="text-muted-foreground">
-                    Once signed in, you'll have full access to:
+                    Once signed in, you&apos;ll have full access to:
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-3">
                     <li>Exclusive VOD library with coaching videos</li>
@@ -124,14 +124,14 @@ export default function LinkAccountPage() {
             <h3 className="text-lg font-semibold mb-3">Troubleshooting</h3>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">Can't see content after signing in?</strong>
+                <strong className="text-foreground">Can&apos;t see content after signing in?</strong>
                 <br />
-                Make sure you've linked your Discord account to Whop and have the "Subscriber" role in the Ladder Legends Academy Discord server. Try signing out and signing back in.
+                Make sure you&apos;ve linked your Discord account to Whop and have the &quot;Subscriber&quot; role in the Ladder Legends Academy Discord server. Try signing out and signing back in.
               </p>
               <p>
                 <strong className="text-foreground">Discord not linked to Whop?</strong>
                 <br />
-                Visit your Whop dashboard and look for the Discord connection option. You may need to disconnect and reconnect if it's not working.
+                Visit your Whop dashboard and look for the Discord connection option. You may need to disconnect and reconnect if it&apos;s not working.
               </p>
               <p>
                 <strong className="text-foreground">Still having issues?</strong>
