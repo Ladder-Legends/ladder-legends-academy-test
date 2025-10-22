@@ -6,9 +6,35 @@ export async function middleware(request: NextRequest) {
 
   console.log(`🛡️ Middleware running for: ${pathname}`);
 
-  // Allow access to login page and auth routes
-  if (pathname.startsWith("/login") || pathname.startsWith("/api/auth")) {
-    console.log(`⏭️ Allowing access to auth route: ${pathname}`);
+  // Allow access to public routes
+  const publicRoutes = [
+    "/login",
+    "/subscribe",
+    "/api/auth",
+    "/",
+    "/library",
+    "/build-orders",
+    "/replays",
+    "/masterclasses",
+    "/coaches",
+  ];
+
+  const isPublicRoute = publicRoutes.some(route =>
+    pathname === route || pathname.startsWith(`${route}/`) || pathname.startsWith(route)
+  );
+
+  // Define detail page patterns that require subscription
+  const detailPagePatterns = [
+    /^\/build-orders\/[^/]+$/,  // /build-orders/:id
+    /^\/replays\/[^/]+$/,         // /replays/:id
+    /^\/masterclasses\/[^/]+$/,   // /masterclasses/:id
+  ];
+
+  const isDetailPage = detailPagePatterns.some(pattern => pattern.test(pathname));
+
+  // Allow access to auth routes and subscribe page
+  if (pathname.startsWith("/login") || pathname.startsWith("/api/auth") || pathname === "/subscribe") {
+    console.log(`⏭️ Allowing access to public route: ${pathname}`);
     return NextResponse.next();
   }
 
@@ -16,31 +42,47 @@ export async function middleware(request: NextRequest) {
   const session = await auth();
   console.log(`🔐 Session check: ${session ? 'authenticated' : 'not authenticated'}`);
 
-  // Check if user is authenticated
-  if (!session) {
-    console.log("❌ No auth session found, redirecting to login");
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
   // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
   if (process.env.SKIP_ROLE_CHECK === "true") {
-    console.log("🔓 SKIP_ROLE_CHECK enabled - user authenticated, bypassing role check");
+    console.log("🔓 SKIP_ROLE_CHECK enabled - bypassing all checks");
     return NextResponse.next();
   }
 
-  // Check if user has the required role
-  console.log(`🔍 Checking role for user. hasSubscriberRole: ${session.user?.hasSubscriberRole}`);
-
-  if (!session.user?.hasSubscriberRole) {
-    console.log("❌ User authenticated but missing required role, redirecting to /login");
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("error", "no_role");
-    return NextResponse.redirect(loginUrl);
+  // Allow browse pages for everyone (authenticated or not)
+  if (isPublicRoute && !isDetailPage) {
+    console.log(`👀 Allowing browse access to: ${pathname}`);
+    return NextResponse.next();
   }
 
-  console.log("✅ User authenticated with required role");
+  // For detail pages, require subscriber role
+  if (isDetailPage) {
+    console.log(`🔒 Detail page detected: ${pathname}`);
+
+    if (!session) {
+      console.log("❌ No session, redirecting to /subscribe");
+      return NextResponse.redirect(new URL("/subscribe", request.url));
+    }
+
+    if (!session.user?.hasSubscriberRole) {
+      console.log("❌ User authenticated but not a subscriber, redirecting to /subscribe");
+      return NextResponse.redirect(new URL("/subscribe", request.url));
+    }
+
+    console.log("✅ User is subscriber, allowing access to detail page");
+    return NextResponse.next();
+  }
+
+  // For admin routes (future), require authentication
+  if (pathname.startsWith("/admin")) {
+    if (!session) {
+      console.log("❌ Admin route requires authentication, redirecting to login");
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  console.log("✅ Allowing access");
   return NextResponse.next();
 }
 
