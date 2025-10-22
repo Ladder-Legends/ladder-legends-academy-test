@@ -80,8 +80,12 @@ export function DashboardContent() {
                           <span>{masterclass.coach}</span>
                           <span>•</span>
                           <span className="capitalize">{masterclass.race}</span>
-                          <span>•</span>
-                          <span>{masterclass.episodes.length} episodes</span>
+                          {masterclass.duration && (
+                            <>
+                              <span>•</span>
+                              <span>{masterclass.duration}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </Link>

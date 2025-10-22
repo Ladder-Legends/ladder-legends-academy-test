@@ -5,15 +5,27 @@ import { FilterSidebar, type FilterSection } from '@/components/shared/filter-si
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
 import Link from 'next/link';
-import { Play, Clock } from 'lucide-react';
+import { Play, Clock, Plus, Edit, Trash2 } from 'lucide-react';
+import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { Button } from '@/components/ui/button';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { toast } from 'sonner';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
+  const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     coaches: [],
   });
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state for editing
+  const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewMasterclass, setIsNewMasterclass] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -24,6 +36,37 @@ export function MasterclassesContent() {
         : [...current, itemId];
       return { ...prev, [sectionId]: updated };
     });
+  };
+
+  // Admin handlers
+  const handleEdit = (masterclass: Masterclass) => {
+    setEditingMasterclass(masterclass);
+    setIsNewMasterclass(false);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (masterclass: Masterclass) => {
+    if (confirm(`Are you sure you want to delete "${masterclass.title}"?`)) {
+      addChange({
+        id: masterclass.id,
+        contentType: 'masterclasses',
+        operation: 'delete',
+        data: masterclass as unknown as Record<string, unknown>,
+      });
+      toast.success(`Masterclass deleted (pending commit)`);
+    }
+  };
+
+  const handleAddNew = () => {
+    setEditingMasterclass(null);
+    setIsNewMasterclass(true);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingMasterclass(null);
+    setIsNewMasterclass(false);
   };
 
   // Count masterclasses for each coach with context-aware filtering
@@ -107,11 +150,19 @@ export function MasterclassesContent() {
 
       <main className="flex-1 px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold">Masterclasses</h2>
-            <p className="text-muted-foreground">
-              In-depth series and structured courses from our coaches. Perfect for systematic improvement in specific areas.
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Masterclasses</h2>
+              <p className="text-muted-foreground">
+                In-depth video courses from our coaches. Perfect for systematic improvement in specific areas.
+              </p>
+            </div>
+            <PermissionGate require="coaches">
+              <Button onClick={handleAddNew} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add New Masterclass
+              </Button>
+            </PermissionGate>
           </div>
 
           <div className="space-y-4">
@@ -125,10 +176,9 @@ export function MasterclassesContent() {
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Series Name</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Race</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Episodes</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
@@ -141,6 +191,8 @@ export function MasterclassesContent() {
                       className={`border-t border-border hover:bg-muted/30 transition-colors ${
                         index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
                       }`}
+                      onMouseEnter={() => setHoveredRow(masterclass.id)}
+                      onMouseLeave={() => setHoveredRow(null)}
                     >
                       <td className="px-6 py-4">
                         <Link
@@ -157,24 +209,45 @@ export function MasterclassesContent() {
                       <td className="px-6 py-4 text-sm capitalize">
                         {masterclass.race}
                       </td>
-                      <td className="px-6 py-4 text-sm">{masterclass.episodes.length}</td>
                       <td className="px-6 py-4 text-sm capitalize">
                         {masterclass.difficulty}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5" />
-                          {masterclass.totalDuration}
-                        </div>
+                        {masterclass.duration && (
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5" />
+                            {masterclass.duration}
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/masterclasses/${masterclass.id}`}
-                          className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-1.5 font-medium"
-                        >
-                          <Play className="h-3.5 w-3.5" />
-                          Watch Series
-                        </Link>
+                        <div className="flex gap-2">
+                          <Link
+                            href={`/masterclasses/${masterclass.id}`}
+                            className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-1.5 font-medium"
+                          >
+                            <Play className="h-3.5 w-3.5" />
+                            Watch
+                          </Link>
+                          <PermissionGate require="coaches">
+                            {hoveredRow === masterclass.id && (
+                              <>
+                                <button
+                                  onClick={() => handleEdit(masterclass)}
+                                  className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
+                                >
+                                  <Edit className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(masterclass)}
+                                  className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </>
+                            )}
+                          </PermissionGate>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -190,6 +263,13 @@ export function MasterclassesContent() {
           </div>
         </div>
       </main>
+
+      <MasterclassEditModal
+        masterclass={editingMasterclass}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        isNew={isNewMasterclass}
+      />
     </div>
   );
 }

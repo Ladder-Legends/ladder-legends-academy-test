@@ -97,7 +97,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       id: videoData.id,
       contentType: 'videos',
       operation: isNew ? 'create' : 'update',
-      data: videoData,
+      data: videoData as unknown as Record<string, unknown>,
     });
 
     toast.success(`Video ${isNew ? 'created' : 'updated'} (pending commit)`);

@@ -78,7 +78,7 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
 
             {/* Info Card */}
             <div className="border border-border rounded-lg p-6 bg-card">
-              <h2 className="text-xl font-semibold mb-4">Series Information</h2>
+              <h2 className="text-xl font-semibold mb-4">Masterclass Information</h2>
               <dl className="grid md:grid-cols-2 gap-4">
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1">Coach</dt>
@@ -88,17 +88,22 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
                   <dt className="text-sm text-muted-foreground mb-1">Race</dt>
                   <dd className={`font-medium capitalize ${getRaceColor(masterclass.race)}`}>{masterclass.race}</dd>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground mb-1">Episodes</dt>
-                  <dd className="font-medium">{masterclass.episodes.length}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground mb-1">Total Duration</dt>
-                  <dd className="font-medium">{masterclass.totalDuration}</dd>
-                </div>
+                {masterclass.duration && (
+                  <div>
+                    <dt className="text-sm text-muted-foreground mb-1">Duration</dt>
+                    <dd className="font-medium flex items-center gap-1.5">
+                      <Clock className="h-4 w-4" />
+                      {masterclass.duration}
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1">Difficulty</dt>
                   <dd className="font-medium capitalize">{masterclass.difficulty}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground mb-1">Created</dt>
+                  <dd className="font-medium">{new Date(masterclass.createdAt).toLocaleDateString()}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1">Last Updated</dt>
@@ -107,47 +112,16 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
               </dl>
             </div>
 
-            {/* Episodes */}
-            <div className="border border-border rounded-lg p-6 bg-card">
-              <h2 className="text-xl font-semibold mb-4">Episodes</h2>
-              <div className="space-y-4">
-                {masterclass.episodes.map((episode) => (
-                  <div
-                    key={episode.episodeNumber}
-                    className="border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded">
-                            EP {episode.episodeNumber}
-                          </span>
-                          <h3 className="text-lg font-semibold">{episode.title}</h3>
-                        </div>
-                        {episode.description && (
-                          <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-                            {episode.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="h-3.5 w-3.5" />
-                            {episode.duration}
-                          </div>
-                        </div>
-                      </div>
-                      <a
-                        href={`https://youtube.com/watch?v=${episode.videoId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium text-sm"
-                      >
-                        <Play className="h-4 w-4" />
-                        Watch
-                      </a>
-                    </div>
-                  </div>
-                ))}
+            {/* Video Player */}
+            <div className="border border-border rounded-lg overflow-hidden bg-card">
+              <div className="aspect-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${masterclass.videoId}`}
+                  title={masterclass.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
               </div>
             </div>
 
@@ -168,16 +142,16 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
               </div>
             )}
 
-            {/* Start Watching Button */}
+            {/* Watch on YouTube Button */}
             <div className="flex gap-4">
               <a
-                href={`https://youtube.com/watch?v=${masterclass.episodes[0].videoId}`}
+                href={`https://youtube.com/watch?v=${masterclass.videoId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
                 <Play className="h-5 w-5" />
-                Start Watching Series
+                Watch on YouTube
               </a>
             </div>
           </div>

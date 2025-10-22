@@ -5,12 +5,18 @@ import { FilterSidebar, type FilterSection } from '@/components/shared/filter-si
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
-import { Video, X } from 'lucide-react';
+import { Video, X, Plus, Edit, Trash2 } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
+import { BuildOrderEditModal } from '@/components/admin/build-order-edit-modal';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { Button } from '@/components/ui/button';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { toast } from 'sonner';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
+  const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     terran: [],
     zerg: [],
@@ -18,6 +24,12 @@ export function BuildOrdersContent() {
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state for editing
+  const [editingBuildOrder, setEditingBuildOrder] = useState<BuildOrder | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewBuildOrder, setIsNewBuildOrder] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -36,6 +48,37 @@ export function BuildOrdersContent() {
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
+  };
+
+  // Admin handlers
+  const handleEdit = (buildOrder: BuildOrder) => {
+    setEditingBuildOrder(buildOrder);
+    setIsNewBuildOrder(false);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (buildOrder: BuildOrder) => {
+    if (confirm(`Are you sure you want to delete "${buildOrder.name}"?`)) {
+      addChange({
+        id: buildOrder.id,
+        contentType: 'build-orders',
+        operation: 'delete',
+        data: buildOrder as unknown as Record<string, unknown>,
+      });
+      toast.success(`Build order deleted (pending commit)`);
+    }
+  };
+
+  const handleAddNew = () => {
+    setEditingBuildOrder(null);
+    setIsNewBuildOrder(true);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingBuildOrder(null);
+    setIsNewBuildOrder(false);
   };
 
   // Extract all unique tags from build orders
@@ -172,11 +215,19 @@ export function BuildOrdersContent() {
 
       <main className="flex-1 px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold">Build Orders</h2>
-            <p className="text-muted-foreground">
-              Master proven build orders from our expert coaches. Each build includes detailed timings, supply counts, and linked video demonstrations.
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Build Orders</h2>
+              <p className="text-muted-foreground">
+                Master proven build orders from our expert coaches. Each build includes detailed timings, supply counts, and linked video demonstrations.
+              </p>
+            </div>
+            <PermissionGate require="coaches">
+              <Button onClick={handleAddNew} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add New Build Order
+              </Button>
+            </PermissionGate>
           </div>
 
           <div className="space-y-4">
@@ -239,6 +290,8 @@ export function BuildOrdersContent() {
                   className={`border-t border-border hover:bg-muted/30 transition-colors ${
                     index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
                   }`}
+                  onMouseEnter={() => setHoveredRow(buildOrder.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
                 >
                   <td className="px-6 py-4">
                     <Link
@@ -281,6 +334,24 @@ export function BuildOrdersContent() {
                           Video
                         </PaywallLink>
                       )}
+                      <PermissionGate require="coaches">
+                        {hoveredRow === buildOrder.id && (
+                          <>
+                            <button
+                              onClick={() => handleEdit(buildOrder)}
+                              className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(buildOrder)}
+                              className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </PermissionGate>
                     </div>
                   </td>
                 </tr>
@@ -296,6 +367,13 @@ export function BuildOrdersContent() {
           )}
         </div>
       </main>
+
+      <BuildOrderEditModal
+        buildOrder={editingBuildOrder}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        isNew={isNewBuildOrder}
+      />
     </div>
   );
 }

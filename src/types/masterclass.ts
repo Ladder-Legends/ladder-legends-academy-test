@@ -1,13 +1,5 @@
 export type Race = 'terran' | 'zerg' | 'protoss' | 'all';
 
-export interface MasterclassEpisode {
-  episodeNumber: number;
-  title: string;
-  videoId: string;
-  duration: string;
-  description?: string;
-}
-
 export interface Masterclass {
   id: string;
   title: string;
@@ -15,8 +7,8 @@ export interface Masterclass {
   coach: string;
   coachId: string;
   race: Race;
-  episodes: MasterclassEpisode[];
-  totalDuration: string;
+  videoId: string;
+  duration?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';
   tags: string[];
   thumbnail?: string;

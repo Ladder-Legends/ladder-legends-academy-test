@@ -5,12 +5,18 @@ import { FilterSidebar, type FilterSection } from '@/components/shared/filter-si
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
-import { Download, Video, X } from 'lucide-react';
+import { Download, Video, X, Plus, Edit, Trash2 } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
+import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { Button } from '@/components/ui/button';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { toast } from 'sonner';
 
 const allReplays = replaysData as Replay[];
 
 export function ReplaysContent() {
+  const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     terran: [],
     zerg: [],
@@ -18,6 +24,12 @@ export function ReplaysContent() {
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state for editing
+  const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewReplay, setIsNewReplay] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -36,6 +48,37 @@ export function ReplaysContent() {
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
+  };
+
+  // Admin handlers
+  const handleEdit = (replay: Replay) => {
+    setEditingReplay(replay);
+    setIsNewReplay(false);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (replay: Replay) => {
+    if (confirm(`Are you sure you want to delete "${replay.title}"?`)) {
+      addChange({
+        id: replay.id,
+        contentType: 'replays',
+        operation: 'delete',
+        data: replay as unknown as Record<string, unknown>,
+      });
+      toast.success(`Replay deleted (pending commit)`);
+    }
+  };
+
+  const handleAddNew = () => {
+    setEditingReplay(null);
+    setIsNewReplay(true);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingReplay(null);
+    setIsNewReplay(false);
   };
 
   // Extract all unique tags from replays
@@ -168,11 +211,19 @@ export function ReplaysContent() {
 
       <main className="flex-1 px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold">Replays</h2>
-            <p className="text-muted-foreground">
-              Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket.
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Replays</h2>
+              <p className="text-muted-foreground">
+                Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket.
+              </p>
+            </div>
+            <PermissionGate require="coaches">
+              <Button onClick={handleAddNew} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add New Replay
+              </Button>
+            </PermissionGate>
           </div>
 
           <div className="space-y-4">
@@ -236,6 +287,8 @@ export function ReplaysContent() {
                   className={`border-t border-border hover:bg-muted/30 transition-colors ${
                     index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
                   }`}
+                  onMouseEnter={() => setHoveredRow(replay.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
                 >
                   <td className="px-6 py-4">
                     <Link
@@ -303,6 +356,24 @@ export function ReplaysContent() {
                           VOD
                         </PaywallLink>
                       )}
+                      <PermissionGate require="coaches">
+                        {hoveredRow === replay.id && (
+                          <>
+                            <button
+                              onClick={() => handleEdit(replay)}
+                              className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(replay)}
+                              className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </PermissionGate>
                     </div>
                   </td>
                 </tr>
@@ -318,6 +389,13 @@ export function ReplaysContent() {
           )}
         </div>
       </main>
+
+      <ReplayEditModal
+        replay={editingReplay}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        isNew={isNewReplay}
+      />
     </div>
   );
 }
