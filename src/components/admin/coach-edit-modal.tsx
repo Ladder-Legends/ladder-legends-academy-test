@@ -20,6 +20,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Coach>>({});
   const [specialtyInput, setSpecialtyInput] = useState('');
+  const [showSpecialtyDropdown, setShowSpecialtyDropdown] = useState(false);
 
   // Get all unique specialties from existing coaches for autocomplete
   const allExistingSpecialties = useMemo(() => {
@@ -178,12 +179,14 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
                 value={specialtyInput}
                 onChange={(e) => setSpecialtyInput(e.target.value)}
                 onKeyDown={handleSpecialtyInputKeyDown}
+                onFocus={() => setShowSpecialtyDropdown(true)}
+                onBlur={() => setTimeout(() => setShowSpecialtyDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to add specialties (press Enter)"
               />
 
               {/* Autocomplete dropdown */}
-              {filteredSpecialties.length > 0 && (
+              {showSpecialtyDropdown && filteredSpecialties.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredSpecialties.map((specialty) => (
                     <button

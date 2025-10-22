@@ -25,6 +25,8 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
   const [typeInput, setTypeInput] = useState('');
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -242,6 +244,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                     setShowCoachDropdown(true);
                   }}
                   onFocus={() => setShowCoachDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
                   className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
                   placeholder="Type to search coaches..."
                 />
@@ -338,11 +341,13 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 type="text"
                 value={typeInput}
                 onChange={(e) => setTypeInput(e.target.value)}
+                onFocus={() => setShowTypeDropdown(true)}
+                onBlur={() => setTimeout(() => setShowTypeDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="macro, all-in, timing..."
               />
               {/* Type autocomplete dropdown */}
-              {filteredTypes.length > 0 && (
+              {showTypeDropdown && filteredTypes.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredTypes.map((type) => (
                     <button
@@ -415,12 +420,14 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
+                onFocus={() => setShowTagDropdown(true)}
+                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to add tags (press Enter)"
               />
 
               {/* Autocomplete dropdown */}
-              {filteredTags.length > 0 && (
+              {showTagDropdown && filteredTags.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredTags.map((tag) => (
                     <button

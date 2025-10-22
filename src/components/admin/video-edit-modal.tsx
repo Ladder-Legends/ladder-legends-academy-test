@@ -23,6 +23,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
 
   // Get all unique tags from existing videos for autocomplete
   const allExistingTags = useMemo(() => {
@@ -201,6 +202,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                     setShowCoachDropdown(true);
                   }}
                   onFocus={() => setShowCoachDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
                   className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
                   placeholder="Type to search coaches..."
                 />
@@ -295,12 +297,14 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
+                onFocus={() => setShowTagDropdown(true)}
+                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to add tags (press Enter)"
               />
 
               {/* Autocomplete dropdown */}
-              {filteredTags.length > 0 && (
+              {showTagDropdown && filteredTags.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredTags.map((tag) => (
                     <button

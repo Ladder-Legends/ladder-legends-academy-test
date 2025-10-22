@@ -22,6 +22,8 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   const [formData, setFormData] = useState<Partial<Masterclass>>({});
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [showCoachDropdown, setShowCoachDropdown] = useState(false);
 
   // Get all unique tags from existing masterclasses for autocomplete
   const allExistingTags = useMemo(() => {
@@ -175,12 +177,14 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
               type="text"
               value={coachSearch}
               onChange={(e) => setCoachSearch(e.target.value)}
+              onFocus={() => setShowCoachDropdown(true)}
+              onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
               placeholder="Type to search coaches..."
             />
 
             {/* Coach dropdown */}
-            {coachSearch && filteredCoaches.length > 0 && (
+            {showCoachDropdown && filteredCoaches.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
                 {filteredCoaches.map((coach) => (
                   <button
@@ -294,12 +298,14 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
+                onFocus={() => setShowTagDropdown(true)}
+                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to add tags (press Enter)"
               />
 
               {/* Autocomplete dropdown */}
-              {filteredTags.length > 0 && (
+              {showTagDropdown && filteredTags.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredTags.map((tag) => (
                     <button

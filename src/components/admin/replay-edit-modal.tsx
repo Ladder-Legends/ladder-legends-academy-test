@@ -24,6 +24,10 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [mapSearch, setMapSearch] = useState('');
   const [player1Search, setPlayer1Search] = useState('');
   const [player2Search, setPlayer2Search] = useState('');
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [showMapDropdown, setShowMapDropdown] = useState(false);
+  const [showPlayer1Dropdown, setShowPlayer1Dropdown] = useState(false);
+  const [showPlayer2Dropdown, setShowPlayer2Dropdown] = useState(false);
 
   // Get all unique tags from existing replays for autocomplete
   const allExistingTags = useMemo(() => {
@@ -244,12 +248,14 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                   setMapSearch(e.target.value);
                   setFormData({ ...formData, map: e.target.value });
                 }}
+                onFocus={() => setShowMapDropdown(true)}
+                onBlur={() => setTimeout(() => setShowMapDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to search maps..."
               />
 
               {/* Map autocomplete dropdown */}
-              {filteredMaps.length > 0 && (
+              {showMapDropdown && filteredMaps.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredMaps.map((map) => (
                     <button
@@ -303,12 +309,14 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                     setPlayer1Search(e.target.value);
                     updatePlayer(1, 'name', e.target.value);
                   }}
+                  onFocus={() => setShowPlayer1Dropdown(true)}
+                  onBlur={() => setTimeout(() => setShowPlayer1Dropdown(false), 200)}
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder="Type to search player names..."
                 />
 
                 {/* Player 1 autocomplete dropdown */}
-                {filteredPlayer1Names.length > 0 && (
+                {showPlayer1Dropdown && filteredPlayer1Names.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                     {filteredPlayer1Names.map((name) => (
                       <button
@@ -377,12 +385,14 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                     setPlayer2Search(e.target.value);
                     updatePlayer(2, 'name', e.target.value);
                   }}
+                  onFocus={() => setShowPlayer2Dropdown(true)}
+                  onBlur={() => setTimeout(() => setShowPlayer2Dropdown(false), 200)}
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder="Type to search player names..."
                 />
 
                 {/* Player 2 autocomplete dropdown */}
-                {filteredPlayer2Names.length > 0 && (
+                {showPlayer2Dropdown && filteredPlayer2Names.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                     {filteredPlayer2Names.map((name) => (
                       <button
@@ -553,12 +563,14 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
+                onFocus={() => setShowTagDropdown(true)}
+                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to add tags (press Enter)"
               />
 
               {/* Autocomplete dropdown */}
-              {filteredTags.length > 0 && (
+              {showTagDropdown && filteredTags.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
                   {filteredTags.map((tag) => (
                     <button
