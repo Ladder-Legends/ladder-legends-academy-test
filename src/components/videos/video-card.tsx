@@ -43,13 +43,13 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
         className="block"
         isFree={video.isFree}
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col">
-          <div className="relative aspect-video bg-muted overflow-hidden">
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0">
+          <div className="relative aspect-video bg-muted overflow-hidden m-0">
             <Image
-              src={`https://img.youtube.com/vi/${thumbnailId}/maxresdefault.jpg`}
+              src={`https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`}
               alt={video.title}
               fill
-              className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
