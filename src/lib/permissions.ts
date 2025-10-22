@@ -90,7 +90,9 @@ export function hasPermission(
   session: Session | null,
   requiredPermission: PermissionLevel | PermissionLevel[]
 ): boolean {
-  if (!session) return false;
+  // Allow emulated roles even without a session (development only)
+  const emulatedRoles = getEmulatedRoles();
+  if (!emulatedRoles && !session) return false;
 
   const permissions = Array.isArray(requiredPermission)
     ? requiredPermission
