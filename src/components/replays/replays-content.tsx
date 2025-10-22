@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
@@ -42,6 +42,9 @@ export function ReplaysContent() {
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Mobile filter state
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Modal state for editing
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
@@ -289,10 +292,17 @@ export function ReplaysContent() {
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
+        onMobileOpenChange={setIsMobileFilterOpen}
       />
 
-      <main className="flex-1 px-8 py-8 overflow-y-auto">
+      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
+          {/* Mobile Filter Button */}
+          <MobileFilterButton
+            onClick={() => setIsMobileFilterOpen(true)}
+            label="Filters & Search"
+          />
+
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold">Replays</h2>

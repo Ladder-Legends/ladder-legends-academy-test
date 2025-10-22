@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VideoGrid } from '@/components/videos/video-grid';
-import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
 import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,9 @@ export function VideoLibrary() {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewVideo, setIsNewVideo] = useState(false);
+
+  // Mobile filter state
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -316,10 +319,17 @@ export function VideoLibrary() {
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
+        onMobileOpenChange={setIsMobileFilterOpen}
       />
 
-      <main className="flex-1 px-8 py-8 overflow-y-auto">
+      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
+          {/* Mobile Filter Button */}
+          <MobileFilterButton
+            onClick={() => setIsMobileFilterOpen(true)}
+            label="Filters & Search"
+          />
+
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold">Video Library</h2>

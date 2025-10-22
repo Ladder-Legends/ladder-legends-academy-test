@@ -59,7 +59,7 @@ export function MainNav() {
 
       {/* Mobile Menu Panel */}
       <div
-        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-card border-l border-border z-50 transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-card border-l border-border shadow-xl z-50 transition-transform duration-200 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

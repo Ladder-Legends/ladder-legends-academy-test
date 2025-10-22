@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Search, X, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, X, Menu, SlidersHorizontal } from 'lucide-react';
 
 export interface FilterSection {
   id: string;
@@ -30,6 +30,10 @@ interface FilterSidebarProps {
   // Selection state
   selectedItems: Record<string, string[]>;  // sectionId -> selected item IDs
   onItemToggle: (sectionId: string, itemId: string) => void;
+
+  // Mobile button customization
+  mobileButtonLabel?: string;
+  onMobileOpenChange?: (isOpen: boolean) => void;
 }
 
 export function FilterSidebar({
@@ -40,9 +44,16 @@ export function FilterSidebar({
   sections,
   selectedItems,
   onItemToggle,
+  mobileButtonLabel = 'Filters',
+  onMobileOpenChange,
 }: FilterSidebarProps) {
   // Mobile sidebar state
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  const handleMobileOpenChange = (isOpen: boolean) => {
+    setIsMobileOpen(isOpen);
+    onMobileOpenChange?.(isOpen);
+  };
 
   // All sections expanded by default
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -140,33 +151,24 @@ export function FilterSidebar({
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
-      <button
-        onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-20 left-4 z-40 p-2 bg-card border border-border rounded-md shadow-lg hover:bg-muted transition-colors"
-        aria-label="Open filters"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
-
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsMobileOpen(false)}
+          onClick={() => handleMobileOpenChange(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        w-64 border-r border-border bg-card/30 p-4 space-y-6 overflow-y-auto
-        lg:relative lg:translate-x-0
-        fixed top-0 left-0 bottom-0 z-50 transition-transform duration-300
+        w-64 border-r border-border bg-card p-4 space-y-6 overflow-y-auto shadow-xl
+        lg:relative lg:translate-x-0 lg:shadow-none
+        fixed top-0 left-0 bottom-0 z-50 transition-transform duration-200
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Mobile Close Button */}
         <button
-          onClick={() => setIsMobileOpen(false)}
+          onClick={() => handleMobileOpenChange(false)}
           className="lg:hidden absolute top-4 right-4 p-2 hover:bg-muted rounded-md transition-colors"
           aria-label="Close filters"
         >
@@ -221,5 +223,24 @@ export function FilterSidebar({
       })}
       </aside>
     </>
+  );
+}
+
+// Separate component for the mobile filter trigger button
+interface MobileFilterButtonProps {
+  onClick: () => void;
+  label?: string;
+}
+
+export function MobileFilterButton({ onClick, label = 'Filters' }: MobileFilterButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="lg:hidden w-full px-4 py-2.5 bg-card border border-border rounded-md hover:bg-muted transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm"
+      aria-label="Open filters"
+    >
+      <SlidersHorizontal className="w-4 h-4" />
+      {label}
+    </button>
   );
 }
