@@ -53,9 +53,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
       if (process.env.SKIP_ROLE_CHECK === "true") {
-        console.log("🔓 SKIP_ROLE_CHECK enabled - granting access without role verification");
+        // Use EMULATE_ROLE to determine which role to grant
+        const emulateRole = process.env.EMULATE_ROLE?.toLowerCase() || "owner";
+
+        // Map role names to role IDs
+        const roleMap: Record<string, string> = {
+          "owner": "1386739785283928124",
+          "moderator": "1386739850731851817",
+          "coach": "1387372036665643188",
+          "subscriber": "1387076312878813337",
+          "member": "1386740453264724068",
+        };
+
+        const roleId = roleMap[emulateRole] || roleMap["owner"];
+
+        console.log(`🔓 SKIP_ROLE_CHECK enabled - emulating ${emulateRole} role`);
         session.user.hasSubscriberRole = true;
-        session.user.roles = ["1386739785283928124"]; // Grant owner role in dev
+        session.user.roles = [roleId];
         return session;
       }
 
