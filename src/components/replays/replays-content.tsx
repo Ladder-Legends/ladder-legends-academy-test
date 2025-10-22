@@ -292,6 +292,7 @@ export function ReplaysContent() {
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
+        isMobileOpen={isMobileFilterOpen}
         onMobileOpenChange={setIsMobileFilterOpen}
       />
 

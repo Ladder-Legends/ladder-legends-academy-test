@@ -52,14 +52,14 @@ export function MainNav() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-50"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Menu Panel */}
       <div
-        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-card border-l border-border shadow-xl z-50 transition-transform duration-200 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-background border-l border-border shadow-2xl z-50 transition-transform duration-200 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

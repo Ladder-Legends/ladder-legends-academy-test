@@ -33,6 +33,7 @@ interface FilterSidebarProps {
 
   // Mobile button customization
   mobileButtonLabel?: string;
+  isMobileOpen?: boolean;
   onMobileOpenChange?: (isOpen: boolean) => void;
 }
 
@@ -45,13 +46,17 @@ export function FilterSidebar({
   selectedItems,
   onItemToggle,
   mobileButtonLabel = 'Filters',
+  isMobileOpen: controlledMobileOpen,
   onMobileOpenChange,
 }: FilterSidebarProps) {
-  // Mobile sidebar state
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  // Mobile sidebar state - use controlled state if provided, otherwise internal state
+  const [internalMobileOpen, setInternalMobileOpen] = useState(false);
+  const isMobileOpen = controlledMobileOpen !== undefined ? controlledMobileOpen : internalMobileOpen;
 
   const handleMobileOpenChange = (isOpen: boolean) => {
-    setIsMobileOpen(isOpen);
+    if (controlledMobileOpen === undefined) {
+      setInternalMobileOpen(isOpen);
+    }
     onMobileOpenChange?.(isOpen);
   };
 

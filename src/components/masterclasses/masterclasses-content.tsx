@@ -152,6 +152,7 @@ export function MasterclassesContent() {
         sections={filterSections}
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
+        isMobileOpen={isMobileFilterOpen}
         onMobileOpenChange={setIsMobileFilterOpen}
       />
 
