@@ -4,12 +4,19 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VideoGrid } from '@/components/videos/video-grid';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { VideoEditModal } from '@/components/admin/video-edit-modal';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { Button } from '@/components/ui/button';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 import videos from '@/data/videos.json';
-import { X } from 'lucide-react';
+import { Video } from '@/types/video';
+import { X, Plus, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function VideoLibrary() {
   const searchParams = useSearchParams();
   const coachFromUrl = searchParams.get('coach');
+  const { addChange } = usePendingChanges();
 
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     races: [],
@@ -18,6 +25,11 @@ export function VideoLibrary() {
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state for editing
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewVideo, setIsNewVideo] = useState(false);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -36,6 +48,37 @@ export function VideoLibrary() {
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
+  };
+
+  // Admin handlers
+  const handleEdit = (video: Video) => {
+    setEditingVideo(video);
+    setIsNewVideo(false);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (video: Video) => {
+    if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
+      addChange({
+        id: video.id,
+        contentType: 'videos',
+        operation: 'delete',
+        data: video,
+      });
+      toast.success(`Video deleted (pending commit)`);
+    }
+  };
+
+  const handleAddNew = () => {
+    setEditingVideo(null);
+    setIsNewVideo(true);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingVideo(null);
+    setIsNewVideo(false);
   };
 
   // Extract all unique tags from videos
@@ -158,15 +201,23 @@ export function VideoLibrary() {
 
       <main className="flex-1 px-8 py-8 overflow-y-auto">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold">Video Library</h2>
-            <p className="text-muted-foreground">
-              {hasActiveFilters ? (
-                <>Showing {filteredVideos.length} filtered video{filteredVideos.length !== 1 ? 's' : ''}</>
-              ) : (
-                <>Browse our collection of {videos.length} coaching videos</>
-              )}
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Video Library</h2>
+              <p className="text-muted-foreground">
+                {hasActiveFilters ? (
+                  <>Showing {filteredVideos.length} filtered video{filteredVideos.length !== 1 ? 's' : ''}</>
+                ) : (
+                  <>Browse our collection of {videos.length} coaching videos</>
+                )}
+              </p>
+            </div>
+            <PermissionGate requiredRole="coach">
+              <Button onClick={handleAddNew} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add New Video
+              </Button>
+            </PermissionGate>
           </div>
 
           {/* Tag Filters */}
@@ -204,9 +255,20 @@ export function VideoLibrary() {
             </div>
           )}
 
-          <VideoGrid videos={filteredVideos} />
+          <VideoGrid
+            videos={filteredVideos}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </div>
       </main>
+
+      <VideoEditModal
+        video={editingVideo}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        isNew={isNewVideo}
+      />
     </div>
   );
 }

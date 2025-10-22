@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Redirect to the videos admin page by default
+// Redirect to home page - edit content in-place on existing pages
 export default function AdminPage() {
-  redirect("/admin/videos");
+  redirect("/");
 }

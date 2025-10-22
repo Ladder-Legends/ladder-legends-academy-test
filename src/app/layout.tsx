@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { Toaster } from "@/components/ui/toaster";
+import { CommitButton } from "@/components/admin/commit-button";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
           {children}
         </SessionProvider>
         <Toaster />
+        <CommitButton />
       </body>
     </html>
   );
