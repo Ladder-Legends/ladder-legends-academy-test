@@ -5,16 +5,20 @@ import { FilterSidebar, type FilterSection } from '@/components/shared/filter-si
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
 import Link from 'next/link';
-import { Play, Clock, Plus, Edit, Trash2 } from 'lucide-react';
+import { Play, Clock, Plus, Edit, Trash2, Lock } from 'lucide-react';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
+import { PaywallLink } from '@/components/auth/paywall-link';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     coaches: [],
@@ -192,12 +196,20 @@ export function MasterclassesContent() {
                       }`}
                     >
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/masterclasses/${masterclass.id}`}
-                          className="text-base font-medium hover:text-primary transition-colors"
-                        >
-                          {masterclass.title}
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/masterclasses/${masterclass.id}`}
+                            className="text-base font-medium hover:text-primary transition-colors"
+                          >
+                            {masterclass.title}
+                          </Link>
+                          {!masterclass.isFree && !hasSubscriberRole && (
+                            <span className="bg-primary/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium whitespace-nowrap">
+                              <Lock className="w-3 h-3" />
+                              Subscriber Only
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1 leading-relaxed">
                           {masterclass.description}
                         </p>

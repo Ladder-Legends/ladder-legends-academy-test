@@ -5,17 +5,20 @@ import { FilterSidebar, type FilterSection } from '@/components/shared/filter-si
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
-import { Download, Video, X, Plus, Edit, Trash2 } from 'lucide-react';
+import { Download, Video, X, Plus, Edit, Trash2, Lock } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 const allReplays = replaysData as Replay[];
 
 export function ReplaysContent() {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     terran: [],
@@ -288,12 +291,20 @@ export function ReplaysContent() {
                   }`}
                 >
                   <td className="px-6 py-4">
-                    <Link
-                      href={`/replays/${replay.id}`}
-                      className="text-base font-medium hover:text-primary transition-colors"
-                    >
-                      {replay.title}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/replays/${replay.id}`}
+                        className="text-base font-medium hover:text-primary transition-colors"
+                      >
+                        {replay.title}
+                      </Link>
+                      {!replay.isFree && !hasSubscriberRole && (
+                        <span className="bg-primary/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium whitespace-nowrap">
+                          <Lock className="w-3 h-3" />
+                          Subscriber Only
+                        </span>
+                      )}
+                    </div>
                     {replay.coach && (
                       <p className="text-sm text-muted-foreground mt-1.5">
                         Coach: {replay.coach}
