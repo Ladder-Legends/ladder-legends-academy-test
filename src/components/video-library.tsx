@@ -8,10 +8,13 @@ import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import videos from '@/data/videos.json';
+import videosData from '@/data/videos.json';
 import { Video } from '@/types/video';
 import { X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Cast imported JSON to Video[] to ensure proper typing
+const videos = videosData as Video[];
 
 export function VideoLibrary() {
   const searchParams = useSearchParams();
