@@ -72,7 +72,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               </div>
             )}
           </div>
-          <CardHeader className="flex-1">
+          <CardHeader className="flex-1 pb-3">
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               {video.title}
             </CardTitle>
@@ -80,7 +80,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               {video.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-0">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CalendarDays className="w-4 h-4" />
               <span>{formatDate(video.date)}</span>
