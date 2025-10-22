@@ -93,13 +93,31 @@ export function VideoLibrary() {
     return Array.from(tagSet).sort();
   }, []);
 
+  // Extract all unique coaches from videos
+  const allCoaches = useMemo(() => {
+    const coachSet = new Set<string>();
+    videos.forEach(video => {
+      if (video.coachId) {
+        coachSet.add(video.coachId);
+      }
+    });
+    return Array.from(coachSet).sort();
+  }, []);
+
   // Count videos for each filter with current filters applied
   const getCount = useCallback((tag: string, sectionId: string) => {
     return videos.filter(video => {
       const videoTags = video.tags.map(t => t.toLowerCase());
+      const videoCoachId = video.coachId?.toLowerCase() || '';
 
-      // Check if video matches the tag we're counting
-      if (!videoTags.includes(tag.toLowerCase())) return false;
+      // Check if video matches the tag/coach we're counting
+      if (sectionId === 'coaches') {
+        // For coaches, check coachId instead of tags
+        if (videoCoachId !== tag.toLowerCase()) return false;
+      } else {
+        // For other sections, check tags as before
+        if (!videoTags.includes(tag.toLowerCase())) return false;
+      }
 
       // Apply other active filters
       const races = sectionId === 'races' ? [] : (selectedItems.races || []);
@@ -108,7 +126,7 @@ export function VideoLibrary() {
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
-      if (coaches.length > 0 && !coaches.some(c => videoTags.includes(c))) return false;
+      if (coaches.length > 0 && !coaches.some(c => videoCoachId === c.toLowerCase())) return false;
 
       return true;
     }).length;
@@ -118,7 +136,13 @@ export function VideoLibrary() {
   const filterSections = useMemo((): FilterSection[] => {
     const races = ['terran', 'zerg', 'protoss'];
     const generalTopics = ['mindset', 'fundamentals', 'meta', 'build order', 'micro', 'macro'];
-    const coaches = ['groovy', 'hino', 'coach nico', 'gamerrichy', 'battleb', 'krystianer', 'drakka'];
+
+    // Helper to format coach name for display
+    const formatCoachName = (coachId: string): string => {
+      // Find the coach's display name from the video data
+      const video = videos.find(v => v.coachId === coachId);
+      return video?.coach || coachId;
+    };
 
     return [
       {
@@ -142,19 +166,20 @@ export function VideoLibrary() {
       {
         id: 'coaches',
         label: 'Coaches',
-        items: coaches.map(coach => ({
-          id: coach,
-          label: coach,
-          count: getCount(coach, 'coaches'),
+        items: allCoaches.map(coachId => ({
+          id: coachId,
+          label: formatCoachName(coachId),
+          count: getCount(coachId, 'coaches'),
         })).filter(item => item.count > 0),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedItems, getCount]);
+  }, [selectedItems, getCount, allCoaches]);
 
   const filteredVideos = useMemo(() => {
     return videos.filter(video => {
       const videoTags = video.tags.map(t => t.toLowerCase());
+      const videoCoachId = video.coachId?.toLowerCase() || '';
 
       // Apply search filter
       if (searchQuery.trim()) {
@@ -162,7 +187,8 @@ export function VideoLibrary() {
         const matchesSearch =
           video.title.toLowerCase().includes(query) ||
           video.description.toLowerCase().includes(query) ||
-          videoTags.some(tag => tag.includes(query));
+          videoTags.some(tag => tag.includes(query)) ||
+          video.coach?.toLowerCase().includes(query);
         if (!matchesSearch) return false;
       }
 
@@ -173,7 +199,7 @@ export function VideoLibrary() {
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
-      if (coaches.length > 0 && !coaches.some(c => videoTags.includes(c))) return false;
+      if (coaches.length > 0 && !coaches.some(c => videoCoachId === c.toLowerCase())) return false;
 
       // If any tag filter is active, video must have all selected tags
       if (selectedTags.length > 0 && !selectedTags.every(tag => video.tags.includes(tag))) {
