@@ -1,3 +1,5 @@
+'use client';
+
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import Image from 'next/image';
@@ -5,23 +7,21 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
-import { Video, ArrowLeft } from 'lucide-react';
+import { Video, ArrowLeft, Lock } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
+import { useSession } from 'next-auth/react';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
-export async function generateStaticParams() {
-  return allBuildOrders.map((buildOrder) => ({
-    id: buildOrder.id,
-  }));
-}
-
 export default function BuildOrderDetailPage({ params }: { params: { id: string } }) {
+  const { data: session } = useSession();
   const buildOrder = allBuildOrders.find(bo => bo.id === params.id);
 
   if (!buildOrder) {
     notFound();
   }
+
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -84,7 +84,15 @@ export default function BuildOrderDetailPage({ params }: { params: { id: string 
 
             {/* Title Section */}
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold">{buildOrder.name}</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold">{buildOrder.name}</h1>
+                {!buildOrder.isFree && !hasSubscriberRole && (
+                  <span className="bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                    <Lock className="h-3 w-3" />
+                    Subscriber Only
+                  </span>
+                )}
+              </div>
               <div className="flex flex-wrap gap-3">
                 <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getTypeColor(buildOrder.type)}`}>
                   {buildOrder.type}
