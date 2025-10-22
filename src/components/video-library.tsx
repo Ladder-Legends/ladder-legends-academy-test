@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import videos from '@/data/videos.json';
 import { Video } from '@/types/video';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function VideoLibrary() {
@@ -146,6 +146,7 @@ export function VideoLibrary() {
         })).filter(item => item.count > 0),
       },
     ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItems, getCount]);
 
   const filteredVideos = useMemo(() => {

@@ -109,6 +109,7 @@ export function ReplaysContent() {
         ],
       },
     ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTags, selectedItems, getCount]);
 
   // Filter replays based on search, selected filters, and tags

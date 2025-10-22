@@ -112,6 +112,7 @@ export function BuildOrdersContent() {
         ],
       },
     ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTags, selectedItems, getCount]);
 
   // Filter build orders based on search, selected filters, and tags

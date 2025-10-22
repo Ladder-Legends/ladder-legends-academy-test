@@ -66,6 +66,7 @@ export function MasterclassesContent() {
         }),
       },
     ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, getCount]);
 
   // Filter masterclasses based on search and selected coaches

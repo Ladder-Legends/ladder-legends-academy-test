@@ -100,7 +100,7 @@ export function CommitButton() {
             <div key={i} className="text-sm text-muted-foreground">
               <span className="capitalize">{change.operation}</span> {change.contentType.replace('-', ' ')}
               {' '}
-              <span className="text-foreground font-mono">{change.data.id}</span>
+              <span className="text-foreground font-mono">{String(change.data.id)}</span>
             </div>
           ))}
         </div>
