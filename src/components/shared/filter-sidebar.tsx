@@ -167,7 +167,7 @@ export function FilterSidebar({
       {/* Sidebar */}
       <aside className={`
         w-64 border-r border-border bg-card p-4 space-y-6 overflow-y-auto shadow-xl
-        lg:relative lg:translate-x-0 lg:shadow-none
+        lg:relative lg:translate-x-0 lg:shadow-none lg:z-0
         fixed top-0 left-0 bottom-0 z-50 transition-transform duration-200
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
