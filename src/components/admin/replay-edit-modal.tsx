@@ -28,6 +28,8 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [showMapDropdown, setShowMapDropdown] = useState(false);
   const [showPlayer1Dropdown, setShowPlayer1Dropdown] = useState(false);
   const [showPlayer2Dropdown, setShowPlayer2Dropdown] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   // Get all unique tags from existing replays for autocomplete
   const allExistingTags = useMemo(() => {
@@ -185,6 +187,63 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         [field]: value,
       }
     });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file extension
+    if (!file.name.endsWith('.SC2Replay')) {
+      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size exceeds maximum allowed size of 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Delete old blob if exists
+      if (formData.downloadUrl) {
+        await fetch('/api/delete-replay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: formData.downloadUrl }),
+        });
+      }
+
+      // Upload new file
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const response = await fetch('/api/upload-replay', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+
+      const { url, filename } = await response.json();
+
+      setFormData({ ...formData, downloadUrl: url });
+      setUploadedFileName(filename);
+      toast.success('Replay file uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to upload file');
+    } finally {
+      setIsUploading(false);
+      // Reset the input
+      e.target.value = '';
+    }
   };
 
   const handleSave = () => {
@@ -499,14 +558,47 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Download URL</label>
-            <input
-              type="text"
-              value={formData.downloadUrl || ''}
-              onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="https://example.com/replay.SC2Replay"
-            />
+            <label className="block text-sm font-medium mb-1">Replay File (.SC2Replay)</label>
+            <div className="space-y-2">
+              {/* Current file display */}
+              {formData.downloadUrl && (
+                <div className="flex items-center gap-2 p-2 bg-muted rounded-md text-sm">
+                  <span className="flex-1 truncate">
+                    {uploadedFileName || formData.downloadUrl.split('/').pop()}
+                  </span>
+                  <a
+                    href={formData.downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    View
+                  </a>
+                </div>
+              )}
+
+              {/* File upload button */}
+              <label className="block">
+                <input
+                  type="file"
+                  accept=".SC2Replay"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+                <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
+                  isUploading
+                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'border-primary text-primary bg-transparent hover:bg-primary/10'
+                }`}>
+                  {isUploading ? 'Uploading...' : formData.downloadUrl ? 'Replace File' : 'Upload File'}
+                </span>
+              </label>
+
+              <p className="text-xs text-muted-foreground">
+                Max file size: 5MB • Allowed: .SC2Replay files
+              </p>
+            </div>
           </div>
 
           <div>
