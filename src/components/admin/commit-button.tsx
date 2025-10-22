@@ -22,47 +22,31 @@ export function CommitButton() {
     setIsCommitting(true);
 
     try {
-      // Commit each change to GitHub via the API
-      const results = await Promise.allSettled(
-        changes.map(change =>
-          fetch('/api/admin/commit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contentType: change.contentType,
-              operation: change.operation,
-              data: change.data,
-            }),
-          }).then(async res => {
-            if (!res.ok) {
-              const errorData = await res.json();
-              console.error('Commit failed:', errorData);
-              throw new Error(errorData.error || `Failed to commit ${change.id}`);
-            }
-            return res.json();
-          })
-        )
-      );
+      // Commit all changes to GitHub in a single batch via the API
+      const response = await fetch('/api/admin/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          changes: changes,
+        }),
+      });
 
-      const failures = results.filter(r => r.status === 'rejected');
-
-      if (failures.length === 0) {
-        toast.success(
-          `Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''}! The site is rebuilding with your changes. Please wait about a minute and then refresh the page to see your updates.`,
-          { duration: 10000 }
-        );
-        clearAllChanges();
-      } else {
-        // Show detailed error message from the first failure
-        const firstFailure = failures[0];
-        const errorMessage = firstFailure.status === 'rejected'
-          ? (firstFailure.reason?.message || 'Unknown error')
-          : 'Unknown error';
-        toast.error(`Failed to commit: ${errorMessage}`);
-        console.error('Commit failures:', failures);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Commit failed:', errorData);
+        throw new Error(errorData.error || 'Failed to commit changes');
       }
+
+      await response.json();
+
+      toast.success(
+        `Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''} in a single commit! The site is rebuilding with your changes. Please wait about a minute and then refresh the page to see your updates.`,
+        { duration: 10000 }
+      );
+      clearAllChanges();
     } catch (error) {
-      toast.error('Failed to commit changes');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to commit: ${errorMessage}`);
       console.error(error);
     } finally {
       setIsCommitting(false);
