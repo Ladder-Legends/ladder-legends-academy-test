@@ -6,6 +6,7 @@ import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
 import { Video, X } from 'lucide-react';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
@@ -270,15 +271,14 @@ export function BuildOrdersContent() {
                         View
                       </Link>
                       {buildOrder.videoId && (
-                        <a
+                        <PaywallLink
                           href={`https://youtube.com/watch?v=${buildOrder.videoId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          external
                           className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Video className="h-3.5 w-3.5" />
                           Video
-                        </a>
+                        </PaywallLink>
                       )}
                     </div>
                   </td>

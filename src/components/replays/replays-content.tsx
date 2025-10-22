@@ -6,6 +6,7 @@ import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
 import { Download, Video, X } from 'lucide-react';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allReplays = replaysData as Replay[];
 
@@ -283,23 +284,23 @@ export function ReplaysContent() {
                         View
                       </Link>
                       {replay.downloadUrl && (
-                        <a
+                        <PaywallLink
                           href={replay.downloadUrl}
-                          download
+                          external
                           className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Download className="h-3.5 w-3.5" />
                           Download
-                        </a>
+                        </PaywallLink>
                       )}
                       {replay.coachingVideoId && (
-                        <Link
+                        <PaywallLink
                           href={`/?videoId=${replay.coachingVideoId}`}
                           className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Video className="h-3.5 w-3.5" />
                           VOD
-                        </Link>
+                        </PaywallLink>
                       )}
                     </div>
                   </td>

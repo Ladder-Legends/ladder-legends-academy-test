@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Video } from "@/types/video";
 import { CalendarDays, PlayCircle } from "lucide-react";
 import Image from "next/image";
+import { PaywallLink } from "@/components/auth/paywall-link";
 
 interface VideoCardProps {
   video: Video;
@@ -23,10 +24,9 @@ export function VideoCard({ video }: VideoCardProps) {
   };
 
   return (
-    <a
+    <PaywallLink
       href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-      target="_blank"
-      rel="noopener noreferrer"
+      external
       className="group"
     >
       <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col">
@@ -68,6 +68,6 @@ export function VideoCard({ video }: VideoCardProps) {
           </div>
         </CardContent>
       </Card>
-    </a>
+    </PaywallLink>
   );
 }
