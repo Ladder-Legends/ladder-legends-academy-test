@@ -24,6 +24,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [youtubeIdInput, setYoutubeIdInput] = useState('');
 
   // Get all unique tags from existing videos for autocomplete
   const allExistingTags = useMemo(() => {
@@ -60,16 +61,18 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         id: uuidv4(),
         title: '',
         description: '',
-        youtubeId: '',
+        youtubeIds: [],
         date: new Date().toISOString().split('T')[0],
         tags: [],
         race: 'terran',
         coach: '',
         coachId: '',
+        thumbnailVideoIndex: 0,
       });
       setCoachSearch('');
     }
     setTagInput('');
+    setYoutubeIdInput('');
   }, [video, isNew, isOpen]);
 
   const addTag = (tag: string) => {
@@ -119,24 +122,64 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     setShowCoachDropdown(true);
   };
 
+  const addYoutubeId = (ytId: string) => {
+    const trimmedId = ytId.trim();
+    if (trimmedId && !formData.youtubeIds?.includes(trimmedId)) {
+      setFormData({ ...formData, youtubeIds: [...(formData.youtubeIds || []), trimmedId] });
+    }
+    setYoutubeIdInput('');
+  };
+
+  const removeYoutubeId = (index: number) => {
+    setFormData({
+      ...formData,
+      youtubeIds: formData.youtubeIds?.filter((_, i) => i !== index) || []
+    });
+  };
+
+  const handleYoutubeIdKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (youtubeIdInput.trim()) {
+        addYoutubeId(youtubeIdInput);
+      }
+    }
+  };
+
   const handleSave = () => {
-    if (!formData.id || !formData.title || !formData.youtubeId || !formData.race || !formData.coach || !formData.coachId) {
-      toast.error('Please fill in all required fields (Title, YouTube ID, Race, Coach)');
+    // Support both old format (youtubeId) and new format (youtubeIds)
+    const hasYoutubeIds = formData.youtubeIds && formData.youtubeIds.length > 0;
+    const hasYoutubeId = formData.youtubeId;
+
+    if (!formData.id || !formData.title || (!hasYoutubeIds && !hasYoutubeId) || !formData.race || !formData.coach || !formData.coachId) {
+      toast.error('Please fill in all required fields (Title, YouTube ID(s), Race, Coach)');
       return;
     }
+
+    // Determine thumbnail ID (first video in playlist or single video)
+    const thumbnailId = hasYoutubeIds
+      ? formData.youtubeIds![formData.thumbnailVideoIndex || 0]
+      : formData.youtubeId!;
 
     const videoData: Video = {
       id: formData.id,
       title: formData.title,
       description: formData.description || '',
-      youtubeId: formData.youtubeId,
-      thumbnail: `https://img.youtube.com/vi/${formData.youtubeId}/hqdefault.jpg`,
+      thumbnail: `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`,
       date: formData.date || new Date().toISOString().split('T')[0],
       tags: formData.tags || [],
-      race: formData.race,
+      race: formData.race!,
       coach: formData.coach,
       coachId: formData.coachId,
     };
+
+    // Add the appropriate YouTube ID format
+    if (hasYoutubeIds) {
+      videoData.youtubeIds = formData.youtubeIds;
+      videoData.thumbnailVideoIndex = formData.thumbnailVideoIndex || 0;
+    } else {
+      videoData.youtubeId = formData.youtubeId;
+    }
 
     addChange({
       id: videoData.id,
@@ -243,17 +286,100 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">YouTube ID *</label>
-          <input
-            type="text"
-            value={formData.youtubeId || ''}
-            onChange={(e) => setFormData({ ...formData, youtubeId: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="dQw4w9WgXcQ"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            The ID from the YouTube URL (e.g., youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>)
-          </p>
+          <label className="block text-sm font-medium mb-1">
+            YouTube Video(s) *
+            {formData.youtubeIds && formData.youtubeIds.length > 1 && (
+              <span className="ml-2 text-xs text-muted-foreground">
+                (Playlist with {formData.youtubeIds.length} videos)
+              </span>
+            )}
+          </label>
+          <div className="space-y-2">
+            {/* Display existing youtubeId (for backwards compatibility with old videos) */}
+            {formData.youtubeId && !formData.youtubeIds?.length && (
+              <div className="px-3 py-2 border border-border rounded-md bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-mono">{formData.youtubeId}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Convert to youtubeIds format
+                      setFormData({
+                        ...formData,
+                        youtubeIds: [formData.youtubeId!],
+                        youtubeId: undefined,
+                      });
+                    }}
+                    className="text-xs text-primary hover:text-primary/70"
+                  >
+                    Convert to Playlist
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Display youtubeIds list */}
+            {formData.youtubeIds && formData.youtubeIds.length > 0 && (
+              <div className="space-y-2">
+                {formData.youtubeIds.map((ytId, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 px-3 py-2 border border-border rounded-md bg-muted/50"
+                  >
+                    <span className="text-sm text-muted-foreground font-medium w-6">
+                      {index + 1}.
+                    </span>
+                    <span className="flex-1 text-sm font-mono">{ytId}</span>
+                    {index === (formData.thumbnailVideoIndex || 0) && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                        Thumbnail
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, thumbnailVideoIndex: index })}
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Set as Thumbnail
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeYoutubeId(index)}
+                      className="text-destructive hover:text-destructive/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Input for adding new YouTube IDs (only show if using youtubeIds format or new video) */}
+            {(!formData.youtubeId || formData.youtubeIds) && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={youtubeIdInput}
+                  onChange={(e) => setYoutubeIdInput(e.target.value)}
+                  onKeyDown={handleYoutubeIdKeyDown}
+                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
+                  placeholder="dQw4w9WgXcQ (press Enter to add)"
+                />
+                <button
+                  type="button"
+                  onClick={() => youtubeIdInput.trim() && addYoutubeId(youtubeIdInput)}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              The ID from the YouTube URL (e.g., youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>).
+              Add multiple videos to create a playlist.
+            </p>
+          </div>
         </div>
 
         <div>

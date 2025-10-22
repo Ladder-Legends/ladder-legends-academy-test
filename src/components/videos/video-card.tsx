@@ -3,8 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Video } from "@/types/video";
-import { CalendarDays, PlayCircle, Pencil, Trash2 } from "lucide-react";
+import { Video, isPlaylist, getThumbnailYoutubeId } from "@/types/video";
+import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
@@ -29,25 +29,37 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
     return 'bg-muted hover:bg-muted/80 text-foreground';
   };
 
+  const videoIsPlaylist = isPlaylist(video);
+  const thumbnailId = getThumbnailYoutubeId(video);
+
   return (
     <div className="relative group">
       <PaywallLink
-        href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-        external
+        href={`/library/${video.id}`}
         className="block"
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col">
           <div className="relative aspect-video bg-muted overflow-hidden">
             <Image
-              src={video.thumbnail}
+              src={`https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`}
               alt={video.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <PlayCircle className="w-16 h-16 text-white" />
+              {videoIsPlaylist ? (
+                <ListVideo className="w-16 h-16 text-white" />
+              ) : (
+                <PlayCircle className="w-16 h-16 text-white" />
+              )}
             </div>
+            {videoIsPlaylist && (
+              <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-1 rounded text-xs text-white flex items-center gap-1">
+                <ListVideo className="w-3 h-3" />
+                Playlist
+              </div>
+            )}
           </div>
           <CardHeader className="flex-1">
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">

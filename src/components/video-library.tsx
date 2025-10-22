@@ -9,7 +9,7 @@ import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import videosData from '@/data/videos.json';
-import { Video } from '@/types/video';
+import { Video, isPlaylist } from '@/types/video';
 import { X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +25,7 @@ export function VideoLibrary() {
     races: [],
     general: [],
     coaches: coachFromUrl ? [coachFromUrl] : [],
+    contentType: [], // 'single' or 'playlist'
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -109,24 +110,39 @@ export function VideoLibrary() {
     return videos.filter(video => {
       const videoTags = video.tags.map(t => t.toLowerCase());
       const videoCoachId = video.coachId?.toLowerCase() || '';
+      const videoIsPlaylist = isPlaylist(video);
 
-      // Check if video matches the tag/coach we're counting
+      // Check if video matches the tag/coach/contentType we're counting
       if (sectionId === 'coaches') {
         // For coaches, check coachId instead of tags
         if (videoCoachId !== tag.toLowerCase()) return false;
+      } else if (sectionId === 'contentType') {
+        // For content type, check if it's a playlist or single video
+        if (tag === 'playlist' && !videoIsPlaylist) return false;
+        if (tag === 'single' && videoIsPlaylist) return false;
       } else {
         // For other sections, check tags as before
         if (!videoTags.includes(tag.toLowerCase())) return false;
       }
 
-      // Apply other active filters
+      // Apply other active filters (excluding current section)
       const races = sectionId === 'races' ? [] : (selectedItems.races || []);
       const general = sectionId === 'general' ? [] : (selectedItems.general || []);
       const coaches = sectionId === 'coaches' ? [] : (selectedItems.coaches || []);
+      const contentTypes = sectionId === 'contentType' ? [] : (selectedItems.contentType || []);
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
       if (coaches.length > 0 && !coaches.some(c => videoCoachId === c.toLowerCase())) return false;
+
+      // Apply content type filter
+      if (contentTypes.length > 0) {
+        const matchesContentType = contentTypes.some(type =>
+          (type === 'playlist' && videoIsPlaylist) ||
+          (type === 'single' && !videoIsPlaylist)
+        );
+        if (!matchesContentType) return false;
+      }
 
       return true;
     }).length;
@@ -145,6 +161,22 @@ export function VideoLibrary() {
     };
 
     return [
+      {
+        id: 'contentType',
+        label: 'Content Type',
+        items: [
+          {
+            id: 'single',
+            label: 'Single Videos',
+            count: getCount('single', 'contentType'),
+          },
+          {
+            id: 'playlist',
+            label: 'Playlists',
+            count: getCount('playlist', 'contentType'),
+          },
+        ].filter(item => item.count > 0),
+      },
       {
         id: 'races',
         label: 'Race-Specific',
@@ -196,10 +228,21 @@ export function VideoLibrary() {
       const races = selectedItems.races || [];
       const general = selectedItems.general || [];
       const coaches = selectedItems.coaches || [];
+      const contentTypes = selectedItems.contentType || [];
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
       if (coaches.length > 0 && !coaches.some(c => videoCoachId === c.toLowerCase())) return false;
+
+      // Apply content type filter (playlists vs single videos)
+      if (contentTypes.length > 0) {
+        const videoIsPlaylist = isPlaylist(video);
+        const matchesContentType = contentTypes.some(type =>
+          (type === 'playlist' && videoIsPlaylist) ||
+          (type === 'single' && !videoIsPlaylist)
+        );
+        if (!matchesContentType) return false;
+      }
 
       // If any tag filter is active, video must have all selected tags
       if (selectedTags.length > 0 && !selectedTags.every(tag => video.tags.includes(tag))) {
@@ -214,6 +257,7 @@ export function VideoLibrary() {
     (selectedItems.races?.length || 0) > 0 ||
     (selectedItems.general?.length || 0) > 0 ||
     (selectedItems.coaches?.length || 0) > 0 ||
+    (selectedItems.contentType?.length || 0) > 0 ||
     selectedTags.length > 0 ||
     searchQuery.trim().length > 0;
 
