@@ -718,7 +718,9 @@
     "youtubeId": "aLP0tR22PO0",
     "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
     "date": "2025-10-22",
-    "tags": [],
+    "tags": [
+      "nico, terran, tvz, macro, timing push"
+    ],
     "race": "terran",
     "coach": "Nico",
     "coachId": "coach-nico"
