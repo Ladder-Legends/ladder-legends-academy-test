@@ -34,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, trigger }) {
       // Store access token and Discord user info in JWT
       if (account?.access_token) {
         token.accessToken = account.access_token;
@@ -42,47 +42,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (profile) {
         token.discordId = profile.id;
       }
+
+      // Fetch roles only on initial sign-in or when explicitly triggered
+      // This prevents hitting Discord API on every page load
+      const shouldFetchRoles = account || trigger === "update";
+
+      if (shouldFetchRoles && token.discordId) {
+        // Hardcoded user override (for development/testing)
+        const HARDCODED_USER_ID = process.env.HARDCODED_USER_ID || "";
+        if (HARDCODED_USER_ID && token.discordId === HARDCODED_USER_ID) {
+          const hardcodedRole = process.env.HARDCODED_ROLE || "";
+          const isSubscriber = process.env.HARDCODED_USER_IS_SUBSCRIBER === "true";
+
+          console.log(`🔑 Hardcoded user override: ${HARDCODED_USER_ID}`);
+          console.log(`   Role: ${hardcodedRole || "none"}`);
+          console.log(`   Subscriber: ${isSubscriber}`);
+
+          token.userRoles = hardcodedRole ? [hardcodedRole] : [];
+          token.hasSubscriberRole = isSubscriber;
+          token.rolesFetchedAt = Date.now();
+        } else {
+          // Fetch roles from Discord API (only once during login)
+          try {
+            const userRoles = await checkUserRole(
+              token.accessToken as string,
+              token.discordId as string
+            );
+            token.userRoles = userRoles;
+            token.hasSubscriberRole = userRoles.length > 0;
+            token.rolesFetchedAt = Date.now();
+            console.log(`✅ Roles cached for user ${token.discordId}: ${userRoles.length} roles`);
+          } catch (error) {
+            console.error("Error fetching user roles:", error);
+            token.userRoles = [];
+            token.hasSubscriberRole = false;
+            token.rolesFetchedAt = Date.now();
+          }
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
-      // Add Discord info to session
+      // Add Discord info to session from cached JWT token
       session.accessToken = token.accessToken as string;
       session.user.discordId = token.discordId as string;
 
-      // Hardcoded user override (for development/testing)
-      // Set HARDCODED_USER_ID to empty string to disable
-      // Available role IDs:
-      //   Owner: 1386739785283928124
-      //   Moderator: 1386739850731851817
-      //   Coach: 1387372036665643188
-      //   Subscriber: 1387076312878813337
-      const HARDCODED_USER_ID = process.env.HARDCODED_USER_ID || "";
-      if (HARDCODED_USER_ID && token.discordId === HARDCODED_USER_ID) {
-        const hardcodedRole = process.env.HARDCODED_ROLE || "";
-        const isSubscriber = process.env.HARDCODED_USER_IS_SUBSCRIBER === "true";
-
-        console.log(`🔑 Hardcoded user override: ${HARDCODED_USER_ID}`);
-        console.log(`   Role: ${hardcodedRole || "none"}`);
-        console.log(`   Subscriber: ${isSubscriber}`);
-
-        session.user.hasSubscriberRole = isSubscriber;
-        session.user.roles = hardcodedRole ? [hardcodedRole] : [];
-        return session;
-      }
-
-      // Normal flow - check Discord API for user roles
-      try {
-        const userRoles = await checkUserRole(
-          token.accessToken as string,
-          token.discordId as string
-        );
-        session.user.hasSubscriberRole = userRoles.length > 0;
-        session.user.roles = userRoles;
-      } catch (error) {
-        console.error("Error checking user role:", error);
-        session.user.hasSubscriberRole = false;
-        session.user.roles = [];
-      }
+      // Use cached roles from JWT token (no Discord API call!)
+      session.user.roles = (token.userRoles as string[]) || [];
+      session.user.hasSubscriberRole = (token.hasSubscriberRole as boolean) || false;
 
       return session;
     },
