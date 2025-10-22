@@ -33,8 +33,12 @@ export function CommitButton() {
               operation: change.operation,
               data: change.data,
             }),
-          }).then(res => {
-            if (!res.ok) throw new Error(`Failed to commit ${change.id}`);
+          }).then(async res => {
+            if (!res.ok) {
+              const errorData = await res.json();
+              console.error('Commit failed:', errorData);
+              throw new Error(errorData.error || `Failed to commit ${change.id}`);
+            }
             return res.json();
           })
         )
@@ -46,7 +50,13 @@ export function CommitButton() {
         toast.success(`Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''}`);
         clearAllChanges();
       } else {
-        toast.error(`${failures.length} change${failures.length !== 1 ? 's' : ''} failed to commit`);
+        // Show detailed error message from the first failure
+        const firstFailure = failures[0];
+        const errorMessage = firstFailure.status === 'rejected'
+          ? (firstFailure.reason?.message || 'Unknown error')
+          : 'Unknown error';
+        toast.error(`Failed to commit: ${errorMessage}`);
+        console.error('Commit failures:', failures);
       }
     } catch (error) {
       toast.error('Failed to commit changes');
