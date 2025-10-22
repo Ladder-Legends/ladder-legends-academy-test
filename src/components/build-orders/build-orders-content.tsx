@@ -24,6 +24,7 @@ export function BuildOrdersContent() {
     terran: [],
     zerg: [],
     protoss: [],
+    difficulty: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -122,6 +123,12 @@ export function BuildOrdersContent() {
         if (!matchesFilter) return false;
       }
 
+      // Apply difficulty filter (excluding if counting difficulty section)
+      const selectedDifficulties = excludeSectionId === 'difficulty' ? [] : (selectedItems.difficulty || []);
+      if (selectedDifficulties.length > 0) {
+        if (!selectedDifficulties.includes(bo.difficulty)) return false;
+      }
+
       return true;
     }).length;
   }, [selectedTags, selectedItems]);
@@ -155,6 +162,15 @@ export function BuildOrdersContent() {
           { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg', 'protoss') },
           { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss', 'protoss') },
         ],
+      },
+      {
+        id: 'difficulty',
+        label: 'Difficulty',
+        items: [
+          { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
+          { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
+          { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
+        ].filter(item => item.count > 0),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,6 +213,12 @@ export function BuildOrdersContent() {
       // Apply tag filters with AND logic (must have ALL selected tags)
       if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
         return false;
+      }
+
+      // Apply difficulty filter
+      const selectedDifficulties = selectedItems.difficulty || [];
+      if (selectedDifficulties.length > 0) {
+        if (!selectedDifficulties.includes(bo.difficulty)) return false;
       }
 
       return true;
