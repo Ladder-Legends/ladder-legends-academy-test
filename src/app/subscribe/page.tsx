@@ -70,11 +70,19 @@ export default function SubscribePage() {
           </div>
 
           {/* Footer Note */}
-          <div className="mt-8 pt-6 border-t border-border/40 text-center text-sm text-muted-foreground">
-            Already a subscriber?{" "}
-            <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors">
-              Sign in with Discord
-            </Link>
+          <div className="mt-8 pt-6 border-t border-border/40 text-center">
+            <div className="text-sm text-muted-foreground mb-2">
+              Already subscribed?{" "}
+              <Link href="/subscribe/link-account" className="text-orange-500 hover:text-orange-400 transition-colors">
+                Learn how to link your account
+              </Link>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Already linked?{" "}
+              <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors">
+                Sign in with Discord
+              </Link>
+            </div>
           </div>
         </div>
       </div>
