@@ -746,5 +746,21 @@
     "race": "terran",
     "coach": "Nico",
     "coachId": "coach-nico"
+  },
+  {
+    "id": "9a675b9a-ccde-4d70-8ba7-d2089e9ea3a3",
+    "title": "test playlist",
+    "description": "",
+    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg",
+    "date": "2025-10-22",
+    "tags": [],
+    "race": "terran",
+    "coach": "Eon",
+    "coachId": "eon",
+    "youtubeIds": [
+      "5530I_pYjbo",
+      "5530I_pYjbj"
+    ],
+    "thumbnailVideoIndex": 0
   }
 ]
