@@ -15,6 +15,7 @@ import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
 import { ChevronRight, Play, Download, Video as VideoIcon, Lock } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
+import { useSession } from 'next-auth/react';
 
 const allVideos = videos as Video[];
 const allCoaches = coaches as Coach[];
@@ -23,6 +24,9 @@ const allReplays = replaysData as Replay[];
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function DashboardContent() {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
   const featuredVideos = allVideos.slice(0, 8);
   const featuredMasterclasses = allMasterclasses.slice(0, 6);
   const featuredReplays = allReplays.slice(0, 6);
@@ -70,8 +74,8 @@ export function DashboardContent() {
                       isFree={masterclass.isFree}
                       className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
-                      {!masterclass.isFree && (
-                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                      {!masterclass.isFree && !hasSubscriberRole && (
+                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium z-20">
                           <Lock className="w-3 h-3" />
                           Subscriber Only
                         </div>
@@ -174,8 +178,8 @@ export function DashboardContent() {
                       href={`/build-orders/${buildOrder.id}`}
                       className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
-                      {!buildOrder.isFree && (
-                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                      {!buildOrder.isFree && !hasSubscriberRole && (
+                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium z-20">
                           <Lock className="w-3 h-3" />
                           Subscriber Only
                         </div>

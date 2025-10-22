@@ -8,6 +8,7 @@ import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo, Lock } from "lucid
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
+import { useSession } from "next-auth/react";
 
 interface VideoCardProps {
   video: Video;
@@ -16,6 +17,9 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -61,8 +65,8 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
                 Playlist
               </div>
             )}
-            {!video.isFree && (
-              <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+            {!video.isFree && !hasSubscriberRole && (
+              <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium z-20">
                 <Lock className="w-3 h-3" />
                 Subscriber Only
               </div>
