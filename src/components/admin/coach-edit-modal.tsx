@@ -20,20 +20,12 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Coach>>({});
   const [specialtyInput, setSpecialtyInput] = useState('');
-  const [rankInput, setRankInput] = useState('');
 
   // Get all unique specialties from existing coaches for autocomplete
   const allExistingSpecialties = useMemo(() => {
     const specialtySet = new Set<string>();
     coaches.forEach(c => c.specialties.forEach(s => specialtySet.add(s)));
     return Array.from(specialtySet).sort();
-  }, []);
-
-  // Get all unique ranks from existing coaches for autocomplete
-  const allExistingRanks = useMemo(() => {
-    const rankSet = new Set<string>();
-    coaches.forEach(c => { if (c.rank) rankSet.add(c.rank); });
-    return Array.from(rankSet).sort();
   }, []);
 
   // Filter specialties based on input
@@ -45,19 +37,9 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       .slice(0, 5);
   }, [specialtyInput, allExistingSpecialties, formData.specialties]);
 
-  // Filter ranks based on input
-  const filteredRanks = useMemo(() => {
-    if (!rankInput.trim()) return [];
-    const input = rankInput.toLowerCase();
-    return allExistingRanks
-      .filter(r => r.toLowerCase().includes(input))
-      .slice(0, 5);
-  }, [rankInput, allExistingRanks]);
-
   useEffect(() => {
     if (coach) {
       setFormData(coach);
-      setRankInput(coach.rank || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -68,7 +50,6 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
         specialties: [],
         socialLinks: {},
       });
-      setRankInput('');
     }
     setSpecialtyInput('');
   }, [coach, isNew, isOpen]);
@@ -110,7 +91,6 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       displayName: formData.displayName,
       race: formData.race as 'terran' | 'zerg' | 'protoss' | 'all',
       bio: formData.bio,
-      rank: rankInput || undefined,
       specialties: formData.specialties || [],
       bookingUrl: formData.bookingUrl,
       socialLinks: {},
@@ -153,49 +133,18 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Race *</label>
-            <select
-              value={formData.race || 'terran'}
-              onChange={(e) => setFormData({ ...formData, race: e.target.value as 'terran' | 'zerg' | 'protoss' | 'all' })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="terran">Terran</option>
-              <option value="zerg">Zerg</option>
-              <option value="protoss">Protoss</option>
-              <option value="all">All Races</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Rank</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={rankInput}
-                onChange={(e) => setRankInput(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Grandmaster"
-              />
-
-              {/* Rank autocomplete dropdown */}
-              {filteredRanks.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredRanks.map((rank) => (
-                    <button
-                      key={rank}
-                      type="button"
-                      onClick={() => setRankInput(rank)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                    >
-                      {rank}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Race *</label>
+          <select
+            value={formData.race || 'terran'}
+            onChange={(e) => setFormData({ ...formData, race: e.target.value as 'terran' | 'zerg' | 'protoss' | 'all' })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+          >
+            <option value="terran">Terran</option>
+            <option value="zerg">Zerg</option>
+            <option value="protoss">Protoss</option>
+            <option value="all">All Races</option>
+          </select>
         </div>
 
         <div>
