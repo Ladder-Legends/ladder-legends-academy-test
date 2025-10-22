@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
 import { Download, Video, ArrowLeft, Calendar, Clock, Map } from 'lucide-react';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allReplays = replaysData as Replay[];
 
@@ -219,13 +220,15 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
                 </a>
               )}
               {replay.coachingVideoId && (
-                <Link
-                  href={`/?videoId=${replay.coachingVideoId}`}
+                <PaywallLink
+                  href={`https://youtube.com/watch?v=${replay.coachingVideoId}`}
+                  external
+                  isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
                   Watch Coaching VOD
-                </Link>
+                </PaywallLink>
               )}
             </div>
           </div>

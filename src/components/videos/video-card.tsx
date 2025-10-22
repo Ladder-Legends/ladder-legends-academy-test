@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Video, isPlaylist, getThumbnailYoutubeId } from "@/types/video";
-import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo } from "lucide-react";
+import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
@@ -37,6 +37,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
       <PaywallLink
         href={`/library/${video.id}`}
         className="block"
+        isFree={video.isFree}
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col">
           <div className="relative aspect-video bg-muted overflow-hidden">
@@ -58,6 +59,12 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-1 rounded text-xs text-white flex items-center gap-1">
                 <ListVideo className="w-3 h-3" />
                 Playlist
+              </div>
+            )}
+            {!video.isFree && (
+              <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                <Lock className="w-3 h-3" />
+                Subscriber Only
               </div>
             )}
           </div>

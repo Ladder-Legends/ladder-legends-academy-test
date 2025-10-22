@@ -26,4 +26,7 @@ export interface BuildOrder {
   tags: string[];
   patch?: string;
   updatedAt: string;
+
+  // Access control: undefined or false = premium (default), true = free
+  isFree?: boolean;
 }

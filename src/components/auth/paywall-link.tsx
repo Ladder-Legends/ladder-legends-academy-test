@@ -10,6 +10,7 @@ interface PaywallLinkProps {
   children: ReactNode;
   className?: string;
   external?: boolean;
+  isFree?: boolean; // If true, bypass paywall (free content)
 }
 
 /**
@@ -32,11 +33,12 @@ interface PaywallLinkProps {
  * <PaywallLink href="https://youtube.com/..." external>Watch on YouTube</PaywallLink>
  * ```
  */
-export function PaywallLink({ href, children, className, external = false }: PaywallLinkProps) {
+export function PaywallLink({ href, children, className, external = false, isFree = false }: PaywallLinkProps) {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const hasAccess = session?.user?.hasSubscriberRole ?? false;
+  // Free content bypasses paywall, otherwise check subscription
+  const hasAccess = isFree || (session?.user?.hasSubscriberRole ?? false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!hasAccess) {

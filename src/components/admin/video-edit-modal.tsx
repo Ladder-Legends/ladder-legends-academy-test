@@ -68,6 +68,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         coach: '',
         coachId: '',
         thumbnailVideoIndex: 0,
+        isFree: false, // Default to premium
       });
       setCoachSearch('');
     }
@@ -171,6 +172,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       race: formData.race!,
       coach: formData.coach,
       coachId: formData.coachId,
+      isFree: formData.isFree || false,
     };
 
     // Add the appropriate YouTube ID format
@@ -390,6 +392,21 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
           />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.isFree || false}
+              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+              className="w-4 h-4 rounded border-border"
+            />
+            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Leave unchecked for premium content (subscribers only). Defaults to premium.
+          </p>
         </div>
 
         <div>

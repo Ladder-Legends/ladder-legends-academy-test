@@ -26,6 +26,7 @@ export function VideoLibrary() {
     general: [],
     coaches: coachFromUrl ? [coachFromUrl] : [],
     contentType: [], // 'single' or 'playlist'
+    accessLevel: [], // 'free' or 'premium'
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -120,6 +121,11 @@ export function VideoLibrary() {
         // For content type, check if it's a playlist or single video
         if (tag === 'playlist' && !videoIsPlaylist) return false;
         if (tag === 'single' && videoIsPlaylist) return false;
+      } else if (sectionId === 'accessLevel') {
+        // For access level, check if it's free or premium
+        const videoIsFree = video.isFree || false;
+        if (tag === 'free' && !videoIsFree) return false;
+        if (tag === 'premium' && videoIsFree) return false;
       } else {
         // For other sections, check tags as before
         if (!videoTags.includes(tag.toLowerCase())) return false;
@@ -130,6 +136,7 @@ export function VideoLibrary() {
       const general = sectionId === 'general' ? [] : (selectedItems.general || []);
       const coaches = sectionId === 'coaches' ? [] : (selectedItems.coaches || []);
       const contentTypes = sectionId === 'contentType' ? [] : (selectedItems.contentType || []);
+      const accessLevels = sectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
@@ -142,6 +149,16 @@ export function VideoLibrary() {
           (type === 'single' && !videoIsPlaylist)
         );
         if (!matchesContentType) return false;
+      }
+
+      // Apply access level filter
+      if (accessLevels.length > 0) {
+        const videoIsFree = video.isFree || false;
+        const matchesAccessLevel = accessLevels.some(level =>
+          (level === 'free' && videoIsFree) ||
+          (level === 'premium' && !videoIsFree)
+        );
+        if (!matchesAccessLevel) return false;
       }
 
       return true;
@@ -161,6 +178,22 @@ export function VideoLibrary() {
     };
 
     return [
+      {
+        id: 'accessLevel',
+        label: 'Access Level',
+        items: [
+          {
+            id: 'free',
+            label: 'Free',
+            count: getCount('free', 'accessLevel'),
+          },
+          {
+            id: 'premium',
+            label: 'Premium',
+            count: getCount('premium', 'accessLevel'),
+          },
+        ].filter(item => item.count > 0),
+      },
       {
         id: 'contentType',
         label: 'Content Type',
@@ -229,6 +262,7 @@ export function VideoLibrary() {
       const general = selectedItems.general || [];
       const coaches = selectedItems.coaches || [];
       const contentTypes = selectedItems.contentType || [];
+      const accessLevels = selectedItems.accessLevel || [];
 
       if (races.length > 0 && !races.some(r => videoTags.includes(r))) return false;
       if (general.length > 0 && !general.some(g => videoTags.includes(g))) return false;
@@ -242,6 +276,16 @@ export function VideoLibrary() {
           (type === 'single' && !videoIsPlaylist)
         );
         if (!matchesContentType) return false;
+      }
+
+      // Apply access level filter (free vs premium)
+      if (accessLevels.length > 0) {
+        const videoIsFree = video.isFree || false;
+        const matchesAccessLevel = accessLevels.some(level =>
+          (level === 'free' && videoIsFree) ||
+          (level === 'premium' && !videoIsFree)
+        );
+        if (!matchesAccessLevel) return false;
       }
 
       // If any tag filter is active, video must have all selected tags
@@ -258,6 +302,7 @@ export function VideoLibrary() {
     (selectedItems.general?.length || 0) > 0 ||
     (selectedItems.coaches?.length || 0) > 0 ||
     (selectedItems.contentType?.length || 0) > 0 ||
+    (selectedItems.accessLevel?.length || 0) > 0 ||
     selectedTags.length > 0 ||
     searchQuery.trim().length > 0;
 

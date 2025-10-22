@@ -18,6 +18,9 @@ export interface Video {
   thumbnailVideoIndex?: number;
 
   thumbnail: string;
+
+  // Access control: undefined or false = premium (default), true = free
+  isFree?: boolean;
 }
 
 // Helper function to detect if video is a playlist

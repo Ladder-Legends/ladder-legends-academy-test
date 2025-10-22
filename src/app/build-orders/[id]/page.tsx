@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import { Video, ArrowLeft } from 'lucide-react';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
@@ -181,15 +182,15 @@ export default function BuildOrderDetailPage({ params }: { params: { id: string 
             {/* Video Link */}
             {buildOrder.videoId && (
               <div className="flex gap-4">
-                <a
+                <PaywallLink
                   href={`https://youtube.com/watch?v=${buildOrder.videoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  external
+                  isFree={buildOrder.isFree}
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
                   Watch Video Tutorial
-                </a>
+                </PaywallLink>
               </div>
             )}
           </div>

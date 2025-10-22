@@ -13,7 +13,8 @@ import { Masterclass } from '@/types/masterclass';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
-import { ChevronRight, Play, Download, Video as VideoIcon } from 'lucide-react';
+import { ChevronRight, Play, Download, Video as VideoIcon, Lock } from 'lucide-react';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allVideos = videos as Video[];
 const allCoaches = coaches as Coach[];
@@ -63,11 +64,18 @@ export function DashboardContent() {
               <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 <div className="flex gap-4 min-w-max">
                   {featuredMasterclasses.map((masterclass) => (
-                    <Link
+                    <PaywallLink
                       key={masterclass.id}
                       href={`/masterclasses/${masterclass.id}`}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors"
+                      isFree={masterclass.isFree}
+                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
+                      {!masterclass.isFree && (
+                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                          <Lock className="w-3 h-3" />
+                          Subscriber Only
+                        </div>
+                      )}
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-lg font-semibold line-clamp-2">{masterclass.title}</h3>
@@ -88,7 +96,7 @@ export function DashboardContent() {
                           )}
                         </div>
                       </div>
-                    </Link>
+                    </PaywallLink>
                   ))}
                 </div>
               </div>
@@ -164,8 +172,14 @@ export function DashboardContent() {
                     <Link
                       key={buildOrder.id}
                       href={`/build-orders/${buildOrder.id}`}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors"
+                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
+                      {!buildOrder.isFree && (
+                        <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
+                          <Lock className="w-3 h-3" />
+                          Subscriber Only
+                        </div>
+                      )}
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-lg font-semibold line-clamp-2">{buildOrder.name}</h3>

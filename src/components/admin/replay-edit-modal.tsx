@@ -146,6 +146,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         tags: [],
         patch: getLatestPatch,
         notes: '',
+        isFree: false,
       });
       setMapSearch('');
       setPlayer1Search('');
@@ -268,6 +269,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       tags: formData.tags || [],
       patch: formData.patch,
       notes: formData.notes,
+      isFree: formData.isFree || false,
     };
 
     addChange({
@@ -622,6 +624,21 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             rows={3}
             placeholder="Additional notes about this replay..."
           />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.isFree || false}
+              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+              className="w-4 h-4 rounded border-border"
+            />
+            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Leave unchecked for premium content (subscribers only). Defaults to premium.
+          </p>
         </div>
 
         <div>

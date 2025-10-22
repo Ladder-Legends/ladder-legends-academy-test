@@ -25,4 +25,7 @@ export interface Replay {
   tags: string[];
   patch?: string;
   notes?: string;
+
+  // Access control: undefined or false = premium (default), true = free
+  isFree?: boolean;
 }

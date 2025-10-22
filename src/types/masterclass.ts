@@ -14,4 +14,7 @@ export interface Masterclass {
   thumbnail?: string;
   createdAt: string;
   updatedAt: string;
+
+  // Access control: undefined or false = premium (default), true = free
+  isFree?: boolean;
 }

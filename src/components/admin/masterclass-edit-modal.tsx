@@ -69,6 +69,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         tags: [],
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
+        isFree: false,
       });
       setCoachSearch('');
     }
@@ -131,6 +132,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       thumbnail: `https://img.youtube.com/vi/${formData.videoId}/hqdefault.jpg`,
       createdAt: formData.createdAt || new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
+      isFree: formData.isFree || false,
     };
 
     addChange({
@@ -265,6 +267,21 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
               Video duration (e.g., &quot;24:15&quot;)
             </p>
           </div>
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.isFree || false}
+              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+              className="w-4 h-4 rounded border-border"
+            />
+            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Leave unchecked for premium content (subscribers only). Defaults to premium.
+          </p>
         </div>
 
         <div>

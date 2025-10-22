@@ -91,6 +91,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         tags: [],
         patch: '',
         updatedAt: new Date().toISOString().split('T')[0],
+        isFree: false,
       });
       setCoachSearch('');
       setTypeInput('macro');
@@ -203,6 +204,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       tags: formData.tags || [],
       patch: formData.patch,
       updatedAt: new Date().toISOString().split('T')[0],
+      isFree: formData.isFree || false,
     };
 
     addChange({
@@ -304,6 +306,21 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             rows={2}
             placeholder="Description of the build order..."
           />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.isFree || false}
+              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+              className="w-4 h-4 rounded border-border"
+            />
+            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Leave unchecked for premium content (subscribers only). Defaults to premium.
+          </p>
         </div>
 
         <div className="grid grid-cols-4 gap-4">
