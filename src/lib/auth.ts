@@ -49,6 +49,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.user.discordId = token.discordId as string;
 
+      // Hardcoded owner fallback - always grant full access to specific Discord user ID
+      const HARDCODED_OWNER_ID = "161384451518103552";
+      if (token.discordId === HARDCODED_OWNER_ID) {
+        console.log(`🔑 Hardcoded owner detected: ${HARDCODED_OWNER_ID}`);
+        session.user.hasSubscriberRole = true;
+        session.user.roles = ["1386739785283928124"]; // Owner role
+        return session;
+      }
+
       // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
       if (process.env.SKIP_ROLE_CHECK === "true") {
         // Use EMULATE_ROLE to determine which role to grant
