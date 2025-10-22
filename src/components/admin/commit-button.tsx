@@ -47,7 +47,10 @@ export function CommitButton() {
       const failures = results.filter(r => r.status === 'rejected');
 
       if (failures.length === 0) {
-        toast.success(`Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''}`);
+        toast.success(
+          `Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''}! The site is rebuilding with your changes. Please wait about a minute and then refresh the page to see your updates.`,
+          { duration: 10000 }
+        );
         clearAllChanges();
       } else {
         // Show detailed error message from the first failure
