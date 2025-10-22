@@ -42,12 +42,6 @@ export async function middleware(request: NextRequest) {
   const session = await auth();
   console.log(`🔐 Session check: ${session ? 'authenticated' : 'not authenticated'}`);
 
-  // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
-  if (process.env.SKIP_ROLE_CHECK === "true") {
-    console.log("🔓 SKIP_ROLE_CHECK enabled - bypassing all checks");
-    return NextResponse.next();
-  }
-
   // Allow browse pages for everyone (authenticated or not)
   if (isPublicRoute && !isDetailPage) {
     console.log(`👀 Allowing browse access to: ${pathname}`);
@@ -61,6 +55,14 @@ export async function middleware(request: NextRequest) {
     if (!session) {
       console.log("❌ No session, redirecting to /subscribe");
       return NextResponse.redirect(new URL("/subscribe", request.url));
+    }
+
+    // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
+    // Only applies to authenticated users on detail pages
+    if (process.env.SKIP_ROLE_CHECK === "true") {
+      console.log("🔓 SKIP_ROLE_CHECK enabled - granting subscriber access to authenticated user");
+      console.log("✅ Dev bypass: allowing access to detail page");
+      return NextResponse.next();
     }
 
     if (!session.user?.hasSubscriberRole) {
