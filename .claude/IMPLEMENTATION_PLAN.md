@@ -66,15 +66,13 @@ Adding a content management system (CMS) for coaches/owners to edit content, imp
 - Changes persist across browser sessions until committed
 - localStorage keys: `admin-pending-{contentType}-{id}`
 
-### 4.2 Set up Cloudflare R2 for replay files
-- Configure R2 bucket for `.SC2Replay` files
-- Add R2 credentials to env vars:
-  - `R2_ACCOUNT_ID`
-  - `R2_ACCESS_KEY_ID`
-  - `R2_SECRET_ACCESS_KEY`
-  - `R2_BUCKET_NAME`
-- Create upload helper utility (`src/lib/r2-upload.ts`)
+### 4.2 Set up Vercel Blob Storage for replay files
+- Install `@vercel/blob` package
+- Configure Vercel Blob for `.SC2Replay` files
+- Vercel automatically provides `BLOB_READ_WRITE_TOKEN` in production
+- Create upload helper utility (`src/lib/blob-upload.ts`)
 - Store file URLs in JSON data
+- Cost: ~$0.15/GB stored + $2/GB transfer (very affordable for low volume)
 
 ### 4.3 Create GitHub commit API route
 **Route:** `/api/admin/commit` (POST)
@@ -187,9 +185,9 @@ npm install sonner  # Toast notifications
 
 ### Storage
 - **Content data**: JSON files in git repository
-- **Replay files**: Cloudflare R2 bucket
+- **Replay files**: Vercel Blob Storage
 - **Pending edits**: Browser localStorage
-- **No Vercel Blob**: Simpler, cheaper, git-native
+- **Simple architecture**: All Vercel-native, no external services needed
 
 ## Implementation Order
 
