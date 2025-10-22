@@ -1,5 +1,3 @@
-'use client';
-
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import Image from 'next/image';
@@ -7,20 +5,24 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
-import { Play, ArrowLeft, Clock, Lock } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { Play, ArrowLeft, Clock } from 'lucide-react';
+import { SubscriberBadge } from '@/components/subscriber-badge';
+import { PaywallLink } from '@/components/auth/paywall-link';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
+export async function generateStaticParams() {
+  return allMasterclasses.map((masterclass) => ({
+    id: masterclass.id,
+  }));
+}
+
 export default function MasterclassDetailPage({ params }: { params: { id: string } }) {
-  const { data: session } = useSession();
   const masterclass = allMasterclasses.find(mc => mc.id === params.id);
 
   if (!masterclass) {
     notFound();
   }
-
-  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   const getRaceColor = (race: string) => {
     switch (race.toLowerCase()) {
@@ -74,12 +76,7 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <h1 className="text-4xl font-bold">{masterclass.title}</h1>
-                {!masterclass.isFree && !hasSubscriberRole && (
-                  <span className="bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
-                    <Lock className="h-3 w-3" />
-                    Subscriber Only
-                  </span>
-                )}
+                <SubscriberBadge isFree={masterclass.isFree} />
               </div>
               <p className="text-lg text-muted-foreground leading-relaxed">{masterclass.description}</p>
             </div>
@@ -150,17 +147,16 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
               </div>
             )}
 
-            {/* Watch on YouTube Button */}
+            {/* Watch Full Video Button */}
             <div className="flex gap-4">
-              <a
-                href={`https://youtube.com/watch?v=${masterclass.videoId}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <PaywallLink
+                href={`/library/${masterclass.videoId}`}
+                isFree={masterclass.isFree}
                 className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
                 <Play className="h-5 w-5" />
-                Watch on YouTube
-              </a>
+                Watch Full Video
+              </PaywallLink>
             </div>
           </div>
         </div>

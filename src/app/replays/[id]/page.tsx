@@ -1,5 +1,3 @@
-'use client';
-
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import Image from 'next/image';
@@ -7,21 +5,24 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
-import { Download, Video, ArrowLeft, Calendar, Clock, Map, Lock } from 'lucide-react';
+import { Download, Video, ArrowLeft, Calendar, Clock, Map } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
-import { useSession } from 'next-auth/react';
+import { SubscriberBadge } from '@/components/subscriber-badge';
 
 const allReplays = replaysData as Replay[];
 
+export async function generateStaticParams() {
+  return allReplays.map((replay) => ({
+    id: replay.id,
+  }));
+}
+
 export default function ReplayDetailPage({ params }: { params: { id: string } }) {
-  const { data: session } = useSession();
   const replay = allReplays.find(r => r.id === params.id);
 
   if (!replay) {
     notFound();
   }
-
-  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   const getRaceColor = (race: string) => {
     switch (race.toLowerCase()) {
@@ -75,12 +76,7 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <h1 className="text-4xl font-bold">{replay.title}</h1>
-                {!replay.isFree && !hasSubscriberRole && (
-                  <span className="bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium">
-                    <Lock className="h-3 w-3" />
-                    Subscriber Only
-                  </span>
-                )}
+                <SubscriberBadge isFree={replay.isFree} />
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
@@ -229,8 +225,7 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
               )}
               {replay.coachingVideoId && (
                 <PaywallLink
-                  href={`https://youtube.com/watch?v=${replay.coachingVideoId}`}
-                  external
+                  href={`/library/${replay.coachingVideoId}`}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

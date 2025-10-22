@@ -346,7 +346,8 @@ export function ReplaysContent() {
                       )}
                       {replay.coachingVideoId && (
                         <PaywallLink
-                          href={`/?videoId=${replay.coachingVideoId}`}
+                          href={`/library/${replay.coachingVideoId}`}
+                          isFree={replay.isFree}
                           className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >
                           <Video className="h-3.5 w-3.5" />
