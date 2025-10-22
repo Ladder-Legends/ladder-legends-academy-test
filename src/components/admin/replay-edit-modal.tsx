@@ -20,6 +20,9 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Replay>>({});
   const [tagInput, setTagInput] = useState('');
+  const [mapSearch, setMapSearch] = useState('');
+  const [player1Search, setPlayer1Search] = useState('');
+  const [player2Search, setPlayer2Search] = useState('');
 
   // Get all unique tags from existing replays for autocomplete
   const allExistingTags = useMemo(() => {
@@ -37,9 +40,80 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
 
+  // Get all unique maps from existing replays
+  const allMaps = useMemo(() => {
+    const mapSet = new Set<string>();
+    replays.forEach(r => mapSet.add(r.map));
+    return Array.from(mapSet).sort();
+  }, []);
+
+  // Filter maps based on search input
+  const filteredMaps = useMemo(() => {
+    if (!mapSearch.trim()) return [];
+    const search = mapSearch.toLowerCase();
+    return allMaps
+      .filter(map => map.toLowerCase().includes(search))
+      .slice(0, 5);
+  }, [mapSearch, allMaps]);
+
+  // Get all unique player names from existing replays
+  const allPlayerNames = useMemo(() => {
+    const nameSet = new Set<string>();
+    replays.forEach(r => {
+      nameSet.add(r.player1.name);
+      nameSet.add(r.player2.name);
+    });
+    return Array.from(nameSet).sort();
+  }, []);
+
+  // Filter player names based on search input
+  const filteredPlayer1Names = useMemo(() => {
+    if (!player1Search.trim()) return [];
+    const search = player1Search.toLowerCase();
+    return allPlayerNames
+      .filter(name => name.toLowerCase().includes(search))
+      .slice(0, 5);
+  }, [player1Search, allPlayerNames]);
+
+  const filteredPlayer2Names = useMemo(() => {
+    if (!player2Search.trim()) return [];
+    const search = player2Search.toLowerCase();
+    return allPlayerNames
+      .filter(name => name.toLowerCase().includes(search))
+      .slice(0, 5);
+  }, [player2Search, allPlayerNames]);
+
+  // Get latest patch version
+  const getLatestPatch = useMemo(() => {
+    const patches = replays
+      .map(r => r.patch)
+      .filter(p => p && p.trim())
+      .map(p => p.trim());
+
+    if (patches.length === 0) return '';
+
+    // Sort patches by semantic versioning (5.0.14 > 5.0.12, 5.1.2 > 5.0.2)
+    const sortedPatches = patches.sort((a, b) => {
+      const aParts = a.split('.').map(Number);
+      const bParts = b.split('.').map(Number);
+
+      for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+        const aVal = aParts[i] || 0;
+        const bVal = bParts[i] || 0;
+        if (aVal !== bVal) return bVal - aVal; // Descending order
+      }
+      return 0;
+    });
+
+    return sortedPatches[0];
+  }, []);
+
   useEffect(() => {
     if (replay) {
       setFormData(replay);
+      setMapSearch(replay.map || '');
+      setPlayer1Search(replay.player1?.name || '');
+      setPlayer2Search(replay.player2?.name || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -63,12 +137,15 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         coachingVideoId: '',
         coach: '',
         tags: [],
-        patch: '',
+        patch: getLatestPatch,
         notes: '',
       });
+      setMapSearch('');
+      setPlayer1Search('');
+      setPlayer2Search('');
     }
     setTagInput('');
-  }, [replay, isNew, isOpen]);
+  }, [replay, isNew, isOpen, getLatestPatch]);
 
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim().toLowerCase();
@@ -158,13 +235,37 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
           <div>
             <label className="block text-sm font-medium mb-1">Map *</label>
-            <input
-              type="text"
-              value={formData.map || ''}
-              onChange={(e) => setFormData({ ...formData, map: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Altitude LE"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={mapSearch}
+                onChange={(e) => {
+                  setMapSearch(e.target.value);
+                  setFormData({ ...formData, map: e.target.value });
+                }}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="Type to search maps..."
+              />
+
+              {/* Map autocomplete dropdown */}
+              {filteredMaps.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                  {filteredMaps.map((map) => (
+                    <button
+                      key={map}
+                      type="button"
+                      onClick={() => {
+                        setMapSearch(map);
+                        setFormData({ ...formData, map });
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
+                    >
+                      {map}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -193,13 +294,37 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           <div className="grid grid-cols-4 gap-3">
             <div className="col-span-2">
               <label className="block text-xs font-medium mb-1">Name *</label>
-              <input
-                type="text"
-                value={formData.player1?.name || ''}
-                onChange={(e) => updatePlayer(1, 'name', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="Player name"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={player1Search}
+                  onChange={(e) => {
+                    setPlayer1Search(e.target.value);
+                    updatePlayer(1, 'name', e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+                  placeholder="Type to search player names..."
+                />
+
+                {/* Player 1 autocomplete dropdown */}
+                {filteredPlayer1Names.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {filteredPlayer1Names.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setPlayer1Search(name);
+                          updatePlayer(1, 'name', name);
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium mb-1">Race *</label>
@@ -243,13 +368,37 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           <div className="grid grid-cols-4 gap-3">
             <div className="col-span-2">
               <label className="block text-xs font-medium mb-1">Name *</label>
-              <input
-                type="text"
-                value={formData.player2?.name || ''}
-                onChange={(e) => updatePlayer(2, 'name', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="Player name"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={player2Search}
+                  onChange={(e) => {
+                    setPlayer2Search(e.target.value);
+                    updatePlayer(2, 'name', e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+                  placeholder="Type to search player names..."
+                />
+
+                {/* Player 2 autocomplete dropdown */}
+                {filteredPlayer2Names.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {filteredPlayer2Names.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setPlayer2Search(name);
+                          updatePlayer(2, 'name', name);
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium mb-1">Race *</label>
