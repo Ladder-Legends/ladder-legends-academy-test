@@ -19,30 +19,37 @@ export function usePendingChanges() {
 
   // Load changes from localStorage on mount
   useEffect(() => {
-    const loadChanges = () => {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        setChanges(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to parse pending changes:', e);
+      }
+    }
+
+    // Listen for storage changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
         try {
-          setChanges(JSON.parse(stored));
+          setChanges(JSON.parse(e.newValue));
         } catch (e) {
           console.error('Failed to parse pending changes:', e);
         }
       }
     };
 
-    // Load initial changes
-    loadChanges();
-
-    // Listen for storage changes from other components
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) {
-        loadChanges();
-      }
-    };
-
     // Listen for custom event (for same-tab updates)
     const handleCustomStorageChange = () => {
-      loadChanges();
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setChanges(parsed);
+        } catch (e) {
+          console.error('Failed to parse pending changes:', e);
+        }
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -54,11 +61,17 @@ export function usePendingChanges() {
     };
   }, []);
 
-  // Save changes to localStorage whenever they change
+  // Save changes to localStorage whenever they change, but don't trigger events here
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(changes));
-    // Dispatch custom event for same-tab updates
-    window.dispatchEvent(new Event('localStorageChange'));
+    const current = localStorage.getItem(STORAGE_KEY);
+    const newValue = JSON.stringify(changes);
+
+    // Only update if actually changed
+    if (current !== newValue) {
+      localStorage.setItem(STORAGE_KEY, newValue);
+      // Dispatch custom event for same-tab updates
+      window.dispatchEvent(new Event('localStorageChange'));
+    }
   }, [changes]);
 
   const addChange = (change: Omit<PendingChange, 'timestamp'>) => {
