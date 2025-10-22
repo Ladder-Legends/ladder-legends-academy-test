@@ -49,51 +49,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.user.discordId = token.discordId as string;
 
-      // Development bypass - skip role checking if SKIP_ROLE_CHECK is true
-      if (process.env.SKIP_ROLE_CHECK === "true") {
-        // Use EMULATE_ROLE to determine which role to grant
-        const emulateRole = process.env.EMULATE_ROLE?.toLowerCase() || "owner";
+      // Hardcoded user override (for development/testing)
+      // Set HARDCODED_USER_ID to empty string to disable
+      // Available role IDs:
+      //   Owner: 1386739785283928124
+      //   Moderator: 1386739850731851817
+      //   Coach: 1387372036665643188
+      //   Subscriber: 1387076312878813337
+      const HARDCODED_USER_ID = process.env.HARDCODED_USER_ID || "";
+      if (HARDCODED_USER_ID && token.discordId === HARDCODED_USER_ID) {
+        const hardcodedRole = process.env.HARDCODED_ROLE || "";
+        const isSubscriber = process.env.HARDCODED_USER_IS_SUBSCRIBER === "true";
 
-        // Map role names to role IDs
-        const roleMap: Record<string, string> = {
-          "owner": "1386739785283928124",
-          "moderator": "1386739850731851817",
-          "coach": "1387372036665643188",
-          "subscriber": "1387076312878813337",
-          "member": "1386740453264724068",
-        };
+        console.log(`🔑 Hardcoded user override: ${HARDCODED_USER_ID}`);
+        console.log(`   Role: ${hardcodedRole || "none"}`);
+        console.log(`   Subscriber: ${isSubscriber}`);
 
-        const roleId = roleMap[emulateRole] || roleMap["owner"];
-
-        console.log(`🔓 SKIP_ROLE_CHECK enabled - emulating ${emulateRole} role`);
-        session.user.hasSubscriberRole = true;
-        session.user.roles = [roleId];
+        session.user.hasSubscriberRole = isSubscriber;
+        session.user.roles = hardcodedRole ? [hardcodedRole] : [];
         return session;
       }
 
-      // Hardcoded owner fallback - always grant access based on EMULATE_ROLE if set
-      const HARDCODED_OWNER_ID = "161384451518103552";
-      if (token.discordId === HARDCODED_OWNER_ID) {
-        console.log(`🔑 Hardcoded owner detected: ${HARDCODED_OWNER_ID}`);
-
-        // Respect EMULATE_ROLE if it's set, otherwise default to owner
-        const emulateRole = process.env.EMULATE_ROLE?.toLowerCase() || "owner";
-        const roleMap: Record<string, string> = {
-          "owner": "1386739785283928124",
-          "moderator": "1386739850731851817",
-          "coach": "1387372036665643188",
-          "subscriber": "1387076312878813337",
-          "member": "1386740453264724068",
-        };
-        const roleId = roleMap[emulateRole] || roleMap["owner"];
-
-        console.log(`   Using emulated role: ${emulateRole}`);
-        session.user.hasSubscriberRole = true;
-        session.user.roles = [roleId];
-        return session;
-      }
-
-      // Check if user has required role in the Discord server
+      // Normal flow - check Discord API for user roles
       try {
         const userRoles = await checkUserRole(
           token.accessToken as string,
