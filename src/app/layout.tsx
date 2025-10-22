@@ -37,9 +37,9 @@ export default function RootLayout({
         <BackgroundEffects />
         <SessionProvider>
           {children}
+          <CommitButton />
         </SessionProvider>
         <Toaster />
-        <CommitButton />
       </body>
     </html>
   );
