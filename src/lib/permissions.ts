@@ -15,21 +15,59 @@ export const ROLE_IDS = {
 export type PermissionLevel = "owners" | "coaches" | "subscribers";
 
 /**
+ * Role emulation for development only
+ * Returns emulated role IDs if EMULATE_ROLE is set and we're in development
+ */
+function getEmulatedRoles(): string[] | null {
+  // Only allow emulation in development
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
+  const emulateRole = process.env.EMULATE_ROLE?.toLowerCase();
+  if (!emulateRole) {
+    return null;
+  }
+
+  switch (emulateRole) {
+    case 'owner':
+      return [ROLE_IDS.OWNER];
+    case 'coach':
+      return [ROLE_IDS.COACH];
+    case 'subscriber':
+      return [ROLE_IDS.SUBSCRIBER];
+    default:
+      return null;
+  }
+}
+
+/**
+ * Helper to get roles with emulation support
+ */
+function getRoles(session: Session | null): string[] {
+  const emulatedRoles = getEmulatedRoles();
+  if (emulatedRoles) {
+    return emulatedRoles;
+  }
+  return session?.user?.roles || [];
+}
+
+/**
  * Check if user has owner role
  */
 export function isOwner(session: Session | null): boolean {
-  if (!session?.user?.roles) return false;
-  return session.user.roles.includes(ROLE_IDS.OWNER);
+  const roles = getRoles(session);
+  return roles.includes(ROLE_IDS.OWNER);
 }
 
 /**
  * Check if user has coach role (includes owners)
  */
 export function isCoach(session: Session | null): boolean {
-  if (!session?.user?.roles) return false;
+  const roles = getRoles(session);
   return (
-    session.user.roles.includes(ROLE_IDS.COACH) ||
-    session.user.roles.includes(ROLE_IDS.OWNER)
+    roles.includes(ROLE_IDS.COACH) ||
+    roles.includes(ROLE_IDS.OWNER)
   );
 }
 
@@ -37,11 +75,11 @@ export function isCoach(session: Session | null): boolean {
  * Check if user has subscriber access (includes coaches and owners)
  */
 export function isSubscriber(session: Session | null): boolean {
-  if (!session?.user?.roles) return false;
+  const roles = getRoles(session);
   return (
-    session.user.roles.includes(ROLE_IDS.SUBSCRIBER) ||
-    session.user.roles.includes(ROLE_IDS.COACH) ||
-    session.user.roles.includes(ROLE_IDS.OWNER)
+    roles.includes(ROLE_IDS.SUBSCRIBER) ||
+    roles.includes(ROLE_IDS.COACH) ||
+    roles.includes(ROLE_IDS.OWNER)
   );
 }
 

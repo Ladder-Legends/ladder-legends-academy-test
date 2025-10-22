@@ -61,6 +61,17 @@ export default function LinkAccountPage() {
                     <li>You'll automatically be added to the Ladder Legends Academy Discord server</li>
                     <li>You'll receive the "Subscriber" role in Discord</li>
                   </ul>
+                  <Link
+                    href="https://discord.gg/kpA3RZeg"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block"
+                  >
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <ExternalLink className="h-4 w-4" />
+                      Join Discord Server
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -125,7 +136,16 @@ export default function LinkAccountPage() {
               <p>
                 <strong className="text-foreground">Still having issues?</strong>
                 <br />
-                Reach out in the Discord server for support from the community or coaches.
+                Reach out in the{" "}
+                <a
+                  href="https://discord.gg/kpA3RZeg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-orange-500 hover:text-orange-400 transition-colors underline"
+                >
+                  Discord server
+                </a>
+                {" "}for support from the community or coaches.
               </p>
             </div>
           </div>
