@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, X, Menu } from 'lucide-react';
 
 export interface FilterSection {
   id: string;
@@ -41,6 +41,9 @@ export function FilterSidebar({
   selectedItems,
   onItemToggle,
 }: FilterSidebarProps) {
+  // Mobile sidebar state
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
   // All sections expanded by default
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(sections.map(s => s.id))
@@ -136,8 +139,41 @@ export function FilterSidebar({
   };
 
   return (
-    <aside className="w-64 border-r border-border bg-card/30 p-4 space-y-6 overflow-y-auto">
-      {/* Search Input */}
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        onClick={() => setIsMobileOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-card border border-border rounded-md shadow-lg hover:bg-muted transition-colors"
+        aria-label="Open filters"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        w-64 border-r border-border bg-card/30 p-4 space-y-6 overflow-y-auto
+        lg:relative lg:translate-x-0
+        fixed top-0 left-0 bottom-0 z-50 transition-transform duration-300
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Mobile Close Button */}
+        <button
+          onClick={() => setIsMobileOpen(false)}
+          className="lg:hidden absolute top-4 right-4 p-2 hover:bg-muted rounded-md transition-colors"
+          aria-label="Close filters"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Search Input */}
       {searchEnabled && (
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -183,6 +219,7 @@ export function FilterSidebar({
           </div>
         );
       })}
-    </aside>
+      </aside>
+    </>
   );
 }

@@ -291,24 +291,32 @@ export function ReplaysContent() {
                   }`}
                 >
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/replays/${replay.id}`}
-                        className="text-base font-medium hover:text-primary transition-colors"
-                      >
-                        {replay.title}
-                      </Link>
-                      {!replay.isFree && !hasSubscriberRole && (
-                        <span className="bg-primary/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium whitespace-nowrap">
-                          <Lock className="w-3 h-3" />
-                          Subscriber Only
-                        </span>
-                      )}
-                    </div>
+                    <Link
+                      href={`/replays/${replay.id}`}
+                      className="text-base font-medium hover:text-primary transition-colors block"
+                    >
+                      {replay.title}
+                    </Link>
                     {replay.coach && (
-                      <p className="text-sm text-muted-foreground mt-1.5">
-                        Coach: {replay.coach}
-                      </p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <p className="text-sm text-muted-foreground">
+                          Coach: {replay.coach}
+                        </p>
+                        {!replay.isFree && !hasSubscriberRole && (
+                          <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
+                            <Lock className="w-2.5 h-2.5" />
+                            Premium
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {!replay.coach && !replay.isFree && !hasSubscriberRole && (
+                      <div className="mt-1.5">
+                        <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap inline-flex">
+                          <Lock className="w-2.5 h-2.5" />
+                          Premium
+                        </span>
+                      </div>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm">

@@ -294,23 +294,23 @@ export function BuildOrdersContent() {
                   }`}
                 >
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/build-orders/${buildOrder.id}`}
-                        className="text-base font-medium hover:text-primary transition-colors"
-                      >
-                        {buildOrder.name}
-                      </Link>
+                    <Link
+                      href={`/build-orders/${buildOrder.id}`}
+                      className="text-base font-medium hover:text-primary transition-colors block"
+                    >
+                      {buildOrder.name}
+                    </Link>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
+                        {buildOrder.description}
+                      </p>
                       {!buildOrder.isFree && !hasSubscriberRole && (
-                        <span className="bg-primary/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium whitespace-nowrap">
-                          <Lock className="w-3 h-3" />
-                          Subscriber Only
+                        <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
+                          <Lock className="w-2.5 h-2.5" />
+                          Premium
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1 leading-relaxed">
-                      {buildOrder.description}
-                    </p>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium">
                     {buildOrder.race.charAt(0).toUpperCase()}v{buildOrder.vsRace.charAt(0).toUpperCase()}

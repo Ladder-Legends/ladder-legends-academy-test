@@ -196,23 +196,23 @@ export function MasterclassesContent() {
                       }`}
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/masterclasses/${masterclass.id}`}
-                            className="text-base font-medium hover:text-primary transition-colors"
-                          >
-                            {masterclass.title}
-                          </Link>
+                        <Link
+                          href={`/masterclasses/${masterclass.id}`}
+                          className="text-base font-medium hover:text-primary transition-colors block"
+                        >
+                          {masterclass.title}
+                        </Link>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
+                            {masterclass.description}
+                          </p>
                           {!masterclass.isFree && !hasSubscriberRole && (
-                            <span className="bg-primary/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs text-primary-foreground flex items-center gap-1 font-medium whitespace-nowrap">
-                              <Lock className="w-3 h-3" />
-                              Subscriber Only
+                            <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
+                              <Lock className="w-2.5 h-2.5" />
+                              Premium
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1 leading-relaxed">
-                          {masterclass.description}
-                        </p>
                       </td>
                       <td className="px-6 py-4 text-sm">{masterclass.coach}</td>
                       <td className="px-6 py-4 text-sm capitalize">
