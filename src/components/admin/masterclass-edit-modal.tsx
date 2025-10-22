@@ -8,6 +8,7 @@ import { Masterclass, Race } from '@/types/masterclass';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
+import coaches from '@/data/coaches.json';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -20,6 +21,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Masterclass>>({});
   const [tagInput, setTagInput] = useState('');
+  const [coachSearch, setCoachSearch] = useState('');
 
   // Get all unique tags from existing masterclasses for autocomplete
   const allExistingTags = useMemo(() => {
@@ -37,9 +39,20 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
 
+  // Filter coaches based on search input
+  const filteredCoaches = useMemo(() => {
+    if (!coachSearch.trim()) return coaches;
+    const search = coachSearch.toLowerCase();
+    return coaches.filter(coach =>
+      coach.name.toLowerCase().includes(search) ||
+      coach.displayName.toLowerCase().includes(search)
+    );
+  }, [coachSearch]);
+
   useEffect(() => {
     if (masterclass) {
       setFormData(masterclass);
+      setCoachSearch(masterclass.coach || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -55,6 +68,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
       });
+      setCoachSearch('');
     }
     setTagInput('');
   }, [masterclass, isNew, isOpen]);
@@ -83,9 +97,21 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
     }
   };
 
+  const selectCoach = (coachId: string) => {
+    const coach = coaches.find(c => c.id === coachId);
+    if (coach) {
+      setFormData({
+        ...formData,
+        coach: coach.name,
+        coachId: coach.id,
+      });
+      setCoachSearch(coach.name);
+    }
+  };
+
   const handleSave = () => {
     if (!formData.id || !formData.title || !formData.coach || !formData.coachId || !formData.videoId) {
-      toast.error('Please fill in all required fields (Title, Coach, Coach ID, Video ID)');
+      toast.error('Please fill in all required fields (Title, Coach, Video ID)');
       return;
     }
 
@@ -142,28 +168,39 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Coach *</label>
+        <div>
+          <label className="block text-sm font-medium mb-1">Coach *</label>
+          <div className="relative">
             <input
               type="text"
-              value={formData.coach || ''}
-              onChange={(e) => setFormData({ ...formData, coach: e.target.value })}
+              value={coachSearch}
+              onChange={(e) => setCoachSearch(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Hino"
+              placeholder="Type to search coaches..."
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Coach ID *</label>
-            <input
-              type="text"
-              value={formData.coachId || ''}
-              onChange={(e) => setFormData({ ...formData, coachId: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="hino"
-            />
+            {/* Coach dropdown */}
+            {coachSearch && filteredCoaches.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {filteredCoaches.map((coach) => (
+                  <button
+                    key={coach.id}
+                    type="button"
+                    onClick={() => selectCoach(coach.id)}
+                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
+                  >
+                    <div className="font-medium">{coach.displayName}</div>
+                    <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+          {formData.coach && formData.coachId && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
