@@ -710,5 +710,17 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino"
+  },
+  {
+    "id": "818baec2-d5df-49ea-983c-6931bf8d24ca",
+    "title": "Nicosystem™ Beginner Terran Builds: 2-1-1 Stimbat Timing Push.",
+    "description": "This build is a variation of the common 2-1-1 16 marine stim timing developed by GamerRichy that has been passed down to me to share with you guys. This build focuses on a huge push at 6:40 that catches many zergs off-guard as it is an unknown opener and difficult to defend without significant cuts in economy and tech. ",
+    "youtubeId": "aLP0tR22PO0",
+    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
+    "date": "2025-10-22",
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico"
   }
 ]
