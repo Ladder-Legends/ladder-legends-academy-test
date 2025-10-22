@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isCoach } from "@/lib/permissions";
 import Link from "next/link";
 import { Settings, FileText, PlaySquare, Video, GraduationCap, Users } from "lucide-react";
+import { CommitButton } from "@/components/admin/commit-button";
 
 export default async function AdminLayout({
   children,
@@ -65,6 +66,9 @@ export default async function AdminLayout({
           {children}
         </div>
       </main>
+
+      {/* Floating Commit Button */}
+      <CommitButton />
     </div>
   );
 }
