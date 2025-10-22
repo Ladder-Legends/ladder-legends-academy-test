@@ -18,7 +18,7 @@ export default async function LoginPage({
   }
 
   const errorMessage = searchParams.error === "no_role"
-    ? "You need one of the following roles in the Ladder Legends Academy Discord server: Owner, Moderator, Coach, Subscriber, or Member."
+    ? "You need one of the following roles in the Ladder Legends Academy Discord server: Owner, Moderator, Coach, or Subscriber."
     : searchParams.error
     ? "Authentication failed. Please try again."
     : null;
@@ -71,7 +71,7 @@ export default async function LoginPage({
               </p>
               <p className="text-sm text-muted-foreground text-center">
                 Make sure you have one of these roles in the Ladder Legends Academy Discord server:
-                <span className="text-primary font-semibold"> Owner, Moderator, Coach, Subscriber, or Member</span>
+                <span className="text-primary font-semibold"> Owner, Moderator, Coach, or Subscriber</span>
               </p>
             </div>
           )}
