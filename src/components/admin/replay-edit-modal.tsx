@@ -8,6 +8,7 @@ import { Replay, Race, Matchup, ReplayPlayer } from '@/types/replay';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
+import coaches from '@/data/coaches.json';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -471,14 +472,19 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Coach</label>
-          <input
-            type="text"
+          <label className="block text-sm font-medium mb-1">Coach (Optional)</label>
+          <select
             value={formData.coach || ''}
             onChange={(e) => setFormData({ ...formData, coach: e.target.value })}
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Hino"
-          />
+          >
+            <option value="">-- No Coach --</option>
+            {coaches.map((coach) => (
+              <option key={coach.id} value={coach.name}>
+                {coach.displayName} ({coach.race})
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
