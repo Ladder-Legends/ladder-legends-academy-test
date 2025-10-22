@@ -24,7 +24,13 @@ function getEmulatedRoles(): string[] | null {
     return null;
   }
 
-  const emulateRole = process.env.EMULATE_ROLE?.toLowerCase();
+  // Check both server-side and client-side env vars
+  // NEXT_PUBLIC_ prefix makes it available on client side
+  const emulateRole = (
+    process.env.EMULATE_ROLE ||
+    process.env.NEXT_PUBLIC_EMULATE_ROLE
+  )?.toLowerCase();
+
   if (!emulateRole) {
     return null;
   }
