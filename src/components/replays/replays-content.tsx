@@ -16,6 +16,19 @@ import { useSession } from 'next-auth/react';
 
 const allReplays = replaysData as Replay[];
 
+// Helper function to parse duration string (e.g., "12:34" or "1:02:34") into minutes
+function parseDuration(duration: string): number {
+  const parts = duration.split(':').map(p => parseInt(p, 10));
+  if (parts.length === 2) {
+    // MM:SS format
+    return parts[0];
+  } else if (parts.length === 3) {
+    // HH:MM:SS format
+    return parts[0] * 60 + parts[1];
+  }
+  return 0;
+}
+
 export function ReplaysContent() {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
@@ -24,6 +37,8 @@ export function ReplaysContent() {
     terran: [],
     zerg: [],
     protoss: [],
+    duration: [],
+    accessLevel: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,6 +134,30 @@ export function ReplaysContent() {
         if (!matchesFilter) return false;
       }
 
+      // Apply duration filter (excluding if counting duration section)
+      const selectedDurations = excludeSectionId === 'duration' ? [] : (selectedItems.duration || []);
+      if (selectedDurations.length > 0) {
+        const durationMatch = selectedDurations.some(d => {
+          const minutes = parseDuration(replay.duration);
+          if (d === 'short') return minutes < 7;
+          if (d === 'medium') return minutes >= 7 && minutes <= 14;
+          if (d === 'long') return minutes > 14;
+          return false;
+        });
+        if (!durationMatch) return false;
+      }
+
+      // Apply access level filter (excluding if counting access section)
+      const selectedAccessLevels = excludeSectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
+      if (selectedAccessLevels.length > 0) {
+        const accessMatch = selectedAccessLevels.some(a => {
+          if (a === 'free') return replay.isFree === true;
+          if (a === 'premium') return !replay.isFree;
+          return false;
+        });
+        if (!accessMatch) return false;
+      }
+
       return true;
     }).length;
   }, [selectedTags, selectedItems]);
@@ -152,6 +191,23 @@ export function ReplaysContent() {
           { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ', 'protoss') },
           { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP', 'protoss') },
         ],
+      },
+      {
+        id: 'duration',
+        label: 'Duration',
+        items: [
+          { id: 'short', label: '< 7 min', count: getCount(r => parseDuration(r.duration) < 7, 'duration') },
+          { id: 'medium', label: '7-14 min', count: getCount(r => parseDuration(r.duration) >= 7 && parseDuration(r.duration) <= 14, 'duration') },
+          { id: 'long', label: '> 14 min', count: getCount(r => parseDuration(r.duration) > 14, 'duration') },
+        ].filter(item => item.count > 0),
+      },
+      {
+        id: 'accessLevel',
+        label: 'Access',
+        items: [
+          { id: 'free', label: 'Free', count: getCount(r => r.isFree === true, 'accessLevel') },
+          { id: 'premium', label: 'Premium', count: getCount(r => !r.isFree, 'accessLevel') },
+        ].filter(item => item.count > 0),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,6 +249,30 @@ export function ReplaysContent() {
       // Apply tag filters with AND logic (must have ALL selected tags)
       if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
         return false;
+      }
+
+      // Apply duration filter
+      const selectedDurations = selectedItems.duration || [];
+      if (selectedDurations.length > 0) {
+        const durationMatch = selectedDurations.some(d => {
+          const minutes = parseDuration(replay.duration);
+          if (d === 'short') return minutes < 7;
+          if (d === 'medium') return minutes >= 7 && minutes <= 14;
+          if (d === 'long') return minutes > 14;
+          return false;
+        });
+        if (!durationMatch) return false;
+      }
+
+      // Apply access level filter
+      const selectedAccessLevels = selectedItems.accessLevel || [];
+      if (selectedAccessLevels.length > 0) {
+        const accessMatch = selectedAccessLevels.some(a => {
+          if (a === 'free') return replay.isFree === true;
+          if (a === 'premium') return !replay.isFree;
+          return false;
+        });
+        if (!accessMatch) return false;
       }
 
       return true;
