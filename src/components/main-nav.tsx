@@ -59,10 +59,9 @@ export function MainNav() {
 
       {/* Mobile Menu Panel */}
       <div
-        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-l border-border shadow-2xl z-50 transition-transform duration-200 ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 w-64 bg-card border-l border-border shadow-2xl z-50 transition-transform duration-200 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ backgroundColor: 'hsl(0 0% 100%)' }}
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-6">
