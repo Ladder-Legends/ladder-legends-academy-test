@@ -77,7 +77,7 @@ export function CoachesContent() {
               Meet our expert coaching team specializing in StarCraft II improvement
             </p>
           </div>
-          <PermissionGate require="owner">
+          <PermissionGate require="owners">
             <Button onClick={handleAddNew} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               Add New Coach
@@ -113,7 +113,7 @@ export function CoachesContent() {
                 coach={coach}
                 videoCount={getVideoCount(coach.name)}
               />
-              <PermissionGate require="owner">
+              <PermissionGate require="owners">
                 <div className="absolute top-2 right-2 flex gap-2 z-10">
                   <button
                     onClick={() => handleEdit(coach)}
