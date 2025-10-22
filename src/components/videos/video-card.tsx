@@ -79,7 +79,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
 
       {/* Admin Edit/Delete Buttons */}
       <PermissionGate require="coaches">
-        <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-2 right-2 flex gap-2 z-10">
           {onEdit && (
             <Button
               size="sm"

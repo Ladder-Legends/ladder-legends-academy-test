@@ -25,7 +25,6 @@ export function MasterclassesContent() {
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -191,8 +190,6 @@ export function MasterclassesContent() {
                       className={`border-t border-border hover:bg-muted/30 transition-colors ${
                         index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
                       }`}
-                      onMouseEnter={() => setHoveredRow(masterclass.id)}
-                      onMouseLeave={() => setHoveredRow(null)}
                     >
                       <td className="px-6 py-4">
                         <Link
@@ -230,22 +227,18 @@ export function MasterclassesContent() {
                             Watch
                           </Link>
                           <PermissionGate require="coaches">
-                            {hoveredRow === masterclass.id && (
-                              <>
-                                <button
-                                  onClick={() => handleEdit(masterclass)}
-                                  className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
-                                >
-                                  <Edit className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(masterclass)}
-                                  className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              </>
-                            )}
+                            <button
+                              onClick={() => handleEdit(masterclass)}
+                              className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(masterclass)}
+                              className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
                           </PermissionGate>
                         </div>
                       </td>

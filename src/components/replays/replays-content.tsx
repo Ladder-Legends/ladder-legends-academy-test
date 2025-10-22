@@ -29,7 +29,6 @@ export function ReplaysContent() {
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewReplay, setIsNewReplay] = useState(false);
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   // Handle filter toggle
   const handleItemToggle = (sectionId: string, itemId: string) => {
@@ -287,8 +286,6 @@ export function ReplaysContent() {
                   className={`border-t border-border hover:bg-muted/30 transition-colors ${
                     index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
                   }`}
-                  onMouseEnter={() => setHoveredRow(replay.id)}
-                  onMouseLeave={() => setHoveredRow(null)}
                 >
                   <td className="px-6 py-4">
                     <Link
@@ -357,22 +354,18 @@ export function ReplaysContent() {
                         </PaywallLink>
                       )}
                       <PermissionGate require="coaches">
-                        {hoveredRow === replay.id && (
-                          <>
-                            <button
-                              onClick={() => handleEdit(replay)}
-                              className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
-                            >
-                              <Edit className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(replay)}
-                              className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </>
-                        )}
+                        <button
+                          onClick={() => handleEdit(replay)}
+                          className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(replay)}
+                          className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </PermissionGate>
                     </div>
                   </td>
