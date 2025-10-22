@@ -19,19 +19,46 @@ export function usePendingChanges() {
 
   // Load changes from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setChanges(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse pending changes:', e);
+    const loadChanges = () => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          setChanges(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse pending changes:', e);
+        }
       }
-    }
+    };
+
+    // Load initial changes
+    loadChanges();
+
+    // Listen for storage changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        loadChanges();
+      }
+    };
+
+    // Listen for custom event (for same-tab updates)
+    const handleCustomStorageChange = () => {
+      loadChanges();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleCustomStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleCustomStorageChange);
+    };
   }, []);
 
   // Save changes to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(changes));
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new Event('localStorageChange'));
   }, [changes]);
 
   const addChange = (change: Omit<PendingChange, 'timestamp'>) => {
