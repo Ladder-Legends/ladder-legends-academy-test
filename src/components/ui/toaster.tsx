@@ -8,9 +8,10 @@ export function Toaster() {
       position="top-right"
       toastOptions={{
         style: {
-          background: 'hsl(var(--background))',
+          background: 'hsl(var(--background) / 0.95)',
           color: 'hsl(var(--foreground))',
           border: '1px solid hsl(var(--border))',
+          backdropFilter: 'blur(8px)',
         },
       }}
     />
