@@ -8,6 +8,7 @@ import { Video } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import videos from '@/data/videos.json';
+import coaches from '@/data/coaches.json';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -20,6 +21,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Video>>({});
   const [tagInput, setTagInput] = useState('');
+  const [coachSearch, setCoachSearch] = useState('');
 
   // Get all unique tags from existing videos for autocomplete
   const allExistingTags = useMemo(() => {
@@ -37,9 +39,20 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
 
+  // Filter coaches based on search input
+  const filteredCoaches = useMemo(() => {
+    if (!coachSearch.trim()) return coaches;
+    const search = coachSearch.toLowerCase();
+    return coaches.filter(coach =>
+      coach.name.toLowerCase().includes(search) ||
+      coach.displayName.toLowerCase().includes(search)
+    );
+  }, [coachSearch]);
+
   useEffect(() => {
     if (video) {
       setFormData(video);
+      setCoachSearch(video.coach || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -48,7 +61,10 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         youtubeId: '',
         date: new Date().toISOString().split('T')[0],
         tags: [],
+        coach: '',
+        coachId: '',
       });
+      setCoachSearch('');
     }
     setTagInput('');
   }, [video, isNew, isOpen]);
@@ -77,6 +93,18 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     }
   };
 
+  const selectCoach = (coachId: string) => {
+    const coach = coaches.find(c => c.id === coachId);
+    if (coach) {
+      setFormData({
+        ...formData,
+        coach: coach.displayName,
+        coachId: coach.id,
+      });
+      setCoachSearch(coach.displayName);
+    }
+  };
+
   const handleSave = () => {
     if (!formData.id || !formData.title || !formData.youtubeId) {
       toast.error('Please fill in all required fields (Title, YouTube ID)');
@@ -91,6 +119,8 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       thumbnail: `https://img.youtube.com/vi/${formData.youtubeId}/hqdefault.jpg`,
       date: formData.date || new Date().toISOString().split('T')[0],
       tags: formData.tags || [],
+      coach: formData.coach,
+      coachId: formData.coachId,
     };
 
     addChange({
@@ -128,6 +158,41 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             rows={3}
             placeholder="Description of the video content..."
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Coach (Optional)</label>
+          <div className="relative">
+            <input
+              type="text"
+              value={coachSearch}
+              onChange={(e) => setCoachSearch(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              placeholder="Type to search coaches..."
+            />
+
+            {/* Coach dropdown */}
+            {coachSearch && filteredCoaches.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {filteredCoaches.map((coach) => (
+                  <button
+                    key={coach.id}
+                    type="button"
+                    onClick={() => selectCoach(coach.id)}
+                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
+                  >
+                    <div className="font-medium">{coach.displayName}</div>
+                    <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {formData.coach && formData.coachId && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
+            </p>
+          )}
         </div>
 
         <div>

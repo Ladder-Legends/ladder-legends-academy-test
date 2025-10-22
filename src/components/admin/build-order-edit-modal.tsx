@@ -8,6 +8,7 @@ import { BuildOrder, BuildOrderStep, Race, Difficulty, BuildType } from '@/types
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
+import coaches from '@/data/coaches.json';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 
 interface BuildOrderEditModalProps {
@@ -21,6 +22,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<BuildOrder>>({});
   const [tagInput, setTagInput] = useState('');
+  const [coachSearch, setCoachSearch] = useState('');
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -38,9 +40,20 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
 
+  // Filter coaches based on search input
+  const filteredCoaches = useMemo(() => {
+    if (!coachSearch.trim()) return coaches;
+    const search = coachSearch.toLowerCase();
+    return coaches.filter(coach =>
+      coach.name.toLowerCase().includes(search) ||
+      coach.displayName.toLowerCase().includes(search)
+    );
+  }, [coachSearch]);
+
   useEffect(() => {
     if (buildOrder) {
       setFormData(buildOrder);
+      setCoachSearch(buildOrder.coach || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -58,6 +71,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         patch: '',
         updatedAt: new Date().toISOString().split('T')[0],
       });
+      setCoachSearch('');
     }
     setTagInput('');
   }, [buildOrder, isNew, isOpen]);
@@ -83,6 +97,18 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       if (tagInput.trim()) {
         addTag(tagInput);
       }
+    }
+  };
+
+  const selectCoach = (coachId: string) => {
+    const coach = coaches.find(c => c.id === coachId);
+    if (coach) {
+      setFormData({
+        ...formData,
+        coach: coach.displayName,
+        coachId: coach.id,
+      });
+      setCoachSearch(coach.displayName);
     }
   };
 
@@ -175,38 +201,49 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
           <div>
             <label className="block text-sm font-medium mb-1">Coach *</label>
-            <input
-              type="text"
-              value={formData.coach || ''}
-              onChange={(e) => setFormData({ ...formData, coach: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Hino"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={coachSearch}
+                onChange={(e) => setCoachSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="Type to search coaches..."
+              />
+
+              {/* Coach dropdown */}
+              {coachSearch && filteredCoaches.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {filteredCoaches.map((coach) => (
+                    <button
+                      key={coach.id}
+                      type="button"
+                      onClick={() => selectCoach(coach.id)}
+                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
+                    >
+                      <div className="font-medium">{coach.displayName}</div>
+                      <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {formData.coach && formData.coachId && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Coach ID *</label>
-            <input
-              type="text"
-              value={formData.coachId || ''}
-              onChange={(e) => setFormData({ ...formData, coachId: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="hino"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Video ID (YouTube)</label>
-            <input
-              type="text"
-              value={formData.videoId || ''}
-              onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="dQw4w9WgXcQ"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Video ID (YouTube)</label>
+          <input
+            type="text"
+            value={formData.videoId || ''}
+            onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            placeholder="dQw4w9WgXcQ"
+          />
         </div>
 
         <div>

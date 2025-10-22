@@ -20,12 +20,20 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Coach>>({});
   const [specialtyInput, setSpecialtyInput] = useState('');
+  const [rankInput, setRankInput] = useState('');
 
   // Get all unique specialties from existing coaches for autocomplete
   const allExistingSpecialties = useMemo(() => {
     const specialtySet = new Set<string>();
     coaches.forEach(c => c.specialties.forEach(s => specialtySet.add(s)));
     return Array.from(specialtySet).sort();
+  }, []);
+
+  // Get all unique ranks from existing coaches for autocomplete
+  const allExistingRanks = useMemo(() => {
+    const rankSet = new Set<string>();
+    coaches.forEach(c => { if (c.rank) rankSet.add(c.rank); });
+    return Array.from(rankSet).sort();
   }, []);
 
   // Filter specialties based on input
@@ -37,9 +45,19 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       .slice(0, 5);
   }, [specialtyInput, allExistingSpecialties, formData.specialties]);
 
+  // Filter ranks based on input
+  const filteredRanks = useMemo(() => {
+    if (!rankInput.trim()) return [];
+    const input = rankInput.toLowerCase();
+    return allExistingRanks
+      .filter(r => r.toLowerCase().includes(input))
+      .slice(0, 5);
+  }, [rankInput, allExistingRanks]);
+
   useEffect(() => {
     if (coach) {
       setFormData(coach);
+      setRankInput(coach.rank || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
@@ -50,6 +68,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
         specialties: [],
         socialLinks: {},
       });
+      setRankInput('');
     }
     setSpecialtyInput('');
   }, [coach, isNew, isOpen]);
@@ -79,22 +98,22 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   };
 
   const handleSave = () => {
-    if (!formData.id || !formData.name || !formData.displayName || !formData.race || !formData.bio) {
-      toast.error('Please fill in all required fields (Name, Display Name, Race, Bio)');
+    if (!formData.id || !formData.displayName || !formData.race || !formData.bio) {
+      toast.error('Please fill in all required fields (Display Name, Race, Bio)');
       return;
     }
 
+    // Use displayName for both name and displayName to maintain backward compatibility
     const coachData: Coach = {
       id: formData.id,
-      name: formData.name,
+      name: formData.displayName.toLowerCase().replace(/\s+/g, ''),
       displayName: formData.displayName,
       race: formData.race as 'terran' | 'zerg' | 'protoss' | 'all',
       bio: formData.bio,
-      rank: formData.rank,
+      rank: rankInput || undefined,
       specialties: formData.specialties || [],
-      image: formData.image,
       bookingUrl: formData.bookingUrl,
-      socialLinks: formData.socialLinks || {},
+      socialLinks: {},
     };
 
     addChange({
@@ -111,35 +130,16 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Coach' : 'Edit Coach'} size="lg">
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name *</label>
-            <input
-              type="text"
-              value={formData.name || ''}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="hino"
-              autoFocus
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Lowercase handle used in data (e.g., &quot;hino&quot;)
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Display Name *</label>
-            <input
-              type="text"
-              value={formData.displayName || ''}
-              onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Hino"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Display name shown to users (e.g., &quot;Hino&quot;)
-            </p>
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Coach Name *</label>
+          <input
+            type="text"
+            value={formData.displayName || ''}
+            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            placeholder="Hino"
+            autoFocus
+          />
         </div>
 
         <div>
@@ -170,13 +170,31 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
 
           <div>
             <label className="block text-sm font-medium mb-1">Rank</label>
-            <input
-              type="text"
-              value={formData.rank || ''}
-              onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Grandmaster"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={rankInput}
+                onChange={(e) => setRankInput(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="Grandmaster"
+              />
+
+              {/* Rank autocomplete dropdown */}
+              {filteredRanks.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                  {filteredRanks.map((rank) => (
+                    <button
+                      key={rank}
+                      type="button"
+                      onClick={() => setRankInput(rank)}
+                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
+                    >
+                      {rank}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -237,86 +255,15 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Image URL</label>
-            <input
-              type="text"
-              value={formData.image || ''}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="https://example.com/coach.jpg"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Booking URL</label>
-            <input
-              type="text"
-              value={formData.bookingUrl || ''}
-              onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="https://app.acuityscheduling.com/..."
-            />
-          </div>
-        </div>
-
         <div>
-          <label className="block text-sm font-medium mb-2">Social Links</label>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium mb-1">Twitch</label>
-              <input
-                type="text"
-                value={formData.socialLinks?.twitch || ''}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  socialLinks: { ...formData.socialLinks, twitch: e.target.value }
-                })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="https://twitch.tv/..."
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">YouTube</label>
-              <input
-                type="text"
-                value={formData.socialLinks?.youtube || ''}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  socialLinks: { ...formData.socialLinks, youtube: e.target.value }
-                })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="https://youtube.com/..."
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Twitter</label>
-              <input
-                type="text"
-                value={formData.socialLinks?.twitter || ''}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  socialLinks: { ...formData.socialLinks, twitter: e.target.value }
-                })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="https://twitter.com/..."
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Discord</label>
-              <input
-                type="text"
-                value={formData.socialLinks?.discord || ''}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  socialLinks: { ...formData.socialLinks, discord: e.target.value }
-                })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-                placeholder="https://discord.gg/..."
-              />
-            </div>
-          </div>
+          <label className="block text-sm font-medium mb-1">Booking URL</label>
+          <input
+            type="text"
+            value={formData.bookingUrl || ''}
+            onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            placeholder="https://app.acuityscheduling.com/..."
+          />
         </div>
 
         <div className="flex gap-2 pt-4">

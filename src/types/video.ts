@@ -4,6 +4,8 @@ export interface Video {
   description: string;
   date: string;
   tags: string[];
+  coach?: string;
+  coachId?: string;
   youtubeId: string;
   thumbnail: string;
 }
