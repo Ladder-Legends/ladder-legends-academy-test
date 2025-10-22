@@ -63,7 +63,7 @@ export function MainNav() {
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-4">
+        <div className="p-4 relative z-50">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-semibold">Menu</h2>
             <button
