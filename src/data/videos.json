@@ -49,15 +49,18 @@
   },
   {
     "id": "5",
-    "title": "Defending cheeses as a Terran with the Nicosystem™",
+    "title": "How to defend proxy void ray/ cannon rush as terran",
     "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-13",
-    "tags": [],
-    "youtubeId": "gIyt8YAVuKo",
     "thumbnail": "https://img.youtube.com/vi/gIyt8YAVuKo/hqdefault.jpg",
+    "date": "2025-10-13",
+    "tags": [
+      "terran"
+    ],
     "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "gIyt8YAVuKo"
   },
   {
     "id": "6",
@@ -111,25 +114,27 @@
     "id": "10",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
+    "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg",
     "date": "2025-10-04",
     "tags": [],
-    "youtubeId": "iYzl-AYAOr0",
-    "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg",
-    "race": "zerg",
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "iYzl-AYAOr0"
   },
   {
     "id": "11",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
+    "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/hqdefault.jpg",
     "date": "2025-09-29",
     "tags": [],
-    "youtubeId": "zrort3y-fRc",
-    "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/hqdefault.jpg",
     "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "zrort3y-fRc"
   },
   {
     "id": "12",
@@ -145,27 +150,33 @@
   },
   {
     "id": "13",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "title": "Starcraft 2 Tips and Tricks: Abusing Terrain ",
     "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-25",
-    "tags": [],
-    "youtubeId": "QuNx1dUeF0I",
     "thumbnail": "https://img.youtube.com/vi/QuNx1dUeF0I/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-25",
+    "tags": [
+      "terran",
+      "micro",
+      "tipsntricks"
+    ],
+    "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "QuNx1dUeF0I"
   },
   {
     "id": "14",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
+    "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/hqdefault.jpg",
     "date": "2025-09-24",
     "tags": [],
-    "youtubeId": "LD4qZIo11LQ",
-    "thumbnail": "https://img.youtube.com/vi/LD4qZIo11LQ/hqdefault.jpg",
-    "race": "zerg",
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "LD4qZIo11LQ"
   },
   {
     "id": "15",
