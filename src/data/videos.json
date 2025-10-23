@@ -795,7 +795,7 @@
       "micro",
       "protoss"
     ],
-    "race": "terran",
+    "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
