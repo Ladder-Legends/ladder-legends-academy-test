@@ -111,7 +111,7 @@ export function FilterSidebar({
       <div key={item.id}>
         <button
           onClick={() => onItemToggle(sectionId, item.id)}
-          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer ${
             isSelected
               ? 'bg-primary text-primary-foreground font-medium'
               : 'hover:bg-muted text-muted-foreground'
@@ -210,7 +210,7 @@ export function FilterSidebar({
           <div key={section.id}>
             <button
               onClick={() => toggleSection(section.id)}
-              className="flex items-center justify-between w-full mb-3 font-semibold text-sm uppercase tracking-wide text-foreground hover:text-primary transition-colors"
+              className="flex items-center justify-between w-full mb-3 font-semibold text-sm uppercase tracking-wide text-foreground hover:text-primary transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 {section.icon && <span>{section.icon}</span>}

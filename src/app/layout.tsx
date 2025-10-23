@@ -30,7 +30,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  // Check localStorage first (user preference)
+                  const stored = localStorage.getItem('theme');
+                  if (stored) {
+                    if (stored === 'dark') {
+                      document.documentElement.classList.add('dark');
+                    }
+                    return;
+                  }
+
+                  // Fall back to system preference
+                  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {
+                  // Ignore errors (e.g., localStorage not available)
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

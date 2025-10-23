@@ -1,5 +1,6 @@
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
+import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -54,7 +55,10 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
 
               <MainNav />
             </div>
-            <UserMenu />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <UserMenu />
+            </div>
           </div>
         </div>
       </header>

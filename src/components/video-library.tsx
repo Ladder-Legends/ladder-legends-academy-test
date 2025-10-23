@@ -369,7 +369,7 @@ export function VideoLibrary() {
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                    className={`px-3 py-1.5 text-sm rounded-full transition-colors cursor-pointer ${
                       selectedTags.includes(tag)
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted hover:bg-muted/80'

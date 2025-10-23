@@ -1,36 +1,34 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  /* Light Professional Theme with Red/Orange Accents */
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(0 0% 5%);
-  --color-card: hsl(0 0% 98%);
-  --color-card-foreground: hsl(0 0% 5%);
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(0 0% 5%);
-  --color-primary: hsl(4 85% 55%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(0 0% 95%);
-  --color-secondary-foreground: hsl(0 0% 5%);
-  --color-muted: hsl(0 0% 95%);
-  --color-muted-foreground: hsl(0 0% 35%);
-  --color-accent: hsl(4 85% 55%);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-destructive: hsl(0 84% 60%);
-  --color-destructive-foreground: hsl(0 0% 100%);
-  --color-border: hsl(0 0% 88%);
-  --color-input: hsl(0 0% 95%);
-  --color-ring: hsl(4 85% 55%);
+@theme {
+  /* Light mode colors */
+  --color-background: #f5f5f5;
+  --color-foreground: #0d0d0d;
+  --color-card: #ffffff;
+  --color-card-foreground: #0d0d0d;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0d0d0d;
+  --color-primary: #e63f31;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #e2e2e2;
+  --color-secondary-foreground: #0d0d0d;
+  --color-muted: #e2e2e2;
+  --color-muted-foreground: #595959;
+  --color-accent: #e63f31;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e0e0e0;
+  --color-input: #e2e2e2;
+  --color-ring: #e63f31;
 
   /* Starcraft race colors */
-  --color-chart-1: hsl(4 85% 55%);
-  --color-chart-2: hsl(30 90% 50%);
-  --color-chart-3: hsl(280 70% 50%);
-  --color-chart-4: hsl(15 80% 50%);
-  --color-chart-5: hsl(350 75% 55%);
+  --color-chart-1: #e63f31;
+  --color-chart-2: #ff8c1a;
+  --color-chart-3: #b84acf;
+  --color-chart-4: #ff6633;
+  --color-chart-5: #e84855;
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
@@ -45,13 +43,44 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--color-border);
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     background-image:
       radial-gradient(at 0% 0%, hsl(4 85% 95% / 0.4) 0px, transparent 50%),
       radial-gradient(at 100% 100%, hsl(30 90% 95% / 0.3) 0px, transparent 50%);
+  }
+
+  /* Dark mode colors */
+  .dark {
+    --color-background: #141414;
+    --color-foreground: #f2f2f2;
+    --color-card: #1a1a1a;
+    --color-card-foreground: #f2f2f2;
+    --color-popover: #1a1a1a;
+    --color-popover-foreground: #f2f2f2;
+    --color-primary: #e63f31;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #2d2d2d;
+    --color-secondary-foreground: #f2f2f2;
+    --color-muted: #2d2d2d;
+    --color-muted-foreground: #999999;
+    --color-accent: #e63f31;
+    --color-accent-foreground: #ffffff;
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
+    --color-border: #4a4a4a;
+    --color-input: #2d2d2d;
+    --color-ring: #e63f31;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(at 0% 0%, hsl(4 85% 12% / 0.4) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(30 90% 12% / 0.3) 0px, transparent 50%);
   }
 
   /* Subtle accent effects */

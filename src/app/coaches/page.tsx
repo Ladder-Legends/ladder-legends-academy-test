@@ -1,6 +1,7 @@
 import { CoachesContent } from '@/components/coaches-content';
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
+import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -26,7 +27,10 @@ export default function CoachesPage() {
 
               <MainNav />
             </div>
-            <UserMenu />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <UserMenu />
+            </div>
           </div>
         </div>
       </header>
