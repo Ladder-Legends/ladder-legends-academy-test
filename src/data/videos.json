@@ -221,15 +221,18 @@
   },
   {
     "id": "18",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "title": "Groovy Cast: Kelpl0rd vs Alaska ",
     "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-13",
-    "tags": [],
-    "youtubeId": "2jAprwtFPIQ",
     "thumbnail": "https://img.youtube.com/vi/2jAprwtFPIQ/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-13",
+    "tags": [
+      "gamecast"
+    ],
+    "race": "protoss",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": true,
+    "youtubeId": "2jAprwtFPIQ"
   },
   {
     "id": "19",
