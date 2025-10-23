@@ -180,15 +180,20 @@
   },
   {
     "id": "15",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
+    "title": "Starcraft 2 Tips and Tricks: How and When to Tech Switch",
     "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-22",
-    "tags": [],
-    "youtubeId": "VBksDLgd3hc",
     "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-22",
+    "tags": [
+      "terran",
+      "zerg",
+      "protoss"
+    ],
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "VBksDLgd3hc"
   },
   {
     "id": "16",
