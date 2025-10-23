@@ -762,5 +762,27 @@
       "vx2u5uUu3DE"
     ],
     "thumbnailVideoIndex": 0
+  },
+  {
+    "id": "63de90db-6a14-410c-97c4-f2e15df25920",
+    "title": "Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
+    "description": "This video goes over the differential of when to a-move vs when to right click and specific situations for each. if you enjoyed please consider checking out ‪@LadderLegends‬",
+    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "tipsandtricks",
+      "zerg",
+      "terran",
+      "micro",
+      "protoss"
+    ],
+    "race": "terran",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeIds": [
+      "n85AUGyZtPk"
+    ],
+    "thumbnailVideoIndex": 0
   }
 ]
