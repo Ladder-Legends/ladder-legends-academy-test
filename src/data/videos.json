@@ -38,15 +38,19 @@
   },
   {
     "id": "4",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-14",
-    "tags": [],
-    "youtubeId": "9HNzKoMNCHk",
+    "title": "How to Engage Tanks in TvT",
+    "description": "This video goes over how to engage tanks as bio in TvT",
     "thumbnail": "https://img.youtube.com/vi/9HNzKoMNCHk/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-10-14",
+    "tags": [
+      "terran",
+      "micro"
+    ],
+    "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "9HNzKoMNCHk"
   },
   {
     "id": "5",
