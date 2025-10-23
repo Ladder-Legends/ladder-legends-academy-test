@@ -117,11 +117,15 @@
   },
   {
     "id": "10",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
+    "title": "Basic Base camera Locations Guide",
+    "description": "This video goes over how to set and use camera locations in starcraft",
     "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg",
     "date": "2025-10-04",
-    "tags": [],
+    "tags": [
+      "terran",
+      "zerg",
+      "protoss"
+    ],
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
