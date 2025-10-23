@@ -843,5 +843,25 @@
       "gHDUWDA-5g"
     ],
     "thumbnailVideoIndex": 0
+  },
+  {
+    "id": "6bab1193-f3cf-43bd-b65e-5cce47835c9d",
+    "title": "Simple Early Game Zerg Setup vs Protoss",
+    "description": "This video goes over how you want to position your queens and when to get your spores/ how to scout",
+    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro",
+      "tipsntricks"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeIds": [
+      "5BLEYQBSF7I"
+    ],
+    "thumbnailVideoIndex": 0
   }
 ]
