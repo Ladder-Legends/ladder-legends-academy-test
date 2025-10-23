@@ -1,15 +1,16 @@
 [
   {
     "id": "1",
-    "title": "session I did with equinox. Wanted to upload a current session so people have something to refere...",
-    "description": "Coaching video for Starcraft 2",
-    "youtubeId": "XBNE-mc9I_Y",
+    "title": "Diamond 2 Coaching session with Equinox",
+    "description": "This is a current up to date coaching session with equinox that I wanted to showcase so people can see my coaching style ",
     "thumbnail": "https://img.youtube.com/vi/XBNE-mc9I_Y/hqdefault.jpg",
     "date": "2025-10-18",
     "tags": [],
     "race": "zerg",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeId": "XBNE-mc9I_Y"
   },
   {
     "id": "2",
