@@ -824,5 +824,24 @@
       "n85AUGyZtPk"
     ],
     "thumbnailVideoIndex": 0
+  },
+  {
+    "id": "e0c2ee66-f39c-4a85-b61d-ec00d77d7a97",
+    "title": "Sc2 Tools for Improvement #2: Big Brain Game",
+    "description": "This video goes over the big brain game and the goal of it, while explaining how it makes you better in starcraft.",
+    "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "youtubeIds": [
+      "gHDUWDA-5g"
+    ],
+    "thumbnailVideoIndex": 0
   }
 ]
