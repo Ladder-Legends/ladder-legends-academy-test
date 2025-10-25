@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
 import coaches from '@/data/coaches.json';
+import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -32,7 +33,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzedReplayFile, setAnalyzedReplayFile] = useState<File | null>(null);
-  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [analysisData, setAnalysisData] = useState<SC2AnalysisResponse | null>(null);
 
   // Get all unique tags from existing replays for autocomplete
   const allExistingTags = useMemo(() => {
@@ -279,7 +280,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       setAnalysisData(data);
 
       // Auto-populate form fields from analysis
-      const { metadata, build_orders } = data;
+      const { metadata } = data;
 
       // Normalize race names (Terran -> terran)
       const normalizeRace = (race: string) => race.toLowerCase() as Race;

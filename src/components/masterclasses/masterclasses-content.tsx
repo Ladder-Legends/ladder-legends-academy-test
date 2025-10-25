@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { Play, Clock, Plus, Edit, Trash2, Lock } from 'lucide-react';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
-import { PaywallLink } from '@/components/auth/paywall-link';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';

@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
+import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -28,7 +29,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [replayAnalysisData, setReplayAnalysisData] = useState<any>(null);
+  const [replayAnalysisData, setReplayAnalysisData] = useState<SC2AnalysisResponse | null>(null);
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
 
   // Get all unique tags from existing build orders for autocomplete
@@ -232,7 +233,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     if (!replayAnalysisData) return;
 
     const { metadata, build_orders } = replayAnalysisData;
-    const playerData = metadata.players.find((p: any) => p.name === playerName);
+    const playerData = metadata.players.find((p: SC2ReplayPlayer) => p.name === playerName);
     const buildOrderEvents = build_orders[playerName] || [];
 
     if (!playerData) {
@@ -250,14 +251,14 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
     // Filter and convert events to build order steps
     const steps: BuildOrderStep[] = buildOrderEvents
-      .filter((event: any) => {
+      .filter((event: SC2BuildOrderEvent) => {
         const action = event.event === 'upgrade'
           ? `Upgrade: ${event.upgrade || 'Unknown'}`
           : event.unit || 'Unknown';
         // Filter out Unknown and Spray events
         return action !== 'Unknown' && !action.includes('Spray');
       })
-      .map((event: any) => ({
+      .map((event: SC2BuildOrderEvent) => ({
         supply: event.supply,
         time: formatTime(event.time),
         action: event.event === 'upgrade'
@@ -597,7 +598,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
               <div className="space-y-2">
                 <label className="block text-sm font-medium">Select Player to Import:</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {replayAnalysisData.metadata.players.map((player: any) => (
+                  {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
                     <button
                       key={player.name}
                       type="button"

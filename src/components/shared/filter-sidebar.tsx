@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Search, X, Menu, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, X, SlidersHorizontal } from 'lucide-react';
 
 export interface FilterSection {
   id: string;
@@ -45,7 +45,7 @@ export function FilterSidebar({
   sections,
   selectedItems,
   onItemToggle,
-  mobileButtonLabel = 'Filters',
+  mobileButtonLabel: _mobileButtonLabel = 'Filters',
   isMobileOpen: controlledMobileOpen,
   onMobileOpenChange,
 }: FilterSidebarProps) {

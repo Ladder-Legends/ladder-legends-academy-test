@@ -13,7 +13,7 @@ const ALLOWED_ROLE_IDS = process.env.ALLOWED_ROLE_IDS?.split(',') || [
 ];
 
 // Role name mapping for logging/debugging
-const ROLE_NAMES: Record<string, string> = {
+const _ROLE_NAMES: Record<string, string> = {
   "1386739785283928124": "Owner",
   "1386739850731851817": "Moderator",
   "1387372036665643188": "Coach",
