@@ -30,6 +30,9 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [showPlayer2Dropdown, setShowPlayer2Dropdown] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzedReplayFile, setAnalyzedReplayFile] = useState<File | null>(null);
+  const [analysisData, setAnalysisData] = useState<any>(null);
 
   // Get all unique tags from existing replays for autocomplete
   const allExistingTags = useMemo(() => {
@@ -236,6 +239,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
       setFormData({ ...formData, downloadUrl: url });
       setUploadedFileName(filename);
+      setAnalyzedReplayFile(file);
       toast.success('Replay file uploaded successfully!');
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -244,6 +248,92 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       setIsUploading(false);
       // Reset the input
       e.target.value = '';
+    }
+  };
+
+  const handleAnalyzeReplay = async (file?: File) => {
+    const fileToAnalyze = file || analyzedReplayFile;
+
+    if (!fileToAnalyze) {
+      toast.error('Please upload a replay file first');
+      return;
+    }
+
+    setIsAnalyzing(true);
+
+    try {
+      const analyzeFormData = new FormData();
+      analyzeFormData.append('file', fileToAnalyze);
+
+      const response = await fetch('/api/analyze-replay', {
+        method: 'POST',
+        body: analyzeFormData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Analysis failed');
+      }
+
+      const data = await response.json();
+      setAnalysisData(data);
+
+      // Auto-populate form fields from analysis
+      const { metadata, build_orders } = data;
+
+      // Normalize race names (Terran -> terran)
+      const normalizeRace = (race: string) => race.toLowerCase() as Race;
+
+      // Determine matchup (e.g., "TvP")
+      const determineMatchup = (r1: string, r2: string) => {
+        const race1 = r1.charAt(0).toUpperCase();
+        const race2 = r2.charAt(0).toUpperCase();
+        return `${race1}v${race2}` as Matchup;
+      };
+
+      // Format duration from seconds to MM:SS
+      const formatDuration = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      const player1Data = metadata.players[0];
+      const player2Data = metadata.players[1];
+
+      setFormData({
+        ...formData,
+        title: formData.title || `${player1Data.name} vs ${player2Data.name}`,
+        map: metadata.map_name,
+        matchup: determineMatchup(player1Data.race, player2Data.race),
+        player1: {
+          name: player1Data.name,
+          race: normalizeRace(player1Data.race),
+          result: player1Data.result === 'Win' ? 'win' : 'loss',
+          mmr: player1Data.mmr || undefined,
+        },
+        player2: {
+          name: player2Data.name,
+          race: normalizeRace(player2Data.race),
+          result: player2Data.result === 'Win' ? 'win' : 'loss',
+          mmr: player2Data.mmr || undefined,
+        },
+        duration: metadata.game_length_seconds ? formatDuration(metadata.game_length_seconds) : formData.duration,
+        gameDate: metadata.date ? metadata.date.split('T')[0] : formData.gameDate,
+        patch: metadata.release_string || formData.patch,
+      });
+
+      // Update search fields
+      setMapSearch(metadata.map_name);
+      setPlayer1Search(player1Data.name);
+      setPlayer2Search(player2Data.name);
+
+      toast.success('Replay analyzed successfully! Form fields have been populated.');
+    } catch (error) {
+      console.error('Error analyzing replay:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -600,6 +690,22 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
               <p className="text-xs text-muted-foreground">
                 Max file size: 5MB • Allowed: .SC2Replay files
               </p>
+
+              {/* Analyze Replay Button */}
+              {analyzedReplayFile && (
+                <button
+                  type="button"
+                  onClick={() => handleAnalyzeReplay()}
+                  disabled={isAnalyzing}
+                  className={`w-full px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors ${
+                    isAnalyzing
+                      ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'border-green-600 text-green-600 bg-transparent hover:bg-green-600/10'
+                  }`}
+                >
+                  {isAnalyzing ? 'Analyzing...' : analysisData ? 'Re-analyze Replay' : 'Analyze Replay & Auto-Fill'}
+                </button>
+              )}
             </div>
           </div>
 

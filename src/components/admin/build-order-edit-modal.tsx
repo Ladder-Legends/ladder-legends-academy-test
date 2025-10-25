@@ -27,6 +27,9 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [typeInput, setTypeInput] = useState('');
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [replayAnalysisData, setReplayAnalysisData] = useState<any>(null);
+  const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -176,6 +179,107 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
     [steps[index], steps[newIndex]] = [steps[newIndex], steps[index]];
     setFormData({ ...formData, steps });
+  };
+
+  const handleReplayFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file extension
+    if (!file.name.endsWith('.SC2Replay')) {
+      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size exceeds maximum allowed size of 5MB');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setReplayAnalysisData(null);
+    setSelectedPlayerForImport(null);
+
+    try {
+      const analyzeFormData = new FormData();
+      analyzeFormData.append('file', file);
+
+      const response = await fetch('/api/analyze-replay', {
+        method: 'POST',
+        body: analyzeFormData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Analysis failed');
+      }
+
+      const data = await response.json();
+      setReplayAnalysisData(data);
+      toast.success('Replay analyzed! Select a player to import their build order.');
+    } catch (error) {
+      console.error('Error analyzing replay:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');
+    } finally {
+      setIsAnalyzing(false);
+      // Reset the input
+      e.target.value = '';
+    }
+  };
+
+  const importBuildOrderFromPlayer = (playerName: string) => {
+    if (!replayAnalysisData) return;
+
+    const { metadata, build_orders } = replayAnalysisData;
+    const playerData = metadata.players.find((p: any) => p.name === playerName);
+    const buildOrderEvents = build_orders[playerName] || [];
+
+    if (!playerData) {
+      toast.error('Player not found in replay data');
+      return;
+    }
+
+    // Format time from seconds to MM:SS
+    const formatTime = (seconds: string | number) => {
+      const secs = typeof seconds === 'string' ? parseFloat(seconds) : seconds;
+      const mins = Math.floor(secs / 60);
+      const remainingSecs = Math.floor(secs % 60);
+      return `${mins}:${remainingSecs.toString().padStart(2, '0')}`;
+    };
+
+    // Filter and convert events to build order steps
+    const steps: BuildOrderStep[] = buildOrderEvents
+      .filter((event: any) => {
+        const action = event.event === 'upgrade'
+          ? `Upgrade: ${event.upgrade || 'Unknown'}`
+          : event.unit || 'Unknown';
+        // Filter out Unknown and Spray events
+        return action !== 'Unknown' && !action.includes('Spray');
+      })
+      .map((event: any) => ({
+        supply: event.supply,
+        time: formatTime(event.time),
+        action: event.event === 'upgrade'
+          ? `Upgrade: ${event.upgrade || 'Unknown'}`
+          : event.unit || 'Unknown',
+        notes: undefined,
+      }));
+
+    // Normalize race
+    const normalizeRace = (race: string): Race => race.toLowerCase() as Race;
+
+    // Auto-populate form with replay data
+    setFormData({
+      ...formData,
+      name: formData.name || `${playerData.name} ${metadata.map_name} Build`,
+      race: normalizeRace(playerData.race),
+      steps: steps,
+      patch: metadata.release_string || formData.patch,
+    });
+
+    setSelectedPlayerForImport(playerName);
+    toast.success(`Imported ${steps.length} build order steps from ${playerName}'s replay!`);
   };
 
   const handleSave = () => {
@@ -459,6 +563,60 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Import from Replay Section */}
+        <div className="border border-border rounded-md p-4 bg-muted/30">
+          <h3 className="text-sm font-semibold mb-3">Import from Replay (Optional)</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="block">
+                <input
+                  type="file"
+                  accept=".SC2Replay"
+                  onChange={handleReplayFileSelect}
+                  disabled={isAnalyzing}
+                  className="hidden"
+                />
+                <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
+                  isAnalyzing
+                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'border-primary text-primary bg-transparent hover:bg-primary/10'
+                }`}>
+                  {isAnalyzing ? 'Analyzing...' : 'Upload Replay to Import Build Order'}
+                </span>
+              </label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Upload a .SC2Replay file to automatically extract build order steps
+              </p>
+            </div>
+
+            {/* Player Selection */}
+            {replayAnalysisData && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">Select Player to Import:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {replayAnalysisData.metadata.players.map((player: any) => (
+                    <button
+                      key={player.name}
+                      type="button"
+                      onClick={() => importBuildOrderFromPlayer(player.name)}
+                      className={`p-3 border-2 rounded-md text-left transition-colors ${
+                        selectedPlayerForImport === player.name
+                          ? 'border-green-600 bg-green-600/10'
+                          : 'border-border hover:border-primary hover:bg-primary/5'
+                      }`}
+                    >
+                      <div className="font-medium">{player.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {player.race} • {player.result} • APM: {player.apm || 'N/A'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

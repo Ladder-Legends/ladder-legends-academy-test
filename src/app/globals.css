@@ -17,7 +17,7 @@
   --color-muted-foreground: #595959;
   --color-accent: #e63f31;
   --color-accent-foreground: #ffffff;
-  --color-destructive: #eb3434;
+  --color-destructive: #e63f31;
   --color-destructive-foreground: #ffffff;
   --color-border: #e0e0e0;
   --color-input: #e2e2e2;
@@ -70,7 +70,7 @@
     --color-muted-foreground: #999999;
     --color-accent: #e63f31;
     --color-accent-foreground: #ffffff;
-    --color-destructive: #eb3434;
+    --color-destructive: #e63f31;
     --color-destructive-foreground: #ffffff;
     --color-border: #4a4a4a;
     --color-input: #2d2d2d;

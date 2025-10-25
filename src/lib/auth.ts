@@ -54,10 +54,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const hardcodedRole = process.env.HARDCODED_ROLE || "";
           const isSubscriber = process.env.HARDCODED_USER_IS_SUBSCRIBER === "true";
 
-          console.log(`🔑 Hardcoded user override: ${HARDCODED_USER_ID}`);
-          console.log(`   Role: ${hardcodedRole || "none"}`);
-          console.log(`   Subscriber: ${isSubscriber}`);
-
           token.userRoles = hardcodedRole ? [hardcodedRole] : [];
           token.hasSubscriberRole = isSubscriber;
           token.rolesFetchedAt = Date.now();
@@ -71,7 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.userRoles = userRoles;
             token.hasSubscriberRole = userRoles.length > 0;
             token.rolesFetchedAt = Date.now();
-            console.log(`✅ Roles cached for user ${token.discordId}: ${userRoles.length} roles`);
           } catch (error) {
             console.error("Error fetching user roles:", error);
             token.userRoles = [];
@@ -126,7 +121,6 @@ async function checkUserRole(
     );
 
     if (!targetGuild) {
-      console.log("User is not in the Ladder Legends Academy server");
       return [];
     }
 
@@ -155,15 +149,9 @@ async function checkUserRole(
     );
 
     if (matchedRoles.length > 0) {
-      // Log which role(s) granted access
-      const roleNames = matchedRoles
-        .map((roleId: string) => ROLE_NAMES[roleId] || roleId)
-        .join(", ");
-      console.log(`User ${userId} granted access with role(s): ${roleNames}`);
       return matchedRoles;
     }
 
-    console.log(`User ${userId} does not have any allowed roles`);
     return [];
   } catch (error) {
     console.error("Error in checkUserRole:", error);

@@ -34,6 +34,7 @@ export default async function LoginPage({
                 alt="Ladder Legends Academy"
                 width={96}
                 height={96}
+                unoptimized
                 className="object-contain"
               />
             </div>

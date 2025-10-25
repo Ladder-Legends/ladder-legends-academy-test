@@ -48,6 +48,7 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
                   alt="Ladder Legends"
                   width={48}
                   height={48}
+                  unoptimized
                   className="object-contain"
                   priority
                 />
@@ -171,6 +172,7 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
                                   alt={`Video ${index + 1}`}
                                   width={120}
                                   height={68}
+                                  unoptimized
                                   className="object-cover w-full h-full"
                                 />
                               </div>

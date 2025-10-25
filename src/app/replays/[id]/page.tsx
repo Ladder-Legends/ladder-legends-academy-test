@@ -47,6 +47,7 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
                   alt="Ladder Legends"
                   width={48}
                   height={48}
+                  unoptimized
                   className="object-contain"
                   priority
                 />
