@@ -32,7 +32,6 @@ interface FilterSidebarProps {
   onItemToggle: (sectionId: string, itemId: string) => void;
 
   // Mobile button customization
-  mobileButtonLabel?: string;
   isMobileOpen?: boolean;
   onMobileOpenChange?: (isOpen: boolean) => void;
 }
@@ -45,7 +44,6 @@ export function FilterSidebar({
   sections,
   selectedItems,
   onItemToggle,
-  mobileButtonLabel: _mobileButtonLabel = 'Filters',
   isMobileOpen: controlledMobileOpen,
   onMobileOpenChange,
 }: FilterSidebarProps) {

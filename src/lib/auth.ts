@@ -12,15 +12,6 @@ const ALLOWED_ROLE_IDS = process.env.ALLOWED_ROLE_IDS?.split(',') || [
   "1387076312878813337", // Subscriber
 ];
 
-// Role name mapping for logging/debugging
-const _ROLE_NAMES: Record<string, string> = {
-  "1386739785283928124": "Owner",
-  "1386739850731851817": "Moderator",
-  "1387372036665643188": "Coach",
-  "1387076312878813337": "Subscriber",
-  "1429527193649938504": "Owner (Lotus)", // Local dev
-};
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Discord({

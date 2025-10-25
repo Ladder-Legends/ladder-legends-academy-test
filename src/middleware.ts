@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Use Edge Runtime for faster, cheaper execution
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
