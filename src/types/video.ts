@@ -1,4 +1,5 @@
 export type VideoRace = 'terran' | 'zerg' | 'protoss' | 'all';
+export type VideoSource = 'youtube' | 'mux';
 
 export interface Video {
   id: string;
@@ -10,9 +11,17 @@ export interface Video {
   coach?: string;
   coachId?: string;
 
-  // Backwards compatible: support both single video and playlists
+  // Video source - defaults to 'youtube' for backwards compatibility
+  source?: VideoSource;
+
+  // YouTube videos (backwards compatible: support both single video and playlists)
   youtubeId?: string;  // For single videos (existing)
   youtubeIds?: string[];  // For playlists (new)
+
+  // Mux videos
+  muxPlaybackId?: string;  // Mux playback ID for video player
+  muxAssetId?: string;  // Mux asset ID for management
+  muxAssetStatus?: 'preparing' | 'ready' | 'errored';  // Processing status
 
   // Optional: which video to use for thumbnail (defaults to 0)
   thumbnailVideoIndex?: number;
@@ -41,6 +50,21 @@ export function getThumbnailYoutubeId(video: Video): string {
   const ids = getYoutubeIds(video);
   const index = video.thumbnailVideoIndex ?? 0;
   return ids[index] ?? ids[0] ?? '';
+}
+
+// Helper to check if video is from Mux
+export function isMuxVideo(video: Video): boolean {
+  return video.source === 'mux' || !!video.muxPlaybackId;
+}
+
+// Helper to check if video is from YouTube
+export function isYoutubeVideo(video: Video): boolean {
+  return !isMuxVideo(video);
+}
+
+// Helper to get video source
+export function getVideoSource(video: Video): VideoSource {
+  return isMuxVideo(video) ? 'mux' : 'youtube';
 }
 
 export type TagType =

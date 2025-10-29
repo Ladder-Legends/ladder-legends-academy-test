@@ -7,10 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import videosData from '@/data/videos.json';
-import { Video, isPlaylist, getYoutubeIds } from '@/types/video';
+import { Video, isPlaylist, getYoutubeIds, isMuxVideo } from '@/types/video';
 import { ArrowLeft, CalendarDays } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useState, use } from 'react';
+import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 
 const allVideos = videosData as Video[];
 
@@ -83,17 +84,37 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
               {/* Main Video Player Section */}
               <div className={videoIsPlaylist ? 'lg:col-span-2' : ''}>
                 {/* Video Player */}
-                <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${currentYoutubeId}`}
-                    title={video.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+                {isMuxVideo(video) ? (
+                  // Mux Video Player
+                  video.muxPlaybackId ? (
+                    <MuxVideoPlayer
+                      playbackId={video.muxPlaybackId}
+                      title={video.title}
+                      className="rounded-lg overflow-hidden"
+                    />
+                  ) : (
+                    <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+                      <div className="text-center p-4">
+                        <p className="text-muted-foreground">
+                          {video.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  // YouTube Video Player
+                  <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${currentYoutubeId}`}
+                      title={video.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                )}
 
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">

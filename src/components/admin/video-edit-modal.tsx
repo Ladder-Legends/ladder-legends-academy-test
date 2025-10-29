@@ -4,11 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { Video, VideoRace } from '@/types/video';
+import { Video, VideoRace, VideoSource } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import videos from '@/data/videos.json';
 import coaches from '@/data/coaches.json';
+import { MuxUpload } from './mux-upload';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -61,6 +62,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         id: uuidv4(),
         title: '',
         description: '',
+        source: 'youtube', // Default to YouTube
         youtubeIds: [],
         date: new Date().toISOString().split('T')[0],
         tags: [],
@@ -75,6 +77,19 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     setTagInput('');
     setYoutubeIdInput('');
   }, [video, isNew, isOpen]);
+
+  const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
+    setFormData({
+      ...formData,
+      source: 'mux',
+      muxAssetId: assetId,
+      muxPlaybackId: playbackId,
+      muxAssetStatus: 'ready',
+      // Generate a Mux thumbnail URL
+      thumbnail: `https://image.mux.com/${playbackId}/thumbnail.jpg`,
+    });
+    toast.success('Mux video linked successfully');
+  };
 
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim().toLowerCase();
@@ -148,39 +163,73 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   };
 
   const handleSave = () => {
-    // Support both old format (youtubeId) and new format (youtubeIds)
+    const isMuxVideo = formData.source === 'mux';
     const hasYoutubeIds = formData.youtubeIds && formData.youtubeIds.length > 0;
     const hasYoutubeId = formData.youtubeId;
+    const hasMuxVideo = formData.muxPlaybackId && formData.muxAssetId;
 
-    if (!formData.id || !formData.title || (!hasYoutubeIds && !hasYoutubeId) || !formData.race || !formData.coach || !formData.coachId) {
-      toast.error('Please fill in all required fields (Title, YouTube ID(s), Race, Coach)');
+    // Validate required fields based on source
+    if (!formData.id || !formData.title || !formData.race || !formData.coach || !formData.coachId) {
+      toast.error('Please fill in all required fields (Title, Race, Coach)');
       return;
     }
 
-    // Determine thumbnail ID (first video in playlist or single video)
-    const thumbnailId = hasYoutubeIds
-      ? formData.youtubeIds![formData.thumbnailVideoIndex || 0]
-      : formData.youtubeId!;
+    // Validate video source
+    if (isMuxVideo && !hasMuxVideo) {
+      toast.error('Please upload a video to Mux or switch to YouTube');
+      return;
+    } else if (!isMuxVideo && !hasYoutubeIds && !hasYoutubeId) {
+      toast.error('Please add at least one YouTube video ID or switch to Mux');
+      return;
+    }
 
-    const videoData: Video = {
-      id: formData.id,
-      title: formData.title,
-      description: formData.description || '',
-      thumbnail: `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`,
-      date: formData.date || new Date().toISOString().split('T')[0],
-      tags: formData.tags || [],
-      race: formData.race!,
-      coach: formData.coach,
-      coachId: formData.coachId,
-      isFree: formData.isFree || false,
-    };
+    let videoData: Video;
 
-    // Add the appropriate YouTube ID format
-    if (hasYoutubeIds) {
-      videoData.youtubeIds = formData.youtubeIds;
-      videoData.thumbnailVideoIndex = formData.thumbnailVideoIndex || 0;
+    if (isMuxVideo) {
+      // Mux video
+      videoData = {
+        id: formData.id,
+        title: formData.title,
+        description: formData.description || '',
+        source: 'mux',
+        muxAssetId: formData.muxAssetId!,
+        muxPlaybackId: formData.muxPlaybackId!,
+        muxAssetStatus: formData.muxAssetStatus || 'ready',
+        thumbnail: formData.thumbnail || `https://image.mux.com/${formData.muxPlaybackId}/thumbnail.jpg`,
+        date: formData.date || new Date().toISOString().split('T')[0],
+        tags: formData.tags || [],
+        race: formData.race!,
+        coach: formData.coach,
+        coachId: formData.coachId,
+        isFree: formData.isFree || false,
+      };
     } else {
-      videoData.youtubeId = formData.youtubeId;
+      // YouTube video
+      const thumbnailId = hasYoutubeIds
+        ? formData.youtubeIds![formData.thumbnailVideoIndex || 0]
+        : formData.youtubeId!;
+
+      videoData = {
+        id: formData.id,
+        title: formData.title,
+        description: formData.description || '',
+        source: 'youtube',
+        thumbnail: `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`,
+        date: formData.date || new Date().toISOString().split('T')[0],
+        tags: formData.tags || [],
+        race: formData.race!,
+        coach: formData.coach,
+        coachId: formData.coachId,
+        isFree: formData.isFree || false,
+      };
+
+      // Add the appropriate YouTube ID format
+      if (hasYoutubeIds) {
+        videoData.youtubeIds = formData.youtubeIds;
+        videoData.thumbnailVideoIndex = formData.thumbnailVideoIndex || 0;
+      } else {
+        videoData.youtubeId = formData.youtubeId;
+      }
     }
 
     addChange({
@@ -218,6 +267,35 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             rows={3}
             placeholder="Description of the video content..."
           />
+        </div>
+
+        {/* Video Source Selector */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Video Source *</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, source: 'youtube' })}
+              className={`px-4 py-2 border rounded-md transition-colors ${
+                (formData.source || 'youtube') === 'youtube'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border hover:bg-muted'
+              }`}
+            >
+              YouTube
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, source: 'mux' })}
+              className={`px-4 py-2 border rounded-md transition-colors ${
+                formData.source === 'mux'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border hover:bg-muted'
+              }`}
+            >
+              Mux (Upload)
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -287,16 +365,51 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            YouTube Video(s) *
-            {formData.youtubeIds && formData.youtubeIds.length > 1 && (
-              <span className="ml-2 text-xs text-muted-foreground">
-                (Playlist with {formData.youtubeIds.length} videos)
-              </span>
+        {/* Conditional Video Input - YouTube or Mux */}
+        {formData.source === 'mux' ? (
+          <div>
+            <label className="block text-sm font-medium mb-1">Upload Video to Mux *</label>
+            {formData.muxPlaybackId ? (
+              <div className="border border-border rounded-lg p-4 bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-green-600">Video uploaded successfully</p>
+                    <p className="text-xs text-muted-foreground">Asset ID: {formData.muxAssetId}</p>
+                    <p className="text-xs text-muted-foreground">Playback ID: {formData.muxPlaybackId}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      muxAssetId: undefined,
+                      muxPlaybackId: undefined,
+                      muxAssetStatus: undefined,
+                    })}
+                    className="px-3 py-1 text-sm text-destructive hover:text-destructive/70"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <MuxUpload
+                onUploadComplete={handleMuxUploadComplete}
+                title={formData.title}
+                description={formData.description}
+              />
             )}
-          </label>
-          <div className="space-y-2">
+          </div>
+        ) : (
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              YouTube Video(s) *
+              {formData.youtubeIds && formData.youtubeIds.length > 1 && (
+                <span className="ml-2 text-xs text-muted-foreground">
+                  (Playlist with {formData.youtubeIds.length} videos)
+                </span>
+              )}
+            </label>
+            <div className="space-y-2">
             {/* Display existing youtubeId (for backwards compatibility with old videos) */}
             {formData.youtubeId && !formData.youtubeIds?.length && (
               <div className="px-3 py-2 border border-border rounded-md bg-muted/50">
@@ -381,8 +494,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               The ID from the YouTube URL (e.g., youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>).
               Add multiple videos to create a playlist.
             </p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium mb-1">Date</label>
