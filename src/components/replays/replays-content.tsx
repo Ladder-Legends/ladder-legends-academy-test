@@ -454,9 +454,9 @@ export function ReplaysContent() {
                           Download
                         </PaywallLink>
                       )}
-                      {replay.coachingVideoId && (
+                      {replay.videoId && (
                         <PaywallLink
-                          href={`/library/${replay.coachingVideoId}`}
+                          href={`/library/${replay.videoId}`}
                           isFree={replay.isFree}
                           className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
                         >

@@ -20,7 +20,6 @@ export interface BuildOrder {
   coach: string;
   coachId: string;
   description: string;
-  videoUrl?: string; // Legacy: direct YouTube URL
   videoId?: string; // Link to video in library (supports Mux and YouTube)
   replayId?: string; // Link to replay in replays collection
   steps: BuildOrderStep[];

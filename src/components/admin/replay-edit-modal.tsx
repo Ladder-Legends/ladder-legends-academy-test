@@ -145,7 +145,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         gameDate: new Date().toISOString().split('T')[0],
         uploadDate: new Date().toISOString().split('T')[0],
         downloadUrl: '',
-        coachingVideoId: '',
+        videoId: '',
         coach: '',
         tags: [],
         patch: getLatestPatch,
@@ -355,7 +355,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       gameDate: formData.gameDate || new Date().toISOString().split('T')[0],
       uploadDate: formData.uploadDate || new Date().toISOString().split('T')[0],
       downloadUrl: formData.downloadUrl,
-      coachingVideoId: formData.coachingVideoId,
+      videoId: formData.videoId,
       coach: formData.coach,
       tags: formData.tags || [],
       patch: formData.patch,
@@ -714,8 +714,8 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             <label className="block text-sm font-medium mb-1">Coaching Video ID</label>
             <input
               type="text"
-              value={formData.coachingVideoId || ''}
-              onChange={(e) => setFormData({ ...formData, coachingVideoId: e.target.value })}
+              value={formData.videoId || ''}
+              onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
               placeholder="dQw4w9WgXcQ"
             />

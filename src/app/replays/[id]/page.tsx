@@ -228,9 +228,9 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
                   Download Replay
                 </a>
               )}
-              {replay.coachingVideoId && (
+              {replay.videoId && (
                 <PaywallLink
-                  href={`/library/${replay.coachingVideoId}`}
+                  href={`/library/${replay.videoId}`}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

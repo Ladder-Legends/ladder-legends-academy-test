@@ -65,7 +65,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
                   <Download className="w-6 h-6 text-white" />
                 </div>
               )}
-              {replay.coachingVideoId && (
+              {replay.videoId && (
                 <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
                   <Video className="w-6 h-6 text-white" />
                 </div>
