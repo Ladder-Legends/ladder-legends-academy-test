@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { hasPermission } from '@/lib/permissions';
 import FormDataNode from 'form-data';
+import { Readable } from 'stream';
 
 const SC2READER_API_URL = process.env.SC2READER_API_URL || 'http://localhost:8000';
 const SC2READER_API_KEY = process.env.SC2READER_API_KEY || 'your-secret-key-change-this';
@@ -76,24 +77,32 @@ export async function POST(request: NextRequest) {
     });
     console.log('✅ [ANALYZE] FormData created');
 
-    // Convert form-data stream to buffer
+    // Convert form-data stream to buffer using Readable.toArray
     console.log('🔄 [ANALYZE] Converting FormData stream to buffer...');
     const formDataBuffer = await new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
       console.log('🔄 [ANALYZE] Setting up stream listeners...');
-      apiFormData.on('data', (chunk: Buffer) => {
-        console.log('📦 [ANALYZE] Received chunk, size:', chunk.length);
-        chunks.push(chunk);
+
+      apiFormData.on('data', (chunk: string | Buffer) => {
+        // Convert chunk to Buffer if it's a string
+        const bufferChunk = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+        console.log('📦 [ANALYZE] Received chunk, size:', bufferChunk.length, 'type:', typeof chunk);
+        chunks.push(bufferChunk);
       });
+
       apiFormData.on('end', () => {
-        console.log('✅ [ANALYZE] Stream ended, concatenating chunks...');
+        console.log('✅ [ANALYZE] Stream ended, concatenating', chunks.length, 'chunks...');
         resolve(Buffer.concat(chunks));
       });
+
       apiFormData.on('error', (err) => {
         console.error('❌ [ANALYZE] Stream error:', err);
         reject(err);
       });
-      console.log('🔄 [ANALYZE] Stream listeners set up, waiting for data...');
+
+      console.log('🔄 [ANALYZE] Stream listeners set up, triggering stream read...');
+      // IMPORTANT: Trigger the stream to start flowing
+      apiFormData.resume();
     });
     console.log('✅ [ANALYZE] FormData buffer created, size:', formDataBuffer.length);
 
