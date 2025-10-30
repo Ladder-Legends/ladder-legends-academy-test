@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { hasPermission } from '@/lib/permissions';
+import FormDataNode from 'form-data';
 
 const SC2READER_API_URL = process.env.SC2READER_API_URL || 'http://localhost:8000';
 const SC2READER_API_KEY = process.env.SC2READER_API_KEY || 'your-secret-key-change-this';
@@ -53,15 +54,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Forward the request to the Flask API
-    const apiFormData = new FormData();
-    apiFormData.append('file', file);
+    // Use form-data package for proper Node.js multipart handling
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const apiFormData = new FormDataNode();
+    apiFormData.append('file', buffer, {
+      filename: file.name,
+      contentType: 'application/octet-stream',
+    });
 
     const response = await fetch(`${SC2READER_API_URL}/analyze`, {
       method: 'POST',
       headers: {
         'X-API-Key': SC2READER_API_KEY,
+        ...apiFormData.getHeaders(), // This includes Content-Type with boundary
       },
-      body: apiFormData,
+      body: apiFormData as unknown as BodyInit,
     });
 
     if (!response.ok) {
