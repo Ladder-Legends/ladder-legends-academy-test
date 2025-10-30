@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Forward the request to the Flask API
-    // Use form-data package for proper Node.js multipart handling
+    // Use form-data package and convert to buffer for proper multipart handling
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -64,13 +64,31 @@ export async function POST(request: NextRequest) {
       contentType: 'application/octet-stream',
     });
 
+    // Convert form-data stream to buffer
+    const formDataBuffer = await new Promise<Buffer>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      apiFormData.on('data', (chunk: Buffer) => chunks.push(chunk));
+      apiFormData.on('end', () => resolve(Buffer.concat(chunks)));
+      apiFormData.on('error', reject);
+    });
+
+    // Get the headers from form-data (includes boundary)
+    const headers = apiFormData.getHeaders();
+
+    // Create a Blob from the buffer (Blob is part of BodyInit)
+    // Convert Buffer to Uint8Array for Blob compatibility
+    const uint8Array = new Uint8Array(formDataBuffer);
+    const blob = new Blob([uint8Array], {
+      type: headers['content-type'],
+    });
+
     const response = await fetch(`${SC2READER_API_URL}/analyze`, {
       method: 'POST',
       headers: {
         'X-API-Key': SC2READER_API_KEY,
-        ...apiFormData.getHeaders(), // This includes Content-Type with boundary
+        'Content-Type': headers['content-type'], // Use exact Content-Type with boundary
       },
-      body: apiFormData as unknown as BodyInit,
+      body: blob,
     });
 
     if (!response.ok) {
