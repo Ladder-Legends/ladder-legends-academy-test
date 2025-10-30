@@ -863,5 +863,21 @@
       "5BLEYQBSF7I"
     ],
     "thumbnailVideoIndex": 0
+  },
+  {
+    "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
+    "title": "chad test video",
+    "description": "",
+    "source": "mux",
+    "muxAssetId": "O56Ta9022BHapWfo2hdlomJ2tBJdXoyDlhNATnwQZSh4",
+    "muxPlaybackId": "e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw",
+    "muxAssetStatus": "ready",
+    "thumbnail": "https://image.mux.com/e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw/thumbnail.jpg",
+    "date": "2025-10-30",
+    "tags": [],
+    "race": "terran",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
