@@ -19,9 +19,11 @@ export interface Replay {
   gameDate: string;
   uploadDate: string;
   downloadUrl?: string;
-  coachingVideoId?: string;
-  coachingVideoTitle?: string;
+  videoId?: string; // Link to coaching video in library (replaces coachingVideoId)
+  coachingVideoId?: string; // Legacy field for backwards compatibility
+  coachingVideoTitle?: string; // Legacy field
   coach?: string;
+  coachId?: string; // Link to coach in coaches collection
   tags: string[];
   patch?: string;
   notes?: string;
