@@ -68,19 +68,34 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     console.log('✅ [ANALYZE] Buffer created, size:', buffer.length);
 
+    console.log('🔧 [ANALYZE] Creating FormData...');
     const apiFormData = new FormDataNode();
     apiFormData.append('file', buffer, {
       filename: file.name,
       contentType: 'application/octet-stream',
     });
+    console.log('✅ [ANALYZE] FormData created');
 
     // Convert form-data stream to buffer
+    console.log('🔄 [ANALYZE] Converting FormData stream to buffer...');
     const formDataBuffer = await new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
-      apiFormData.on('data', (chunk: Buffer) => chunks.push(chunk));
-      apiFormData.on('end', () => resolve(Buffer.concat(chunks)));
-      apiFormData.on('error', reject);
+      console.log('🔄 [ANALYZE] Setting up stream listeners...');
+      apiFormData.on('data', (chunk: Buffer) => {
+        console.log('📦 [ANALYZE] Received chunk, size:', chunk.length);
+        chunks.push(chunk);
+      });
+      apiFormData.on('end', () => {
+        console.log('✅ [ANALYZE] Stream ended, concatenating chunks...');
+        resolve(Buffer.concat(chunks));
+      });
+      apiFormData.on('error', (err) => {
+        console.error('❌ [ANALYZE] Stream error:', err);
+        reject(err);
+      });
+      console.log('🔄 [ANALYZE] Stream listeners set up, waiting for data...');
     });
+    console.log('✅ [ANALYZE] FormData buffer created, size:', formDataBuffer.length);
 
     // Get the headers from form-data (includes boundary)
     const headers = apiFormData.getHeaders();
