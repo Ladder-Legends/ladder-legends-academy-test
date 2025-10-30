@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { hasPermission } from '@/lib/permissions';
 import FormDataNode from 'form-data';
-import { Readable } from 'stream';
 
 const SC2READER_API_URL = process.env.SC2READER_API_URL || 'http://localhost:8000';
 const SC2READER_API_KEY = process.env.SC2READER_API_KEY || 'your-secret-key-change-this';
