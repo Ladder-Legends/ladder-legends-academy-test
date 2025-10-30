@@ -4,7 +4,7 @@ import { isCoach, isOwner } from '@/lib/permissions';
 
 // GitHub API configuration
 const GITHUB_API_URL = 'https://api.github.com';
-const REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'chadfurman';
+const REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'Ladder-Legends';
 const REPO_NAME = process.env.GITHUB_REPO_NAME || 'ladder-legends-academy';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const VERCEL_DEPLOY_HOOK = process.env.VERCEL_DEPLOY_HOOK;
