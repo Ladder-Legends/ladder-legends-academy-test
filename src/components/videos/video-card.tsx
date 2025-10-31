@@ -9,7 +9,6 @@ import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { useSession } from "next-auth/react";
-import { useMuxThumbnail } from "@/hooks/use-mux-thumbnail";
 
 interface VideoCardProps {
   video: Video;
@@ -20,7 +19,6 @@ interface VideoCardProps {
 export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
-  const { url: muxThumbnailUrl, isLoading: muxThumbnailLoading } = useMuxThumbnail(video);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -40,7 +38,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
 
   // Get thumbnail URL based on video source
   const thumbnailUrl = isMuxVideo(video)
-    ? muxThumbnailUrl || video.thumbnail // Use signed Mux URL or fallback to stored thumbnail
+    ? `/thumbnails/${video.id}.jpg` // Use static Mux thumbnail
     : `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`; // YouTube thumbnail
 
   return (

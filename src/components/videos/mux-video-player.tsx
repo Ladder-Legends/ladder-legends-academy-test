@@ -5,6 +5,7 @@ import MuxPlayer from '@mux/mux-player-react';
 
 interface MuxVideoPlayerProps {
   playbackId: string;
+  videoId?: string; // Video ID for static thumbnail
   title?: string;
   className?: string;
   autoPlay?: boolean;
@@ -18,14 +19,17 @@ interface MuxVideoPlayerProps {
  */
 export function MuxVideoPlayer({
   playbackId,
+  videoId,
   title,
   className = '',
   autoPlay = false,
 }: MuxVideoPlayerProps) {
   const [playbackToken, setPlaybackToken] = useState<string | null>(null);
-  const [thumbnailToken, setThumbnailToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Use static thumbnail instead of generating token
+  const posterUrl = videoId ? `/thumbnails/${videoId}.jpg` : undefined;
 
   useEffect(() => {
     // Fetch signed playback tokens
@@ -44,18 +48,14 @@ export function MuxVideoPlayer({
         const data = await response.json();
         console.log('[MUX PLAYER] Received token data:', {
           hasPlayback: !!data.playback,
-          hasThumbnail: !!data.thumbnail,
           hasLegacyToken: !!data.token,
           playbackType: typeof data.playback,
-          thumbnailType: typeof data.thumbnail,
         });
 
-        // Support both new format (playback/thumbnail) and legacy format (token)
+        // Support both new format (playback) and legacy format (token)
         const pbToken = data.playback || data.token;
-        const thToken = data.thumbnail || data.token;
 
         setPlaybackToken(pbToken);
-        setThumbnailToken(thToken);
       } catch (err) {
         console.error('Error fetching playback tokens:', err);
         setError(err instanceof Error ? err.message : 'Failed to load video');
@@ -103,8 +103,8 @@ export function MuxVideoPlayer({
         playbackId={playbackId}
         tokens={{
           playback: playbackToken,
-          thumbnail: thumbnailToken || undefined,
         }}
+        poster={posterUrl}
         metadata={{
           video_title: title,
         }}

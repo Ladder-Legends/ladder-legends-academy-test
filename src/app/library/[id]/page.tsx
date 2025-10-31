@@ -89,6 +89,7 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
                   video.muxPlaybackId ? (
                     <MuxVideoPlayer
                       playbackId={video.muxPlaybackId}
+                      videoId={video.id}
                       title={video.title}
                       className="rounded-lg overflow-hidden"
                     />
