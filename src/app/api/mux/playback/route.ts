@@ -46,15 +46,36 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate signed playback token (valid for 24 hours)
-    const token = mux.jwt.signPlaybackId(playbackId, {
+    // Note: signPlaybackId returns a Promise, so we need to await it
+    const playbackToken = await mux.jwt.signPlaybackId(playbackId, {
       keyId: process.env.MUX_SIGNING_KEY_ID,
       keySecret: process.env.MUX_SIGNING_KEY_PRIVATE_KEY,
       expiration: '24h', // Token expires in 24 hours
+      type: 'video', // Specify video type for playback
     });
+
+    // Generate signed thumbnail token
+    const thumbnailToken = await mux.jwt.signPlaybackId(playbackId, {
+      keyId: process.env.MUX_SIGNING_KEY_ID,
+      keySecret: process.env.MUX_SIGNING_KEY_PRIVATE_KEY,
+      expiration: '24h',
+      type: 'thumbnail', // Specify thumbnail type
+    });
+
+    console.log('[MUX PLAYBACK] Generated tokens for playbackId:', playbackId);
+    console.log('[MUX PLAYBACK] Playback token type:', typeof playbackToken);
+    console.log('[MUX PLAYBACK] Thumbnail token type:', typeof thumbnailToken);
+    console.log('[MUX PLAYBACK] Playback token preview:', playbackToken.substring(0, 50) + '...');
+
+    // Tokens are already strings from the API
+    const playbackTokenStr = playbackToken;
+    const thumbnailTokenStr = thumbnailToken;
 
     return NextResponse.json({
       playbackId,
-      token,
+      token: playbackTokenStr, // Keep for backward compatibility
+      playback: playbackTokenStr,
+      thumbnail: thumbnailTokenStr,
       expiresIn: '24h',
     });
   } catch (error) {
@@ -71,7 +92,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/mux/playback
- * Get asset information by asset ID
+ * Get asset information and playback ID by asset ID
  */
 export async function POST(request: NextRequest) {
   try {
@@ -98,9 +119,34 @@ export async function POST(request: NextRequest) {
     // Get asset information
     const asset = await mux.video.assets.retrieve(assetId);
 
+    console.log('[MUX ASSET] Asset details:', {
+      assetId: asset.id,
+      status: asset.status,
+      playbackIds: asset.playback_ids?.map(p => ({
+        id: p.id,
+        policy: p.policy,
+      })),
+    });
+
+    // Get the first playback ID (should be signed)
+    const playbackId = asset.playback_ids?.[0]?.id;
+    const playbackPolicy = asset.playback_ids?.[0]?.policy;
+
+    if (!playbackId) {
+      return NextResponse.json(
+        {
+          error: 'No playback ID found for this asset',
+          assetId: asset.id,
+          status: asset.status,
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       assetId: asset.id,
-      playbackId: asset.playback_ids?.[0]?.id,
+      playbackId: playbackId,
+      playbackPolicy: playbackPolicy,
       status: asset.status,
       duration: asset.duration,
       aspectRatio: asset.aspect_ratio,

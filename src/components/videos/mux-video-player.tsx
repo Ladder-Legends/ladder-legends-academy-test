@@ -22,13 +22,14 @@ export function MuxVideoPlayer({
   className = '',
   autoPlay = false,
 }: MuxVideoPlayerProps) {
-  const [token, setToken] = useState<string | null>(null);
+  const [playbackToken, setPlaybackToken] = useState<string | null>(null);
+  const [thumbnailToken, setThumbnailToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch signed playback token
-    const fetchToken = async () => {
+    // Fetch signed playback tokens
+    const fetchTokens = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -41,16 +42,29 @@ export function MuxVideoPlayer({
         }
 
         const data = await response.json();
-        setToken(data.token);
+        console.log('[MUX PLAYER] Received token data:', {
+          hasPlayback: !!data.playback,
+          hasThumbnail: !!data.thumbnail,
+          hasLegacyToken: !!data.token,
+          playbackType: typeof data.playback,
+          thumbnailType: typeof data.thumbnail,
+        });
+
+        // Support both new format (playback/thumbnail) and legacy format (token)
+        const pbToken = data.playback || data.token;
+        const thToken = data.thumbnail || data.token;
+
+        setPlaybackToken(pbToken);
+        setThumbnailToken(thToken);
       } catch (err) {
-        console.error('Error fetching playback token:', err);
+        console.error('Error fetching playback tokens:', err);
         setError(err instanceof Error ? err.message : 'Failed to load video');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchToken();
+    fetchTokens();
   }, [playbackId]);
 
   if (loading) {
@@ -75,7 +89,7 @@ export function MuxVideoPlayer({
     );
   }
 
-  if (!token) {
+  if (!playbackToken) {
     return (
       <div className={`relative w-full aspect-video bg-black/10 flex items-center justify-center ${className}`}>
         <p className="text-sm text-muted-foreground">No playback token available</p>
@@ -87,7 +101,10 @@ export function MuxVideoPlayer({
     <div className={className}>
       <MuxPlayer
         playbackId={playbackId}
-        tokens={{ playback: token }}
+        tokens={{
+          playback: playbackToken,
+          thumbnail: thumbnailToken || undefined,
+        }}
         metadata={{
           video_title: title,
         }}

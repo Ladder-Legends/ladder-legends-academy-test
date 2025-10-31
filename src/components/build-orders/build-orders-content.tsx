@@ -25,6 +25,7 @@ export function BuildOrdersContent() {
     zerg: [],
     protoss: [],
     difficulty: [],
+    accessLevel: [],
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -132,6 +133,18 @@ export function BuildOrdersContent() {
         if (!selectedDifficulties.includes(bo.difficulty)) return false;
       }
 
+      // Apply access level filter (excluding if counting accessLevel section)
+      const selectedAccessLevels = excludeSectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
+      if (selectedAccessLevels.length > 0) {
+        const isFree = bo.isFree === true;
+        const matchesAccessLevel = selectedAccessLevels.some(level => {
+          if (level === 'free') return isFree;
+          if (level === 'premium') return !isFree;
+          return false;
+        });
+        if (!matchesAccessLevel) return false;
+      }
+
       return true;
     }).length;
   }, [selectedTags, selectedItems]);
@@ -173,6 +186,14 @@ export function BuildOrdersContent() {
           { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
           { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
           { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
+        ].filter(item => item.count > 0),
+      },
+      {
+        id: 'accessLevel',
+        label: 'Access',
+        items: [
+          { id: 'free', label: 'Free', count: getCount(bo => bo.isFree === true, 'accessLevel') },
+          { id: 'premium', label: 'Premium', count: getCount(bo => !bo.isFree, 'accessLevel') },
         ].filter(item => item.count > 0),
       },
     ];
@@ -222,6 +243,18 @@ export function BuildOrdersContent() {
       const selectedDifficulties = selectedItems.difficulty || [];
       if (selectedDifficulties.length > 0) {
         if (!selectedDifficulties.includes(bo.difficulty)) return false;
+      }
+
+      // Apply access level filter
+      const selectedAccessLevels = selectedItems.accessLevel || [];
+      if (selectedAccessLevels.length > 0) {
+        const isFree = bo.isFree === true;
+        const matchesAccessLevel = selectedAccessLevels.some(level => {
+          if (level === 'free') return isFree;
+          if (level === 'premium') return !isFree;
+          return false;
+        });
+        if (!matchesAccessLevel) return false;
       }
 
       return true;
