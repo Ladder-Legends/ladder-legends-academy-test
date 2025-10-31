@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "node scripts/download-mux-thumbnails.js && next build --turbopack",
+    "build": "node scripts/download-mux-thumbnails.mjs && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
     "json-to-csv": "tsx scripts/json-to-csv.ts",

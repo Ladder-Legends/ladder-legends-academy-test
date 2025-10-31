@@ -10,13 +10,19 @@
  * reducing serverless compute costs.
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const Mux = require('@mux/mux-node').default;
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import Mux from '@mux/mux-node';
+import { config } from 'dotenv';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
-require('dotenv').config({ path: '.env.local' });
+config({ path: '.env.local' });
 
 const VIDEOS_PATH = path.join(__dirname, '../src/data/videos.json');
 const THUMBNAILS_DIR = path.join(__dirname, '../public/thumbnails');
