@@ -8,6 +8,7 @@ export interface Masterclass {
   coachId: string;
   race: Race;
   videoId: string;
+  replayIds?: string[]; // Multiple example replays demonstrating the concepts
   duration?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';
   tags: string[];
