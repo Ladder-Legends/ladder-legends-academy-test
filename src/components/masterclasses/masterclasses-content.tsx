@@ -21,6 +21,7 @@ export function MasterclassesContent() {
   const { addChange } = usePendingChanges();
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     coaches: [],
+    accessLevel: [],
   });
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -96,7 +97,7 @@ export function MasterclassesContent() {
     }).length;
   }, [searchQuery]);
 
-  // Build filter sections with coaches
+  // Build filter sections with coaches and access level
   const filterSections = useMemo((): FilterSection[] => {
     const coaches = Array.from(new Set(allMasterclasses.map(mc => mc.coachId)));
 
@@ -112,6 +113,14 @@ export function MasterclassesContent() {
             count: getCount(coachId),
           };
         }),
+      },
+      {
+        id: 'accessLevel',
+        label: 'Access',
+        items: [
+          { id: 'free', label: 'Free', count: allMasterclasses.filter(mc => mc.isFree === true).length },
+          { id: 'premium', label: 'Premium', count: allMasterclasses.filter(mc => !mc.isFree).length },
+        ].filter(item => item.count > 0),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,6 +145,19 @@ export function MasterclassesContent() {
     const coachFilters = selectedItems.coaches || [];
     if (coachFilters.length > 0) {
       filtered = filtered.filter(mc => coachFilters.includes(mc.coachId));
+    }
+
+    // Apply access level filter
+    const accessFilters = selectedItems.accessLevel || [];
+    if (accessFilters.length > 0) {
+      filtered = filtered.filter(mc => {
+        const isFree = mc.isFree === true;
+        return accessFilters.some(level => {
+          if (level === 'free') return isFree;
+          if (level === 'premium') return !isFree;
+          return false;
+        });
+      });
     }
 
     return filtered;
