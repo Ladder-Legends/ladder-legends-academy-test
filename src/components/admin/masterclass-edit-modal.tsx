@@ -270,6 +270,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           selectedVideoId={formData.videoId}
           onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
           label="Video *"
+          suggestedTitle={formData.title}
         />
 
         <div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Video } from '@/types/video';
 import videos from '@/data/videos.json';
 import { MuxUpload } from './mux-upload';
@@ -15,6 +15,7 @@ interface VideoSelectorProps {
   onVideoSelect: (videoId: string | undefined) => void;
   label?: string;
   className?: string;
+  suggestedTitle?: string; // Pre-fill upload form with this title
 }
 
 export function VideoSelector({
@@ -22,6 +23,7 @@ export function VideoSelector({
   onVideoSelect,
   label = 'Video',
   className = '',
+  suggestedTitle = '',
 }: VideoSelectorProps) {
   const { addChange } = usePendingChanges();
   const [showUpload, setShowUpload] = useState(false);
@@ -30,6 +32,13 @@ export function VideoSelector({
   const [uploadType, setUploadType] = useState<'mux' | 'youtube'>('mux');
   const [youtubeId, setYoutubeId] = useState('');
   const [pendingNewVideo, setPendingNewVideo] = useState<Video | null>(null);
+
+  // Auto-populate title when showing upload form
+  useEffect(() => {
+    if (showUpload && suggestedTitle && !uploadingVideoTitle) {
+      setUploadingVideoTitle(suggestedTitle);
+    }
+  }, [showUpload, suggestedTitle, uploadingVideoTitle]);
 
   const allVideos = videos as Video[];
 

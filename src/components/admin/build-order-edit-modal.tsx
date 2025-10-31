@@ -418,6 +418,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           selectedVideoId={formData.videoId}
           onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
           label="Video"
+          suggestedTitle={formData.name}
         />
 
         <div>

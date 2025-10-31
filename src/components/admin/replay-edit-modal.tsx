@@ -737,6 +737,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             selectedVideoId={formData.videoId}
             onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
             label="Video"
+            suggestedTitle={formData.title}
           />
         </div>
 
