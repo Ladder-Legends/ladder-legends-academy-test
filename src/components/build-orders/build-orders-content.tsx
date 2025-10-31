@@ -153,6 +153,14 @@ export function BuildOrdersContent() {
   const filterSections = useMemo((): FilterSection[] => {
     return [
       {
+        id: 'accessLevel',
+        label: 'Access Level',
+        items: [
+          { id: 'free', label: 'Free', count: getCount(bo => bo.isFree === true, 'accessLevel') },
+          { id: 'premium', label: 'Premium', count: getCount(bo => !bo.isFree, 'accessLevel') },
+        ].filter(item => item.count > 0),
+      },
+      {
         id: 'terran',
         label: 'Terran',
         items: [
@@ -186,14 +194,6 @@ export function BuildOrdersContent() {
           { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
           { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
           { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
-        ].filter(item => item.count > 0),
-      },
-      {
-        id: 'accessLevel',
-        label: 'Access',
-        items: [
-          { id: 'free', label: 'Free', count: getCount(bo => bo.isFree === true, 'accessLevel') },
-          { id: 'premium', label: 'Premium', count: getCount(bo => !bo.isFree, 'accessLevel') },
         ].filter(item => item.count > 0),
       },
     ];

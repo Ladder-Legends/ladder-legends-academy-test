@@ -169,6 +169,14 @@ export function ReplaysContent() {
   const filterSections = useMemo((): FilterSection[] => {
     return [
       {
+        id: 'accessLevel',
+        label: 'Access Level',
+        items: [
+          { id: 'free', label: 'Free', count: getCount(r => r.isFree === true, 'accessLevel') },
+          { id: 'premium', label: 'Premium', count: getCount(r => !r.isFree, 'accessLevel') },
+        ].filter(item => item.count > 0),
+      },
+      {
         id: 'terran',
         label: 'Terran',
         items: [
@@ -202,14 +210,6 @@ export function ReplaysContent() {
           { id: 'short', label: '< 7 min', count: getCount(r => parseDuration(r.duration) < 7, 'duration') },
           { id: 'medium', label: '7-14 min', count: getCount(r => parseDuration(r.duration) >= 7 && parseDuration(r.duration) <= 14, 'duration') },
           { id: 'long', label: '> 14 min', count: getCount(r => parseDuration(r.duration) > 14, 'duration') },
-        ].filter(item => item.count > 0),
-      },
-      {
-        id: 'accessLevel',
-        label: 'Access',
-        items: [
-          { id: 'free', label: 'Free', count: getCount(r => r.isFree === true, 'accessLevel') },
-          { id: 'premium', label: 'Premium', count: getCount(r => !r.isFree, 'accessLevel') },
         ].filter(item => item.count > 0),
       },
     ];

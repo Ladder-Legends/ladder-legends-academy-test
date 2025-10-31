@@ -103,6 +103,14 @@ export function MasterclassesContent() {
 
     return [
       {
+        id: 'accessLevel',
+        label: 'Access Level',
+        items: [
+          { id: 'free', label: 'Free', count: allMasterclasses.filter(mc => mc.isFree === true).length },
+          { id: 'premium', label: 'Premium', count: allMasterclasses.filter(mc => !mc.isFree).length },
+        ].filter(item => item.count > 0),
+      },
+      {
         id: 'coaches',
         label: 'Coaches',
         items: coaches.map(coachId => {
@@ -113,14 +121,6 @@ export function MasterclassesContent() {
             count: getCount(coachId),
           };
         }),
-      },
-      {
-        id: 'accessLevel',
-        label: 'Access',
-        items: [
-          { id: 'free', label: 'Free', count: allMasterclasses.filter(mc => mc.isFree === true).length },
-          { id: 'premium', label: 'Premium', count: allMasterclasses.filter(mc => !mc.isFree).length },
-        ].filter(item => item.count > 0),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
