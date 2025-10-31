@@ -29,12 +29,18 @@ export function VideoSelector({
   const [searchQuery, setSearchQuery] = useState('');
   const [uploadType, setUploadType] = useState<'mux' | 'youtube'>('mux');
   const [youtubeId, setYoutubeId] = useState('');
+  const [pendingNewVideo, setPendingNewVideo] = useState<Video | null>(null);
 
   const allVideos = videos as Video[];
 
   const selectedVideo = useMemo(() => {
+    // First check if there's a pending new video that matches
+    if (pendingNewVideo && pendingNewVideo.id === selectedVideoId) {
+      return pendingNewVideo;
+    }
+    // Otherwise look in existing videos
     return allVideos.find(v => v.id === selectedVideoId);
-  }, [allVideos, selectedVideoId]);
+  }, [allVideos, selectedVideoId, pendingNewVideo]);
 
   const filteredVideos = useMemo(() => {
     if (!searchQuery.trim()) return allVideos;
@@ -65,6 +71,9 @@ export function VideoSelector({
       thumbnailVideoIndex: 0,
       isFree: false,
     };
+
+    // Store in pending state for immediate display
+    setPendingNewVideo(newVideo);
 
     // Add to pending changes
     addChange({
@@ -111,6 +120,9 @@ export function VideoSelector({
       isFree: false,
     };
 
+    // Store in pending state for immediate display
+    setPendingNewVideo(newVideo);
+
     // Add to pending changes
     addChange({
       id: newVideo.id,
@@ -134,12 +146,22 @@ export function VideoSelector({
       {/* Selected Video Display */}
       {selectedVideo && (
         <div className="mb-3 p-3 bg-muted rounded-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <VideoIcon className="w-5 h-5 text-primary" />
-            <div>
-              <div className="font-medium">{selectedVideo.title}</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{selectedVideo.title}</span>
+                {pendingNewVideo && pendingNewVideo.id === selectedVideo.id && (
+                  <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full font-medium">
+                    New - pending commit
+                  </span>
+                )}
+              </div>
               {selectedVideo.coach && (
                 <div className="text-sm text-muted-foreground">Coach: {selectedVideo.coach}</div>
+              )}
+              {selectedVideo.source === 'mux' && pendingNewVideo && (
+                <div className="text-sm text-muted-foreground">Mux video uploaded successfully</div>
               )}
             </div>
           </div>
@@ -147,7 +169,10 @@ export function VideoSelector({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => onVideoSelect(undefined)}
+            onClick={() => {
+              onVideoSelect(undefined);
+              setPendingNewVideo(null);
+            }}
           >
             <X className="w-4 h-4" />
           </Button>
