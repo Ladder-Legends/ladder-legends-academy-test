@@ -82,7 +82,7 @@ async function fetchFiles(
  */
 function applyChanges(
   files: Record<string, FileInfo>,
-  changesByType: Record<ContentType, Change[]>
+  changesByType: Record<Exclude<ContentType, 'file'>, Change[]>
 ): Record<string, FileInfo> {
   const updatedFiles = { ...files };
 
@@ -317,10 +317,11 @@ async function commitWithRetry(
 
   // Group JSON changes by content type
   const changesByType = jsonChanges.reduce((acc, change) => {
-    if (!acc[change.contentType]) {
-      acc[change.contentType] = [];
+    const contentType = change.contentType as Exclude<ContentType, 'file'>;
+    if (!acc[contentType]) {
+      acc[contentType] = [];
     }
-    acc[change.contentType].push(change);
+    acc[contentType].push(change);
     return acc;
   }, {} as Record<Exclude<ContentType, 'file'>, Change[]>);
 
