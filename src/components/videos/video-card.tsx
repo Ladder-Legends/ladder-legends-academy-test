@@ -3,12 +3,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Video, isPlaylist, getThumbnailYoutubeId } from "@/types/video";
+import { Video, isPlaylist, getThumbnailYoutubeId, isMuxVideo } from "@/types/video";
 import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { useSession } from "next-auth/react";
+import { useMuxThumbnail } from "@/hooks/use-mux-thumbnail";
 
 interface VideoCardProps {
   video: Video;
@@ -19,6 +20,7 @@ interface VideoCardProps {
 export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+  const { url: muxThumbnailUrl, isLoading: muxThumbnailLoading } = useMuxThumbnail(video);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -36,6 +38,11 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   const videoIsPlaylist = isPlaylist(video);
   const thumbnailId = getThumbnailYoutubeId(video);
 
+  // Get thumbnail URL based on video source
+  const thumbnailUrl = isMuxVideo(video)
+    ? muxThumbnailUrl || video.thumbnail // Use signed Mux URL or fallback to stored thumbnail
+    : `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`; // YouTube thumbnail
+
   return (
     <div className="relative group">
       <PaywallLink
@@ -45,14 +52,20 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0">
           <div className="relative aspect-video bg-muted overflow-hidden m-0">
-            <Image
-              src={`https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`}
-              alt={video.title}
-              fill
-              unoptimized
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt={video.title}
+                fill
+                unoptimized
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                <PlayCircle className="w-16 h-16 text-muted-foreground/50" />
+              </div>
+            )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               {videoIsPlaylist ? (
                 <ListVideo className="w-16 h-16 text-white" />
