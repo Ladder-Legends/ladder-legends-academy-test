@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
 import coaches from '@/data/coaches.json';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
+import { VideoSelector } from './video-selector';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -710,16 +711,11 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Coaching Video ID</label>
-            <input
-              type="text"
-              value={formData.videoId || ''}
-              onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="dQw4w9WgXcQ"
-            />
-          </div>
+          <VideoSelector
+            selectedVideoId={formData.videoId}
+            onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
+            label="Video"
+          />
         </div>
 
         <div>

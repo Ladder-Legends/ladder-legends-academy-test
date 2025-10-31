@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
 import coaches from '@/data/coaches.json';
+import videos from '@/data/videos.json';
+import { VideoSelector } from './video-selector';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -114,9 +116,13 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
 
   const handleSave = () => {
     if (!formData.id || !formData.title || !formData.coach || !formData.coachId || !formData.videoId) {
-      toast.error('Please fill in all required fields (Title, Coach, Video ID)');
+      toast.error('Please fill in all required fields (Title, Coach, Video)');
       return;
     }
+
+    // Get thumbnail from the selected video
+    const selectedVideo = videos.find(v => v.id === formData.videoId);
+    const thumbnail = selectedVideo?.thumbnail || `https://img.youtube.com/vi/${formData.videoId}/hqdefault.jpg`;
 
     const masterclassData: Masterclass = {
       id: formData.id,
@@ -129,7 +135,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       duration: formData.duration,
       difficulty: formData.difficulty || 'beginner',
       tags: formData.tags || [],
-      thumbnail: `https://img.youtube.com/vi/${formData.videoId}/hqdefault.jpg`,
+      thumbnail: thumbnail,
       createdAt: formData.createdAt || new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
       isFree: formData.isFree || false,
@@ -239,34 +245,24 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">YouTube Video ID *</label>
-            <input
-              type="text"
-              value={formData.videoId || ''}
-              onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="dQw4w9WgXcQ"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              The ID from the YouTube URL (e.g., youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>)
-            </p>
-          </div>
+        <VideoSelector
+          selectedVideoId={formData.videoId}
+          onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
+          label="Video *"
+        />
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Duration</label>
-            <input
-              type="text"
-              value={formData.duration || ''}
-              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="24:15"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Video duration (e.g., &quot;24:15&quot;)
-            </p>
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Duration</label>
+          <input
+            type="text"
+            value={formData.duration || ''}
+            onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            placeholder="24:15"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Video duration (e.g., &quot;24:15&quot;)
+          </p>
         </div>
 
         <div>

@@ -11,6 +11,7 @@ import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
+import { VideoSelector } from './video-selector';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -391,16 +392,11 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Video ID (YouTube)</label>
-          <input
-            type="text"
-            value={formData.videoId || ''}
-            onChange={(e) => setFormData({ ...formData, videoId: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="dQw4w9WgXcQ"
-          />
-        </div>
+        <VideoSelector
+          selectedVideoId={formData.videoId}
+          onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
+          label="Video"
+        />
 
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
