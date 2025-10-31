@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
+import videos from '@/data/videos.json';
+import { Video } from '@/types/video';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector';
@@ -319,6 +321,26 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       operation: isNew ? 'create' : 'update',
       data: buildOrderData as unknown as Record<string, unknown>,
     });
+
+    // If there's a linked video, update it with build order metadata
+    if (formData.videoId) {
+      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
+      if (existingVideo) {
+        const updatedVideo: Video = {
+          ...existingVideo,
+          title: formData.name, // Use build order name as title
+          tags: Array.from(new Set([...(existingVideo.tags || []), 'build-order'])), // Add 'build-order' tag
+          race: formData.race || existingVideo.race, // Use build order race
+        };
+
+        addChange({
+          id: updatedVideo.id,
+          contentType: 'videos',
+          operation: 'update',
+          data: updatedVideo as unknown as Record<string, unknown>,
+        });
+      }
+    }
 
     toast.success(`Build order ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();

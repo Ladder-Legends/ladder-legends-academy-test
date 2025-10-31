@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
 import coaches from '@/data/coaches.json';
+import videos from '@/data/videos.json';
+import { Video } from '@/types/video';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector';
 
@@ -370,6 +372,26 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       operation: isNew ? 'create' : 'update',
       data: replayData as unknown as Record<string, unknown>,
     });
+
+    // If there's a linked video, update it with replay metadata
+    if (formData.videoId) {
+      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
+      if (existingVideo) {
+        const updatedVideo: Video = {
+          ...existingVideo,
+          title: formData.title, // Use replay title
+          tags: Array.from(new Set([...(existingVideo.tags || []), 'replay'])), // Add 'replay' tag
+          race: formData.player1?.race || existingVideo.race, // Use player 1's race
+        };
+
+        addChange({
+          id: updatedVideo.id,
+          contentType: 'videos',
+          operation: 'update',
+          data: updatedVideo as unknown as Record<string, unknown>,
+        });
+      }
+    }
 
     toast.success(`Replay ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();

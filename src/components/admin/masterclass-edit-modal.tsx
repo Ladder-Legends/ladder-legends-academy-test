@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
 import coaches from '@/data/coaches.json';
 import videos from '@/data/videos.json';
+import { Video } from '@/types/video';
 import { VideoSelector } from './video-selector';
 
 interface MasterclassEditModalProps {
@@ -147,6 +148,26 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       operation: isNew ? 'create' : 'update',
       data: masterclassData as unknown as Record<string, unknown>,
     });
+
+    // If there's a linked video, update it with masterclass metadata
+    if (formData.videoId) {
+      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
+      if (existingVideo) {
+        const updatedVideo: Video = {
+          ...existingVideo,
+          title: formData.title, // Use masterclass title
+          tags: Array.from(new Set([...(existingVideo.tags || []), 'masterclass'])), // Add 'masterclass' tag
+          race: formData.race || existingVideo.race, // Use masterclass race
+        };
+
+        addChange({
+          id: updatedVideo.id,
+          contentType: 'videos',
+          operation: 'update',
+          data: updatedVideo as unknown as Record<string, unknown>,
+        });
+      }
+    }
 
     toast.success(`Masterclass ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
