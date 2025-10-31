@@ -10,7 +10,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const VERCEL_DEPLOY_HOOK = process.env.VERCEL_DEPLOY_HOOK;
 const MAX_RETRY_ATTEMPTS = 3;
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'file';
 type Operation = 'create' | 'update' | 'delete';
 
 interface Change {
@@ -18,6 +18,14 @@ interface Change {
   contentType: ContentType;
   operation: Operation;
   data: Record<string, unknown>;
+}
+
+interface FileChange extends Change {
+  contentType: 'file';
+  data: {
+    path: string; // e.g., 'public/thumbnails/video-id.jpg'
+    content: string; // base64 data URL (e.g., 'data:image/jpeg;base64,/9j/4AAQ...')
+  };
 }
 
 interface CommitRequest {
@@ -117,10 +125,11 @@ function applyChanges(
 }
 
 /**
- * Creates a Git commit with updated files
+ * Creates a Git commit with updated files and custom files (like thumbnails)
  */
 async function createGitCommit(
   files: Record<string, FileInfo>,
+  fileChanges: FileChange[],
   commitMessage: string,
   token: string
 ): Promise<{ sha: string; url: string }> {
@@ -156,7 +165,7 @@ async function createGitCommit(
   const commitData = await commitResponse.json();
   const baseTreeSha = commitData.tree.sha;
 
-  // 3. Create blobs for all updated files
+  // 3. Create blobs for all updated JSON files
   const tree = [];
   for (const [contentType, fileInfo] of Object.entries(files)) {
     const newContentString = JSON.stringify(fileInfo.content, null, 2) + '\n';
@@ -189,7 +198,40 @@ async function createGitCommit(
     });
   }
 
-  // 4. Create new tree
+  // 4. Create blobs for custom files (e.g., thumbnails)
+  for (const fileChange of fileChanges) {
+    // Extract base64 content from data URL (e.g., 'data:image/jpeg;base64,/9j/4AAQ...')
+    const base64Content = fileChange.data.content.split(',')[1];
+
+    const blobUrl = `${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/git/blobs`;
+    const blobResponse = await fetch(blobUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: base64Content,
+        encoding: 'base64',
+      }),
+    });
+
+    if (!blobResponse.ok) {
+      throw new Error(`Failed to create blob for ${fileChange.data.path}: ${await blobResponse.text()}`);
+    }
+
+    const blobData = await blobResponse.json();
+
+    tree.push({
+      path: fileChange.data.path,
+      mode: '100644',
+      type: 'blob',
+      sha: blobData.sha,
+    });
+  }
+
+  // 5. Create new tree
   const treeUrl = `${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/git/trees`;
   const treeResponse = await fetch(treeUrl, {
     method: 'POST',
@@ -210,7 +252,7 @@ async function createGitCommit(
 
   const treeData = await treeResponse.json();
 
-  // 5. Create new commit
+  // 6. Create new commit
   const newCommitUrl = `${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/git/commits`;
   const newCommitResponse = await fetch(newCommitUrl, {
     method: 'POST',
@@ -232,7 +274,7 @@ async function createGitCommit(
 
   const newCommitData = await newCommitResponse.json();
 
-  // 6. Update the reference
+  // 7. Update the reference
   const updateRefUrl = `${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/main`;
   const updateRefResponse = await fetch(updateRefUrl, {
     method: 'PATCH',
@@ -269,27 +311,31 @@ async function commitWithRetry(
   commitMessage: string,
   token: string
 ): Promise<{ sha: string; url: string; attempts: number }> {
-  // Group changes by content type
-  const changesByType = changes.reduce((acc, change) => {
+  // Separate file changes from JSON changes
+  const fileChanges = changes.filter(c => c.contentType === 'file') as FileChange[];
+  const jsonChanges = changes.filter(c => c.contentType !== 'file');
+
+  // Group JSON changes by content type
+  const changesByType = jsonChanges.reduce((acc, change) => {
     if (!acc[change.contentType]) {
       acc[change.contentType] = [];
     }
     acc[change.contentType].push(change);
     return acc;
-  }, {} as Record<ContentType, Change[]>);
+  }, {} as Record<Exclude<ContentType, 'file'>, Change[]>);
 
-  const contentTypes = Object.keys(changesByType) as ContentType[];
+  const contentTypes = Object.keys(changesByType) as Exclude<ContentType, 'file'>[];
 
   for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
     try {
-      // 1. Fetch current files (fresh on each attempt)
-      const files = await fetchFiles(contentTypes, token);
+      // 1. Fetch current JSON files (fresh on each attempt)
+      const files = contentTypes.length > 0 ? await fetchFiles(contentTypes, token) : {};
 
       // 2. Apply changes (pure function - idempotent)
-      const updatedFiles = applyChanges(files, changesByType);
+      const updatedFiles = contentTypes.length > 0 ? applyChanges(files, changesByType) : {};
 
-      // 3. Create Git commit (atomic operation)
-      const result = await createGitCommit(updatedFiles, commitMessage, token);
+      // 3. Create Git commit (atomic operation) with both JSON and file changes
+      const result = await createGitCommit(updatedFiles, fileChanges, commitMessage, token);
 
       return { ...result, attempts: attempt };
     } catch (error) {

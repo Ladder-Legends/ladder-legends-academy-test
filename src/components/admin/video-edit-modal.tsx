@@ -26,6 +26,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
+  const [customThumbnail, setCustomThumbnail] = useState<string | null>(null); // base64 or URL
 
   // Get all unique tags from existing videos for autocomplete
   const allExistingTags = useMemo(() => {
@@ -162,6 +163,35 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     }
   };
 
+  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setCustomThumbnail(base64);
+      toast.success('Custom thumbnail uploaded');
+    };
+    reader.onerror = () => {
+      toast.error('Failed to read image file');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = () => {
     const isMuxVideo = formData.source === 'mux';
     const hasYoutubeIds = formData.youtubeIds && formData.youtubeIds.length > 0;
@@ -238,6 +268,19 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       operation: isNew ? 'create' : 'update',
       data: videoData as unknown as Record<string, unknown>,
     });
+
+    // If custom thumbnail uploaded for Mux video, add it as a file change
+    if (isMuxVideo && customThumbnail) {
+      addChange({
+        id: `thumbnail-${videoData.id}`,
+        contentType: 'file',
+        operation: 'create',
+        data: {
+          path: `public/thumbnails/${videoData.id}.jpg`,
+          content: customThumbnail, // base64
+        },
+      });
+    }
 
     toast.success(`Video ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
@@ -397,6 +440,60 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                 title={formData.title}
                 description={formData.description}
               />
+            )}
+
+            {/* Custom Thumbnail Upload for Mux Videos */}
+            {formData.muxPlaybackId && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium mb-2">Custom Thumbnail (Optional)</label>
+                <div className="space-y-3">
+                  {customThumbnail ? (
+                    <div className="relative">
+                      <img
+                        src={customThumbnail}
+                        alt="Custom thumbnail preview"
+                        className="w-full aspect-video object-cover rounded-lg border border-border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCustomThumbnail(null)}
+                        className="absolute top-2 right-2 px-3 py-1 bg-destructive text-destructive-foreground rounded-md text-sm hover:bg-destructive/90"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailUpload}
+                        className="hidden"
+                        id="thumbnail-upload"
+                      />
+                      <label
+                        htmlFor="thumbnail-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                          <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Click to upload custom thumbnail</p>
+                          <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 2MB</p>
+                        </div>
+                      </label>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {customThumbnail
+                      ? 'This custom thumbnail will be saved when you commit changes.'
+                      : 'If not uploaded, Mux will generate a thumbnail automatically during the build process.'}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         ) : (
