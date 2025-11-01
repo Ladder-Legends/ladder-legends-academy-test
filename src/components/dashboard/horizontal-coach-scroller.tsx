@@ -5,6 +5,7 @@ import { CoachCard } from '@/components/coaches/coach-card';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import videos from '@/data/videos.json';
+import { HorizontalScrollContainer } from '@/components/ui/horizontal-scroll-container';
 
 interface HorizontalCoachScrollerProps {
   title: string;
@@ -39,17 +40,15 @@ export function HorizontalCoachScroller({
       </div>
 
       {/* Horizontal Scroll Container */}
-      <div className="relative">
-        <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-          <div className="flex gap-4 min-w-max">
-            {coaches.map((coach) => (
-              <div key={coach.id} className="w-96 flex-shrink-0">
-                <CoachCard coach={coach} videoCount={getVideoCount(coach.id)} />
-              </div>
-            ))}
-          </div>
+      <HorizontalScrollContainer>
+        <div className="flex gap-4 min-w-max items-stretch">
+          {coaches.map((coach) => (
+            <div key={coach.id} className="w-80 flex-shrink-0">
+              <CoachCard coach={coach} videoCount={getVideoCount(coach.id)} />
+            </div>
+          ))}
         </div>
-      </div>
+      </HorizontalScrollContainer>
     </section>
   );
 }

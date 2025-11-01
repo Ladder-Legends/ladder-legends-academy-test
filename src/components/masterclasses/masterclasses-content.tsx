@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
+import { useState, useMemo } from 'react';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
-import Link from 'next/link';
-import { Play, Clock, Plus, Edit, Trash2, Lock } from 'lucide-react';
-import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
-import { PermissionGate } from '@/components/auth/permission-gate';
+import { MasterclassCard } from './masterclass-card';
+import { MasterclassesTable } from './masterclasses-table';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
@@ -19,32 +21,104 @@ export function MasterclassesContent() {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
+
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     coaches: [],
     accessLevel: [],
   });
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Mobile filter state
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-
-  // Modal state for editing
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
 
-  // Handle filter toggle
-  const handleItemToggle = (sectionId: string, itemId: string) => {
-    setSelectedItems(prev => {
-      const current = prev[sectionId] || [];
-      const updated = current.includes(itemId)
-        ? current.filter(id => id !== itemId)
-        : [...current, itemId];
-      return { ...prev, [sectionId]: updated };
+  // Get all unique tags
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    allMasterclasses.forEach(mc => {
+      mc.tags?.forEach(tag => tags.add(tag));
     });
+    return Array.from(tags).sort();
+  }, []);
+
+  // Get unique coaches
+  const allCoaches = useMemo(() => {
+    const coaches = new Set<string>();
+    allMasterclasses.forEach(mc => coaches.add(mc.coach));
+    return Array.from(coaches).sort();
+  }, []);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
 
-  // Admin handlers
+  // Filter masterclasses
+  const filteredMasterclasses = useMemo(() => {
+    return allMasterclasses.filter(mc => {
+      // Search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !mc.title.toLowerCase().includes(query) &&
+          !mc.description.toLowerCase().includes(query) &&
+          !mc.coach.toLowerCase().includes(query) &&
+          !mc.race.toLowerCase().includes(query) &&
+          !mc.tags?.some(tag => tag.toLowerCase().includes(query))
+        ) {
+          return false;
+        }
+      }
+
+      // Tag filters
+      if (selectedTags.length > 0) {
+        if (!mc.tags || !selectedTags.every(tag => mc.tags.includes(tag))) {
+          return false;
+        }
+      }
+
+      // Coach filters
+      if (selectedItems.coaches && selectedItems.coaches.length > 0) {
+        if (!selectedItems.coaches.includes(mc.coach)) return false;
+      }
+
+      // Access level filters
+      if (selectedItems.accessLevel && selectedItems.accessLevel.length > 0) {
+        const isFree = mc.isFree ?? false;
+        if (selectedItems.accessLevel.includes('free') && !isFree) return false;
+        if (selectedItems.accessLevel.includes('premium') && isFree) return false;
+      }
+
+      return true;
+    });
+  }, [allMasterclasses, selectedItems, selectedTags, searchQuery]);
+
+  // Filter sections
+  const filterSections: FilterSection[] = [
+    {
+      id: 'search',
+      title: 'Search',
+      type: 'search' as const,
+      items: [],
+    },
+    {
+      id: 'coaches',
+      title: 'Coach',
+      type: 'checkbox' as const,
+      items: allCoaches.map(coach => ({ id: coach, label: coach })),
+    },
+    {
+      id: 'accessLevel',
+      title: 'Access Level',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'free', label: 'Free' },
+        { id: 'premium', label: 'Premium' },
+      ],
+    },
+  ];
+
   const handleEdit = (masterclass: Masterclass) => {
     setEditingMasterclass(masterclass);
     setIsNewMasterclass(false);
@@ -75,238 +149,78 @@ export function MasterclassesContent() {
     setIsNewMasterclass(false);
   };
 
-  // Count masterclasses for each coach with context-aware filtering
-  const getCount = useCallback((coachId: string) => {
-    return allMasterclasses.filter(mc => {
-      // Check if masterclass matches the coach we're counting
-      if (mc.coachId !== coachId) return false;
+  // Filter content
+  const filterContent = (
+    <FilterSidebar
+      searchEnabled={true}
+      searchPlaceholder="Search masterclasses..."
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      sections={filterSections}
+      selectedItems={selectedItems}
+      onSelectionChange={setSelectedItems}
+    />
+  );
 
-      // Apply search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch =
-          mc.title.toLowerCase().includes(query) ||
-          mc.description.toLowerCase().includes(query) ||
-          mc.coach.toLowerCase().includes(query) ||
-          mc.race.toLowerCase().includes(query) ||
-          (mc.tags && mc.tags.some(tag => tag.toLowerCase().includes(query)));
-        if (!matchesSearch) return false;
-      }
+  // Table content
+  const tableContent = (
+    <MasterclassesTable
+      masterclasses={filteredMasterclasses}
+      hasSubscriberRole={hasSubscriberRole}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  );
 
-      return true;
-    }).length;
-  }, [searchQuery]);
+  // Grid content
+  const gridContent = (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {filteredMasterclasses.map(mc => (
+        <MasterclassCard
+          key={mc.id}
+          masterclass={mc}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      ))}
+    </div>
+  );
 
-  // Build filter sections with coaches and access level
-  const filterSections = useMemo((): FilterSection[] => {
-    const coaches = Array.from(new Set(allMasterclasses.map(mc => mc.coachId)));
-
-    return [
-      {
-        id: 'accessLevel',
-        label: 'Access Level',
-        items: [
-          { id: 'free', label: 'Free', count: allMasterclasses.filter(mc => mc.isFree === true).length },
-          { id: 'premium', label: 'Premium', count: allMasterclasses.filter(mc => !mc.isFree).length },
-        ].filter(item => item.count > 0),
-      },
-      {
-        id: 'coaches',
-        label: 'Coaches',
-        items: coaches.map(coachId => {
-          const coachMasterclass = allMasterclasses.find(mc => mc.coachId === coachId);
-          return {
-            id: coachId,
-            label: coachMasterclass?.coach || coachId,
-            count: getCount(coachId),
-          };
-        }),
-      },
-    ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, getCount]);
-
-  // Filter masterclasses based on search and selected coaches
-  const filteredMasterclasses = useMemo(() => {
-    let filtered = allMasterclasses;
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(mc =>
-        mc.title.toLowerCase().includes(query) ||
-        mc.description.toLowerCase().includes(query) ||
-        mc.coach.toLowerCase().includes(query) ||
-        mc.race.toLowerCase().includes(query) ||
-        (mc.tags && mc.tags.some(tag => tag.toLowerCase().includes(query)))
-      );
-    }
-
-    const coachFilters = selectedItems.coaches || [];
-    if (coachFilters.length > 0) {
-      filtered = filtered.filter(mc => coachFilters.includes(mc.coachId));
-    }
-
-    // Apply access level filter
-    const accessFilters = selectedItems.accessLevel || [];
-    if (accessFilters.length > 0) {
-      filtered = filtered.filter(mc => {
-        const isFree = mc.isFree === true;
-        return accessFilters.some(level => {
-          if (level === 'free') return isFree;
-          if (level === 'premium') return !isFree;
-          return false;
-        });
-      });
-    }
-
-    return filtered;
-  }, [selectedItems, searchQuery]);
+  // Header actions
+  const headerActions = (
+    <PermissionGate require="coaches">
+      <Button onClick={handleAddNew} className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Add New Masterclass
+      </Button>
+    </PermissionGate>
+  );
 
   return (
-    <div className="flex flex-1">
-      <FilterSidebar
-        searchEnabled={true}
-        searchPlaceholder="Search masterclasses..."
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        sections={filterSections}
-        selectedItems={selectedItems}
-        onItemToggle={handleItemToggle}
-        isMobileOpen={isMobileFilterOpen}
-        onMobileOpenChange={setIsMobileFilterOpen}
+    <>
+      <FilterableContentLayout
+        title="Masterclasses"
+        description="Deep dive tutorials and advanced strategies from our expert coaches"
+        filterContent={filterContent}
+        tableContent={tableContent}
+        gridContent={gridContent}
+        defaultView="grid"
+        showViewToggle={true}
+        headerActions={headerActions}
+        resultCount={`Showing ${filteredMasterclasses.length} masterclass${filteredMasterclasses.length !== 1 ? 'es' : ''}`}
+        tags={allTags}
+        selectedTags={selectedTags}
+        onTagToggle={toggleTag}
+        onClearTags={() => setSelectedTags([])}
       />
 
-      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
-        <div className="space-y-6">
-          {/* Mobile Filter Button */}
-          <MobileFilterButton
-            onClick={() => setIsMobileFilterOpen(true)}
-            label="Filters & Search"
-          />
-
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold">Masterclasses</h2>
-              <p className="text-muted-foreground">
-                In-depth video courses from our coaches. Perfect for systematic improvement in specific areas.
-              </p>
-            </div>
-            <PermissionGate require="coaches">
-              <Button onClick={handleAddNew} className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add New Masterclass
-              </Button>
-            </PermissionGate>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Showing {filteredMasterclasses.length} masterclass{filteredMasterclasses.length !== 1 ? 'es' : ''}
-              </p>
-            </div>
-
-            <div className="border border-border rounded-lg overflow-x-auto">
-              <table className="w-full min-w-[800px]">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Race</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMasterclasses.map((masterclass, index) => (
-                    <tr
-                      key={masterclass.id}
-                      className={`border-t border-border hover:bg-muted/30 transition-colors ${
-                        index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
-                      }`}
-                    >
-                      <td className="px-6 py-4">
-                        <Link
-                          href={`/masterclasses/${masterclass.id}`}
-                          className="text-base font-medium hover:text-primary transition-colors block"
-                        >
-                          {masterclass.title}
-                        </Link>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
-                            {masterclass.description}
-                          </p>
-                          {!masterclass.isFree && !hasSubscriberRole && (
-                            <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                              <Lock className="w-2.5 h-2.5" />
-                              Premium
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm">{masterclass.coach}</td>
-                      <td className="px-6 py-4 text-sm capitalize">
-                        {masterclass.race}
-                      </td>
-                      <td className="px-6 py-4 text-sm capitalize">
-                        {masterclass.difficulty}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        {masterclass.duration && (
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="h-3.5 w-3.5" />
-                            {masterclass.duration}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <Link
-                            href={`/masterclasses/${masterclass.id}`}
-                            className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-1.5 font-medium"
-                          >
-                            <Play className="h-3.5 w-3.5" />
-                            Watch
-                          </Link>
-                          <PermissionGate require="coaches">
-                            <button
-                              onClick={() => handleEdit(masterclass)}
-                              className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
-                            >
-                              <Edit className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(masterclass)}
-                              className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </PermissionGate>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {filteredMasterclasses.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No masterclasses found for this category.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
+      {/* Edit Modal */}
       <MasterclassEditModal
         masterclass={editingMasterclass}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         isNew={isNewMasterclass}
       />
-    </div>
+    </>
   );
 }

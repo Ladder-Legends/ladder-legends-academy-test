@@ -1,0 +1,144 @@
+'use client';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BuildOrder } from "@/types/build-order";
+import { Video, Lock, Edit, Trash2, FileText } from "lucide-react";
+import Link from "next/link";
+import { PermissionGate } from "@/components/auth/permission-gate";
+import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { Badge } from "@/components/ui/badge";
+
+interface BuildOrderCardProps {
+  buildOrder: BuildOrder;
+  onEdit?: (buildOrder: BuildOrder) => void;
+  onDelete?: (buildOrder: BuildOrder) => void;
+}
+
+export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardProps) {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'beginner': return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'intermediate': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'advanced': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      default: return 'bg-muted';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'aggressive': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'defensive': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'economic': return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'timing': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+      case 'all-in': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+      default: return 'bg-muted';
+    }
+  };
+
+  return (
+    <div className="relative group">
+      <Link
+        href={`/build-orders/${buildOrder.id}`}
+        className="block"
+      >
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
+          <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 overflow-hidden flex items-center justify-center">
+            {/* Matchup Display */}
+            <div className="text-6xl font-bold text-muted-foreground/20">
+              {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
+            </div>
+
+            {/* Premium Badge */}
+            {!buildOrder.isFree && !hasSubscriberRole && (
+              <div className="absolute bottom-2 right-2 bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium z-20">
+                <Lock className="w-2.5 h-2.5" />
+                Premium
+              </div>
+            )}
+
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              {buildOrder.videoId && (
+                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
+                  <Video className="w-6 h-6 text-white" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <CardHeader className="flex-1">
+            <div className="flex items-start gap-2 mb-2 flex-wrap">
+              <Badge variant="outline" className={getTypeColor(buildOrder.type)}>
+                {buildOrder.type}
+              </Badge>
+              <Badge variant="outline" className={getDifficultyColor(buildOrder.difficulty)}>
+                {buildOrder.difficulty}
+              </Badge>
+            </div>
+            <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+              {buildOrder.name}
+            </CardTitle>
+            <CardDescription className="line-clamp-2">
+              {buildOrder.description}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-2 pt-0">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="font-medium uppercase">
+                {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
+              </span>
+              {buildOrder.coach && (
+                <>
+                  <span>•</span>
+                  <span>Coach: {buildOrder.coach}</span>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+
+      {/* Admin Edit/Delete Buttons */}
+      <PermissionGate require="coaches">
+        <div className="absolute top-2 right-2 flex gap-2 z-10">
+          {onEdit && (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit(buildOrder);
+              }}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="sm"
+              variant="destructive"
+              className="h-8 w-8 p-0 bg-destructive/90 backdrop-blur-sm hover:bg-destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(buildOrder);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </PermissionGate>
+    </div>
+  );
+}

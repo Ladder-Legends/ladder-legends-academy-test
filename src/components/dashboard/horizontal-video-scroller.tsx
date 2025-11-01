@@ -4,6 +4,7 @@ import { Video } from '@/types/video';
 import { VideoCard } from '@/components/videos/video-card';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { HorizontalScrollContainer } from '@/components/ui/horizontal-scroll-container';
 
 interface HorizontalVideoScrollerProps {
   title: string;
@@ -33,17 +34,15 @@ export function HorizontalVideoScroller({
       </div>
 
       {/* Horizontal Scroll Container */}
-      <div className="relative">
-        <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-          <div className="flex gap-4 min-w-max">
-            {videos.map((video) => (
-              <div key={video.id} className="w-80 flex-shrink-0">
-                <VideoCard video={video} />
-              </div>
-            ))}
-          </div>
+      <HorizontalScrollContainer>
+        <div className="flex gap-4 min-w-max items-stretch">
+          {videos.map((video) => (
+            <div key={video.id} className="w-80 flex-shrink-0">
+              <VideoCard video={video} />
+            </div>
+          ))}
         </div>
-      </div>
+      </HorizontalScrollContainer>
     </section>
   );
 }

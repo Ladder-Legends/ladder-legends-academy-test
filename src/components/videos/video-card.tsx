@@ -42,13 +42,13 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
     : `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`; // YouTube thumbnail
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <PaywallLink
         href={`/library/${video.id}`}
-        className="block"
+        className="block h-full"
         isFree={video.isFree}
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0">
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-muted overflow-hidden m-0">
             {thumbnailUrl ? (
               <Image
@@ -94,17 +94,17 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               {video.description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 pt-0">
+          <CardContent className="space-y-2 pt-0">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CalendarDays className="w-4 h-4" />
               <span>{formatDate(video.date)}</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {video.tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className={`${getTagColor()} border-0`}
+                  className={`${getTagColor()} border-0 text-xs`}
                 >
                   {tag}
                 </Badge>

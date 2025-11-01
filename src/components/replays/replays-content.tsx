@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
+import { useState, useMemo } from 'react';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
-import Link from 'next/link';
-import { Download, Video, X, Plus, Edit, Trash2, Lock } from 'lucide-react';
-import { PaywallLink } from '@/components/auth/paywall-link';
-import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
-import { PermissionGate } from '@/components/auth/permission-gate';
+import { ReplayCard } from './replay-card';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import { ReplaysTable } from './replays-table';
 
 const allReplays = replaysData as Replay[];
 
@@ -20,10 +20,8 @@ const allReplays = replaysData as Replay[];
 function parseDuration(duration: string): number {
   const parts = duration.split(':').map(p => parseInt(p, 10));
   if (parts.length === 2) {
-    // MM:SS format
     return parts[0];
   } else if (parts.length === 3) {
-    // HH:MM:SS format
     return parts[0] * 60 + parts[1];
   }
   return 0;
@@ -33,6 +31,7 @@ export function ReplaysContent() {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
+
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     terran: [],
     zerg: [],
@@ -42,464 +41,250 @@ export function ReplaysContent() {
   });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Mobile filter state
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-
-  // Modal state for editing
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isNewReplay, setIsNewReplay] = useState(false);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
-  // Handle filter toggle
-  const handleItemToggle = (sectionId: string, itemId: string) => {
-    setSelectedItems(prev => {
-      const current = prev[sectionId] || [];
-      const updated = current.includes(itemId)
-        ? current.filter(id => id !== itemId)
-        : [...current, itemId];
-      return { ...prev, [sectionId]: updated };
+  // Get all unique tags
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    allReplays.forEach(replay => {
+      replay.tags?.forEach(tag => tags.add(tag));
     });
-  };
+    return Array.from(tags).sort();
+  }, []);
 
   const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
 
-  // Admin handlers
-  const handleEdit = (replay: Replay) => {
-    setEditingReplay(replay);
-    setIsNewReplay(false);
-    setIsModalOpen(true);
-  };
+  // Filter replays
+  const filteredReplays = useMemo(() => {
+    return allReplays.filter(replay => {
+      // Search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !replay.title.toLowerCase().includes(query) &&
+          !replay.player1.name.toLowerCase().includes(query) &&
+          !replay.player2.name.toLowerCase().includes(query) &&
+          !replay.map.toLowerCase().includes(query) &&
+          !replay.coach?.toLowerCase().includes(query)
+        ) {
+          return false;
+        }
+      }
 
-  const handleDelete = (replay: Replay) => {
-    if (confirm(`Are you sure you want to delete "${replay.title}"?`)) {
-      addChange({
-        id: replay.id,
-        contentType: 'replays',
-        operation: 'delete',
-        data: replay as unknown as Record<string, unknown>,
-      });
-      toast.success(`Replay deleted (pending commit)`);
-    }
-  };
+      // Tag filters
+      if (selectedTags.length > 0) {
+        if (!replay.tags || !selectedTags.every(tag => replay.tags.includes(tag))) {
+          return false;
+        }
+      }
+
+      // Race filters (Terran)
+      if (selectedItems.terran.length > 0) {
+        const hasTerran =
+          (replay.player1.race === 'terran' && selectedItems.terran.includes('player1')) ||
+          (replay.player2.race === 'terran' && selectedItems.terran.includes('player2'));
+        if (!hasTerran) return false;
+      }
+
+      // Race filters (Zerg)
+      if (selectedItems.zerg.length > 0) {
+        const hasZerg =
+          (replay.player1.race === 'zerg' && selectedItems.zerg.includes('player1')) ||
+          (replay.player2.race === 'zerg' && selectedItems.zerg.includes('player2'));
+        if (!hasZerg) return false;
+      }
+
+      // Race filters (Protoss)
+      if (selectedItems.protoss.length > 0) {
+        const hasProtoss =
+          (replay.player1.race === 'protoss' && selectedItems.protoss.includes('player1')) ||
+          (replay.player2.race === 'protoss' && selectedItems.protoss.includes('player2'));
+        if (!hasProtoss) return false;
+      }
+
+      // Duration filters
+      if (selectedItems.duration.length > 0) {
+        const durationMinutes = parseDuration(replay.duration);
+        const matchesDuration = selectedItems.duration.some(range => {
+          if (range === 'under10') return durationMinutes < 10;
+          if (range === '10-20') return durationMinutes >= 10 && durationMinutes <= 20;
+          if (range === '20-30') return durationMinutes > 20 && durationMinutes <= 30;
+          if (range === 'over30') return durationMinutes > 30;
+          return false;
+        });
+        if (!matchesDuration) return false;
+      }
+
+      // Access level filters
+      if (selectedItems.accessLevel.length > 0) {
+        const isFree = replay.isFree ?? false;
+        if (selectedItems.accessLevel.includes('free') && !isFree) return false;
+        if (selectedItems.accessLevel.includes('premium') && isFree) return false;
+      }
+
+      return true;
+    });
+  }, [allReplays, selectedItems, selectedTags, searchQuery]);
+
+  // Filter sections for sidebar
+  const filterSections: FilterSection[] = [
+    {
+      id: 'search',
+      title: 'Search',
+      type: 'search' as const,
+      items: [],
+    },
+    {
+      id: 'terran',
+      title: 'Terran',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'player1', label: 'Player 1' },
+        { id: 'player2', label: 'Player 2' },
+      ],
+    },
+    {
+      id: 'zerg',
+      title: 'Zerg',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'player1', label: 'Player 1' },
+        { id: 'player2', label: 'Player 2' },
+      ],
+    },
+    {
+      id: 'protoss',
+      title: 'Protoss',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'player1', label: 'Player 1' },
+        { id: 'player2', label: 'Player 2' },
+      ],
+    },
+    {
+      id: 'duration',
+      title: 'Duration',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'under10', label: 'Under 10 min' },
+        { id: '10-20', label: '10-20 min' },
+        { id: '20-30', label: '20-30 min' },
+        { id: 'over30', label: 'Over 30 min' },
+      ],
+    },
+    {
+      id: 'accessLevel',
+      title: 'Access Level',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'free', label: 'Free' },
+        { id: 'premium', label: 'Premium' },
+      ],
+    },
+  ];
 
   const handleAddNew = () => {
     setEditingReplay(null);
-    setIsNewReplay(true);
-    setIsModalOpen(true);
+    setIsAddingNew(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingReplay(null);
-    setIsNewReplay(false);
+  const handleEdit = (replay: Replay) => {
+    setEditingReplay(replay);
+    setIsAddingNew(false);
   };
 
-  // Extract all unique tags from replays
-  const allTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    allReplays.forEach(replay => {
-      replay.tags.forEach(tag => tagSet.add(tag));
+  const handleDelete = async (replay: Replay) => {
+    if (!confirm(`Are you sure you want to delete "${replay.title}"?`)) {
+      return;
+    }
+    addChange({
+      id: replay.id,
+      contentType: 'replays',
+      operation: 'delete',
+      data: replay as unknown as Record<string, unknown>,
     });
-    return Array.from(tagSet).sort();
-  }, []);
+  };
 
-  // Count replays for each filter with context-aware filtering
-  const getCount = useCallback((filterFn: (replay: Replay) => boolean, excludeSectionId?: string) => {
-    return allReplays.filter(replay => {
-      if (!filterFn(replay)) return false;
+  // Filter sidebar content
+  const filterContent = (
+    <FilterSidebar
+      searchEnabled={true}
+      searchPlaceholder="Search replays..."
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      sections={filterSections}
+      selectedItems={selectedItems}
+      onSelectionChange={setSelectedItems}
+    />
+  );
 
-      // Apply tag filter
-      if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
-        return false;
-      }
+  // Table content
+  const tableContent = (
+    <ReplaysTable
+      replays={filteredReplays}
+      hasSubscriberRole={hasSubscriberRole}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  );
 
-      // Apply other race/matchup filters (excluding the current section being counted)
-      const allSelectedMatchups = [
-        ...(excludeSectionId === 'terran' ? [] : (selectedItems.terran || [])),
-        ...(excludeSectionId === 'zerg' ? [] : (selectedItems.zerg || [])),
-        ...(excludeSectionId === 'protoss' ? [] : (selectedItems.protoss || [])),
-      ];
+  // Grid content
+  const gridContent = (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {filteredReplays.map(replay => (
+        <ReplayCard
+          key={replay.id}
+          replay={replay}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      ))}
+    </div>
+  );
 
-      if (allSelectedMatchups.length > 0) {
-        const matchesFilter = allSelectedMatchups.some(filterId => {
-          if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
-            return replay.matchup === filterId;
-          }
-          return false;
-        });
-        if (!matchesFilter) return false;
-      }
-
-      // Apply duration filter (excluding if counting duration section)
-      const selectedDurations = excludeSectionId === 'duration' ? [] : (selectedItems.duration || []);
-      if (selectedDurations.length > 0) {
-        const durationMatch = selectedDurations.some(d => {
-          const minutes = parseDuration(replay.duration);
-          if (d === 'short') return minutes < 7;
-          if (d === 'medium') return minutes >= 7 && minutes <= 14;
-          if (d === 'long') return minutes > 14;
-          return false;
-        });
-        if (!durationMatch) return false;
-      }
-
-      // Apply access level filter (excluding if counting access section)
-      const selectedAccessLevels = excludeSectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
-      if (selectedAccessLevels.length > 0) {
-        const accessMatch = selectedAccessLevels.some(a => {
-          if (a === 'free') return replay.isFree === true;
-          if (a === 'premium') return !replay.isFree;
-          return false;
-        });
-        if (!accessMatch) return false;
-      }
-
-      return true;
-    }).length;
-  }, [selectedTags, selectedItems]);
-
-  // Build filter sections with race as top-level sections
-  const filterSections = useMemo((): FilterSection[] => {
-    return [
-      {
-        id: 'accessLevel',
-        label: 'Access Level',
-        items: [
-          { id: 'free', label: 'Free', count: getCount(r => r.isFree === true, 'accessLevel') },
-          { id: 'premium', label: 'Premium', count: getCount(r => !r.isFree, 'accessLevel') },
-        ].filter(item => item.count > 0),
-      },
-      {
-        id: 'terran',
-        label: 'Terran',
-        items: [
-          { id: 'TvT', label: 'vs Terran', count: getCount(r => r.matchup === 'TvT', 'terran') },
-          { id: 'TvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'TvZ', 'terran') },
-          { id: 'TvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'TvP', 'terran') },
-        ],
-      },
-      {
-        id: 'zerg',
-        label: 'Zerg',
-        items: [
-          { id: 'ZvT', label: 'vs Terran', count: getCount(r => r.matchup === 'ZvT', 'zerg') },
-          { id: 'ZvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'ZvZ', 'zerg') },
-          { id: 'ZvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'ZvP', 'zerg') },
-        ],
-      },
-      {
-        id: 'protoss',
-        label: 'Protoss',
-        items: [
-          { id: 'PvT', label: 'vs Terran', count: getCount(r => r.matchup === 'PvT', 'protoss') },
-          { id: 'PvZ', label: 'vs Zerg', count: getCount(r => r.matchup === 'PvZ', 'protoss') },
-          { id: 'PvP', label: 'vs Protoss', count: getCount(r => r.matchup === 'PvP', 'protoss') },
-        ],
-      },
-      {
-        id: 'duration',
-        label: 'Duration',
-        items: [
-          { id: 'short', label: '< 7 min', count: getCount(r => parseDuration(r.duration) < 7, 'duration') },
-          { id: 'medium', label: '7-14 min', count: getCount(r => parseDuration(r.duration) >= 7 && parseDuration(r.duration) <= 14, 'duration') },
-          { id: 'long', label: '> 14 min', count: getCount(r => parseDuration(r.duration) > 14, 'duration') },
-        ].filter(item => item.count > 0),
-      },
-    ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTags, selectedItems, getCount]);
-
-  // Filter replays based on search, selected filters, and tags
-  const filteredReplays = useMemo(() => {
-    return allReplays.filter(replay => {
-      // Apply search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch =
-          replay.title.toLowerCase().includes(query) ||
-          replay.map.toLowerCase().includes(query) ||
-          replay.player1.name.toLowerCase().includes(query) ||
-          replay.player2.name.toLowerCase().includes(query) ||
-          (replay.coach && replay.coach.toLowerCase().includes(query)) ||
-          replay.tags.some(tag => tag.toLowerCase().includes(query));
-        if (!matchesSearch) return false;
-      }
-
-      // Apply matchup filters with OR logic (selecting multiple matchups shows ANY match)
-      const allSelectedMatchups = [
-        ...(selectedItems.terran || []),
-        ...(selectedItems.zerg || []),
-        ...(selectedItems.protoss || []),
-      ];
-
-      if (allSelectedMatchups.length > 0) {
-        const matchesAnyMatchup = allSelectedMatchups.some(filterId => {
-          if (['TvT', 'TvZ', 'TvP', 'ZvT', 'ZvZ', 'ZvP', 'PvT', 'PvZ', 'PvP'].includes(filterId)) {
-            return replay.matchup === filterId;
-          }
-          return false;
-        });
-        if (!matchesAnyMatchup) return false;
-      }
-
-      // Apply tag filters with AND logic (must have ALL selected tags)
-      if (selectedTags.length > 0 && !selectedTags.every(tag => replay.tags.includes(tag))) {
-        return false;
-      }
-
-      // Apply duration filter
-      const selectedDurations = selectedItems.duration || [];
-      if (selectedDurations.length > 0) {
-        const durationMatch = selectedDurations.some(d => {
-          const minutes = parseDuration(replay.duration);
-          if (d === 'short') return minutes < 7;
-          if (d === 'medium') return minutes >= 7 && minutes <= 14;
-          if (d === 'long') return minutes > 14;
-          return false;
-        });
-        if (!durationMatch) return false;
-      }
-
-      // Apply access level filter
-      const selectedAccessLevels = selectedItems.accessLevel || [];
-      if (selectedAccessLevels.length > 0) {
-        const accessMatch = selectedAccessLevels.some(a => {
-          if (a === 'free') return replay.isFree === true;
-          if (a === 'premium') return !replay.isFree;
-          return false;
-        });
-        if (!accessMatch) return false;
-      }
-
-      return true;
-    });
-  }, [selectedItems, selectedTags, searchQuery]);
+  // Header actions (Add button)
+  const headerActions = (
+    <PermissionGate require="coaches">
+      <Button onClick={handleAddNew} className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Add New Replay
+      </Button>
+    </PermissionGate>
+  );
 
   return (
-    <div className="flex flex-1">
-      <FilterSidebar
-        searchEnabled={true}
-        searchPlaceholder="Search replays..."
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        sections={filterSections}
-        selectedItems={selectedItems}
-        onItemToggle={handleItemToggle}
-        isMobileOpen={isMobileFilterOpen}
-        onMobileOpenChange={setIsMobileFilterOpen}
+    <>
+      <FilterableContentLayout
+        title="Replays"
+        description="Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket."
+        filterContent={filterContent}
+        tableContent={tableContent}
+        gridContent={gridContent}
+        defaultView="table"
+        showViewToggle={true}
+        headerActions={headerActions}
+        resultCount={`Showing ${filteredReplays.length} replay${filteredReplays.length !== 1 ? 's' : ''}`}
+        tags={allTags}
+        selectedTags={selectedTags}
+        onTagToggle={toggleTag}
+        onClearTags={() => setSelectedTags([])}
       />
 
-      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
-        <div className="space-y-6">
-          {/* Mobile Filter Button */}
-          <MobileFilterButton
-            onClick={() => setIsMobileFilterOpen(true)}
-            label="Filters & Search"
-          />
-
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold">Replays</h2>
-              <p className="text-muted-foreground">
-                Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket.
-              </p>
-            </div>
-            <PermissionGate require="coaches">
-              <Button onClick={handleAddNew} className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add New Replay
-              </Button>
-            </PermissionGate>
-          </div>
-
-          <div className="space-y-4">
-          {/* Tag Filters */}
-          {allTags.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold">Filter by Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
-                      selectedTags.includes(tag)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                  >
-                    {tag}
-                    {selectedTags.includes(tag) && (
-                      <X className="inline-block ml-1 h-3 w-3" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {filteredReplays.length} replay{filteredReplays.length !== 1 ? 's' : ''}
-            </p>
-            {selectedTags.length > 0 && (
-              <button
-                onClick={() => setSelectedTags([])}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="border border-border rounded-lg overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Players</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Matchup</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Map</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Date</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReplays.map((replay, index) => (
-                <tr
-                  key={replay.id}
-                  className={`border-t border-border hover:bg-muted/30 transition-colors ${
-                    index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
-                  }`}
-                >
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/replays/${replay.id}`}
-                      className="text-base font-medium hover:text-primary transition-colors block"
-                    >
-                      {replay.title}
-                    </Link>
-                    {replay.coach && (
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <p className="text-sm text-muted-foreground">
-                          Coach: {replay.coach}
-                        </p>
-                        {!replay.isFree && !hasSubscriberRole && (
-                          <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                            <Lock className="w-2.5 h-2.5" />
-                            Premium
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {!replay.coach && !replay.isFree && !hasSubscriberRole && (
-                      <div className="mt-1.5">
-                        <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap inline-flex">
-                          <Lock className="w-2.5 h-2.5" />
-                          Premium
-                        </span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="space-y-1">
-                      <div className={`flex items-center gap-2 ${replay.player1.result === 'win' ? 'font-semibold' : ''}`}>
-                        <span>
-                          {replay.player1.race.charAt(0).toUpperCase()}
-                        </span>
-                        <span>{replay.player1.name}</span>
-                        {replay.player1.mmr && (
-                          <span className="text-xs text-muted-foreground">({replay.player1.mmr})</span>
-                        )}
-                      </div>
-                      <div className={`flex items-center gap-2 ${replay.player2.result === 'win' ? 'font-semibold' : ''}`}>
-                        <span>
-                          {replay.player2.race.charAt(0).toUpperCase()}
-                        </span>
-                        <span>{replay.player2.name}</span>
-                        {replay.player2.mmr && (
-                          <span className="text-xs text-muted-foreground">({replay.player2.mmr})</span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium">{replay.matchup}</td>
-                  <td className="px-6 py-4 text-sm">{replay.map}</td>
-                  <td className="px-6 py-4 text-sm">{replay.duration}</td>
-                  <td className="px-6 py-4 text-sm">{new Date(replay.gameDate).toLocaleDateString()}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/replays/${replay.id}`}
-                        className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
-                      >
-                        View
-                      </Link>
-                      {replay.downloadUrl && (
-                        <PaywallLink
-                          href={replay.downloadUrl}
-                          external
-                          className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          Download
-                        </PaywallLink>
-                      )}
-                      {replay.videoId && (
-                        <PaywallLink
-                          href={`/library/${replay.videoId}`}
-                          isFree={replay.isFree}
-                          className="text-sm px-4 py-2 border-2 border-primary text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center gap-1.5 font-medium"
-                        >
-                          <Video className="h-3.5 w-3.5" />
-                          VOD
-                        </PaywallLink>
-                      )}
-                      <PermissionGate require="coaches">
-                        <button
-                          onClick={() => handleEdit(replay)}
-                          className="text-sm px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors flex items-center gap-1.5"
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(replay)}
-                          className="text-sm px-3 py-2 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors flex items-center gap-1.5"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </PermissionGate>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-          {filteredReplays.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No replays found for this category.</p>
-            </div>
-          )}
-        </div>
-      </main>
-
+      {/* Edit Modal */}
       <ReplayEditModal
         replay={editingReplay}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        isNew={isNewReplay}
+        isOpen={!!(editingReplay || isAddingNew)}
+        onClose={() => {
+          setEditingReplay(null);
+          setIsAddingNew(false);
+        }}
+        isNew={isAddingNew}
       />
-    </div>
+    </>
   );
 }

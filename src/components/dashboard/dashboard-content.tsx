@@ -13,9 +13,12 @@ import { Masterclass } from '@/types/masterclass';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
-import { ChevronRight, Play, Download, Video as VideoIcon, Lock } from 'lucide-react';
-import { PaywallLink } from '@/components/auth/paywall-link';
+import { ChevronRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { HorizontalScrollContainer } from '@/components/ui/horizontal-scroll-container';
+import { ReplayCard } from '@/components/replays/replay-card';
+import { MasterclassCard } from '@/components/masterclasses/masterclass-card';
+import { BuildOrderCard } from '@/components/build-orders/build-order-card';
 
 const allVideos = videos as Video[];
 const allCoaches = coaches as Coach[];
@@ -26,6 +29,8 @@ const allBuildOrders = buildOrdersData as BuildOrder[];
 export function DashboardContent() {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  console.log('[DASHBOARD] hasSubscriberRole:', hasSubscriberRole);
 
   const featuredVideos = allVideos.slice(0, 8);
   const featuredMasterclasses = allMasterclasses.slice(0, 6);
@@ -64,51 +69,15 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="relative">
-              <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                <div className="flex gap-4 min-w-max">
-                  {featuredMasterclasses.map((masterclass) => (
-                    <PaywallLink
-                      key={masterclass.id}
-                      href={`/masterclasses/${masterclass.id}`}
-                      isFree={masterclass.isFree}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
-                    >
-                      {!masterclass.isFree && !hasSubscriberRole && (
-                        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] text-primary-foreground flex items-center gap-1 font-medium z-20">
-                          <Lock className="w-2.5 h-2.5" />
-                          Premium
-                        </div>
-                      )}
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-lg font-semibold line-clamp-2">{masterclass.title}</h3>
-                          {!masterclass.isFree && !hasSubscriberRole ? (
-                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
-                          ) : (
-                            <Play className="h-5 w-5 text-primary flex-shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {masterclass.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>{masterclass.coach}</span>
-                          <span>•</span>
-                          <span className="capitalize">{masterclass.race}</span>
-                          {masterclass.duration && (
-                            <>
-                              <span>•</span>
-                              <span>{masterclass.duration}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </PaywallLink>
-                  ))}
-                </div>
+            <HorizontalScrollContainer>
+              <div className="flex gap-4 min-w-max items-stretch">
+                {featuredMasterclasses.map((masterclass) => (
+                  <div key={masterclass.id} className="w-80 flex-shrink-0">
+                    <MasterclassCard masterclass={masterclass} />
+                  </div>
+                ))}
               </div>
-            </div>
+            </HorizontalScrollContainer>
           </section>
         )}
 
@@ -125,49 +94,15 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="relative">
-              <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                <div className="flex gap-4 min-w-max">
-                  {featuredReplays.map((replay) => (
-                    <PaywallLink
-                      key={replay.id}
-                      href={`/replays/${replay.id}`}
-                      isFree={replay.isFree}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
-                    >
-                      {!replay.isFree && !hasSubscriberRole && (
-                        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] text-primary-foreground flex items-center gap-1 font-medium z-20">
-                          <Lock className="w-2.5 h-2.5" />
-                          Premium
-                        </div>
-                      )}
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-lg font-semibold line-clamp-2">{replay.title}</h3>
-                          {(replay.isFree || hasSubscriberRole) ? (
-                            <Download className="h-5 w-5 text-primary flex-shrink-0" />
-                          ) : (
-                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
-                          )}
-                        </div>
-                        <div className="text-sm space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground">{replay.player1.name}</span>
-                            <span className="text-muted-foreground">vs</span>
-                            <span className="text-muted-foreground">{replay.player2.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <span>{replay.map}</span>
-                            <span>•</span>
-                            <span className="font-medium">{replay.matchup}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </PaywallLink>
-                  ))}
-                </div>
+            <HorizontalScrollContainer>
+              <div className="flex gap-4 min-w-max items-stretch">
+                {featuredReplays.map((replay) => (
+                  <div key={replay.id} className="w-80 flex-shrink-0">
+                    <ReplayCard replay={replay} />
+                  </div>
+                ))}
               </div>
-            </div>
+            </HorizontalScrollContainer>
           </section>
         )}
 
@@ -184,46 +119,15 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="relative">
-              <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                <div className="flex gap-4 min-w-max">
-                  {featuredBuildOrders.map((buildOrder) => (
-                    <Link
-                      key={buildOrder.id}
-                      href={`/build-orders/${buildOrder.id}`}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
-                    >
-                      {!buildOrder.isFree && !hasSubscriberRole && (
-                        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] text-primary-foreground flex items-center gap-1 font-medium z-20">
-                          <Lock className="w-2.5 h-2.5" />
-                          Premium
-                        </div>
-                      )}
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-lg font-semibold line-clamp-2">{buildOrder.name}</h3>
-                          {!buildOrder.isFree && !hasSubscriberRole ? (
-                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
-                          ) : buildOrder.videoId ? (
-                            <VideoIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                          ) : null}
-                        </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {buildOrder.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="font-medium uppercase">{buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}</span>
-                          <span>•</span>
-                          <span className="capitalize">{buildOrder.type}</span>
-                          <span>•</span>
-                          <span className="capitalize">{buildOrder.difficulty}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+            <HorizontalScrollContainer>
+              <div className="flex gap-4 min-w-max items-stretch">
+                {featuredBuildOrders.map((buildOrder) => (
+                  <div key={buildOrder.id} className="w-80 flex-shrink-0">
+                    <BuildOrderCard buildOrder={buildOrder} />
+                  </div>
+                ))}
               </div>
-            </div>
+            </HorizontalScrollContainer>
           </section>
         )}
 

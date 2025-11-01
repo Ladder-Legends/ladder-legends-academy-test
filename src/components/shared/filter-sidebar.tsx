@@ -5,7 +5,9 @@ import { ChevronDown, ChevronRight, Search, X, SlidersHorizontal } from 'lucide-
 
 export interface FilterSection {
   id: string;
-  label: string;
+  label?: string;  // legacy field
+  title?: string;  // new field
+  type?: 'search' | 'checkbox';  // new field for filter type
   icon?: string;
   items: FilterItem[];
 }
@@ -29,7 +31,9 @@ interface FilterSidebarProps {
 
   // Selection state
   selectedItems: Record<string, string[]>;  // sectionId -> selected item IDs
-  onItemToggle: (sectionId: string, itemId: string) => void;
+  onItemToggle?: (sectionId: string, itemId: string) => void;  // legacy callback
+  onSelectionChange?: (selectedItems: Record<string, string[]>) => void;  // new callback
+  onClearAll?: () => void;  // new callback for clearing all filters
 
   // Mobile button customization
   isMobileOpen?: boolean;
@@ -44,6 +48,7 @@ export function FilterSidebar({
   sections,
   selectedItems,
   onItemToggle,
+  onSelectionChange,
   isMobileOpen: controlledMobileOpen,
   onMobileOpenChange,
 }: FilterSidebarProps) {
@@ -56,6 +61,25 @@ export function FilterSidebar({
       setInternalMobileOpen(isOpen);
     }
     onMobileOpenChange?.(isOpen);
+  };
+
+  // Handle item toggle - support both legacy and new APIs
+  const handleItemToggle = (sectionId: string, itemId: string) => {
+    if (onItemToggle) {
+      // Legacy API
+      onItemToggle(sectionId, itemId);
+    } else if (onSelectionChange) {
+      // New API - toggle the item in the current selection
+      const currentSectionItems = selectedItems[sectionId] || [];
+      const newSectionItems = currentSectionItems.includes(itemId)
+        ? currentSectionItems.filter(id => id !== itemId)
+        : [...currentSectionItems, itemId];
+
+      onSelectionChange({
+        ...selectedItems,
+        [sectionId]: newSectionItems,
+      });
+    }
   };
 
   // All sections expanded by default
@@ -108,7 +132,7 @@ export function FilterSidebar({
     return (
       <div key={item.id}>
         <button
-          onClick={() => onItemToggle(sectionId, item.id)}
+          onClick={() => handleItemToggle(sectionId, item.id)}
           className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer ${
             isSelected
               ? 'bg-primary text-primary-foreground font-medium'
@@ -172,7 +196,7 @@ export function FilterSidebar({
         {/* Mobile Close Button */}
         <button
           onClick={() => handleMobileOpenChange(false)}
-          className="lg:hidden absolute top-4 right-4 p-2 hover:bg-muted rounded-md transition-colors"
+          className="lg:hidden absolute top-2 right-2 p-2 hover:bg-muted rounded-md transition-colors z-10"
           aria-label="Close filters"
         >
           <X className="w-5 h-5" />
@@ -202,7 +226,11 @@ export function FilterSidebar({
 
       {/* Sections */}
       {sections.map(section => {
+        // Skip search section - it's handled separately above
+        if (section.type === 'search') return null;
+
         const isSectionExpanded = expandedSections.has(section.id);
+        const sectionLabel = section.title || section.label || section.id;
 
         return (
           <div key={section.id}>
@@ -212,7 +240,7 @@ export function FilterSidebar({
             >
               <span className="flex items-center gap-2">
                 {section.icon && <span>{section.icon}</span>}
-                {section.label}
+                {sectionLabel}
               </span>
               {isSectionExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>

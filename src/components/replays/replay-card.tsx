@@ -43,7 +43,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
         className="block"
         isFree={replay.isFree}
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col">
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 overflow-hidden flex items-center justify-center">
             {/* Matchup Display */}
             <div className="text-6xl font-bold text-muted-foreground/20">
