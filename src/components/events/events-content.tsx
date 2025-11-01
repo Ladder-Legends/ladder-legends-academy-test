@@ -3,13 +3,15 @@
 import { useState, useMemo, useCallback } from 'react';
 import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
 import eventsData from '@/data/events.json';
-import { Event, getEventStatus } from '@/types/event';
-import { EventCard } from './event-card';
+import { Event, getEventStatus, formatEventDateTime } from '@/types/event';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Lock, Repeat } from 'lucide-react';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { useState as useStateAlias } from 'react';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import coachesData from '@/data/coaches.json';
 
 const allEvents = eventsData as Event[];
 
@@ -19,6 +21,7 @@ export function EventsContent() {
   const [isModalOpen, setIsModalOpen] = useStateAlias(false);
   const [isNewEvent, setIsNewEvent] = useStateAlias(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [showPastEvents, setShowPastEvents] = useState(false);
 
   const handleItemToggle = (sectionId: string, itemId: string) => {
     setSelectedItems(prev => {
@@ -117,6 +120,12 @@ export function EventsContent() {
   // Filter events
   const filteredEvents = useMemo(() => {
     return allEvents.filter(event => {
+      // Filter out past events by default (unless showPastEvents is true)
+      if (!showPastEvents) {
+        const status = getEventStatus(event);
+        if (status === 'past') return false;
+      }
+
       // Type filter
       if (selectedItems.type?.length > 0 && !selectedItems.type.includes(event.type)) {
         return false;
@@ -143,7 +152,7 @@ export function EventsContent() {
 
       return true;
     });
-  }, [selectedItems]);
+  }, [selectedItems, showPastEvents]);
 
   // Sort: upcoming events first, then by date
   const sortedEvents = useMemo(() => {
@@ -213,23 +222,113 @@ export function EventsContent() {
             </PermissionGate>
           </div>
 
-          {/* Results */}
-          <div>
+          {/* Results and Toggle */}
+          <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Showing {sortedEvents.length} of {allEvents.length} events
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPastEvents(!showPastEvents)}
+              className="text-xs"
+            >
+              {showPastEvents ? 'Hide Past Events' : 'Show Past Events'}
+            </Button>
           </div>
 
-          {/* Events Grid */}
+          {/* Events Table */}
           {sortedEvents.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No events found matching your filters.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedEvents.map(event => (
-                <EventCard key={event.id} event={event} />
-              ))}
+            <div className="border border-border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Event</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Type</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Date & Time</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Duration</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Coach</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedEvents.map((event, index) => {
+                    const status = getEventStatus(event);
+                    const coach = event.coach ? coachesData.find(c => c.id === event.coach) : null;
+                    const href = event.isFree ? `/free/events/${event.id}` : `/events/${event.id}`;
+
+                    const getTypeColor = (type: string): string => {
+                      switch (type) {
+                        case 'tournament':
+                          return 'bg-red-500/10 text-red-500 border-red-500/20';
+                        case 'coaching':
+                          return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+                        case 'casting':
+                          return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+                        case 'streaming':
+                          return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
+                        case 'replay-analysis':
+                          return 'bg-green-500/10 text-green-500 border-green-500/20';
+                        case 'arcade':
+                          return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+                        default:
+                          return 'bg-muted text-muted-foreground';
+                      }
+                    };
+
+                    return (
+                      <tr
+                        key={event.id}
+                        className={`border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors ${
+                          index % 2 === 0 ? 'bg-card' : 'bg-card/50'
+                        }`}
+                      >
+                        <td className="px-4 py-3">
+                          <Link
+                            href={href}
+                            className="font-medium hover:text-primary transition-colors flex items-center gap-2"
+                          >
+                            {event.title}
+                            {!event.isFree && <Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
+                            {event.recurring?.enabled && (
+                              <Repeat className="h-3 w-3 text-cyan-500 flex-shrink-0" />
+                            )}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline" className={`${getTypeColor(event.type)} border text-xs`}>
+                            {event.type.replace('-', ' ')}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          {formatEventDateTime(event)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {event.duration ? `${event.duration} min` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {coach?.displayName || '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {status === 'upcoming' ? (
+                            <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 border text-xs">
+                              Upcoming
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-muted text-muted-foreground border text-xs">
+                              Past
+                            </Badge>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
 
