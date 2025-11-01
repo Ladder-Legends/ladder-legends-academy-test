@@ -37,17 +37,18 @@ export function UserMenu() {
             {session.user.name || session.user.email}
           </span>
         </div>
-        <form action={handleSignOut}>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign out
-          </Button>
-        </form>
+        <Button
+          onClick={async () => {
+            await handleSignOut();
+            window.location.href = '/';
+          }}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </Button>
       </div>
     );
   }
@@ -73,17 +74,18 @@ export function UserMenu() {
           {session.user.name || session.user.email}
         </span>
       </div>
-      <form action={handleSignOut}>
-        <Button
-          type="submit"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign out
-        </Button>
-      </form>
+      <Button
+        onClick={async () => {
+          await handleSignOut();
+          window.location.href = '/';
+        }}
+        variant="outline"
+        size="sm"
+        className="gap-2"
+      >
+        <LogOut className="w-4 h-4" />
+        Sign out
+      </Button>
     </div>
   );
 }
