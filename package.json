@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "NEXT_BUILD_DIR=.next-dev next dev --turbopack",
     "build": "node scripts/download-mux-thumbnails.mjs && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
