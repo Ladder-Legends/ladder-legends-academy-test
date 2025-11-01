@@ -197,7 +197,7 @@ export function EventsContent() {
         </div>
 
         {/* Admin Controls */}
-        <PermissionGate require={["coaches", "owners"]}>
+        <PermissionGate require="coaches">
           <div className="mb-6">
             <Button onClick={handleNewEvent} className="gap-2">
               <Plus className="h-4 w-4" />
