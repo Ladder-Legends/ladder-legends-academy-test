@@ -2,25 +2,10 @@ import { Event } from '@/types/event';
 
 export function generateGoogleCalendarUrl(event: Event): string {
   // Parse date in the event's timezone to avoid timezone conversion issues
-  // Create a date object at noon to avoid daylight saving time issues
   const [year, month, day] = event.date.split('-').map(Number);
   const [hours, minutes] = event.time.split(':').map(Number);
 
-  let startDate = new Date(year, month - 1, day, hours, minutes);
-
-  // For weekly recurring events, adjust start date to match the specified day of week
-  if (event.recurring?.enabled && event.recurring.frequency === 'weekly' && event.recurring.dayOfWeek !== undefined) {
-    const currentDay = startDate.getDay();
-    const targetDay = event.recurring.dayOfWeek;
-
-    // Calculate days to add/subtract to get to the target day
-    let daysToAdd = targetDay - currentDay;
-    if (daysToAdd < 0) {
-      daysToAdd += 7; // Move to next week if target day already passed
-    }
-
-    startDate = new Date(startDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-  }
+  const startDate = new Date(year, month - 1, day, hours, minutes);
 
   // Calculate end time based on duration or default to 1 hour
   const durationMs = event.duration ? event.duration * 60 * 1000 : 60 * 60 * 1000;
@@ -90,21 +75,7 @@ export function generateICalFile(event: Event): string {
   const [year, month, day] = event.date.split('-').map(Number);
   const [hours, minutes] = event.time.split(':').map(Number);
 
-  let startDate = new Date(year, month - 1, day, hours, minutes);
-
-  // For weekly recurring events, adjust start date to match the specified day of week
-  if (event.recurring?.enabled && event.recurring.frequency === 'weekly' && event.recurring.dayOfWeek !== undefined) {
-    const currentDay = startDate.getDay();
-    const targetDay = event.recurring.dayOfWeek;
-
-    // Calculate days to add/subtract to get to the target day
-    let daysToAdd = targetDay - currentDay;
-    if (daysToAdd < 0) {
-      daysToAdd += 7; // Move to next week if target day already passed
-    }
-
-    startDate = new Date(startDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-  }
+  const startDate = new Date(year, month - 1, day, hours, minutes);
 
   // Calculate end time based on duration or default to 1 hour
   const durationMs = event.duration ? event.duration * 60 * 1000 : 60 * 60 * 1000;
