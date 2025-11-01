@@ -36,11 +36,19 @@ export interface Event {
 
 /**
  * Helper to determine if an event is upcoming or past
+ * For recurring events, checks the next occurrence
  */
 export function getEventStatus(event: Event): EventStatus {
-  const eventDateTime = new Date(`${event.date}T${event.time}`);
-  const now = new Date();
-  return eventDateTime > now ? 'upcoming' : 'past';
+  if (!event.recurring?.enabled) {
+    // Non-recurring: check the original date
+    const eventDateTime = new Date(`${event.date}T${event.time}`);
+    const now = new Date();
+    return eventDateTime > now ? 'upcoming' : 'past';
+  }
+
+  // Recurring: check if there's a next occurrence
+  const nextOccurrence = getNextOccurrence(event);
+  return nextOccurrence !== null ? 'upcoming' : 'past';
 }
 
 /**

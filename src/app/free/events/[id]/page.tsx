@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import eventsData from '@/data/events.json';
 import coachesData from '@/data/coaches.json';
-import { Event, formatEventDateTime, getEventStatus } from '@/types/event';
+import { Event, getEventStatus } from '@/types/event';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Repeat } from 'lucide-react';
 import { MarkdownContent } from '@/components/ui/markdown-content';
 import { Badge } from '@/components/ui/badge';
 import { SubscriberBadge } from '@/components/subscriber-badge';
+import { EventDateDisplay } from '@/components/events/event-date-display';
 
 const allEvents = eventsData as Event[];
 
@@ -143,9 +144,11 @@ export default async function FreeEventDetailPage({ params }: PageProps) {
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    Date & Time
+                    {event.recurring?.enabled ? 'Next Occurrence' : 'Date & Time'}
                   </dt>
-                  <dd className="font-medium">{formatEventDateTime(event)}</dd>
+                  <dd className="font-medium">
+                    <EventDateDisplay event={event} />
+                  </dd>
                 </div>
 
                 <div>

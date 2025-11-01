@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { FilterSidebar, MobileFilterButton, type FilterSection } from '@/components/shared/filter-sidebar';
 import eventsData from '@/data/events.json';
-import { Event, getEventStatus, formatEventDateTime } from '@/types/event';
+import { Event, getEventStatus } from '@/types/event';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { Plus, Lock, Repeat } from 'lucide-react';
@@ -12,6 +12,7 @@ import { useState as useStateAlias } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import coachesData from '@/data/coaches.json';
+import { EventDateDisplay } from './event-date-display';
 
 const allEvents = eventsData as Event[];
 
@@ -305,7 +306,7 @@ export function EventsContent() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          {formatEventDateTime(event)}
+                          <EventDateDisplay event={event} />
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {event.duration ? `${event.duration} min` : '—'}
