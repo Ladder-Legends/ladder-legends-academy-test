@@ -3,6 +3,7 @@ import { UserMenu } from '@/components/user-menu';
 import { VideoLibraryContent } from '@/components/videos/video-library-content';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -44,11 +45,7 @@ export default function LibraryPage() {
       </Suspense>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8">
-        <div className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Ladder Legends Academy. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

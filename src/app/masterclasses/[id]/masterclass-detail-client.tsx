@@ -5,6 +5,7 @@ import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Masterclass } from '@/types/masterclass';
@@ -198,11 +199,7 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8 mt-12">
-        <div className="text-center text-sm text-muted-foreground">
-          © 2025 Ladder Legends Academy. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
 
       {/* Edit Modal */}
       <MasterclassEditModal

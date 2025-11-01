@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Event, getEventStatus } from '@/types/event';
@@ -243,11 +244,7 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8 mt-12">
-        <div className="text-center text-sm text-muted-foreground">
-          © 2025 Ladder Legends Academy. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
 
       {/* Edit Modal */}
       <EventEditModal

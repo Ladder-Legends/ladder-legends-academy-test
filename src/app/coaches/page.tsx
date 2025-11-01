@@ -2,6 +2,7 @@ import { CoachesContent } from '@/components/coaches-content';
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -40,13 +41,7 @@ export default function CoachesPage() {
       <CoachesContent />
 
       {/* Footer */}
-      <footer className="border-t border-border mt-24">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Ladder Legends Academy. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

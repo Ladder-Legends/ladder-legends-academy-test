@@ -5,7 +5,18 @@ export function generateGoogleCalendarUrl(event: Event): string {
   const [year, month, day] = event.date.split('-').map(Number);
   const [hours, minutes] = event.time.split(':').map(Number);
 
-  const startDate = new Date(year, month - 1, day, hours, minutes);
+  let startDate = new Date(year, month - 1, day, hours, minutes);
+
+  // For recurring events, adjust start date to match the recurring day
+  if (event.recurring?.enabled && event.recurring.frequency === 'weekly' && event.recurring.dayOfWeek !== undefined) {
+    const currentDay = startDate.getDay();
+    const targetDay = event.recurring.dayOfWeek;
+    let daysToAdd = targetDay - currentDay;
+    if (daysToAdd <= 0) {
+      daysToAdd += 7; // Move to next week if target day is today or in the past
+    }
+    startDate = new Date(startDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  }
 
   // Calculate end time based on duration or default to 1 hour
   const durationMs = event.duration ? event.duration * 60 * 1000 : 60 * 60 * 1000;

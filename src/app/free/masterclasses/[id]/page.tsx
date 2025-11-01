@@ -1,6 +1,7 @@
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -181,11 +182,7 @@ export default async function FreeMasterclassDetailPage({ params }: PageProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8 mt-12">
-        <div className="text-center text-sm text-muted-foreground">
-          © 2025 Ladder Legends Academy. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

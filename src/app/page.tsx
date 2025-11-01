@@ -2,6 +2,7 @@ import { UserMenu } from '@/components/user-menu';
 import { DashboardContent } from '@/components/dashboard/dashboard-content';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -41,11 +42,7 @@ export default function Home() {
       <DashboardContent />
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 px-8">
-        <div className="text-center text-sm text-muted-foreground">
-          © 2025 Ladder Legends Academy. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
