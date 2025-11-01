@@ -25,7 +25,8 @@ export async function middleware(request: NextRequest) {
 
   // Define detail page patterns that require subscription
   const detailPagePatterns = [
-    /^\/build-orders\/[^/]+$/,  // /build-orders/:id
+    /^\/library\/[^/]+$/,         // /library/:id (video pages)
+    /^\/build-orders\/[^/]+$/,    // /build-orders/:id
     /^\/replays\/[^/]+$/,         // /replays/:id
     /^\/masterclasses\/[^/]+$/,   // /masterclasses/:id
   ];
