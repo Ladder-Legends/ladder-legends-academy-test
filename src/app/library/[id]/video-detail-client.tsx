@@ -3,11 +3,14 @@
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Video, isPlaylist, getYoutubeIds, isMuxVideo } from '@/types/video';
-import { ArrowLeft, CalendarDays } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 
@@ -17,6 +20,14 @@ interface VideoDetailClientProps {
 
 export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
+      console.log('Delete video:', video.id);
+      // The actual delete would be handled by the modal/CMS system
+    }
+  };
 
   const videoIsPlaylist = isPlaylist(video);
   const youtubeIds = getYoutubeIds(video);
@@ -114,7 +125,34 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">
                   <div className="space-y-2">
-                    <h1 className="text-3xl font-bold">{video.title}</h1>
+                    <div className="flex items-start justify-between gap-4">
+                      <h1 className="text-3xl font-bold flex-1">{video.title}</h1>
+
+                      {/* Admin Actions */}
+                      <PermissionGate require="coaches">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="flex items-center gap-2"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDelete}
+                            className="flex items-center gap-2 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </div>
+                      </PermissionGate>
+                    </div>
+
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-4 h-4" />
@@ -214,6 +252,13 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
           © 2025 Ladder Legends Academy. All rights reserved.
         </div>
       </footer>
+
+      {/* Edit Modal */}
+      <VideoEditModal
+        video={video}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
     </div>
   );
 }
