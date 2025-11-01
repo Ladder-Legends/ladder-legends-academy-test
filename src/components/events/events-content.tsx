@@ -176,7 +176,7 @@ export function EventsContent() {
   };
 
   return (
-    <>
+    <div className="flex flex-1">
       {/* Filter Sidebar */}
       <FilterSidebar
         sections={filterSections}
@@ -187,57 +187,65 @@ export function EventsContent() {
       />
 
       {/* Main Content */}
-      <div className="flex-1">
-        {/* Mobile Filter Button */}
-        <div className="lg:hidden mb-6">
+      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
+        <div className="space-y-6">
+          {/* Mobile Filter Button */}
           <MobileFilterButton
             onClick={() => setIsMobileFilterOpen(true)}
             label="Filters"
           />
+
+          {/* Page Header */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold">Events</h2>
+              <p className="text-muted-foreground">
+                Join our community events: tournaments, coaching sessions, team games, and more
+              </p>
+            </div>
+
+            {/* Admin Controls */}
+            <PermissionGate require="coaches">
+              <Button onClick={handleNewEvent} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create Event
+              </Button>
+            </PermissionGate>
+          </div>
+
+          {/* Results */}
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Showing {sortedEvents.length} of {allEvents.length} events
+            </p>
+          </div>
+
+          {/* Events Grid */}
+          {sortedEvents.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No events found matching your filters.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {sortedEvents.map(event => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+
+          {/* Event Edit Modal */}
+          <EventEditModal
+            event={editingEvent}
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setEditingEvent(null);
+              setIsNewEvent(false);
+            }}
+            isNew={isNewEvent}
+          />
         </div>
-
-        {/* Admin Controls */}
-        <PermissionGate require="coaches">
-          <div className="mb-6">
-            <Button onClick={handleNewEvent} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Event
-            </Button>
-          </div>
-        </PermissionGate>
-
-        {/* Results */}
-        <div className="mb-6">
-          <p className="text-sm text-muted-foreground">
-            Showing {sortedEvents.length} of {allEvents.length} events
-          </p>
-        </div>
-
-        {/* Events Grid */}
-        {sortedEvents.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No events found matching your filters.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sortedEvents.map(event => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        )}
-
-        {/* Event Edit Modal */}
-        <EventEditModal
-          event={editingEvent}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingEvent(null);
-            setIsNewEvent(false);
-          }}
-          isNew={isNewEvent}
-        />
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

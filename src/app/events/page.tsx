@@ -42,20 +42,7 @@ export default function EventsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-4 lg:px-8 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-3">Events</h1>
-            <p className="text-lg text-muted-foreground">
-              Join our community events: tournaments, coaching sessions, team games, and more
-            </p>
-          </div>
-
-          {/* Events Content */}
-          <EventsContent />
-        </div>
-      </main>
+      <EventsContent />
 
       {/* Footer */}
       <footer className="border-t border-border py-6 px-4 lg:px-8 mt-12">
