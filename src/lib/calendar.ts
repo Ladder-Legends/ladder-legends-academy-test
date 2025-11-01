@@ -1,8 +1,12 @@
 import { Event } from '@/types/event';
 
 export function generateGoogleCalendarUrl(event: Event): string {
-  // Combine date and time to create full datetime string
-  let startDate = new Date(`${event.date}T${event.time}`);
+  // Parse date in the event's timezone to avoid timezone conversion issues
+  // Create a date object at noon to avoid daylight saving time issues
+  const [year, month, day] = event.date.split('-').map(Number);
+  const [hours, minutes] = event.time.split(':').map(Number);
+
+  let startDate = new Date(year, month - 1, day, hours, minutes);
 
   // For weekly recurring events, adjust start date to match the specified day of week
   if (event.recurring?.enabled && event.recurring.frequency === 'weekly' && event.recurring.dayOfWeek !== undefined) {
@@ -82,8 +86,11 @@ function generateGoogleRecurrenceRule(event: Event): string | null {
 }
 
 export function generateICalFile(event: Event): string {
-  // Combine date and time to create full datetime string
-  let startDate = new Date(`${event.date}T${event.time}`);
+  // Parse date in the event's timezone to avoid timezone conversion issues
+  const [year, month, day] = event.date.split('-').map(Number);
+  const [hours, minutes] = event.time.split(':').map(Number);
+
+  let startDate = new Date(year, month - 1, day, hours, minutes);
 
   // For weekly recurring events, adjust start date to match the specified day of week
   if (event.recurring?.enabled && event.recurring.frequency === 'weekly' && event.recurring.dayOfWeek !== undefined) {
