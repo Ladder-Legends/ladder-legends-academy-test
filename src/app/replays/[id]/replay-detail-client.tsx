@@ -14,6 +14,7 @@ import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 interface ReplayDetailClientProps {
   replay: Replay;
@@ -21,6 +22,17 @@ interface ReplayDetailClientProps {
 
 export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useTrackPageView({
+    contentType: 'replay',
+    contentId: replay.id,
+    contentTitle: replay.title,
+    properties: {
+      matchup: replay.matchup,
+      is_free: replay.isFree || false,
+      coach: replay.coach || undefined,
+    },
+  });
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${replay.title}"?`)) {

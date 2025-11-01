@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 interface VideoDetailClientProps {
   video: Video;
@@ -23,16 +24,30 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const videoIsPlaylist = isPlaylist(video);
+  const youtubeIds = getYoutubeIds(video);
+  const currentYoutubeId = youtubeIds[currentVideoIndex];
+
+  // Track video view
+  useTrackPageView({
+    contentType: 'video',
+    contentId: video.id.toString(),
+    contentTitle: video.title,
+    properties: {
+      is_playlist: videoIsPlaylist,
+      is_free: video.isFree || false,
+      coach: video.coach || undefined,
+      tags: video.tags,
+      video_count: videoIsPlaylist ? youtubeIds.length : 1,
+    },
+  });
+
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       console.log('Delete video:', video.id);
       // The actual delete would be handled by the modal/CMS system
     }
   };
-
-  const videoIsPlaylist = isPlaylist(video);
-  const youtubeIds = getYoutubeIds(video);
-  const currentYoutubeId = youtubeIds[currentVideoIndex];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
+import { PostHogProvider } from "@/components/posthog-provider";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { Toaster } from "@/components/ui/toaster";
 import { CommitButton } from "@/components/admin/commit-button";
@@ -60,8 +61,10 @@ export default function RootLayout({
       >
         <BackgroundEffects />
         <SessionProvider>
-          {children}
-          <CommitButton />
+          <PostHogProvider>
+            {children}
+            <CommitButton />
+          </PostHogProvider>
         </SessionProvider>
         <Toaster />
       </body>

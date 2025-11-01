@@ -14,6 +14,7 @@ import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 interface BuildOrderDetailClientProps {
   buildOrder: BuildOrder;
@@ -21,6 +22,17 @@ interface BuildOrderDetailClientProps {
 
 export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useTrackPageView({
+    contentType: 'build-order',
+    contentId: buildOrder.id,
+    contentTitle: buildOrder.name,
+    properties: {
+      race: buildOrder.race,
+      difficulty: buildOrder.difficulty,
+      is_free: buildOrder.isFree || false,
+    },
+  });
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${buildOrder.name}"?`)) {

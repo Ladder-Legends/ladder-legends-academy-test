@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { EventDateDisplay } from '@/components/events/event-date-display';
 import { useState } from 'react';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 interface Coach {
   id: string;
@@ -37,6 +38,18 @@ interface EventDetailClientProps {
 export function EventDetailClient({ event, coach }: EventDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const status = getEventStatus(event);
+
+  useTrackPageView({
+    contentType: 'event',
+    contentId: event.id,
+    contentTitle: event.title,
+    properties: {
+      event_type: event.type,
+      is_free: event.isFree || false,
+      is_recurring: event.recurring?.enabled || false,
+      coach: coach?.name || undefined,
+    },
+  });
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${event.title}"?`)) {

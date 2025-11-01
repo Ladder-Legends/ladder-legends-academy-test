@@ -14,6 +14,7 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 interface MasterclassDetailClientProps {
   masterclass: Masterclass;
@@ -21,6 +22,17 @@ interface MasterclassDetailClientProps {
 
 export function MasterclassDetailClient({ masterclass }: MasterclassDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useTrackPageView({
+    contentType: 'masterclass',
+    contentId: masterclass.id,
+    contentTitle: masterclass.title,
+    properties: {
+      is_free: masterclass.isFree || false,
+      coach: masterclass.coach || undefined,
+      tags: masterclass.tags,
+    },
+  });
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${masterclass.title}"?`)) {

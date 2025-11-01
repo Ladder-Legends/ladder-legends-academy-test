@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { posthog } from '@/lib/posthog';
 
 export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'events' | 'file';
 
@@ -80,7 +81,17 @@ export function usePendingChanges() {
       const filtered = prev.filter(
         c => !(c.id === change.id && c.contentType === change.contentType)
       );
-      return [...filtered, { ...change, timestamp: Date.now() }];
+      const newChange = { ...change, timestamp: Date.now() };
+
+      // Track CMS action in PostHog
+      posthog.capture('cms_action', {
+        content_type: change.contentType,
+        operation: change.operation,
+        content_id: change.id,
+        content_title: (change.data as { title?: string }).title || undefined,
+      });
+
+      return [...filtered, newChange];
     });
   };
 

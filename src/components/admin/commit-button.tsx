@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { GitCommit, X, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import { posthog } from '@/lib/posthog';
 
 export function CommitButton() {
   const { changes, clearAllChanges, hasChanges } = usePendingChanges();
@@ -38,6 +39,13 @@ export function CommitButton() {
       }
 
       await response.json();
+
+      // Track successful commit in PostHog
+      posthog.capture('cms_commit', {
+        changes_count: changes.length,
+        content_types: [...new Set(changes.map(c => c.contentType))],
+        operations: [...new Set(changes.map(c => c.operation))],
+      });
 
       toast.success(
         `Successfully committed ${changes.length} change${changes.length !== 1 ? 's' : ''} in a single commit! The site is rebuilding with your changes. Please wait about a minute and then refresh the page to see your updates.`,
