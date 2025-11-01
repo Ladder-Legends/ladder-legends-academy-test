@@ -25,9 +25,6 @@ interface FilterableContentLayoutProps {
   // Additional header actions (e.g., "Show Past Events")
   headerActions?: ReactNode;
 
-  // Result count
-  resultCount?: string;
-
   // Tag filtering (optional)
   tags?: string[];
   selectedTags?: string[];
@@ -44,7 +41,6 @@ export function FilterableContentLayout({
   defaultView = 'table',
   showViewToggle = true,
   headerActions,
-  resultCount,
   tags,
   selectedTags,
   onTagToggle,
@@ -85,17 +81,12 @@ export function FilterableContentLayout({
             {headerActions}
           </div>
 
-          {/* View Toggle + Result Count */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {resultCount && (
-                <p className="text-sm text-muted-foreground">{resultCount}</p>
-              )}
-            </div>
-            {showViewToggle && (
+          {/* View Toggle */}
+          {showViewToggle && (
+            <div className="flex items-center justify-end">
               <ViewToggle view={view} onViewChange={setView} />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Tag Filters */}
           {tags && tags.length > 0 && (

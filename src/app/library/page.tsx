@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { UserMenu } from '@/components/user-menu';
-import { VideoLibrary } from '@/components/video-library';
+import { VideoLibraryContent } from '@/components/videos/video-library-content';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import Image from 'next/image';
@@ -40,7 +40,7 @@ export default function LibraryPage() {
 
       {/* Main Content */}
       <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading...</div>}>
-        <VideoLibrary />
+        <VideoLibraryContent />
       </Suspense>
 
       {/* Footer */}

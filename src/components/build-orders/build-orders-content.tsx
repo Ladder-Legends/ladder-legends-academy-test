@@ -340,7 +340,6 @@ export function BuildOrdersContent() {
         defaultView="grid"
         showViewToggle={true}
         headerActions={headerActions}
-        resultCount={`Showing ${filteredBuildOrders.length} build order${filteredBuildOrders.length !== 1 ? 's' : ''}`}
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}

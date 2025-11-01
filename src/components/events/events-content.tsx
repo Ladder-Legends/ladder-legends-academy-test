@@ -218,7 +218,6 @@ export function EventsContent() {
         defaultView="table"
         showViewToggle={true}
         headerActions={headerActions}
-        resultCount={`Showing ${filteredEvents.length} of ${allEvents.length} events`}
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}

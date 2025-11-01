@@ -207,7 +207,6 @@ export function MasterclassesContent() {
         defaultView="grid"
         showViewToggle={true}
         headerActions={headerActions}
-        resultCount={`Showing ${filteredMasterclasses.length} masterclass${filteredMasterclasses.length !== 1 ? 'es' : ''}`}
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}

@@ -268,7 +268,6 @@ export function ReplaysContent() {
         defaultView="table"
         showViewToggle={true}
         headerActions={headerActions}
-        resultCount={`Showing ${filteredReplays.length} replay${filteredReplays.length !== 1 ? 's' : ''}`}
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}
