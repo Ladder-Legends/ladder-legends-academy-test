@@ -12,15 +12,59 @@ export function generateGoogleCalendarUrl(event: Event): string {
     return date.toISOString().replace(/-|:|\.\d+/g, '');
   };
 
-  const params = new URLSearchParams({
+  const params: Record<string, string> = {
     action: 'TEMPLATE',
     text: event.title,
     dates: `${formatDate(startDate)}/${formatDate(endDate)}`,
     details: event.description || '',
     location: 'Online',
-  });
+  };
 
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  // Add recurrence rule if event is recurring
+  if (event.recurring?.enabled) {
+    const recur = generateGoogleRecurrenceRule(event);
+    if (recur) {
+      params.recur = recur;
+    }
+  }
+
+  return `https://calendar.google.com/calendar/render?${new URLSearchParams(params).toString()}`;
+}
+
+function generateGoogleRecurrenceRule(event: Event): string | null {
+  if (!event.recurring?.enabled) return null;
+
+  const parts: string[] = ['RRULE:'];
+
+  switch (event.recurring.frequency) {
+    case 'daily':
+      parts.push('FREQ=DAILY');
+      break;
+    case 'weekly':
+      parts.push('FREQ=WEEKLY');
+      if (event.recurring.dayOfWeek !== undefined) {
+        const days = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+        parts.push(`;BYDAY=${days[event.recurring.dayOfWeek]}`);
+      }
+      break;
+    case 'monthly':
+      parts.push('FREQ=MONTHLY');
+      if (event.recurring.dayOfMonth !== undefined) {
+        parts.push(`;BYMONTHDAY=${event.recurring.dayOfMonth}`);
+      }
+      break;
+    default:
+      return null;
+  }
+
+  // Add end date if specified
+  if (event.recurring.endDate) {
+    const endDate = new Date(event.recurring.endDate);
+    const formatted = endDate.toISOString().replace(/-|:|\.\d+/g, '').split('T')[0];
+    parts.push(`;UNTIL=${formatted}`);
+  }
+
+  return parts.join('');
 }
 
 export function generateICalFile(event: Event): string {
@@ -35,7 +79,7 @@ export function generateICalFile(event: Event): string {
     return date.toISOString().replace(/-|:|\.\d+/g, '');
   };
 
-  const ical = [
+  const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Ladder Legends Academy//Event//EN',
@@ -47,11 +91,56 @@ export function generateICalFile(event: Event): string {
     `SUMMARY:${event.title}`,
     `DESCRIPTION:${(event.description || '').replace(/\n/g, '\\n')}`,
     `LOCATION:Online`,
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
+  ];
 
-  return ical;
+  // Add recurrence rule if event is recurring
+  if (event.recurring?.enabled) {
+    const rrule = generateICalRecurrenceRule(event);
+    if (rrule) {
+      lines.push(rrule);
+    }
+  }
+
+  lines.push('END:VEVENT');
+  lines.push('END:VCALENDAR');
+
+  return lines.join('\r\n');
+}
+
+function generateICalRecurrenceRule(event: Event): string | null {
+  if (!event.recurring?.enabled) return null;
+
+  const parts: string[] = ['RRULE:'];
+
+  switch (event.recurring.frequency) {
+    case 'daily':
+      parts.push('FREQ=DAILY');
+      break;
+    case 'weekly':
+      parts.push('FREQ=WEEKLY');
+      if (event.recurring.dayOfWeek !== undefined) {
+        const days = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+        parts.push(`;BYDAY=${days[event.recurring.dayOfWeek]}`);
+      }
+      break;
+    case 'monthly':
+      parts.push('FREQ=MONTHLY');
+      if (event.recurring.dayOfMonth !== undefined) {
+        parts.push(`;BYMONTHDAY=${event.recurring.dayOfMonth}`);
+      }
+      break;
+    default:
+      return null;
+  }
+
+  // Add end date if specified
+  if (event.recurring.endDate) {
+    const endDate = new Date(event.recurring.endDate);
+    const formatted = endDate.toISOString().replace(/-|:|\.\d+/g, '');
+    parts.push(`;UNTIL=${formatted}`);
+  }
+
+  return parts.join('');
 }
 
 export function downloadICalFile(event: Event): void {
