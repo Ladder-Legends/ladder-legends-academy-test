@@ -19,15 +19,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Ladder Legends Academy | Starcraft 2 Coaching",
   description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy",
-  icons: {
-    icon: [
-      { url: '/LL_LOGO.png' },
-      { url: '/LL_LOGO.png', sizes: '32x32', type: 'image/png' },
-      { url: '/LL_LOGO.png', sizes: '16x16', type: 'image/png' },
-    ],
-    apple: '/LL_LOGO.png',
-    shortcut: '/LL_LOGO.png',
-  },
 };
 
 export default function RootLayout({
