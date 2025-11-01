@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useSession } from 'next-auth/react';
 import { handleSignOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -8,18 +9,28 @@ import Link from "next/link";
 import { isOwner } from "@/lib/permissions";
 
 function SignOutButton() {
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
+
   return (
     <Button
       onClick={async () => {
-        await handleSignOut();
-        window.location.href = '/';
+        setIsSigningOut(true);
+        try {
+          await handleSignOut();
+          // Force a hard reload to clear all caches
+          window.location.replace('/');
+        } catch (error) {
+          console.error('Sign out error:', error);
+          setIsSigningOut(false);
+        }
       }}
       variant="outline"
       size="sm"
       className="gap-2"
+      disabled={isSigningOut}
     >
       <LogOut className="w-4 h-4" />
-      Sign out
+      {isSigningOut ? 'Signing out...' : 'Sign out'}
     </Button>
   );
 }
