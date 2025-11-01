@@ -138,6 +138,7 @@ export function DashboardContent() {
           viewAllHref="/coaches"
         />
       </div>
+      <div className="mb-12" />
     </main>
   );
 }

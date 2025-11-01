@@ -133,6 +133,7 @@ export function FilterableContentLayout({
           )}
         </div>
       </main>
+      <div className="mb-12" />
     </div>
   );
 }

@@ -148,6 +148,7 @@ export function CoachesContent() {
         onClose={handleCloseModal}
         isNew={isNewCoach}
       />
+      <div className="mb-12" />
     </main>
   );
 }
