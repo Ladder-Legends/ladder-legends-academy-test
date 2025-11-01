@@ -7,6 +7,7 @@
     "build": "node scripts/download-mux-thumbnails.mjs && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "checkup": "tsx scripts/checkup.ts",
     "json-to-csv": "tsx scripts/json-to-csv.ts",
     "csv-to-json": "tsx scripts/csv-to-json.ts",
     "prepare": "husky"

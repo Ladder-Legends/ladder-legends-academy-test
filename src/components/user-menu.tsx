@@ -3,8 +3,9 @@
 import { useSession } from 'next-auth/react';
 import { handleSignOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, LogIn } from "lucide-react";
+import { LogOut, User, LogIn, Activity } from "lucide-react";
 import Link from "next/link";
+import { isOwner } from "@/lib/permissions";
 
 export function UserMenu() {
   const { data: session } = useSession();
@@ -54,6 +55,18 @@ export function UserMenu() {
   // Logged in and subscribed - show user info + sign out
   return (
     <div className="flex items-center gap-4">
+      {isOwner(session) && (
+        <Link href="/admin/checkup">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Activity className="w-4 h-4" />
+            Checkup
+          </Button>
+        </Link>
+      )}
       <div className="flex items-center gap-2 text-sm">
         <User className="w-4 h-4 text-primary" />
         <span className="text-muted-foreground">
