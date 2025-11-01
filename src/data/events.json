@@ -1,0 +1,51 @@
+[
+  {
+    "id": "event-1",
+    "title": "Weekly Team Games Night",
+    "description": "# Team Games Night\n\nJoin us every Friday for casual team games! All skill levels welcome.\n\n## What to Expect\n- 2v2 and 3v3 matches\n- Friendly competition\n- Coaching tips throughout\n- Discord voice chat\n\n## Requirements\n- Discord account\n- Starcraft 2 (any version)\n- Positive attitude!",
+    "type": "arcade",
+    "date": "2025-11-07",
+    "time": "19:00",
+    "timezone": "America/New_York",
+    "duration": 120,
+    "coach": "coach-terran",
+    "isFree": true,
+    "tags": ["Team Games", "Casual", "All Races"],
+    "recurring": {
+      "enabled": true,
+      "frequency": "weekly",
+      "dayOfWeek": 5
+    },
+    "createdAt": "2025-11-01T12:00:00Z",
+    "updatedAt": "2025-11-01T12:00:00Z"
+  },
+  {
+    "id": "event-2",
+    "title": "Bronze-Gold Tournament",
+    "description": "# November Bronze-Gold Tournament\n\nCompete against players at your skill level for prizes and glory!\n\n## Tournament Details\n- **Format**: Best of 3, single elimination\n- **Map Pool**: Current ladder maps\n- **Check-in**: 30 minutes before start\n- **Prize Pool**: $100\n\n## Rules\n- Must be Bronze-Gold league\n- No smurfing (will be verified)\n- Standard ladder rules apply\n\n## Registration\nRegister in our Discord #tournaments channel before the event!",
+    "type": "tournament",
+    "date": "2025-11-15",
+    "time": "14:00",
+    "timezone": "America/New_York",
+    "duration": 240,
+    "isFree": false,
+    "tags": ["Tournament", "Bronze", "Gold", "Prize Pool"],
+    "createdAt": "2025-11-01T12:00:00Z",
+    "updatedAt": "2025-11-01T12:00:00Z"
+  },
+  {
+    "id": "event-3",
+    "title": "Terran Build Order Workshop",
+    "description": "# Terran Build Order Deep Dive\n\nMaster the fundamentals of Terran macro with our expert coach.\n\n## Workshop Focus\n- 1-1-1 builds\n- 3CC timing attacks\n- Defensive play\n- Build order execution\n\n## What You'll Learn\n- Supply timings\n- Worker counts\n- Transition points\n- Common mistakes to avoid\n\n## Format\n- 1 hour lecture\n- 30 min Q&A\n- Replay review\n\nPerfect for Platinum and below players looking to improve their macro!",
+    "type": "coaching",
+    "date": "2025-11-10",
+    "time": "18:00",
+    "timezone": "America/New_York",
+    "duration": 90,
+    "coach": "coach-terran",
+    "isFree": false,
+    "tags": ["Terran", "Build Orders", "Macro", "Workshop"],
+    "createdAt": "2025-11-01T12:00:00Z",
+    "updatedAt": "2025-11-01T12:00:00Z"
+  }
+]
