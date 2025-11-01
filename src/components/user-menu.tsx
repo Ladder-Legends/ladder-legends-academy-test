@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
-import { handleSignOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, LogIn, Activity } from "lucide-react";
 import Link from "next/link";
