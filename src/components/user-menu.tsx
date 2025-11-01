@@ -7,6 +7,34 @@ import { LogOut, User, LogIn, Activity } from "lucide-react";
 import Link from "next/link";
 import { isOwner } from "@/lib/permissions";
 
+function SignOutButton() {
+  return (
+    <Button
+      onClick={async () => {
+        await handleSignOut();
+        window.location.href = '/';
+      }}
+      variant="outline"
+      size="sm"
+      className="gap-2"
+    >
+      <LogOut className="w-4 h-4" />
+      Sign out
+    </Button>
+  );
+}
+
+function UserInfo({ session }: { session: { user: { name?: string | null; email?: string | null } } }) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <User className="w-4 h-4 text-primary" />
+      <span className="text-muted-foreground">
+        {session.user.name || session.user.email}
+      </span>
+    </div>
+  );
+}
+
 export function UserMenu() {
   const { data: session } = useSession();
 
@@ -31,24 +59,8 @@ export function UserMenu() {
             Subscribe
           </Button>
         </Link>
-        <div className="flex items-center gap-2 text-sm">
-          <User className="w-4 h-4 text-primary" />
-          <span className="text-muted-foreground">
-            {session.user.name || session.user.email}
-          </span>
-        </div>
-        <Button
-          onClick={async () => {
-            await handleSignOut();
-            window.location.href = '/';
-          }}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign out
-        </Button>
+        <UserInfo session={session} />
+        <SignOutButton />
       </div>
     );
   }
@@ -68,24 +80,8 @@ export function UserMenu() {
           </Button>
         </Link>
       )}
-      <div className="flex items-center gap-2 text-sm">
-        <User className="w-4 h-4 text-primary" />
-        <span className="text-muted-foreground">
-          {session.user.name || session.user.email}
-        </span>
-      </div>
-      <Button
-        onClick={async () => {
-          await handleSignOut();
-          window.location.href = '/';
-        }}
-        variant="outline"
-        size="sm"
-        className="gap-2"
-      >
-        <LogOut className="w-4 h-4" />
-        Sign out
-      </Button>
+      <UserInfo session={session} />
+      <SignOutButton />
     </div>
   );
 }
