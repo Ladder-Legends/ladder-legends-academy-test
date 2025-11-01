@@ -12,6 +12,7 @@ const navItems = [
   { href: '/build-orders', label: 'Build Orders' },
   { href: '/replays', label: 'Replays' },
   { href: '/masterclasses', label: 'Masterclasses' },
+  { href: '/events', label: 'Events' },
   { href: '/coaches', label: 'Meet the Coaches' },
 ];
 

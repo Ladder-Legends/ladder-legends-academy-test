@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'file';
+export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'events' | 'file';
 
 export interface PendingChange {
   id: string;
