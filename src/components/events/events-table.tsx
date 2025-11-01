@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EventDateDisplay } from './event-date-display';
 import { PermissionGate } from '@/components/auth/permission-gate';
+import { AddToCalendarButton } from './add-to-calendar-button';
 import coachesData from '@/data/coaches.json';
 
 interface EventsTableProps {
@@ -114,6 +115,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
               </td>
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
+                  <AddToCalendarButton event={event} />
                   <Link href={`/events/${event.id}`}>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                       View

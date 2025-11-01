@@ -5,6 +5,7 @@ import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
+import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Event, getEventStatus } from '@/types/event';
@@ -133,9 +134,12 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
 
             {/* Title Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl font-bold">{event.title}</h1>
-                <SubscriberBadge isFree={event.isFree} />
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-4xl font-bold">{event.title}</h1>
+                  <SubscriberBadge isFree={event.isFree} />
+                </div>
+                <AddToCalendarButton event={event} variant="default" size="default" />
               </div>
 
               <div className="flex flex-wrap gap-2">
