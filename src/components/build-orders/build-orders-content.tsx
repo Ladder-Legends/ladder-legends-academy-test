@@ -131,7 +131,7 @@ export function BuildOrdersContent() {
       items: [
         { id: 'free', label: 'Free', count: getCount(bo => bo.isFree === true, 'accessLevel') },
         { id: 'premium', label: 'Premium', count: getCount(bo => !bo.isFree, 'accessLevel') },
-      ].filter(item => item.count !== undefined && item.count > 0),
+      ],
     },
     {
       id: 'terran',
@@ -171,7 +171,7 @@ export function BuildOrdersContent() {
         id: type,
         label: type.charAt(0).toUpperCase() + type.slice(1),
         count: getCount(bo => bo.type === type, 'type'),
-      })).filter(item => item.count !== undefined && item.count > 0),
+      })),
     },
     {
       id: 'difficulty',
@@ -181,7 +181,7 @@ export function BuildOrdersContent() {
         { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
         { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
         { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
-      ].filter(item => item.count !== undefined && item.count > 0),
+      ],
     },
   ], [selectedTags, selectedItems, getCount, allTypes]);
 
