@@ -2,16 +2,21 @@
 
 import { Event, getEventStatus } from '@/types/event';
 import Link from 'next/link';
-import { Lock, Repeat } from 'lucide-react';
+import { Lock, Repeat, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { EventDateDisplay } from './event-date-display';
+import { PermissionGate } from '@/components/auth/permission-gate';
 import coachesData from '@/data/coaches.json';
 
 interface EventsTableProps {
   events: Event[];
+  hasSubscriberRole?: boolean;
+  onEdit?: (event: Event) => void;
+  onDelete?: (event: Event) => void;
 }
 
-export function EventsTable({ events }: EventsTableProps) {
+export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelete }: EventsTableProps) {
   const getEventTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
       tournament: 'bg-red-500/10 text-red-500 border-red-500/20',
@@ -55,6 +60,7 @@ export function EventsTable({ events }: EventsTableProps) {
             <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Status</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -73,7 +79,7 @@ export function EventsTable({ events }: EventsTableProps) {
                   {event.title}
                 </Link>
                 <div className="flex items-center gap-2 mt-1">
-                  {!event.isFree && (
+                  {!event.isFree && !hasSubscriberRole && (
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                       <Lock className="w-3 h-3" />
                     </span>
@@ -104,6 +110,45 @@ export function EventsTable({ events }: EventsTableProps) {
               </td>
               <td className="px-6 py-4">
                 {getStatusBadge(event)}
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <Link href={`/events/${event.id}`}>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      View
+                    </Button>
+                  </Link>
+                  <PermissionGate require="coaches">
+                    {onEdit && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onEdit(event);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onDelete(event);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </PermissionGate>
+                </div>
               </td>
             </tr>
           ))}

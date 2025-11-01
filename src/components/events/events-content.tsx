@@ -11,15 +11,19 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
+import { useSession } from 'next-auth/react';
 
 const allEvents = eventsData as Event[];
 
 export function EventsContent() {
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Get all unique tags
   const allTags = useMemo(() => {
@@ -40,6 +44,19 @@ export function EventsContent() {
   const filteredEvents = useMemo(() => {
     const filtered = allEvents.filter(event => {
       const status = getEventStatus(event);
+
+      // Search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !event.title.toLowerCase().includes(query) &&
+          !event.description.toLowerCase().includes(query) &&
+          !event.type.toLowerCase().includes(query) &&
+          !event.tags?.some(tag => tag.toLowerCase().includes(query))
+        ) {
+          return false;
+        }
+      }
 
       // Show past events filter
       if (!showPastEvents && status === 'past') return false;
@@ -85,7 +102,7 @@ export function EventsContent() {
 
       return statusA === 'upcoming' ? dateA - dateB : dateB - dateA;
     });
-  }, [allEvents, selectedItems, showPastEvents, selectedTags]);
+  }, [allEvents, selectedItems, showPastEvents, selectedTags, searchQuery]);
 
   // Filter sections
   const filterSections: FilterSection[] = [
@@ -127,9 +144,25 @@ export function EventsContent() {
     setIsModalOpen(true);
   };
 
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (event: Event) => {
+    if (confirm(`Are you sure you want to delete "${event.title}"?`)) {
+      // Would add pending change here
+      console.log('Delete event:', event.id);
+    }
+  };
+
   // Filter content
   const filterContent = (
     <FilterSidebar
+      searchEnabled={true}
+      searchPlaceholder="Search events..."
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
       sections={filterSections}
       selectedItems={selectedItems}
       onSelectionChange={setSelectedItems}
@@ -137,7 +170,14 @@ export function EventsContent() {
   );
 
   // Table content
-  const tableContent = <EventsTable events={filteredEvents} />;
+  const tableContent = (
+    <EventsTable
+      events={filteredEvents}
+      hasSubscriberRole={hasSubscriberRole}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  );
 
   // Grid content
   const gridContent = (
