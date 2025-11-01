@@ -40,6 +40,9 @@ export function PaywallLink({ href, children, className, external = false, isFre
   // Free content bypasses paywall, otherwise check subscription
   const hasAccess = isFree || (session?.user?.hasSubscriberRole ?? false);
 
+  // For free content, prepend /free to the route
+  const actualHref = isFree ? `/free${href}` : href;
+
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!hasAccess) {
       e.preventDefault();
@@ -65,7 +68,7 @@ export function PaywallLink({ href, children, className, external = false, isFre
   // For internal Next.js links
   return (
     <Link
-      href={hasAccess ? href : '/subscribe'}
+      href={hasAccess ? actualHref : '/subscribe'}
       onClick={handleClick}
       className={className}
     >

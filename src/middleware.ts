@@ -12,12 +12,14 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/free/") || // Free content routes (no auth required)
     pathname === "/subscribe" ||
     pathname === "/" ||
     pathname === "/library" ||
     pathname === "/build-orders" ||
     pathname === "/replays" ||
     pathname === "/masterclasses" ||
+    pathname === "/events" ||
     pathname === "/coaches"
   ) {
     return NextResponse.next();
@@ -29,6 +31,7 @@ export async function middleware(request: NextRequest) {
     /^\/build-orders\/[^/]+$/,    // /build-orders/:id
     /^\/replays\/[^/]+$/,         // /replays/:id
     /^\/masterclasses\/[^/]+$/,   // /masterclasses/:id
+    /^\/events\/[^/]+$/,          // /events/:id
   ];
 
   const isDetailPage = detailPagePatterns.some(pattern => pattern.test(pathname));
