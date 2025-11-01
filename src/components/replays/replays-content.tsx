@@ -59,6 +59,82 @@ export function ReplaysContent() {
     );
   };
 
+  // Count replays for each filter
+  const getCount = (matchupOrFilter: string, sectionId: string) => {
+    return allReplays.filter(replay => {
+      // Apply search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !replay.title.toLowerCase().includes(query) &&
+          !replay.player1.name.toLowerCase().includes(query) &&
+          !replay.player2.name.toLowerCase().includes(query) &&
+          !replay.map.toLowerCase().includes(query) &&
+          !replay.coach?.toLowerCase().includes(query)
+        ) {
+          return false;
+        }
+      }
+
+      // Check if replay matches the filter we're counting
+      if (sectionId === 'terran') {
+        if (!['TvT', 'TvZ', 'TvP'].includes(matchupOrFilter)) return false;
+        if (replay.matchup !== matchupOrFilter) return false;
+      } else if (sectionId === 'zerg') {
+        if (!['ZvT', 'ZvZ', 'ZvP'].includes(matchupOrFilter)) return false;
+        if (replay.matchup !== matchupOrFilter) return false;
+      } else if (sectionId === 'protoss') {
+        if (!['PvT', 'PvZ', 'PvP'].includes(matchupOrFilter)) return false;
+        if (replay.matchup !== matchupOrFilter) return false;
+      } else if (sectionId === 'duration') {
+        const durationMinutes = parseDuration(replay.duration);
+        if (matchupOrFilter === 'under10' && durationMinutes >= 10) return false;
+        if (matchupOrFilter === '10-20' && (durationMinutes < 10 || durationMinutes > 20)) return false;
+        if (matchupOrFilter === '20-30' && (durationMinutes <= 20 || durationMinutes > 30)) return false;
+        if (matchupOrFilter === 'over30' && durationMinutes <= 30) return false;
+      } else if (sectionId === 'accessLevel') {
+        const isFree = replay.isFree ?? false;
+        if (matchupOrFilter === 'free' && !isFree) return false;
+        if (matchupOrFilter === 'premium' && isFree) return false;
+      }
+
+      // Apply other active filters (excluding current section)
+      const terran = sectionId === 'terran' ? [] : (selectedItems.terran || []);
+      const zerg = sectionId === 'zerg' ? [] : (selectedItems.zerg || []);
+      const protoss = sectionId === 'protoss' ? [] : (selectedItems.protoss || []);
+      const duration = sectionId === 'duration' ? [] : (selectedItems.duration || []);
+      const accessLevel = sectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
+
+      // Apply matchup filters
+      const allSelectedMatchups = [...terran, ...zerg, ...protoss];
+      if (allSelectedMatchups.length > 0 && !allSelectedMatchups.includes(replay.matchup)) {
+        return false;
+      }
+
+      // Apply duration filters
+      if (duration.length > 0) {
+        const durationMinutes = parseDuration(replay.duration);
+        const matchesDuration = duration.some(range => {
+          if (range === 'under10') return durationMinutes < 10;
+          if (range === '10-20') return durationMinutes >= 10 && durationMinutes <= 20;
+          if (range === '20-30') return durationMinutes > 20 && durationMinutes <= 30;
+          if (range === 'over30') return durationMinutes > 30;
+          return false;
+        });
+        if (!matchesDuration) return false;
+      }
+
+      // Apply access level filters
+      if (accessLevel.length > 0) {
+        const isFree = replay.isFree ?? false;
+        if (accessLevel.includes('free') && !isFree) return false;
+        if (accessLevel.includes('premium') && isFree) return false;
+      }
+
+      return true;
+    }).length;
+  };
+
   // Filter replays
   const filteredReplays = useMemo(() => {
     return allReplays.filter(replay => {
@@ -83,28 +159,17 @@ export function ReplaysContent() {
         }
       }
 
-      // Race filters (Terran)
-      if (selectedItems.terran.length > 0) {
-        const hasTerran =
-          (replay.player1.race === 'terran' && selectedItems.terran.includes('player1')) ||
-          (replay.player2.race === 'terran' && selectedItems.terran.includes('player2'));
-        if (!hasTerran) return false;
-      }
+      // Apply matchup filters
+      const allSelectedMatchups = [
+        ...(selectedItems.terran || []),
+        ...(selectedItems.zerg || []),
+        ...(selectedItems.protoss || []),
+      ];
 
-      // Race filters (Zerg)
-      if (selectedItems.zerg.length > 0) {
-        const hasZerg =
-          (replay.player1.race === 'zerg' && selectedItems.zerg.includes('player1')) ||
-          (replay.player2.race === 'zerg' && selectedItems.zerg.includes('player2'));
-        if (!hasZerg) return false;
-      }
-
-      // Race filters (Protoss)
-      if (selectedItems.protoss.length > 0) {
-        const hasProtoss =
-          (replay.player1.race === 'protoss' && selectedItems.protoss.includes('player1')) ||
-          (replay.player2.race === 'protoss' && selectedItems.protoss.includes('player2'));
-        if (!hasProtoss) return false;
+      if (allSelectedMatchups.length > 0) {
+        if (!allSelectedMatchups.includes(replay.matchup)) {
+          return false;
+        }
       }
 
       // Duration filters
@@ -140,12 +205,22 @@ export function ReplaysContent() {
       items: [],
     },
     {
+      id: 'accessLevel',
+      title: 'Access Level',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'free', label: 'Free', count: getCount('free', 'accessLevel') },
+        { id: 'premium', label: 'Premium', count: getCount('premium', 'accessLevel') },
+      ],
+    },
+    {
       id: 'terran',
       title: 'Terran',
       type: 'checkbox' as const,
       items: [
-        { id: 'player1', label: 'Player 1' },
-        { id: 'player2', label: 'Player 2' },
+        { id: 'TvT', label: 'vs Terran', count: getCount('TvT', 'terran') },
+        { id: 'TvZ', label: 'vs Zerg', count: getCount('TvZ', 'terran') },
+        { id: 'TvP', label: 'vs Protoss', count: getCount('TvP', 'terran') },
       ],
     },
     {
@@ -153,8 +228,9 @@ export function ReplaysContent() {
       title: 'Zerg',
       type: 'checkbox' as const,
       items: [
-        { id: 'player1', label: 'Player 1' },
-        { id: 'player2', label: 'Player 2' },
+        { id: 'ZvT', label: 'vs Terran', count: getCount('ZvT', 'zerg') },
+        { id: 'ZvZ', label: 'vs Zerg', count: getCount('ZvZ', 'zerg') },
+        { id: 'ZvP', label: 'vs Protoss', count: getCount('ZvP', 'zerg') },
       ],
     },
     {
@@ -162,8 +238,9 @@ export function ReplaysContent() {
       title: 'Protoss',
       type: 'checkbox' as const,
       items: [
-        { id: 'player1', label: 'Player 1' },
-        { id: 'player2', label: 'Player 2' },
+        { id: 'PvT', label: 'vs Terran', count: getCount('PvT', 'protoss') },
+        { id: 'PvZ', label: 'vs Zerg', count: getCount('PvZ', 'protoss') },
+        { id: 'PvP', label: 'vs Protoss', count: getCount('PvP', 'protoss') },
       ],
     },
     {
@@ -171,19 +248,10 @@ export function ReplaysContent() {
       title: 'Duration',
       type: 'checkbox' as const,
       items: [
-        { id: 'under10', label: 'Under 10 min' },
-        { id: '10-20', label: '10-20 min' },
-        { id: '20-30', label: '20-30 min' },
-        { id: 'over30', label: 'Over 30 min' },
-      ],
-    },
-    {
-      id: 'accessLevel',
-      title: 'Access Level',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'free', label: 'Free' },
-        { id: 'premium', label: 'Premium' },
+        { id: 'under10', label: 'Under 10 min', count: getCount('under10', 'duration') },
+        { id: '10-20', label: '10-20 min', count: getCount('10-20', 'duration') },
+        { id: '20-30', label: '20-30 min', count: getCount('20-30', 'duration') },
+        { id: 'over30', label: 'Over 30 min', count: getCount('over30', 'duration') },
       ],
     },
   ];
