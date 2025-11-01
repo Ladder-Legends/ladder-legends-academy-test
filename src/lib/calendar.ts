@@ -1,8 +1,12 @@
 import { Event } from '@/types/event';
 
 export function generateGoogleCalendarUrl(event: Event): string {
-  const startDate = new Date(event.startDateTime);
-  const endDate = event.endDateTime ? new Date(event.endDateTime) : new Date(startDate.getTime() + 60 * 60 * 1000); // Default 1 hour if no end time
+  // Combine date and time to create full datetime string
+  const startDate = new Date(`${event.date}T${event.time}`);
+
+  // Calculate end time based on duration or default to 1 hour
+  const durationMs = event.duration ? event.duration * 60 * 1000 : 60 * 60 * 1000;
+  const endDate = new Date(startDate.getTime() + durationMs);
 
   const formatDate = (date: Date) => {
     return date.toISOString().replace(/-|:|\.\d+/g, '');
@@ -13,15 +17,19 @@ export function generateGoogleCalendarUrl(event: Event): string {
     text: event.title,
     dates: `${formatDate(startDate)}/${formatDate(endDate)}`,
     details: event.description || '',
-    location: event.location || 'Online',
+    location: 'Online',
   });
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 export function generateICalFile(event: Event): string {
-  const startDate = new Date(event.startDateTime);
-  const endDate = event.endDateTime ? new Date(event.endDateTime) : new Date(startDate.getTime() + 60 * 60 * 1000);
+  // Combine date and time to create full datetime string
+  const startDate = new Date(`${event.date}T${event.time}`);
+
+  // Calculate end time based on duration or default to 1 hour
+  const durationMs = event.duration ? event.duration * 60 * 1000 : 60 * 60 * 1000;
+  const endDate = new Date(startDate.getTime() + durationMs);
 
   const formatDate = (date: Date) => {
     return date.toISOString().replace(/-|:|\.\d+/g, '');
@@ -38,7 +46,7 @@ export function generateICalFile(event: Event): string {
     `DTEND:${formatDate(endDate)}`,
     `SUMMARY:${event.title}`,
     `DESCRIPTION:${(event.description || '').replace(/\n/g, '\\n')}`,
-    `LOCATION:${event.location || 'Online'}`,
+    `LOCATION:Online`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n');
