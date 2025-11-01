@@ -40,10 +40,10 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <Link
         href={`/build-orders/${buildOrder.id}`}
-        className="block"
+        className="block h-full"
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 overflow-hidden flex items-center justify-center">

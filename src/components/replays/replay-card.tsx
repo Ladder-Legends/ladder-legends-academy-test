@@ -37,10 +37,10 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <PaywallLink
         href={`/replays/${replay.id}`}
-        className="block"
+        className="block h-full"
         isFree={replay.isFree}
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">

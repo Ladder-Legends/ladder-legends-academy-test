@@ -40,7 +40,7 @@ export function HorizontalCoachScroller({
       </div>
 
       {/* Horizontal Scroll Container */}
-      <HorizontalScrollContainer>
+      <HorizontalScrollContainer showFadeIndicator>
         <div className="flex gap-4 min-w-max items-stretch">
           {coaches.map((coach) => (
             <div key={coach.id} className="w-80 flex-shrink-0">

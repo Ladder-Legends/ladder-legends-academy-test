@@ -24,9 +24,14 @@ export function HorizontalScrollContainer({ children, className = '', showFadeIn
       setShowLeftArrow(scrollLeft > 0);
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10); // 10px threshold
 
-      if (showFadeIndicator && hasOverflow) {
-        setShowLeftFade(scrollLeft > 0);
-        setShowRightFade(scrollLeft < scrollWidth - clientWidth - 10);
+      if (showFadeIndicator) {
+        if (hasOverflow) {
+          setShowLeftFade(scrollLeft > 0);
+          setShowRightFade(scrollLeft < scrollWidth - clientWidth - 10);
+        } else {
+          setShowLeftFade(false);
+          setShowRightFade(false);
+        }
       }
     }
   };
@@ -53,7 +58,7 @@ export function HorizontalScrollContainer({ children, className = '', showFadeIn
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group/container">
       {/* Left Fade Indicator */}
       {showFadeIndicator && showLeftFade && (
         <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent pointer-events-none z-[5]" />
@@ -68,7 +73,7 @@ export function HorizontalScrollContainer({ children, className = '', showFadeIn
       {showLeftArrow && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/70 hover:bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg transition-all duration-300 flex items-center justify-center md:opacity-0 md:group-hover:opacity-100"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/70 hover:bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg transition-all duration-300 flex items-center justify-center md:opacity-0 md:group-hover/container:opacity-100"
           aria-label="Scroll left"
         >
           <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
@@ -79,7 +84,7 @@ export function HorizontalScrollContainer({ children, className = '', showFadeIn
       {showRightArrow && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/70 hover:bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg transition-all duration-300 flex items-center justify-center md:opacity-0 md:group-hover:opacity-100"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/70 hover:bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg transition-all duration-300 flex items-center justify-center md:opacity-0 md:group-hover/container:opacity-100"
           aria-label="Scroll right"
         >
           <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />

@@ -30,7 +30,7 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
   };
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-hidden inline-block min-w-full">
       <table className="w-full min-w-[800px]">
         <thead className="bg-muted/50">
           <tr>

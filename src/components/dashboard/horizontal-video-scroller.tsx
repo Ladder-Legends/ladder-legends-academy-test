@@ -34,7 +34,7 @@ export function HorizontalVideoScroller({
       </div>
 
       {/* Horizontal Scroll Container */}
-      <HorizontalScrollContainer>
+      <HorizontalScrollContainer showFadeIndicator>
         <div className="flex gap-4 min-w-max items-stretch">
           {videos.map((video) => (
             <div key={video.id} className="w-80 flex-shrink-0">

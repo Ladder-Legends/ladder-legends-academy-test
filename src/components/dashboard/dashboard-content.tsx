@@ -69,7 +69,7 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <HorizontalScrollContainer>
+            <HorizontalScrollContainer showFadeIndicator>
               <div className="flex gap-4 min-w-max items-stretch">
                 {featuredMasterclasses.map((masterclass) => (
                   <div key={masterclass.id} className="w-80 flex-shrink-0">
@@ -94,7 +94,7 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <HorizontalScrollContainer>
+            <HorizontalScrollContainer showFadeIndicator>
               <div className="flex gap-4 min-w-max items-stretch">
                 {featuredReplays.map((replay) => (
                   <div key={replay.id} className="w-80 flex-shrink-0">
@@ -119,7 +119,7 @@ export function DashboardContent() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-            <HorizontalScrollContainer>
+            <HorizontalScrollContainer showFadeIndicator>
               <div className="flex gap-4 min-w-max items-stretch">
                 {featuredBuildOrders.map((buildOrder) => (
                   <div key={buildOrder.id} className="w-80 flex-shrink-0">

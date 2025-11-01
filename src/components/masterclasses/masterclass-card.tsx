@@ -29,10 +29,10 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <PaywallLink
         href={`/masterclasses/${masterclass.id}`}
-        className="block"
+        className="block h-full"
         isFree={masterclass.isFree}
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">

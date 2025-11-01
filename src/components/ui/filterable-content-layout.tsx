@@ -53,10 +53,6 @@ export function FilterableContentLayout({
   const [view, setView] = useState<'grid' | 'table'>(defaultView);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // On mobile, default to grid view for better UX
-  const isMobileView = typeof window !== 'undefined' && window.innerWidth < 768;
-  const effectiveView = isMobileView && defaultView === 'table' ? 'grid' : view;
-
   // Clone filterContent and inject mobile props if it's a valid React element
   const enhancedFilterContent = isValidElement(filterContent)
     ? cloneElement(filterContent as React.ReactElement<{ isMobileOpen?: boolean; onMobileOpenChange?: (isOpen: boolean) => void }>, {
@@ -97,7 +93,7 @@ export function FilterableContentLayout({
               )}
             </div>
             {showViewToggle && (
-              <ViewToggle view={effectiveView} onViewChange={setView} />
+              <ViewToggle view={view} onViewChange={setView} />
             )}
           </div>
 
@@ -137,7 +133,7 @@ export function FilterableContentLayout({
           )}
 
           {/* Content Area */}
-          {effectiveView === 'table' ? (
+          {view === 'table' ? (
             <HorizontalScrollContainer showFadeIndicator>
               {tableContent}
             </HorizontalScrollContainer>
