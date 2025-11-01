@@ -83,7 +83,11 @@ export function DashboardContent() {
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-lg font-semibold line-clamp-2">{masterclass.title}</h3>
-                          <Play className="h-5 w-5 text-primary flex-shrink-0" />
+                          {!masterclass.isFree && !hasSubscriberRole ? (
+                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
+                          ) : (
+                            <Play className="h-5 w-5 text-primary flex-shrink-0" />
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">
                           {masterclass.description}
@@ -125,15 +129,26 @@ export function DashboardContent() {
               <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 <div className="flex gap-4 min-w-max">
                   {featuredReplays.map((replay) => (
-                    <Link
+                    <PaywallLink
                       key={replay.id}
                       href={`/replays/${replay.id}`}
-                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors"
+                      isFree={replay.isFree}
+                      className="w-80 flex-shrink-0 border border-border rounded-lg p-6 bg-card hover:bg-muted/50 transition-colors relative"
                     >
+                      {!replay.isFree && !hasSubscriberRole && (
+                        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] text-primary-foreground flex items-center gap-1 font-medium z-20">
+                          <Lock className="w-2.5 h-2.5" />
+                          Premium
+                        </div>
+                      )}
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-lg font-semibold line-clamp-2">{replay.title}</h3>
-                          <Download className="h-5 w-5 text-primary flex-shrink-0" />
+                          {(replay.isFree || hasSubscriberRole) ? (
+                            <Download className="h-5 w-5 text-primary flex-shrink-0" />
+                          ) : (
+                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
+                          )}
                         </div>
                         <div className="text-sm space-y-1">
                           <div className="flex items-center gap-2">
@@ -148,7 +163,7 @@ export function DashboardContent() {
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </PaywallLink>
                   ))}
                 </div>
               </div>
@@ -187,7 +202,11 @@ export function DashboardContent() {
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-lg font-semibold line-clamp-2">{buildOrder.name}</h3>
-                          {buildOrder.videoId && <VideoIcon className="h-5 w-5 text-primary flex-shrink-0" />}
+                          {!buildOrder.isFree && !hasSubscriberRole ? (
+                            <Lock className="h-5 w-5 text-primary flex-shrink-0" />
+                          ) : buildOrder.videoId ? (
+                            <VideoIcon className="h-5 w-5 text-primary flex-shrink-0" />
+                          ) : null}
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">
                           {buildOrder.description}

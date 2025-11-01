@@ -65,7 +65,9 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               </div>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              {videoIsPlaylist ? (
+              {!video.isFree && !hasSubscriberRole ? (
+                <Lock className="w-16 h-16 text-white" />
+              ) : videoIsPlaylist ? (
                 <ListVideo className="w-16 h-16 text-white" />
               ) : (
                 <PlayCircle className="w-16 h-16 text-white" />
