@@ -179,7 +179,7 @@ export function VideoLibraryContent() {
             label: 'Premium',
             count: getCount('premium', 'accessLevel'),
           },
-        ].filter(item => item.count > 0),
+        ],
       },
       {
         id: 'contentType',
@@ -196,7 +196,7 @@ export function VideoLibraryContent() {
             label: 'Playlists',
             count: getCount('playlist', 'contentType'),
           },
-        ].filter(item => item.count > 0),
+        ],
       },
       {
         id: 'races',
@@ -216,7 +216,7 @@ export function VideoLibraryContent() {
           id: topic,
           label: topic,
           count: getCount(topic, 'general'),
-        })).filter(item => item.count > 0),
+        })).filter(item => item.count > 0 || selectedItems.general?.includes(item.id)),
       },
       {
         id: 'coaches',
@@ -226,7 +226,7 @@ export function VideoLibraryContent() {
           id: coachId,
           label: formatCoachName(coachId),
           count: getCount(coachId, 'coaches'),
-        })).filter(item => item.count > 0),
+        })).filter(item => item.count > 0 || selectedItems.coaches?.includes(item.id)),
       },
     ];
   }, [selectedItems, getCount, allCoaches]);
