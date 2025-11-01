@@ -75,14 +75,40 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       <main className="flex-1 px-4 lg:px-8 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="space-y-8">
-            {/* Back Button */}
-            <Link
-              href="/library"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Library
-            </Link>
+            {/* Back Button & Admin Actions */}
+            <div className="flex items-center justify-between">
+              <Link
+                href="/library"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Library
+              </Link>
+
+              {/* Admin Actions */}
+              <PermissionGate require="coaches">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDelete}
+                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
+              </PermissionGate>
+            </div>
 
             {/* Video Player and Playlist Layout */}
             <div className={videoIsPlaylist ? 'grid lg:grid-cols-3 gap-6' : ''}>
@@ -125,33 +151,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">
                   <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-4">
-                      <h1 className="text-3xl font-bold flex-1">{video.title}</h1>
-
-                      {/* Admin Actions */}
-                      <PermissionGate require="coaches">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setIsEditModalOpen(true)}
-                            className="flex items-center gap-2"
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleDelete}
-                            className="flex items-center gap-2 text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </Button>
-                        </div>
-                      </PermissionGate>
-                    </div>
+                    <h1 className="text-3xl font-bold">{video.title}</h1>
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">

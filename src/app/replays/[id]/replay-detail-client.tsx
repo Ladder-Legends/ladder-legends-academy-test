@@ -71,46 +71,46 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
       <main className="flex-1 px-8 py-8">
         <div className="max-w-5xl mx-auto">
           <div className="space-y-8">
-            {/* Back Button */}
-            <Link
-              href="/replays"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Replays
-            </Link>
+            {/* Back Button & Admin Actions */}
+            <div className="flex items-center justify-between">
+              <Link
+                href="/replays"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Replays
+              </Link>
+
+              {/* Admin Actions */}
+              <PermissionGate require="coaches">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDelete}
+                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
+              </PermissionGate>
+            </div>
 
             {/* Title Section */}
             <div className="space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1">
-                  <h1 className="text-4xl font-bold">{replay.title}</h1>
-                  <SubscriberBadge isFree={replay.isFree} />
-                </div>
-
-                {/* Admin Actions */}
-                <PermissionGate require="coaches">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsEditModalOpen(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDelete}
-                      className="flex items-center gap-2 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </Button>
-                  </div>
-                </PermissionGate>
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold">{replay.title}</h1>
+                <SubscriberBadge isFree={replay.isFree} />
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
