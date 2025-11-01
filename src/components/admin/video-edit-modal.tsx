@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
@@ -449,11 +450,15 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                 <div className="space-y-3">
                   {customThumbnail ? (
                     <div className="relative">
-                      <img
-                        src={customThumbnail}
-                        alt="Custom thumbnail preview"
-                        className="w-full aspect-video object-cover rounded-lg border border-border"
-                      />
+                      <div className="relative w-full aspect-video rounded-lg border border-border overflow-hidden">
+                        <Image
+                          src={customThumbnail}
+                          alt="Custom thumbnail preview"
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={() => setCustomThumbnail(null)}
