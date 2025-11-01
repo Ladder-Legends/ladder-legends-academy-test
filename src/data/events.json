@@ -10,7 +10,11 @@
     "duration": 120,
     "coach": "coach-terran",
     "isFree": true,
-    "tags": ["Team Games", "Casual", "All Races"],
+    "tags": [
+      "Team Games",
+      "Casual",
+      "All Races"
+    ],
     "recurring": {
       "enabled": true,
       "frequency": "weekly",
@@ -29,7 +33,12 @@
     "timezone": "America/New_York",
     "duration": 240,
     "isFree": false,
-    "tags": ["Tournament", "Bronze", "Gold", "Prize Pool"],
+    "tags": [
+      "Tournament",
+      "Bronze",
+      "Gold",
+      "Prize Pool"
+    ],
     "createdAt": "2025-11-01T12:00:00Z",
     "updatedAt": "2025-11-01T12:00:00Z"
   },
@@ -44,8 +53,32 @@
     "duration": 90,
     "coach": "coach-terran",
     "isFree": false,
-    "tags": ["Terran", "Build Orders", "Macro", "Workshop"],
+    "tags": [
+      "Terran",
+      "Build Orders",
+      "Macro",
+      "Workshop"
+    ],
     "createdAt": "2025-11-01T12:00:00Z",
     "updatedAt": "2025-11-01T12:00:00Z"
+  },
+  {
+    "id": "event-3e156bb4-ba23-47ed-a20b-d113362efa09",
+    "title": "asdfasdf",
+    "description": "sdfgsdfgsdfg",
+    "type": "tournament",
+    "date": "2024-12-12",
+    "time": "18:00",
+    "timezone": "America/New_York",
+    "duration": 60,
+    "isFree": false,
+    "tags": [],
+    "recurring": {
+      "enabled": true,
+      "frequency": "weekly",
+      "dayOfWeek": 1
+    },
+    "createdAt": "2025-11-01T17:38:21.626Z",
+    "updatedAt": "2025-11-01T17:38:21.626Z"
   }
 ]
