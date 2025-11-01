@@ -30,7 +30,9 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
   }, [isOpen]);
 
   const handleGoogleCalendar = () => {
-    window.open(generateGoogleCalendarUrl(event), '_blank');
+    const url = generateGoogleCalendarUrl(event);
+    console.log('Google Calendar URL:', url);
+    window.open(url, '_blank');
     setIsOpen(false);
   };
 

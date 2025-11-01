@@ -37,7 +37,7 @@ export function generateGoogleCalendarUrl(event: Event): string {
 function generateGoogleRecurrenceRule(event: Event): string | null {
   if (!event.recurring?.enabled) return null;
 
-  const parts: string[] = ['RRULE:'];
+  const parts: string[] = [];
 
   switch (event.recurring.frequency) {
     case 'daily':
@@ -47,13 +47,13 @@ function generateGoogleRecurrenceRule(event: Event): string | null {
       parts.push('FREQ=WEEKLY');
       if (event.recurring.dayOfWeek !== undefined) {
         const days = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-        parts.push(`;BYDAY=${days[event.recurring.dayOfWeek]}`);
+        parts.push(`BYDAY=${days[event.recurring.dayOfWeek]}`);
       }
       break;
     case 'monthly':
       parts.push('FREQ=MONTHLY');
       if (event.recurring.dayOfMonth !== undefined) {
-        parts.push(`;BYMONTHDAY=${event.recurring.dayOfMonth}`);
+        parts.push(`BYMONTHDAY=${event.recurring.dayOfMonth}`);
       }
       break;
     default:
@@ -64,10 +64,10 @@ function generateGoogleRecurrenceRule(event: Event): string | null {
   if (event.recurring.endDate) {
     const endDate = new Date(event.recurring.endDate);
     const formatted = endDate.toISOString().replace(/-|:|\.\d+/g, '').split('T')[0];
-    parts.push(`;UNTIL=${formatted}`);
+    parts.push(`UNTIL=${formatted}`);
   }
 
-  return parts.join('');
+  return 'RRULE:' + parts.join(';');
 }
 
 export function generateICalFile(event: Event): string {
