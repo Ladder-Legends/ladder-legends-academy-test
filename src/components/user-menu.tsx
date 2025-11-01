@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut as clientSignOut } from 'next-auth/react';
 import { handleSignOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, LogIn, Activity } from "lucide-react";
@@ -14,13 +14,18 @@ function SignOutButton() {
   return (
     <Button
       onClick={async () => {
+        console.log('[CLIENT] Sign out button clicked');
         setIsSigningOut(true);
         try {
-          await handleSignOut();
-          // Force a hard reload to clear all caches
-          window.location.replace('/');
+          // Use NextAuth's client-side signOut which handles everything
+          console.log('[CLIENT] Calling clientSignOut with redirect...');
+          await clientSignOut({
+            callbackUrl: '/',
+            redirect: true
+          });
+          console.log('[CLIENT] clientSignOut completed');
         } catch (error) {
-          console.error('Sign out error:', error);
+          console.error('[CLIENT] Sign out error:', error);
           setIsSigningOut(false);
         }
       }}
@@ -48,6 +53,10 @@ function UserInfo({ session }: { session: { user: { name?: string | null; email?
 
 export function UserMenu() {
   const { data: session } = useSession();
+
+  React.useEffect(() => {
+    console.log('[CLIENT] UserMenu session state:', session);
+  }, [session]);
 
   // Not logged in - show login button
   if (!session?.user) {
