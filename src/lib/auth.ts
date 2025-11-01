@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
+import { cache } from "react";
 
 // Discord server ID - from environment variable
 const GUILD_ID = process.env.DISCORD_GUILD_ID || "1386735340517195959";
@@ -12,7 +13,7 @@ const ALLOWED_ROLE_IDS = process.env.ALLOWED_ROLE_IDS?.split(',') || [
   "1387076312878813337", // Subscriber
 ];
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const { handlers, signIn, signOut, auth: uncachedAuth } = NextAuth({
   providers: [
     Discord({
       clientId: process.env.AUTH_DISCORD_ID!,
@@ -149,3 +150,18 @@ async function checkUserRole(
     return [];
   }
 }
+
+/**
+ * Cached auth function
+ *
+ * Wraps NextAuth's auth() with React's cache() to deduplicate calls within the same request.
+ * If multiple components/middleware call auth() during a single request, only one JWT verification occurs.
+ *
+ * This is safe because:
+ * - cache() is scoped per-request (new cache for each request)
+ * - JWTs don't change during a single request
+ * - Dramatically reduces auth overhead when multiple components check auth
+ */
+export const auth = cache(uncachedAuth);
+
+export { handlers, signIn, signOut };
