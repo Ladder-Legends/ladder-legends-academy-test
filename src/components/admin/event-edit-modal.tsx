@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useTheme } from '@/hooks/use-theme';
 import { Event, EventType } from '@/types/event';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,6 +50,7 @@ const timezones = [
 
 export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventEditModalProps) {
   const { addChange } = usePendingChanges();
+  const { theme } = useTheme();
 
   const [formData, setFormData] = useState<Partial<Event>>({
     title: '',
@@ -392,7 +394,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         {/* Description - Markdown Editor */}
         <div>
           <label className="block text-sm font-medium mb-2">Description * (Markdown supported)</label>
-          <div data-color-mode="dark">
+          <div data-color-mode={theme}>
             <MDEditor
               value={formData.description}
               onChange={(value) => setFormData({ ...formData, description: value || '' })}

@@ -78,10 +78,11 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
                 >
                   {event.title}
                 </Link>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1.5">
                   {!event.isFree && !hasSubscriberRole && (
-                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Lock className="w-3 h-3" />
+                    <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
+                      <Lock className="w-2.5 h-2.5" />
+                      Premium
                     </span>
                   )}
                   {event.recurring && (
