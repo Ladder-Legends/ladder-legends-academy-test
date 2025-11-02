@@ -55,6 +55,10 @@ export function VideoSelector({
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Drag and drop state
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
   // Auto-populate title when showing upload form
   useEffect(() => {
     if (showUpload && suggestedTitle && !uploadingVideoTitle) {
@@ -227,6 +231,48 @@ export function VideoSelector({
     const newIds = [...selectedVideoIds];
     [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
     onVideoIdsChange(newIds);
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+
+    if (draggedIndex === null || mode !== 'playlist' || !onVideoIdsChange) return;
+    if (draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newIds = [...selectedVideoIds];
+    const draggedId = newIds[draggedIndex];
+
+    // Remove from old position
+    newIds.splice(draggedIndex, 1);
+
+    // Insert at new position
+    newIds.splice(dropIndex, 0, draggedId);
+
+    onVideoIdsChange(newIds);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   // Render: Single Mode
@@ -475,29 +521,24 @@ export function VideoSelector({
           {playlistVideos.map((video, index) => (
             <div
               key={video.id}
-              className="flex items-center gap-2 p-2 bg-muted/50 rounded-md"
+              draggable={allowReorder}
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`flex items-center gap-2 p-2 bg-muted/50 rounded-md transition-all ${
+                allowReorder ? 'cursor-move' : ''
+              } ${
+                draggedIndex === index ? 'opacity-50' : ''
+              } ${
+                dragOverIndex === index && draggedIndex !== index
+                  ? 'border-2 border-primary border-dashed'
+                  : ''
+              }`}
             >
               {allowReorder && (
-                <div className="flex flex-col gap-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleMoveVideo(index, 'up')}
-                    disabled={index === 0}
-                    className="p-0.5 hover:bg-muted rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Move up"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMoveVideo(index, 'down')}
-                    disabled={index === playlistVideos.length - 1}
-                    className="p-0.5 hover:bg-muted rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Move down"
-                  >
-                    ▼
-                  </button>
-                </div>
+                <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
               )}
               <VideoIcon className="w-4 h-4 text-primary flex-shrink-0" />
               <div className="flex-1 min-w-0">

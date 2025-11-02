@@ -442,6 +442,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             label="Playlist Videos"
             suggestedTitle={formData.title}
             allowCreate={false}
+            allowReorder={true}
           />
         ) : formData.source === 'mux' ? (
           <div>
