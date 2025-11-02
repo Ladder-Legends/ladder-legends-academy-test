@@ -771,7 +771,7 @@
   },
   {
     "id": "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
-    "title": "Nicosystem™ Beginner Terran Builds: The 5-1-1 Tank/Mine Timing Push. ",
+    "title": "Nico's RFE 5-1-1 Timing vs Protoss",
     "description": "The most effective standard style of TvP currently available, this build is designed around killing a Protoss at the 7-9 minute mark. Conceptually, this build defends any Protoss opener and strikes the most vulnerable Protoss timing before they begin to scale into the late game, with several variations that can be used to keep your opponent guessing. ",
     "youtubeId": "5xh1WVcRoSA",
     "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg",
@@ -781,7 +781,8 @@
       "terran",
       "tvp",
       "timing push",
-      "macro"
+      "macro",
+      "replay"
     ],
     "race": "terran",
     "coach": "Nico",
@@ -879,5 +880,31 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "fe056d66-e846-4665-9262-1d8e60b057ad",
+    "title": "The Nicosystem's™ Beginner Terran Builds: ",
+    "description": "A collection of my Beginner build orders for all MU's at all levels. ",
+    "source": "youtube",
+    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
+    "date": "2025-11-02",
+    "tags": [
+      "nico",
+      "terran",
+      "tvt",
+      "tvp",
+      "tvz"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false,
+    "youtubeIds": [
+      "I3pzBYSUfr8",
+      "aLP0tR22PO0",
+      "5xh1WVcRoSA",
+      "yKT8fsweVwQ"
+    ],
+    "thumbnailVideoIndex": 0
   }
 ]
