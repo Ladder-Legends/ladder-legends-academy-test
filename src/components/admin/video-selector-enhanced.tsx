@@ -28,6 +28,7 @@ interface VideoSelectorProps {
   className?: string;
   suggestedTitle?: string; // Pre-fill upload form with this title
   allowReorder?: boolean;   // Enable drag-to-reorder (playlist mode only) - TODO: Future enhancement
+  allowCreate?: boolean;    // Allow creating new videos (default: true)
 }
 
 export function VideoSelector({
@@ -40,6 +41,7 @@ export function VideoSelector({
   className = '',
   suggestedTitle = '',
   allowReorder = false,
+  allowCreate = true,
 }: VideoSelectorProps) {
   const { addChange } = usePendingChanges();
   const [showUpload, setShowUpload] = useState(false);
@@ -309,15 +311,17 @@ export function VideoSelector({
                 </div>
 
                 {/* Upload New Video Button */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowUpload(true)}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Upload New Video
-                </Button>
+                {allowCreate && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowUpload(true)}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Upload New Video
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
@@ -422,7 +426,7 @@ export function VideoSelector({
     <div className={className}>
       <div className="flex items-center justify-between mb-2">
         <label className="block text-sm font-medium">{label}</label>
-        {!showUpload && (
+        {!showUpload && allowCreate && (
           <Button
             type="button"
             variant="outline"
@@ -434,6 +438,36 @@ export function VideoSelector({
           </Button>
         )}
       </div>
+
+      {/* Always-visible search when allowCreate is false */}
+      {!allowCreate && (
+        <div className="mb-3">
+          <input
+            type="text"
+            placeholder="Search existing videos to add..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {searchQuery && filteredVideos.length > 0 && (
+            <div className="mt-2 border border-border rounded-md max-h-60 overflow-y-auto">
+              {filteredVideos.map((video) => (
+                <button
+                  key={video.id}
+                  type="button"
+                  onClick={() => handleSelectExisting(video.id)}
+                  className="w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
+                >
+                  <div className="text-sm font-medium">{video.title}</div>
+                  {video.coach && (
+                    <div className="text-xs text-muted-foreground">Coach: {video.coach}</div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Playlist Display */}
       {playlistVideos.length > 0 && (
@@ -506,7 +540,7 @@ export function VideoSelector({
       )}
 
       {/* Add Video Section */}
-      {showUpload && (
+      {showUpload && allowCreate && (
         <div className="border border-border rounded-md p-4 space-y-3 mb-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold">Add Video to Playlist</h4>
@@ -628,16 +662,22 @@ export function VideoSelector({
       {playlistVideos.length === 0 && !showUpload && (
         <div className="text-center py-8 border border-dashed border-border rounded-md">
           <p className="text-sm text-muted-foreground">No videos in playlist</p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setShowUpload(true)}
-            className="mt-2"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add First Video
-          </Button>
+          {allowCreate ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowUpload(true)}
+              className="mt-2"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add First Video
+            </Button>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-2">
+              Search for existing videos above to add them to this playlist
+            </p>
+          )}
         </div>
       )}
 

@@ -359,7 +359,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             {isPlaylistMode
-              ? 'Playlist: Reference multiple videos from the library'
+              ? 'Playlist: Select multiple existing videos from the library to group together'
               : formData.source === 'mux'
                 ? 'Mux: Upload your own video file'
                 : 'YouTube: Link to a single YouTube video'}
@@ -441,6 +441,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
             label="Playlist Videos"
             suggestedTitle={formData.title}
+            allowCreate={false}
           />
         ) : formData.source === 'mux' ? (
           <div>
