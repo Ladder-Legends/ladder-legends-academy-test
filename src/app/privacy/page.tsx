@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold">2. Data Controller</h2>
                 <p>
-                  Ladder Legends Academy is the data controller responsible for your personal data. If you have any questions about this privacy policy or our data practices, please contact us at privacy@ladderlegendsacademy.com.
+                  Ladder Legends Academy is the data controller responsible for your personal data. If you have any questions about this privacy policy or our data practices, please contact us at l4dderlegends@gmail.com.
                 </p>
               </section>
 
@@ -172,7 +172,7 @@ export default function PrivacyPolicyPage() {
                   <li><strong>Right to Withdraw Consent:</strong> Where processing is based on consent, you can withdraw it at any time.</li>
                 </ul>
                 <p>
-                  To exercise any of these rights, please contact us at privacy@ladderlegendsacademy.com. We will respond to your request within 30 days.
+                  To exercise any of these rights, please contact us at l4dderlegends@gmail.com. We will respond to your request within 30 days.
                 </p>
               </section>
 
@@ -239,7 +239,7 @@ export default function PrivacyPolicyPage() {
                   If you have any questions, concerns, or requests regarding this privacy policy or our data practices, please contact us at:
                 </p>
                 <div className="pl-4">
-                  <p>Email: privacy@ladderlegendsacademy.com</p>
+                  <p>Email: l4dderlegends@gmail.com</p>
                   <p>Website: <Link href="/" className="text-primary hover:underline">ladderlegendsacademy.com</Link></p>
                 </div>
               </section>

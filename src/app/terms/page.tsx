@@ -117,7 +117,7 @@ export default function TermsOfServicePage() {
 
                 <h3 className="text-xl font-semibold">4.3 Refunds</h3>
                 <p>
-                  Refunds are handled on a case-by-case basis. Please contact us at support@ladderlegendsacademy.com to discuss refund requests.
+                  Refunds are handled on a case-by-case basis. Please contact us at l4dderlegends@gmail.com to discuss refund requests.
                 </p>
 
                 <h3 className="text-xl font-semibold">4.4 Cancellation</h3>
@@ -302,7 +302,7 @@ export default function TermsOfServicePage() {
                   If you have any questions about these Terms, please contact us at:
                 </p>
                 <div className="pl-4">
-                  <p>Email: support@ladderlegendsacademy.com</p>
+                  <p>Email: l4dderlegends@gmail.com</p>
                   <p>Website: <Link href="/" className="text-primary hover:underline">ladderlegendsacademy.com</Link></p>
                 </div>
               </section>
