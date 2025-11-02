@@ -14,6 +14,7 @@ import { ArrowLeft, CalendarDays, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 
@@ -24,12 +25,26 @@ interface VideoDetailClientProps {
 export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   const videoIsPlaylist = isPlaylist(video);
 
   // For playlists, load the referenced videos
-  const playlistVideos = videoIsPlaylist
+  const allPlaylistVideos = videoIsPlaylist
     ? (video.videoIds || []).map(id => (videos as Video[]).find(v => v.id === id)).filter(Boolean) as Video[]
+    : [];
+
+  // Filter playlist videos based on user access - if playlist is free, only show free videos
+  const playlistVideos = videoIsPlaylist
+    ? allPlaylistVideos.filter(v => {
+        // If user has subscriber role, show all videos
+        if (hasSubscriberRole) return true;
+        // If the playlist itself is free, only show free videos
+        if (video.isFree) return v.isFree === true;
+        // Otherwise show all (this handles premium playlists viewed by non-subscribers - they shouldn't see this anyway)
+        return true;
+      })
     : [];
 
   // Get current video to play
@@ -254,9 +269,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                                   className="object-cover w-full h-full"
                                 />
                               </div>
-                              <p className="text-sm font-medium line-clamp-2">{plVideo.title}
-                                {index === 0 ? video.title : `Part ${index + 1}`}
-                              </p>
+                              <p className="text-sm font-medium line-clamp-2">{plVideo.title}</p>
                             </div>
                           </div>
                         </button>

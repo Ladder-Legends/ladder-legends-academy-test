@@ -38,6 +38,30 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     return Array.from(tagSet).sort();
   }, []);
 
+  // Check if this is a free playlist containing non-free videos
+  const freePlaylistWarning = useMemo(() => {
+    if (!isPlaylistMode || !formData.isFree || !formData.videoIds || formData.videoIds.length === 0) {
+      return null;
+    }
+
+    const allVideos = videos as Video[];
+    const selectedVideos = formData.videoIds
+      .map(id => allVideos.find(v => v.id === id))
+      .filter(Boolean) as Video[];
+
+    const nonFreeVideos = selectedVideos.filter(v => !v.isFree);
+
+    if (nonFreeVideos.length === 0) {
+      return null;
+    }
+
+    return {
+      count: nonFreeVideos.length,
+      total: selectedVideos.length,
+      titles: nonFreeVideos.map(v => v.title),
+    };
+  }, [isPlaylistMode, formData.isFree, formData.videoIds]);
+
   // Filter tags based on input
   const filteredTags = useMemo(() => {
     if (!tagInput.trim()) return [];
@@ -611,6 +635,33 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           <p className="text-xs text-muted-foreground mt-1">
             Leave unchecked for premium content (subscribers only). Defaults to premium.
           </p>
+
+          {/* Warning for free playlists with non-free videos */}
+          {freePlaylistWarning && (
+            <div className="mt-3 border border-yellow-500/50 bg-yellow-500/10 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-yellow-700 dark:text-yellow-500">
+                    Free Playlist Warning
+                  </p>
+                  <p className="text-sm text-yellow-700/90 dark:text-yellow-500/90 mt-1">
+                    This playlist is marked as <strong>free</strong> but contains <strong>{freePlaylistWarning.count} premium video{freePlaylistWarning.count > 1 ? 's' : ''}</strong> out of {freePlaylistWarning.total} total.
+                    Non-subscribers will not be able to see {freePlaylistWarning.count > 1 ? 'these videos' : 'this video'} in the playlist.
+                  </p>
+                  {freePlaylistWarning.count <= 3 && (
+                    <ul className="text-xs text-yellow-700/80 dark:text-yellow-500/80 mt-2 space-y-1 list-disc list-inside">
+                      {freePlaylistWarning.titles.map((title, i) => (
+                        <li key={i}>{title}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
