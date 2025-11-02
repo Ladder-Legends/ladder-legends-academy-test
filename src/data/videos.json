@@ -26,8 +26,11 @@
   },
   {
     "id": "e742ae6f-fdbf-4e04-b3a7-d8d146f1b577",
-    "title": "Video I3pzBYSUfr8",
+    "title": "TvP 5-1-1 Double gas skipping tanks",
     "description": "Imported from playlist: The Nicosystem's™ Beginner Terran Builds: ",
+    "source": "youtube",
+    "youtubeId": "I3pzBYSUfr8",
+    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
     "date": "2025-11-02",
     "tags": [
       "nico",
@@ -39,9 +42,6 @@
     "race": "terran",
     "coach": "Nico",
     "coachId": "coach-nico",
-    "source": "youtube",
-    "youtubeId": "I3pzBYSUfr8",
-    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
     "isFree": false
   },
   {
