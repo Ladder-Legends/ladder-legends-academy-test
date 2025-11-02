@@ -61,67 +61,6 @@
     "isFree": false
   },
   {
-    "id": "63de90db-6a14-410c-97c4-f2e15df25920",
-    "title": "Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
-    "description": "This video goes over the differential of when to a-move vs when to right click and specific situations for each. if you enjoyed please consider checking out ‪@LadderLegends‬",
-    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "tipsandtricks",
-      "zerg",
-      "terran",
-      "micro",
-      "protoss"
-    ],
-    "race": "all",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "videoIds": [
-      "91333018-95d1-4315-a88b-96b6f6e7994d"
-    ],
-    "source": "playlist"
-  },
-  {
-    "id": "e0c2ee66-f39c-4a85-b61d-ec00d77d7a97",
-    "title": "Sc2 Tools for Improvement #2: Big Brain Game",
-    "description": "This video goes over the big brain game and the goal of it, while explaining how it makes you better in starcraft.",
-    "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "zerg",
-      "macro"
-    ],
-    "race": "zerg",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "videoIds": [
-      "31f4310c-2d87-4c18-866e-01ae1b2b26aa"
-    ],
-    "source": "playlist"
-  },
-  {
-    "id": "6bab1193-f3cf-43bd-b65e-5cce47835c9d",
-    "title": "Simple Early Game Zerg Setup vs Protoss",
-    "description": "This video goes over how you want to position your queens and when to get your spores/ how to scout",
-    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "zerg",
-      "macro",
-      "tipsntricks"
-    ],
-    "race": "zerg",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "videoIds": [
-      "f391207c-0ba7-4681-8a78-c054d5298d05"
-    ],
-    "source": "playlist"
-  },
-  {
     "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
     "title": "Video n85AUGyZtPk",
     "description": "Imported from playlist: Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
