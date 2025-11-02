@@ -111,7 +111,6 @@ export function VideoSelector({
       race: 'terran',
       coach: '',
       coachId: '',
-      thumbnailVideoIndex: 0,
       isFree: false,
     };
 
@@ -157,14 +156,12 @@ export function VideoSelector({
       description: '',
       source: 'youtube',
       youtubeId: youtubeId.trim(),
-      youtubeIds: [youtubeId.trim()],
       thumbnail: `https://img.youtube.com/vi/${youtubeId.trim()}/hqdefault.jpg`,
       date: new Date().toISOString().split('T')[0],
       tags: [],
       race: 'terran',
       coach: '',
       coachId: '',
-      thumbnailVideoIndex: 0,
       isFree: false,
     };
 

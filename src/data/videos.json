@@ -1,5 +1,261 @@
 [
   {
+    "id": "fe056d66-e846-4665-9262-1d8e60b057ad",
+    "title": "The Nicosystem's™ Beginner Terran Builds: ",
+    "description": "A collection of my Beginner build orders for all MU's at all levels. ",
+    "source": "playlist",
+    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
+    "date": "2025-11-02",
+    "tags": [
+      "nico",
+      "terran",
+      "tvt",
+      "tvp",
+      "tvz"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false,
+    "videoIds": [
+      "e742ae6f-fdbf-4e04-b3a7-d8d146f1b577",
+      "818baec2-d5df-49ea-983c-6931bf8d24ca",
+      "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
+      "28"
+    ]
+  },
+  {
+    "id": "e742ae6f-fdbf-4e04-b3a7-d8d146f1b577",
+    "title": "Video I3pzBYSUfr8",
+    "description": "Imported from playlist: The Nicosystem's™ Beginner Terran Builds: ",
+    "date": "2025-11-02",
+    "tags": [
+      "nico",
+      "terran",
+      "tvt",
+      "tvp",
+      "tvz"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "source": "youtube",
+    "youtubeId": "I3pzBYSUfr8",
+    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
+    "isFree": false
+  },
+  {
+    "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
+    "title": "chad test video tes",
+    "description": "",
+    "source": "mux",
+    "muxAssetId": "O56Ta9022BHapWfo2hdlomJ2tBJdXoyDlhNATnwQZSh4",
+    "muxPlaybackId": "e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw",
+    "muxAssetStatus": "ready",
+    "thumbnail": "https://image.mux.com/e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw/thumbnail.jpg",
+    "date": "2025-10-30",
+    "tags": [],
+    "race": "terran",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
+  },
+  {
+    "id": "63de90db-6a14-410c-97c4-f2e15df25920",
+    "title": "Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
+    "description": "This video goes over the differential of when to a-move vs when to right click and specific situations for each. if you enjoyed please consider checking out ‪@LadderLegends‬",
+    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "tipsandtricks",
+      "zerg",
+      "terran",
+      "micro",
+      "protoss"
+    ],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "videoIds": [
+      "91333018-95d1-4315-a88b-96b6f6e7994d"
+    ],
+    "source": "playlist"
+  },
+  {
+    "id": "e0c2ee66-f39c-4a85-b61d-ec00d77d7a97",
+    "title": "Sc2 Tools for Improvement #2: Big Brain Game",
+    "description": "This video goes over the big brain game and the goal of it, while explaining how it makes you better in starcraft.",
+    "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "videoIds": [
+      "31f4310c-2d87-4c18-866e-01ae1b2b26aa"
+    ],
+    "source": "playlist"
+  },
+  {
+    "id": "6bab1193-f3cf-43bd-b65e-5cce47835c9d",
+    "title": "Simple Early Game Zerg Setup vs Protoss",
+    "description": "This video goes over how you want to position your queens and when to get your spores/ how to scout",
+    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro",
+      "tipsntricks"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false,
+    "videoIds": [
+      "f391207c-0ba7-4681-8a78-c054d5298d05"
+    ],
+    "source": "playlist"
+  },
+  {
+    "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
+    "title": "Video n85AUGyZtPk",
+    "description": "Imported from playlist: Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
+    "date": "2025-10-23",
+    "tags": [
+      "tipsandtricks",
+      "zerg",
+      "terran",
+      "micro",
+      "protoss"
+    ],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "source": "youtube",
+    "youtubeId": "n85AUGyZtPk",
+    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
+    "isFree": false
+  },
+  {
+    "id": "31f4310c-2d87-4c18-866e-01ae1b2b26aa",
+    "title": "Video gHDUWDA-5g",
+    "description": "Imported from playlist: Sc2 Tools for Improvement #2: Big Brain Game",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "source": "youtube",
+    "youtubeId": "gHDUWDA-5g",
+    "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
+    "isFree": false
+  },
+  {
+    "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
+    "title": "Video 5BLEYQBSF7I",
+    "description": "Imported from playlist: Simple Early Game Zerg Setup vs Protoss",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro",
+      "tipsntricks"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "source": "youtube",
+    "youtubeId": "5BLEYQBSF7I",
+    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
+    "isFree": false
+  },
+  {
+    "id": "818baec2-d5df-49ea-983c-6931bf8d24ca",
+    "title": "Nicosystem™ Beginner Terran Builds: 2-1-1 Stimbat Timing Push.",
+    "description": "This build is a variation of the common 2-1-1 16 marine stim timing developed by GamerRichy that has been passed down to me to share with you guys. This build focuses on a huge push at 6:40 that catches many zergs off-guard as it is an unknown opener and difficult to defend without significant cuts in economy and tech. ",
+    "youtubeId": "aLP0tR22PO0",
+    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
+    "date": "2025-10-22",
+    "tags": [
+      "nico",
+      "terran",
+      "tvz",
+      "timing push",
+      "macro"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico"
+  },
+  {
+    "id": "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
+    "title": "Nico's RFE 5-1-1 Timing vs Protoss",
+    "description": "The most effective standard style of TvP currently available, this build is designed around killing a Protoss at the 7-9 minute mark. Conceptually, this build defends any Protoss opener and strikes the most vulnerable Protoss timing before they begin to scale into the late game, with several variations that can be used to keep your opponent guessing. ",
+    "youtubeId": "5xh1WVcRoSA",
+    "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg",
+    "date": "2025-10-22",
+    "tags": [
+      "nico",
+      "terran",
+      "tvp",
+      "timing push",
+      "macro",
+      "replay"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico"
+  },
+  {
+    "id": "9a675b9a-ccde-4d70-8ba7-d2089e9ea3a3",
+    "title": "test playlist",
+    "description": "",
+    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg",
+    "date": "2025-10-22",
+    "tags": [],
+    "race": "terran",
+    "coach": "Eon",
+    "coachId": "eon",
+    "videoIds": [
+      "0923e175-1b61-4819-9c33-84be180933df",
+      "671e14f1-8f49-43fc-9676-76c09caa1046"
+    ],
+    "source": "playlist"
+  },
+  {
+    "id": "0923e175-1b61-4819-9c33-84be180933df",
+    "title": "Video 5530I_pYjbo",
+    "description": "Imported from playlist: test playlist",
+    "date": "2025-10-22",
+    "tags": [],
+    "race": "terran",
+    "coach": "Eon",
+    "coachId": "eon",
+    "source": "youtube",
+    "youtubeId": "5530I_pYjbo",
+    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg"
+  },
+  {
+    "id": "671e14f1-8f49-43fc-9676-76c09caa1046",
+    "title": "Video vx2u5uUu3DE",
+    "description": "Imported from playlist: test playlist",
+    "date": "2025-10-22",
+    "tags": [],
+    "race": "terran",
+    "coach": "Eon",
+    "coachId": "eon",
+    "source": "youtube",
+    "youtubeId": "vx2u5uUu3DE",
+    "thumbnail": "https://img.youtube.com/vi/vx2u5uUu3DE/hqdefault.jpg"
+  },
+  {
     "id": "1",
     "title": "Diamond 2 Coaching session with Equinox",
     "description": "This is a current up to date coaching session with equinox that I wanted to showcase so people can see my coaching style ",
@@ -750,161 +1006,5 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino"
-  },
-  {
-    "id": "818baec2-d5df-49ea-983c-6931bf8d24ca",
-    "title": "Nicosystem™ Beginner Terran Builds: 2-1-1 Stimbat Timing Push.",
-    "description": "This build is a variation of the common 2-1-1 16 marine stim timing developed by GamerRichy that has been passed down to me to share with you guys. This build focuses on a huge push at 6:40 that catches many zergs off-guard as it is an unknown opener and difficult to defend without significant cuts in economy and tech. ",
-    "youtubeId": "aLP0tR22PO0",
-    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [
-      "nico",
-      "terran",
-      "tvz",
-      "timing push",
-      "macro"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
-    "id": "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
-    "title": "Nico's RFE 5-1-1 Timing vs Protoss",
-    "description": "The most effective standard style of TvP currently available, this build is designed around killing a Protoss at the 7-9 minute mark. Conceptually, this build defends any Protoss opener and strikes the most vulnerable Protoss timing before they begin to scale into the late game, with several variations that can be used to keep your opponent guessing. ",
-    "youtubeId": "5xh1WVcRoSA",
-    "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [
-      "nico",
-      "terran",
-      "tvp",
-      "timing push",
-      "macro",
-      "replay"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
-    "id": "9a675b9a-ccde-4d70-8ba7-d2089e9ea3a3",
-    "title": "test playlist",
-    "description": "",
-    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [],
-    "race": "terran",
-    "coach": "Eon",
-    "coachId": "eon",
-    "youtubeIds": [
-      "5530I_pYjbo",
-      "vx2u5uUu3DE"
-    ],
-    "thumbnailVideoIndex": 0
-  },
-  {
-    "id": "63de90db-6a14-410c-97c4-f2e15df25920",
-    "title": "Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
-    "description": "This video goes over the differential of when to a-move vs when to right click and specific situations for each. if you enjoyed please consider checking out ‪@LadderLegends‬",
-    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "tipsandtricks",
-      "zerg",
-      "terran",
-      "micro",
-      "protoss"
-    ],
-    "race": "all",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "youtubeIds": [
-      "n85AUGyZtPk"
-    ],
-    "thumbnailVideoIndex": 0
-  },
-  {
-    "id": "e0c2ee66-f39c-4a85-b61d-ec00d77d7a97",
-    "title": "Sc2 Tools for Improvement #2: Big Brain Game",
-    "description": "This video goes over the big brain game and the goal of it, while explaining how it makes you better in starcraft.",
-    "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "zerg",
-      "macro"
-    ],
-    "race": "zerg",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "youtubeIds": [
-      "gHDUWDA-5g"
-    ],
-    "thumbnailVideoIndex": 0
-  },
-  {
-    "id": "6bab1193-f3cf-43bd-b65e-5cce47835c9d",
-    "title": "Simple Early Game Zerg Setup vs Protoss",
-    "description": "This video goes over how you want to position your queens and when to get your spores/ how to scout",
-    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
-    "date": "2025-10-23",
-    "tags": [
-      "zerg",
-      "macro",
-      "tipsntricks"
-    ],
-    "race": "zerg",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false,
-    "youtubeIds": [
-      "5BLEYQBSF7I"
-    ],
-    "thumbnailVideoIndex": 0
-  },
-  {
-    "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
-    "title": "chad test video tes",
-    "description": "",
-    "source": "mux",
-    "muxAssetId": "O56Ta9022BHapWfo2hdlomJ2tBJdXoyDlhNATnwQZSh4",
-    "muxPlaybackId": "e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw",
-    "muxAssetStatus": "ready",
-    "thumbnail": "https://image.mux.com/e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw/thumbnail.jpg",
-    "date": "2025-10-30",
-    "tags": [],
-    "race": "terran",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false
-  },
-  {
-    "id": "fe056d66-e846-4665-9262-1d8e60b057ad",
-    "title": "The Nicosystem's™ Beginner Terran Builds: ",
-    "description": "A collection of my Beginner build orders for all MU's at all levels. ",
-    "source": "youtube",
-    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
-    "date": "2025-11-02",
-    "tags": [
-      "nico",
-      "terran",
-      "tvt",
-      "tvp",
-      "tvz"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico",
-    "isFree": false,
-    "youtubeIds": [
-      "I3pzBYSUfr8",
-      "aLP0tR22PO0",
-      "5xh1WVcRoSA",
-      "yKT8fsweVwQ"
-    ],
-    "thumbnailVideoIndex": 0
   }
 ]

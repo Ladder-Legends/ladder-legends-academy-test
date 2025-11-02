@@ -5,12 +5,13 @@ import Image from 'next/image';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { Video, VideoRace } from '@/types/video';
+import { Video, VideoRace, getYoutubeIds } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import videos from '@/data/videos.json';
 import coaches from '@/data/coaches.json';
 import { MuxUpload } from './mux-upload';
+import { Plus } from 'lucide-react';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -28,6 +29,8 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
   const [customThumbnail, setCustomThumbnail] = useState<string | null>(null); // base64 or URL
+  const [showVideoImport, setShowVideoImport] = useState(false);
+  const [videoSearchQuery, setVideoSearchQuery] = useState('');
 
   // Get all unique tags from existing videos for autocomplete
   const allExistingTags = useMemo(() => {
@@ -54,6 +57,27 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       coach.displayName.toLowerCase().includes(search)
     );
   }, [coachSearch]);
+
+  // Filter videos for import (only YouTube videos with IDs)
+  const filteredVideosForImport = useMemo(() => {
+    const allVideos = videos as Video[];
+    let filtered = allVideos.filter(v => {
+      // Only show YouTube videos that have IDs
+      const ytIds = getYoutubeIds(v);
+      return ytIds.length > 0;
+    });
+
+    if (videoSearchQuery.trim()) {
+      const query = videoSearchQuery.toLowerCase();
+      filtered = filtered.filter(v =>
+        v.title.toLowerCase().includes(query) ||
+        v.description?.toLowerCase().includes(query) ||
+        v.coach?.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [videoSearchQuery]);
 
   useEffect(() => {
     if (video) {
