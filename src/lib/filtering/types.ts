@@ -3,6 +3,8 @@
  * This module defines the generic types used across all content filtering.
  */
 
+import type { Session } from 'next-auth';
+
 /**
  * Represents a filter value that can be a string, array, or boolean
  */
@@ -37,10 +39,10 @@ export interface FilterFieldConfig<T> {
   predicate: FilterPredicate<T>;
 
   /** Whether this filter requires special permissions to use */
-  requiresPermission?: (session: any) => boolean;
+  requiresPermission?: (session: Session | null) => boolean;
 
   /** Function to sanitize filter values based on permissions */
-  sanitizeValue?: (value: FilterValue, session: any) => FilterValue;
+  sanitizeValue?: (value: FilterValue, session: Session | null) => FilterValue;
 }
 
 /**
@@ -52,8 +54,8 @@ export function createFilterField<T, TId extends string>(
     id: TId;
     urlParam?: TId;
     predicate: FilterPredicate<T>;
-    requiresPermission?: (session: any) => boolean;
-    sanitizeValue?: (value: FilterValue, session: any) => FilterValue;
+    requiresPermission?: (session: Session | null) => boolean;
+    sanitizeValue?: (value: FilterValue, session: Session | null) => FilterValue;
   }
 ): FilterFieldConfig<T> {
   return config;
@@ -102,7 +104,7 @@ export interface FilterConfig<T> {
   searchFields?: (keyof T)[];
 
   /** Permission-based item filter (e.g., hide inactive coaches) */
-  permissionFilter?: (item: T, session: any) => boolean;
+  permissionFilter?: (item: T, session: Session | null) => boolean;
 }
 
 /**
@@ -136,8 +138,13 @@ export interface UseFilteringResult<T> {
   /** Clear all tags */
   clearTags: () => void;
 
-  /** Filter sections for sidebar */
-  sections: FilterSectionConfig<T>[];
+  /** Filter sections for sidebar (transformed with items) */
+  sections: {
+    id: string;
+    title: string;
+    type: 'search' | 'checkbox' | 'radio';
+    items: FilterOption[];
+  }[];
 
   /** Get count for a specific filter option */
   getCount: (optionId: string, sectionId: string) => number;

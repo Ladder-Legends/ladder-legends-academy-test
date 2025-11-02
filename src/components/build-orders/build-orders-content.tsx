@@ -113,7 +113,7 @@ export function BuildOrdersContent() {
       searchPlaceholder="Search build orders..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections as any}
+      sections={filterSections}
       selectedItems={selectedItems}
       onSelectionChange={handleSelectionChange}
     />

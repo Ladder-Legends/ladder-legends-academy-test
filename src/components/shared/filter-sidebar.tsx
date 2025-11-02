@@ -7,7 +7,7 @@ export interface FilterSection {
   id: string;
   label?: string;  // legacy field
   title?: string;  // new field
-  type?: 'search' | 'checkbox';  // new field for filter type
+  type?: 'search' | 'checkbox' | 'radio';  // new field for filter type
   icon?: string;
   items: FilterItem[];
 }

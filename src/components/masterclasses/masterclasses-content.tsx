@@ -113,7 +113,7 @@ export function MasterclassesContent() {
       searchPlaceholder="Search masterclasses..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections as any}
+      sections={filterSections}
       selectedItems={selectedItems}
       onSelectionChange={handleSelectionChange}
     />

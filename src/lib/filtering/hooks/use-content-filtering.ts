@@ -147,7 +147,7 @@ export function useContentFiltering<T>(
     selectedTags,
     toggleTag,
     clearTags,
-    sections: sections as any, // Type assertion needed for section type compatibility
+    sections,
     getCount,
   };
 }

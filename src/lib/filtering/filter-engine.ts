@@ -3,6 +3,7 @@
  * This is the core of the filtering system - completely reusable and testable.
  */
 
+import type { Session } from 'next-auth';
 import type { FilterState, FilterPredicate, FilterFieldConfig } from './types';
 
 /**
@@ -68,7 +69,7 @@ export function applyFilters<T>(
 
     // Apply tag filter (AND logic - must have ALL selected tags)
     if (selectedTags && selectedTags.length > 0) {
-      const itemTags = (item as any).tags;
+      const itemTags = (item as Record<string, unknown>).tags;
       if (!itemTags || !Array.isArray(itemTags)) return false;
       if (!selectedTags.every(tag => itemTags.includes(tag))) return false;
     }
@@ -135,7 +136,7 @@ export function countWithFilter<T>(
 
     // Apply tag filter
     if (selectedTags && selectedTags.length > 0) {
-      const itemTags = (item as any).tags;
+      const itemTags = (item as Record<string, unknown>).tags;
       if (!itemTags || !Array.isArray(itemTags)) return false;
       if (!selectedTags.every(tag => itemTags.includes(tag))) return false;
     }
@@ -185,7 +186,7 @@ export function createTagPredicate<T>(
 
     const selectedTags = Array.isArray(filterValue) ? filterValue : [filterValue];
     return selectedTags.some(tag =>
-      itemTags.some((itemTag: any) =>
+      itemTags.some((itemTag: unknown) =>
         String(itemTag).toLowerCase() === String(tag).toLowerCase()
       )
     );
@@ -248,7 +249,7 @@ export function createBooleanPredicate<T>(
 export function sanitizeFilters<T>(
   filters: FilterState,
   fieldConfigs: FilterFieldConfig<T>[],
-  session: any
+  session: Session | null
 ): FilterState {
   const sanitized: FilterState = {};
 

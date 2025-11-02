@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import type { Session } from 'next-auth';
 import type { FilterState, FilterValue, FilterFieldConfig } from './types';
 
 /**
@@ -13,7 +14,7 @@ import type { FilterState, FilterValue, FilterFieldConfig } from './types';
 export function parseUrlParams<T>(
   searchParams: URLSearchParams,
   fieldConfigs: FilterFieldConfig<T>[],
-  session?: any
+  session?: Session | null
 ): FilterState {
   const filters: FilterState = {};
 
@@ -114,7 +115,7 @@ export function useSyncFiltersToUrl(
  */
 export function useInitialFiltersFromUrl<T>(
   fieldConfigs: FilterFieldConfig<T>[],
-  session?: any
+  session?: Session | null
 ): {
   initialFilters: FilterState;
   initialSearch: string;

@@ -114,7 +114,7 @@ export function VideoLibraryContent() {
       searchPlaceholder="Search videos..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections as any}
+      sections={filterSections}
       selectedItems={selectedItems}
       onSelectionChange={handleSelectionChange}
     />

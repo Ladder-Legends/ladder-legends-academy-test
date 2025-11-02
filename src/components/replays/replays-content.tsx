@@ -103,7 +103,7 @@ export function ReplaysContent() {
       searchPlaceholder="Search replays..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections as any}
+      sections={filterSections}
       selectedItems={selectedItems}
       onSelectionChange={handleSelectionChange}
     />
