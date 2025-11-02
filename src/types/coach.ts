@@ -8,6 +8,7 @@ export interface Coach {
   specialties: string[];
   image?: string;
   bookingUrl?: string;
+  isActive?: boolean; // If false, coach is hidden from filters/UI but content remains
   socialLinks?: {
     twitch?: string;
     youtube?: string;

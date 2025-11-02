@@ -20,10 +20,11 @@ export function HorizontalCoachScroller({
 }: HorizontalCoachScrollerProps) {
   // Calculate video count for each coach
   const getVideoCount = (coachId: string) => {
-    return videos.filter(video =>
-      video.tags.some(tag => tag.toLowerCase() === coachId.toLowerCase())
-    ).length;
+    return videos.filter(video => video.coachId === coachId).length;
   };
+
+  // Filter to only show active coaches (undefined or true)
+  const activeCoaches = coaches.filter(coach => coach.isActive !== false);
 
   return (
     <section className="space-y-4">
@@ -42,7 +43,7 @@ export function HorizontalCoachScroller({
       {/* Horizontal Scroll Container */}
       <HorizontalScrollContainer showFadeIndicator>
         <div className="flex gap-4 min-w-max items-stretch">
-          {coaches.map((coach) => (
+          {activeCoaches.map((coach) => (
             <div key={coach.id} className="w-80 flex-shrink-0">
               <CoachCard coach={coach} videoCount={getVideoCount(coach.id)} />
             </div>

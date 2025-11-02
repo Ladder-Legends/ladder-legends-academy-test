@@ -50,6 +50,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
         bio: '',
         specialties: [],
         socialLinks: {},
+        isActive: true, // New coaches are active by default
       });
     }
     setSpecialtyInput('');
@@ -94,6 +95,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       bio: formData.bio,
       specialties: formData.specialties || [],
       bookingUrl: formData.bookingUrl,
+      isActive: formData.isActive !== false, // Default to true if undefined
       socialLinks: {},
     };
 
@@ -216,6 +218,22 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
             placeholder="https://app.acuityscheduling.com/..."
           />
+        </div>
+
+        <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-card/50">
+          <input
+            type="checkbox"
+            id="isActive"
+            checked={formData.isActive !== false}
+            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+            className="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2"
+          />
+          <label htmlFor="isActive" className="text-sm font-medium cursor-pointer flex-1">
+            Active Coach
+            <p className="text-xs text-muted-foreground font-normal mt-1">
+              Inactive coaches are hidden from public pages but their content remains visible
+            </p>
+          </label>
         </div>
 
         <div className="flex gap-2 pt-4">

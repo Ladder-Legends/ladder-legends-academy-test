@@ -1,11 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { FilterSidebar } from '@/components/shared/filter-sidebar';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUrlState } from '@/hooks/use-url-state';
+import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
-import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
-import { masterclassFilterConfig } from '@/lib/filtering/configs/masterclass-filters';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
 import { MasterclassCard } from './masterclass-card';
@@ -15,31 +14,39 @@ import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
 
-  // Use the new filtering system
-  const {
-    filtered: filteredMasterclasses,
-    filters,
-    setFilter,
-    searchQuery,
-    setSearchQuery,
-    selectedTags,
-    toggleTag,
-    clearTags,
-    sections: filterSections,
-  } = useContentFiltering(allMasterclasses, masterclassFilterConfig);
-
+  // Initialize state from URL parameters
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => ({
+    coaches: searchParams.get('coach')?.split(',').filter(Boolean) || [],
+    accessLevel: searchParams.get('access')?.split(',').filter(Boolean) || [],
+  }));
+  const [searchQuery, setSearchQuery] = useState(() =>
+    searchParams.get('q') || ''
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    searchParams.get('tags')?.split(',').filter(Boolean) || []
+  );
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
+
+  // Sync filters to URL whenever they change
+  useUrlState({
+    q: searchQuery,
+    coach: selectedItems.coaches,
+    access: selectedItems.accessLevel,
+    tags: selectedTags,
+  });
 
   // Get all unique tags
   const allTags = useMemo(() => {
@@ -50,31 +57,83 @@ export function MasterclassesContent() {
     return Array.from(tags).sort();
   }, []);
 
-  // Convert filters object to selectedItems format for FilterSidebar
-  const selectedItems = useMemo(() => {
-    const result: Record<string, string[]> = {};
+  // Get unique coaches
+  const allCoaches = useMemo(() => {
+    const coaches = new Set<string>();
+    allMasterclasses.forEach(mc => coaches.add(mc.coach));
+    return Array.from(coaches).sort();
+  }, []);
 
-    for (const [key, value] of Object.entries(filters)) {
-      if (Array.isArray(value)) {
-        result[key] = value;
-      } else if (value) {
-        result[key] = [String(value)];
-      } else {
-        result[key] = [];
-      }
-    }
-
-    return result;
-  }, [filters]);
-
-  // Handle selection changes from FilterSidebar
-  const handleSelectionChange = (newSelectedItems: Record<string, string[]>) => {
-    for (const [key, value] of Object.entries(newSelectedItems)) {
-      if (JSON.stringify(selectedItems[key]) !== JSON.stringify(value)) {
-        setFilter(key, value);
-      }
-    }
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
+
+  // Filter masterclasses
+  const filteredMasterclasses = useMemo(() => {
+    return allMasterclasses.filter(mc => {
+      // Search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !mc.title.toLowerCase().includes(query) &&
+          !mc.description.toLowerCase().includes(query) &&
+          !mc.coach.toLowerCase().includes(query) &&
+          !mc.race.toLowerCase().includes(query) &&
+          !mc.tags?.some(tag => tag.toLowerCase().includes(query))
+        ) {
+          return false;
+        }
+      }
+
+      // Tag filters
+      if (selectedTags.length > 0) {
+        if (!mc.tags || !selectedTags.every(tag => mc.tags.includes(tag))) {
+          return false;
+        }
+      }
+
+      // Coach filters
+      if (selectedItems.coaches && selectedItems.coaches.length > 0) {
+        if (!selectedItems.coaches.includes(mc.coach)) return false;
+      }
+
+      // Access level filters
+      if (selectedItems.accessLevel && selectedItems.accessLevel.length > 0) {
+        const isFree = mc.isFree ?? false;
+        if (selectedItems.accessLevel.includes('free') && !isFree) return false;
+        if (selectedItems.accessLevel.includes('premium') && isFree) return false;
+      }
+
+      return true;
+    });
+  }, [allMasterclasses, selectedItems, selectedTags, searchQuery]);
+
+  // Filter sections
+  const filterSections: FilterSection[] = [
+    {
+      id: 'search',
+      title: 'Search',
+      type: 'search' as const,
+      items: [],
+    },
+    {
+      id: 'coaches',
+      title: 'Coach',
+      type: 'checkbox' as const,
+      items: allCoaches.map(coach => ({ id: coach, label: coach })),
+    },
+    {
+      id: 'accessLevel',
+      title: 'Access Level',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'free', label: 'Free' },
+        { id: 'premium', label: 'Premium' },
+      ],
+    },
+  ];
 
   const handleEdit = (masterclass: Masterclass) => {
     setEditingMasterclass(masterclass);
@@ -113,9 +172,9 @@ export function MasterclassesContent() {
       searchPlaceholder="Search masterclasses..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections as any}
+      sections={filterSections}
       selectedItems={selectedItems}
-      onSelectionChange={handleSelectionChange}
+      onSelectionChange={setSelectedItems}
     />
   );
 
@@ -167,9 +226,10 @@ export function MasterclassesContent() {
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}
-        onClearTags={clearTags}
+        onClearTags={() => setSelectedTags([])}
       />
 
+      {/* Edit Modal */}
       <MasterclassEditModal
         masterclass={editingMasterclass}
         isOpen={isModalOpen}

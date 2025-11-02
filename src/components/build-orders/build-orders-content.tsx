@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useUrlState } from '@/hooks/use-url-state';
-import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
+import { useMemo, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
+import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
+import { buildOrderFilterConfig } from '@/lib/filtering/configs/build-order-filters';
 import buildOrdersData from '@/data/build-orders.json';
 import { BuildOrder } from '@/types/build-order';
 import { BuildOrderCard } from './build-order-card';
@@ -14,47 +15,31 @@ import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { BuildOrderEditModal } from '@/components/admin/build-order-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
-  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
 
-  // Initialize state from URL parameters
-  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => ({
-    terran: searchParams.get('terran')?.split(',').filter(Boolean) || [],
-    zerg: searchParams.get('zerg')?.split(',').filter(Boolean) || [],
-    protoss: searchParams.get('protoss')?.split(',').filter(Boolean) || [],
-    difficulty: searchParams.get('difficulty')?.split(',').filter(Boolean) || [],
-    type: searchParams.get('type')?.split(',').filter(Boolean) || [],
-    accessLevel: searchParams.get('access')?.split(',').filter(Boolean) || [],
-  }));
-  const [searchQuery, setSearchQuery] = useState(() =>
-    searchParams.get('q') || ''
-  );
-  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
-    searchParams.get('tags')?.split(',').filter(Boolean) || []
-  );
+  // Use the new filtering system
+  const {
+    filtered: filteredBuildOrders,
+    filters,
+    setFilter,
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    clearTags,
+    sections: filterSections,
+  } = useContentFiltering(allBuildOrders, buildOrderFilterConfig);
+
   const [editingBuildOrder, setEditingBuildOrder] = useState<BuildOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewBuildOrder, setIsNewBuildOrder] = useState(false);
-
-  // Sync filters to URL whenever they change
-  useUrlState({
-    q: searchQuery,
-    terran: selectedItems.terran,
-    zerg: selectedItems.zerg,
-    protoss: selectedItems.protoss,
-    difficulty: selectedItems.difficulty,
-    type: selectedItems.type,
-    access: selectedItems.accessLevel,
-    tags: selectedTags,
-  });
 
   // Get all unique tags
   const allTags = useMemo(() => {
@@ -65,212 +50,31 @@ export function BuildOrdersContent() {
     return Array.from(tags).sort();
   }, []);
 
-  // Get unique types
-  const allTypes = useMemo(() => {
-    const types = new Set<string>();
-    allBuildOrders.forEach(bo => types.add(bo.type));
-    return Array.from(types).sort();
-  }, []);
+  // Convert filters object to selectedItems format for FilterSidebar
+  const selectedItems = useMemo(() => {
+    const result: Record<string, string[]> = {};
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
+    for (const [key, value] of Object.entries(filters)) {
+      if (Array.isArray(value)) {
+        result[key] = value;
+      } else if (value) {
+        result[key] = [String(value)];
+      } else {
+        result[key] = [];
+      }
+    }
+
+    return result;
+  }, [filters]);
+
+  // Handle selection changes from FilterSidebar
+  const handleSelectionChange = (newSelectedItems: Record<string, string[]>) => {
+    for (const [key, value] of Object.entries(newSelectedItems)) {
+      if (JSON.stringify(selectedItems[key]) !== JSON.stringify(value)) {
+        setFilter(key, value);
+      }
+    }
   };
-
-  // Count build orders for each filter with context-aware filtering
-  const getCount = useCallback((filterFn: (bo: BuildOrder) => boolean, excludeSectionId?: string) => {
-    return allBuildOrders.filter(bo => {
-      if (!filterFn(bo)) return false;
-
-      // Apply tag filter
-      if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
-        return false;
-      }
-
-      // Apply other race/matchup filters (excluding the current section being counted)
-      const allSelectedMatchups = [
-        ...(excludeSectionId === 'terran' ? [] : (selectedItems.terran || [])),
-        ...(excludeSectionId === 'zerg' ? [] : (selectedItems.zerg || [])),
-        ...(excludeSectionId === 'protoss' ? [] : (selectedItems.protoss || [])),
-      ];
-
-      if (allSelectedMatchups.length > 0) {
-        const matchesFilter = allSelectedMatchups.some(filterId => {
-          if (filterId.includes('-')) {
-            const [race, matchup] = filterId.split('-');
-            const vsRace = matchup.substring(matchup.length - 1);
-            const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-            return bo.race === race && (bo.vsRace === vsRaceMap[vsRace] || bo.vsRace === 'all');
-          }
-          return false;
-        });
-        if (!matchesFilter) return false;
-      }
-
-      // Apply difficulty filter (excluding if counting difficulty section)
-      const selectedDifficulties = excludeSectionId === 'difficulty' ? [] : (selectedItems.difficulty || []);
-      if (selectedDifficulties.length > 0) {
-        if (!selectedDifficulties.includes(bo.difficulty)) return false;
-      }
-
-      // Apply type filter (excluding if counting type section)
-      const selectedTypes = excludeSectionId === 'type' ? [] : (selectedItems.type || []);
-      if (selectedTypes.length > 0) {
-        if (!selectedTypes.includes(bo.type)) return false;
-      }
-
-      // Apply access level filter (excluding if counting accessLevel section)
-      const selectedAccessLevels = excludeSectionId === 'accessLevel' ? [] : (selectedItems.accessLevel || []);
-      if (selectedAccessLevels.length > 0) {
-        const isFree = bo.isFree === true;
-        const matchesAccessLevel = selectedAccessLevels.some(level => {
-          if (level === 'free') return isFree;
-          if (level === 'premium') return !isFree;
-          return false;
-        });
-        if (!matchesAccessLevel) return false;
-      }
-
-      return true;
-    }).length;
-  }, [selectedTags, selectedItems]);
-
-  // Build filter sections with race as top-level sections
-  const filterSections: FilterSection[] = useMemo(() => [
-    {
-      id: 'search',
-      title: 'Search',
-      type: 'search' as const,
-      items: [],
-    },
-    {
-      id: 'accessLevel',
-      title: 'Access Level',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'free', label: 'Free', count: getCount(bo => bo.isFree === true, 'accessLevel') },
-        { id: 'premium', label: 'Premium', count: getCount(bo => !bo.isFree, 'accessLevel') },
-      ],
-    },
-    {
-      id: 'terran',
-      title: 'Terran',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'terran-tvt', label: 'vs Terran', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'terran', 'terran') },
-        { id: 'terran-tvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'zerg', 'terran') },
-        { id: 'terran-tvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'terran' && bo.vsRace === 'protoss', 'terran') },
-      ],
-    },
-    {
-      id: 'zerg',
-      title: 'Zerg',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'zerg-zvt', label: 'vs Terran', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'terran', 'zerg') },
-        { id: 'zerg-zvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'zerg', 'zerg') },
-        { id: 'zerg-zvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'zerg' && bo.vsRace === 'protoss', 'zerg') },
-      ],
-    },
-    {
-      id: 'protoss',
-      title: 'Protoss',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'protoss-pvt', label: 'vs Terran', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'terran', 'protoss') },
-        { id: 'protoss-pvz', label: 'vs Zerg', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'zerg', 'protoss') },
-        { id: 'protoss-pvp', label: 'vs Protoss', count: getCount(bo => bo.race === 'protoss' && bo.vsRace === 'protoss', 'protoss') },
-      ],
-    },
-    {
-      id: 'type',
-      title: 'Type',
-      type: 'checkbox' as const,
-      items: allTypes.map(type => ({
-        id: type,
-        label: type.charAt(0).toUpperCase() + type.slice(1),
-        count: getCount(bo => bo.type === type, 'type'),
-      })),
-    },
-    {
-      id: 'difficulty',
-      title: 'Difficulty',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
-        { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
-        { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
-      ],
-    },
-  ], [selectedTags, selectedItems, getCount, allTypes]);
-
-  // Filter build orders based on search, selected filters, and tags
-  const filteredBuildOrders = useMemo(() => {
-    return allBuildOrders.filter(bo => {
-      // Apply search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch =
-          bo.name.toLowerCase().includes(query) ||
-          bo.description.toLowerCase().includes(query) ||
-          bo.tags.some(tag => tag.toLowerCase().includes(query)) ||
-          bo.coach.toLowerCase().includes(query);
-        if (!matchesSearch) return false;
-      }
-
-      // Apply matchup filters with OR logic (selecting multiple matchups shows ANY match)
-      const allSelectedMatchups = [
-        ...(selectedItems.terran || []),
-        ...(selectedItems.zerg || []),
-        ...(selectedItems.protoss || []),
-      ];
-
-      if (allSelectedMatchups.length > 0) {
-        const matchesAnyMatchup = allSelectedMatchups.some(filterId => {
-          if (filterId.includes('-')) {
-            const [race, matchup] = filterId.split('-');
-            const vsRace = matchup.substring(matchup.length - 1);
-            const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-            return bo.race === race && (bo.vsRace === vsRaceMap[vsRace] || bo.vsRace === 'all');
-          }
-          return false;
-        });
-        if (!matchesAnyMatchup) return false;
-      }
-
-      // Apply tag filters with AND logic (must have ALL selected tags)
-      if (selectedTags.length > 0 && !selectedTags.every(tag => bo.tags.includes(tag))) {
-        return false;
-      }
-
-      // Apply difficulty filter
-      const selectedDifficulties = selectedItems.difficulty || [];
-      if (selectedDifficulties.length > 0) {
-        if (!selectedDifficulties.includes(bo.difficulty)) return false;
-      }
-
-      // Apply type filter
-      const selectedTypes = selectedItems.type || [];
-      if (selectedTypes.length > 0) {
-        if (!selectedTypes.includes(bo.type)) return false;
-      }
-
-      // Apply access level filter
-      const selectedAccessLevels = selectedItems.accessLevel || [];
-      if (selectedAccessLevels.length > 0) {
-        const isFree = bo.isFree === true;
-        const matchesAccessLevel = selectedAccessLevels.some(level => {
-          if (level === 'free') return isFree;
-          if (level === 'premium') return !isFree;
-          return false;
-        });
-        if (!matchesAccessLevel) return false;
-      }
-
-      return true;
-    });
-  }, [selectedItems, selectedTags, searchQuery]);
 
   const handleEdit = (buildOrder: BuildOrder) => {
     setEditingBuildOrder(buildOrder);
@@ -309,9 +113,9 @@ export function BuildOrdersContent() {
       searchPlaceholder="Search build orders..."
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
-      sections={filterSections}
+      sections={filterSections as any}
       selectedItems={selectedItems}
-      onSelectionChange={setSelectedItems}
+      onSelectionChange={handleSelectionChange}
     />
   );
 
@@ -363,10 +167,9 @@ export function BuildOrdersContent() {
         tags={allTags}
         selectedTags={selectedTags}
         onTagToggle={toggleTag}
-        onClearTags={() => setSelectedTags([])}
+        onClearTags={clearTags}
       />
 
-      {/* Edit Modal */}
       <BuildOrderEditModal
         buildOrder={editingBuildOrder}
         isOpen={isModalOpen}

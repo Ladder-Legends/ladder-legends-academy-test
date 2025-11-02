@@ -27,6 +27,7 @@ const navItems = [
   { href: '/masterclasses', label: 'Masterclasses' },
   { href: '/events', label: 'Events' },
   { href: '/coaches', label: 'Meet the Coaches' },
+  { href: '/about', label: 'About' },
   { href: 'https://discord.gg/uHzvKAqu3F', label: 'Discord', external: true, icon: 'discord' },
 ];
 

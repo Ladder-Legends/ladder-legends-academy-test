@@ -62,7 +62,7 @@ export default function LinkAccountPage() {
                     <li>You&apos;ll receive the &quot;Subscriber&quot; role in Discord</li>
                   </ul>
                   <Link
-                    href="https://discord.gg/kpA3RZeg"
+                    href="https://discord.gg/uHzvKAqu3F"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 inline-block"
@@ -138,7 +138,7 @@ export default function LinkAccountPage() {
                 <br />
                 Reach out in the{" "}
                 <a
-                  href="https://discord.gg/kpA3RZeg"
+                  href="https://discord.gg/uHzvKAqu3F"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-orange-500 hover:text-orange-400 transition-colors underline"

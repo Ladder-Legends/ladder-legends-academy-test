@@ -53,7 +53,7 @@ export default async function LoginPage({
               {searchParams.error === "no_role" && (
                 <div className="mt-4 text-center">
                   <a
-                    href="https://discord.gg/kpA3RZe"
+                    href="https://discord.gg/uHzvKAqu3F"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-secondary hover:underline"

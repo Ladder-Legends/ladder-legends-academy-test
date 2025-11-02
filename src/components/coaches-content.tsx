@@ -11,11 +11,15 @@ import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import { isOwner } from '@/lib/permissions';
 
 const coaches = coachesData as Coach[];
 
 export function CoachesContent() {
   const { addChange } = usePendingChanges();
+  const { data: session } = useSession();
+  const userIsOwner = isOwner(session);
   const [selectedRace, setSelectedRace] = useState<string>('all');
 
   // Modal state for editing
@@ -24,10 +28,8 @@ export function CoachesContent() {
   const [isNewCoach, setIsNewCoach] = useState(false);
 
   // Count videos for each coach
-  const getVideoCount = (coachName: string) => {
-    return videos.filter(video =>
-      video.tags.map(t => t.toLowerCase()).includes(coachName.toLowerCase())
-    ).length;
+  const getVideoCount = (coachId: string) => {
+    return videos.filter(video => video.coachId === coachId).length;
   };
 
   // Admin handlers
@@ -61,10 +63,21 @@ export function CoachesContent() {
     setIsNewCoach(false);
   };
 
-  // Filter coaches by race
-  const filteredCoaches = selectedRace === 'all'
-    ? coaches
-    : coaches.filter(coach => coach.race === selectedRace || coach.race === 'all');
+  // Separate active and inactive coaches
+  const activeCoaches = coaches.filter(coach => coach.isActive !== false);
+  const inactiveCoaches = coaches.filter(coach => coach.isActive === false);
+
+  // Filter active coaches by race
+  const filteredActiveCoaches = selectedRace === 'all'
+    ? activeCoaches
+    : activeCoaches.filter(coach => coach.race === selectedRace || coach.race === 'all');
+
+  // Filter inactive coaches by race (only for owners)
+  const filteredInactiveCoaches = userIsOwner
+    ? (selectedRace === 'all'
+        ? inactiveCoaches
+        : inactiveCoaches.filter(coach => coach.race === selectedRace || coach.race === 'all'))
+    : [];
 
   return (
     <main className="flex-1 px-8 py-8">
@@ -105,13 +118,13 @@ export function CoachesContent() {
           </div>
         </div>
 
-        {/* Coaches Grid */}
+        {/* Active Coaches Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCoaches.map((coach) => (
+          {filteredActiveCoaches.map((coach) => (
             <div key={coach.id} className="relative">
               <CoachCard
                 coach={coach}
-                videoCount={getVideoCount(coach.name)}
+                videoCount={getVideoCount(coach.id)}
               />
               <PermissionGate require="owners">
                 <div className="absolute top-2 right-2 flex gap-2 z-10">
@@ -133,11 +146,51 @@ export function CoachesContent() {
           ))}
         </div>
 
-        {filteredCoaches.length === 0 && (
+        {filteredActiveCoaches.length === 0 && !isOwner && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
               No coaches found for the selected race.
             </p>
+          </div>
+        )}
+
+        {/* Inactive Coaches Section (Owners Only) */}
+        {userIsOwner && filteredInactiveCoaches.length > 0 && (
+          <div className="space-y-6 mt-12 pt-12 border-t border-border">
+            <div>
+              <h2 className="text-2xl font-bold text-muted-foreground">Inactive Coaches</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                These coaches are hidden from public view but their content remains accessible
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredInactiveCoaches.map((coach) => (
+                <div key={coach.id} className="relative opacity-60">
+                  <div className="absolute top-2 left-2 z-10 bg-muted/90 text-muted-foreground px-2 py-1 rounded-md text-xs font-semibold border border-border">
+                    INACTIVE
+                  </div>
+                  <CoachCard
+                    coach={coach}
+                    videoCount={getVideoCount(coach.id)}
+                  />
+                  <div className="absolute top-2 right-2 flex gap-2 z-10">
+                    <button
+                      onClick={() => handleEdit(coach)}
+                      className="p-2 bg-card/90 border border-border hover:bg-muted rounded-md transition-colors"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(coach)}
+                      className="p-2 bg-card/90 border border-destructive text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

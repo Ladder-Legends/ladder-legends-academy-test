@@ -45,7 +45,11 @@ export function useUrlState(filters: Record<string, string | string[] | boolean 
 
     const queryString = params.toString();
     const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
+
+    // Only update if URL actually changed
+    if (window.location.search !== (queryString ? `?${queryString}` : '')) {
+      router.replace(newUrl, { scroll: false });
+    }
   }, [filters, router]);
 }
 
