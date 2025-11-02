@@ -232,15 +232,15 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
             )}
 
             {/* Video Link */}
-            {buildOrder.videoId && (
+            {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
               <div className="flex gap-4">
                 <PaywallLink
-                  href={`/library/${buildOrder.videoId}`}
+                  href={`/library/${buildOrder.videoIds[0]}`}
                   isFree={buildOrder.isFree}
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
-                  Watch Video Tutorial
+                  Watch Video Tutorial{buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
                 </PaywallLink>
               </div>
             )}

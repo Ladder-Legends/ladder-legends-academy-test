@@ -142,12 +142,16 @@ function checkBrokenReferences(): {
         missingId: buildOrder.coachId,
       });
     }
-    if (buildOrder.videoId && !videoIds.has(buildOrder.videoId)) {
-      brokenBuildOrders.push({
-        id: buildOrder.id,
-        field: 'videoId',
-        missingId: buildOrder.videoId,
-      });
+    if (buildOrder.videoIds && buildOrder.videoIds.length > 0) {
+      for (const videoId of buildOrder.videoIds) {
+        if (!videoIds.has(videoId)) {
+          brokenBuildOrders.push({
+            id: buildOrder.id,
+            field: 'videoIds',
+            missingId: videoId,
+          });
+        }
+      }
     }
   }
 
@@ -160,12 +164,16 @@ function checkBrokenReferences(): {
         missingId: masterclass.coachId,
       });
     }
-    if (masterclass.videoId && !videoIds.has(masterclass.videoId)) {
-      brokenMasterclasses.push({
-        id: masterclass.id,
-        field: 'videoId',
-        missingId: masterclass.videoId,
-      });
+    if (masterclass.videoIds && masterclass.videoIds.length > 0) {
+      for (const videoId of masterclass.videoIds) {
+        if (!videoIds.has(videoId)) {
+          brokenMasterclasses.push({
+            id: masterclass.id,
+            field: 'videoIds',
+            missingId: videoId,
+          });
+        }
+      }
     }
   }
 

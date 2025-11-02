@@ -119,6 +119,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
       timezone: formData.timezone!,
       duration: formData.duration,
       coach: formData.coach || undefined,
+      videoIds: formData.videoIds || [],
       isFree: formData.isFree!,
       tags: formData.tags || [],
       recurring: formData.recurring,

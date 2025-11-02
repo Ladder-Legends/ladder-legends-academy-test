@@ -11,7 +11,7 @@ import masterclasses from '@/data/masterclasses.json';
 import coaches from '@/data/coaches.json';
 import videos from '@/data/videos.json';
 import { Video } from '@/types/video';
-import { VideoSelector } from './video-selector';
+import { VideoSelector } from './video-selector-enhanced';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -66,7 +66,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         coach: '',
         coachId: '',
         race: 'all',
-        videoId: '',
+        videoIds: [],
         duration: '',
         difficulty: 'beginner',
         tags: [],
@@ -116,14 +116,17 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   };
 
   const handleSave = () => {
-    if (!formData.id || !formData.title || !formData.coach || !formData.coachId || !formData.videoId) {
-      toast.error('Please fill in all required fields (Title, Coach, Video)');
+    if (!formData.id || !formData.title || !formData.coach || !formData.coachId) {
+      toast.error('Please fill in all required fields (Title, Coach)');
       return;
     }
 
-    // Get thumbnail from the selected video
-    const selectedVideo = videos.find(v => v.id === formData.videoId);
-    const thumbnail = selectedVideo?.thumbnail || `https://img.youtube.com/vi/${formData.videoId}/hqdefault.jpg`;
+    // Get thumbnail from the first video if available
+    let thumbnail = formData.thumbnail;
+    if (!thumbnail && formData.videoIds && formData.videoIds.length > 0) {
+      const firstVideo = videos.find(v => v.id === formData.videoIds![0]);
+      thumbnail = firstVideo?.thumbnail;
+    }
 
     const masterclassData: Masterclass = {
       id: formData.id,
@@ -132,7 +135,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       coach: formData.coach,
       coachId: formData.coachId,
       race: formData.race || 'all',
-      videoId: formData.videoId,
+      videoIds: formData.videoIds || [],
       duration: formData.duration,
       difficulty: formData.difficulty || 'beginner',
       tags: formData.tags || [],
@@ -148,26 +151,6 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       operation: isNew ? 'create' : 'update',
       data: masterclassData as unknown as Record<string, unknown>,
     });
-
-    // If there's a linked video, update it with masterclass metadata
-    if (formData.videoId) {
-      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
-      if (existingVideo) {
-        const updatedVideo: Video = {
-          ...existingVideo,
-          title: formData.title, // Use masterclass title
-          tags: Array.from(new Set([...(existingVideo.tags || []), 'masterclass'])), // Add 'masterclass' tag
-          race: formData.race || existingVideo.race, // Use masterclass race
-        };
-
-        addChange({
-          id: updatedVideo.id,
-          contentType: 'videos',
-          operation: 'update',
-          data: updatedVideo as unknown as Record<string, unknown>,
-        });
-      }
-    }
 
     toast.success(`Masterclass ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
@@ -267,9 +250,10 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         </div>
 
         <VideoSelector
-          selectedVideoId={formData.videoId}
-          onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
-          label="Video *"
+          mode="playlist"
+          selectedVideoIds={formData.videoIds || []}
+          onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+          label="Videos"
           suggestedTitle={formData.title}
         />
 

@@ -65,7 +65,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
               <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
                 <FileText className="w-6 h-6 text-white" />
               </div>
-              {buildOrder.videoId && (
+              {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
                 <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
                   <Video className="w-6 h-6 text-white" />
                 </div>

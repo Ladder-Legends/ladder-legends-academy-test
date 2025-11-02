@@ -99,8 +99,8 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
                       <FileText className="h-4 w-4" />
                     </Button>
                   </Link>
-                  {buildOrder.videoId && (
-                    <Link href={`/library/${buildOrder.videoId}`}>
+                  {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
+                    <Link href={`/library/${buildOrder.videoIds[0]}`}>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <Video className="h-4 w-4" />
                       </Button>

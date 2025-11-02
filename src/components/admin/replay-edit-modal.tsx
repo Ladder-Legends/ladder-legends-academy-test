@@ -12,7 +12,7 @@ import coaches from '@/data/coaches.json';
 import videos from '@/data/videos.json';
 import { Video } from '@/types/video';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
-import { VideoSelector } from './video-selector';
+import { VideoSelector } from './video-selector-enhanced';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -148,7 +148,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         gameDate: new Date().toISOString().split('T')[0],
         uploadDate: new Date().toISOString().split('T')[0],
         downloadUrl: '',
-        videoId: '',
+        videoIds: [],
         coach: '',
         tags: [],
         patch: getLatestPatch,
@@ -358,7 +358,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       gameDate: formData.gameDate || new Date().toISOString().split('T')[0],
       uploadDate: formData.uploadDate || new Date().toISOString().split('T')[0],
       downloadUrl: formData.downloadUrl,
-      videoId: formData.videoId,
+      videoIds: formData.videoIds || [],
       coach: formData.coach,
       tags: formData.tags || [],
       patch: formData.patch,
@@ -373,25 +373,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       data: replayData as unknown as Record<string, unknown>,
     });
 
-    // If there's a linked video, update it with replay metadata
-    if (formData.videoId) {
-      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
-      if (existingVideo) {
-        const updatedVideo: Video = {
-          ...existingVideo,
-          title: formData.title, // Use replay title
-          tags: Array.from(new Set([...(existingVideo.tags || []), 'replay'])), // Add 'replay' tag
-          race: formData.player1?.race || existingVideo.race, // Use player 1's race
-        };
-
-        addChange({
-          id: updatedVideo.id,
-          contentType: 'videos',
-          operation: 'update',
-          data: updatedVideo as unknown as Record<string, unknown>,
-        });
-      }
-    }
 
     toast.success(`Replay ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
@@ -734,9 +715,10 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           </div>
 
           <VideoSelector
-            selectedVideoId={formData.videoId}
-            onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
-            label="Video"
+            mode="playlist"
+            selectedVideoIds={formData.videoIds || []}
+            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+            label="Videos"
             suggestedTitle={formData.title}
           />
         </div>

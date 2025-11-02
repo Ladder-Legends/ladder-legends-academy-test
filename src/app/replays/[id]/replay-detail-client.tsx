@@ -271,9 +271,9 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                   Download Replay
                 </a>
               )}
-              {replay.videoId && (
+              {replay.videoIds && replay.videoIds.length > 0 && (
                 <PaywallLink
-                  href={`/library/${replay.videoId}`}
+                  href={`/library/${replay.videoIds[0]}`}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

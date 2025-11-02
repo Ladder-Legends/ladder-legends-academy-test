@@ -13,7 +13,7 @@ import videos from '@/data/videos.json';
 import { Video } from '@/types/video';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
-import { VideoSelector } from './video-selector';
+import { VideoSelector } from './video-selector-enhanced';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -93,7 +93,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         coach: '',
         coachId: '',
         description: '',
-        videoId: '',
+        videoIds: [],
         steps: [],
         tags: [],
         patch: '',
@@ -307,7 +307,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       coach: formData.coach,
       coachId: formData.coachId,
       description: formData.description || '',
-      videoId: formData.videoId,
+      videoIds: formData.videoIds || [],
       steps: formData.steps,
       tags: formData.tags || [],
       patch: formData.patch,
@@ -321,26 +321,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       operation: isNew ? 'create' : 'update',
       data: buildOrderData as unknown as Record<string, unknown>,
     });
-
-    // If there's a linked video, update it with build order metadata
-    if (formData.videoId) {
-      const existingVideo = (videos as Video[]).find(v => v.id === formData.videoId);
-      if (existingVideo) {
-        const updatedVideo: Video = {
-          ...existingVideo,
-          title: formData.name, // Use build order name as title
-          tags: Array.from(new Set([...(existingVideo.tags || []), 'build-order'])), // Add 'build-order' tag
-          race: formData.race || existingVideo.race, // Use build order race
-        };
-
-        addChange({
-          id: updatedVideo.id,
-          contentType: 'videos',
-          operation: 'update',
-          data: updatedVideo as unknown as Record<string, unknown>,
-        });
-      }
-    }
 
     toast.success(`Build order ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
@@ -415,9 +395,10 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         </div>
 
         <VideoSelector
-          selectedVideoId={formData.videoId}
-          onVideoSelect={(videoId) => setFormData({ ...formData, videoId })}
-          label="Video"
+          mode="playlist"
+          selectedVideoIds={formData.videoIds || []}
+          onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+          label="Videos"
           suggestedTitle={formData.name}
         />
 

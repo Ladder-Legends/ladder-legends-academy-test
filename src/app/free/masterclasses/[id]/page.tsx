@@ -139,13 +139,15 @@ export default async function FreeMasterclassDetailPage({ params }: PageProps) {
             {/* Video Player */}
             <div className="border border-border rounded-lg overflow-hidden bg-card">
               <div className="aspect-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${masterclass.videoId}`}
-                  title={masterclass.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
+                {masterclass.videoIds && masterclass.videoIds.length > 0 && (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${masterclass.videoIds[0]}`}
+                    title={masterclass.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                )}
               </div>
             </div>
 
@@ -169,7 +171,7 @@ export default async function FreeMasterclassDetailPage({ params }: PageProps) {
             {/* Watch Full Video Button */}
             <div className="flex gap-4">
               <PaywallLink
-                href={`/library/${masterclass.videoId}`}
+                href={`/library/${masterclass.videoIds[0]}`}
                 isFree={masterclass.isFree}
                 className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >

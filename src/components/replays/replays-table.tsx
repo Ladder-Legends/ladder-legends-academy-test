@@ -109,9 +109,9 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
                       </Button>
                     </PaywallLink>
                   )}
-                  {replay.videoId && (
+                  {replay.videoIds && replay.videoIds.length > 0 && (
                     <PaywallLink
-                      href={`/library/${replay.videoId}`}
+                      href={`/library/${replay.videoIds[0]}`}
                       isFree={replay.isFree}
                     >
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

@@ -2,7 +2,7 @@
  * Helper functions for working with videos and playlists across content types
  */
 
-interface VideoReference {
+export interface VideoReference {
   videoIds: string[];
 }
 
@@ -41,7 +41,7 @@ export function hasVideos(content: VideoReference): boolean {
 }
 
 /**
- * Get the first video ID (useful for thumbnails, etc.)
+ * Get the first video ID (useful for thumbnails, single video display, etc.)
  *
  * @example
  * getFirstVideoId({ videoIds: ['a', 'b'] }) // 'a'
