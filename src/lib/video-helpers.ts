@@ -50,3 +50,35 @@ export function hasVideos(content: VideoReference): boolean {
 export function getFirstVideoId(content: VideoReference): string | undefined {
   return content.videoIds.length > 0 ? content.videoIds[0] : undefined;
 }
+
+/**
+ * Get the appropriate video URL based on whether the video/content is free
+ *
+ * @param videoId - The ID of the video
+ * @param isFree - Whether the video or parent content is free
+ * @returns The URL path to the video (either /library or /free/library)
+ *
+ * @example
+ * getVideoUrl('abc123', true) // '/free/library/abc123'
+ * getVideoUrl('abc123', false) // '/library/abc123'
+ */
+export function getVideoUrl(videoId: string, isFree: boolean): string {
+  return isFree ? `/free/library/${videoId}` : `/library/${videoId}`;
+}
+
+/**
+ * Get the appropriate video URL for content with videos
+ * Uses the first video ID and the content's isFree flag
+ *
+ * @param content - Content with videoIds and isFree properties
+ * @returns The URL path to the first video, or undefined if no videos
+ *
+ * @example
+ * getContentVideoUrl({ videoIds: ['abc'], isFree: true }) // '/free/library/abc'
+ * getContentVideoUrl({ videoIds: [], isFree: false }) // undefined
+ */
+export function getContentVideoUrl(content: VideoReference & { isFree?: boolean }): string | undefined {
+  const firstVideoId = getFirstVideoId(content);
+  if (!firstVideoId) return undefined;
+  return getVideoUrl(firstVideoId, content.isFree ?? false);
+}

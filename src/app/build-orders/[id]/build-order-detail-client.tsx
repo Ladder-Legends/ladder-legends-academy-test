@@ -15,6 +15,7 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { getContentVideoUrl } from '@/lib/video-helpers';
 
 interface BuildOrderDetailClientProps {
   buildOrder: BuildOrder;
@@ -232,15 +233,15 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
             )}
 
             {/* Video Link */}
-            {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
+            {getContentVideoUrl(buildOrder) && (
               <div className="flex gap-4">
                 <PaywallLink
-                  href={`/library/${buildOrder.videoIds[0]}`}
+                  href={getContentVideoUrl(buildOrder)!}
                   isFree={buildOrder.isFree}
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
-                  Watch Video Tutorial{buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
+                  Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
                 </PaywallLink>
               </div>
             )}

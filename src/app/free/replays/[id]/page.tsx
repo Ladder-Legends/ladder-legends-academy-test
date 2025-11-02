@@ -10,6 +10,7 @@ import { Replay } from '@/types/replay';
 import { Download, Video, ArrowLeft, Calendar, Clock, Map } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
+import { getContentVideoUrl } from '@/lib/video-helpers';
 
 const allReplays = replaysData as Replay[];
 
@@ -242,9 +243,9 @@ export default async function FreeReplayDetailPage({ params }: PageProps) {
                   Download Replay
                 </a>
               )}
-              {replay.videoIds && replay.videoIds.length > 0 && (
+              {getContentVideoUrl(replay) && (
                 <PaywallLink
-                  href={`/library/${replay.videoIds[0]}`}
+                  href={getContentVideoUrl(replay)!}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

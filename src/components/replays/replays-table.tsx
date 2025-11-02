@@ -6,6 +6,7 @@ import { Download, Video, Edit, Trash2, Lock } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
+import { getContentVideoUrl } from '@/lib/video-helpers';
 
 interface ReplaysTableProps {
   replays: Replay[];
@@ -109,9 +110,9 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
                       </Button>
                     </PaywallLink>
                   )}
-                  {replay.videoIds && replay.videoIds.length > 0 && (
+                  {getContentVideoUrl(replay) && (
                     <PaywallLink
-                      href={`/library/${replay.videoIds[0]}`}
+                      href={getContentVideoUrl(replay)!}
                       isFree={replay.isFree}
                     >
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

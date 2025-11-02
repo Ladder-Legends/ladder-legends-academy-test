@@ -9,6 +9,7 @@ import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { useSession } from "next-auth/react";
+import { getVideoUrl } from "@/lib/video-helpers";
 
 interface VideoCardProps {
   video: Video;
@@ -44,7 +45,7 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   return (
     <div className="relative group h-full">
       <PaywallLink
-        href={`/library/${video.id}`}
+        href={getVideoUrl(video.id, video.isFree ?? false)}
         className="block h-full"
         isFree={video.isFree}
       >

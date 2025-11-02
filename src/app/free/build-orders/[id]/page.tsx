@@ -10,6 +10,7 @@ import { BuildOrder } from '@/types/build-order';
 import { Video, ArrowLeft } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
+import { getContentVideoUrl } from '@/lib/video-helpers';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
@@ -203,15 +204,15 @@ export default async function FreeBuildOrderDetailPage({ params }: PageProps) {
             )}
 
             {/* Video Link */}
-            {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
+            {getContentVideoUrl(buildOrder) && (
               <div className="flex gap-4">
                 <PaywallLink
-                  href={`/library/${buildOrder.videoIds[0]}`}
+                  href={getContentVideoUrl(buildOrder)!}
                   isFree={buildOrder.isFree}
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Video className="h-5 w-5" />
-                  Watch Video Tutorial{buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
+                  Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
                 </PaywallLink>
               </div>
             )}

@@ -15,6 +15,7 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { getContentVideoUrl } from '@/lib/video-helpers';
 
 interface ReplayDetailClientProps {
   replay: Replay;
@@ -271,9 +272,9 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                   Download Replay
                 </a>
               )}
-              {replay.videoIds && replay.videoIds.length > 0 && (
+              {getContentVideoUrl(replay) && (
                 <PaywallLink
-                  href={`/library/${replay.videoIds[0]}`}
+                  href={getContentVideoUrl(replay)!}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >
