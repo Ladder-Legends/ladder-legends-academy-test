@@ -222,17 +222,6 @@ export function VideoSelector({
     setIsEditModalOpen(true);
   };
 
-  const handleMoveVideo = (index: number, direction: 'up' | 'down') => {
-    if (mode !== 'playlist' || !onVideoIdsChange) return;
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= selectedVideoIds.length) return;
-
-    const newIds = [...selectedVideoIds];
-    [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
-    onVideoIdsChange(newIds);
-  };
-
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
   };
