@@ -10,7 +10,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const VERCEL_DEPLOY_HOOK = process.env.VERCEL_DEPLOY_HOOK;
 const MAX_RETRY_ATTEMPTS = 3;
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'file';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'file';
 type Operation = 'create' | 'update' | 'delete';
 
 interface Change {
@@ -35,7 +35,7 @@ interface CommitRequest {
 interface FileInfo {
   path: string;
   sha: string;
-  content: Record<string, unknown>[];
+  content: Record<string, unknown>[] | Record<string, unknown>; // Array for most types, object for 'about'
 }
 
 /**
@@ -87,7 +87,21 @@ function applyChanges(
   const updatedFiles = { ...files };
 
   for (const [contentType, typeChanges] of Object.entries(changesByType)) {
-    let updatedContent = [...updatedFiles[contentType].content];
+    // Special handling for 'about' content type (single object, not array)
+    if (contentType === 'about') {
+      for (const change of typeChanges) {
+        if (change.operation === 'update') {
+          updatedFiles[contentType] = {
+            ...updatedFiles[contentType],
+            content: change.data,
+          };
+        }
+      }
+      continue;
+    }
+
+    // Array-based content (videos, build-orders, replays, etc.)
+    let updatedContent = [...(updatedFiles[contentType].content as Record<string, unknown>[])];
 
     for (const change of typeChanges) {
       switch (change.operation) {

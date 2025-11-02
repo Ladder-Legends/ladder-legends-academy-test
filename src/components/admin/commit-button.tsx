@@ -88,13 +88,20 @@ export function CommitButton() {
         </div>
 
         <div className="space-y-2 mb-3 max-h-[200px] overflow-y-auto">
-          {changes.map((change, i) => (
-            <div key={i} className="text-sm text-muted-foreground">
-              <span className="capitalize">{change.operation}</span> {change.contentType.replace('-', ' ')}
-              {' '}
-              <span className="text-foreground font-mono">{String(change.data.id)}</span>
-            </div>
-          ))}
+          {changes.map((change, i) => {
+            // For file changes, show the path; for others, show the id
+            const displayName = change.contentType === 'file'
+              ? String(change.data.path)
+              : change.id;
+
+            return (
+              <div key={i} className="text-sm text-muted-foreground">
+                <span className="capitalize">{change.operation}</span> {change.contentType.replace('-', ' ')}
+                {' '}
+                <span className="text-foreground font-mono text-xs">{displayName}</span>
+              </div>
+            );
+          })}
         </div>
 
         {showConfirm ? (
