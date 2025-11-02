@@ -5,6 +5,7 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { EventsContent } from '@/components/events/events-content';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Events | Ladder Legends Academy',
@@ -43,7 +44,9 @@ export default function EventsPage() {
       </header>
 
       {/* Main Content */}
-      <EventsContent />
+      <Suspense fallback={<div className="flex-1" />}>
+        <EventsContent />
+      </Suspense>
 
       {/* Footer */}
       <Footer />

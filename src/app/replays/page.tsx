@@ -5,6 +5,7 @@ import { ReplaysContent } from '@/components/replays/replays-content';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function ReplaysPage() {
   return (
@@ -38,7 +39,9 @@ export default function ReplaysPage() {
       </header>
 
       {/* Main Content */}
-      <ReplaysContent />
+      <Suspense fallback={<div className="flex-1" />}>
+        <ReplaysContent />
+      </Suspense>
 
       {/* Footer */}
       <Footer />

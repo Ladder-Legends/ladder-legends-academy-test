@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import replaysData from '@/data/replays.json';
@@ -28,21 +29,45 @@ function parseDuration(duration: string): number {
 }
 
 export function ReplaysContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
 
-  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
-    terran: [],
-    zerg: [],
-    protoss: [],
-    duration: [],
-    accessLevel: [],
-  });
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  // Initialize state from URL parameters
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => ({
+    terran: searchParams.get('terran')?.split(',').filter(Boolean) || [],
+    zerg: searchParams.get('zerg')?.split(',').filter(Boolean) || [],
+    protoss: searchParams.get('protoss')?.split(',').filter(Boolean) || [],
+    duration: searchParams.get('duration')?.split(',').filter(Boolean) || [],
+    accessLevel: searchParams.get('access')?.split(',').filter(Boolean) || [],
+  }));
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    searchParams.get('tags')?.split(',').filter(Boolean) || []
+  );
+  const [searchQuery, setSearchQuery] = useState(() =>
+    searchParams.get('q') || ''
+  );
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+
+  // Sync filters to URL whenever they change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedItems.terran?.length > 0) params.set('terran', selectedItems.terran.join(','));
+    if (selectedItems.zerg?.length > 0) params.set('zerg', selectedItems.zerg.join(','));
+    if (selectedItems.protoss?.length > 0) params.set('protoss', selectedItems.protoss.join(','));
+    if (selectedItems.duration?.length > 0) params.set('duration', selectedItems.duration.join(','));
+    if (selectedItems.accessLevel?.length > 0) params.set('access', selectedItems.accessLevel.join(','));
+    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+    router.replace(newUrl, { scroll: false });
+  }, [selectedItems, selectedTags, searchQuery, router]);
 
   // Get all unique tags
   const allTags = useMemo(() => {

@@ -5,6 +5,7 @@ import { MasterclassesContent } from '@/components/masterclasses/masterclasses-c
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function MasterclassesPage() {
   return (
@@ -38,7 +39,9 @@ export default function MasterclassesPage() {
       </header>
 
       {/* Main Content */}
-      <MasterclassesContent />
+      <Suspense fallback={<div className="flex-1" />}>
+        <MasterclassesContent />
+      </Suspense>
 
       {/* Footer */}
       <Footer />

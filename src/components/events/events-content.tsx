@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import eventsData from '@/data/events.json';
@@ -16,14 +17,37 @@ import { useSession } from 'next-auth/react';
 const allEvents = eventsData as Event[];
 
 export function EventsContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  // Initialize state from URL parameters
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showPastEvents, setShowPastEvents] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [showPastEvents, setShowPastEvents] = useState(() =>
+    searchParams.get('past') === 'true'
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    searchParams.get('tags')?.split(',').filter(Boolean) || []
+  );
+  const [searchQuery, setSearchQuery] = useState(() =>
+    searchParams.get('q') || ''
+  );
+
+  // Sync filters to URL whenever they change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+    if (showPastEvents) params.set('past', 'true');
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+    router.replace(newUrl, { scroll: false });
+  }, [selectedTags, searchQuery, showPastEvents, router]);
 
   // Get all unique tags
   const allTags = useMemo(() => {

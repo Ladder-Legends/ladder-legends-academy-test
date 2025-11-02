@@ -5,6 +5,7 @@ import { BuildOrdersContent } from '@/components/build-orders/build-orders-conte
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function BuildOrdersPage() {
   return (
@@ -38,7 +39,9 @@ export default function BuildOrdersPage() {
       </header>
 
       {/* Main Content */}
-      <BuildOrdersContent />
+      <Suspense fallback={<div className="flex-1" />}>
+        <BuildOrdersContent />
+      </Suspense>
 
       {/* Footer */}
       <Footer />

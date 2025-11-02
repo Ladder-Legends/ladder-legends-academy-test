@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import masterclassesData from '@/data/masterclasses.json';
@@ -18,19 +19,40 @@ import { toast } from 'sonner';
 const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
 
-  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
-    coaches: [],
-    accessLevel: [],
-  });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // Initialize state from URL parameters
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => ({
+    coaches: searchParams.get('coach')?.split(',').filter(Boolean) || [],
+    accessLevel: searchParams.get('access')?.split(',').filter(Boolean) || [],
+  }));
+  const [searchQuery, setSearchQuery] = useState(() =>
+    searchParams.get('q') || ''
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    searchParams.get('tags')?.split(',').filter(Boolean) || []
+  );
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
+
+  // Sync filters to URL whenever they change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedItems.coaches?.length > 0) params.set('coach', selectedItems.coaches.join(','));
+    if (selectedItems.accessLevel?.length > 0) params.set('access', selectedItems.accessLevel.join(','));
+    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+    router.replace(newUrl, { scroll: false });
+  }, [selectedItems, selectedTags, searchQuery, router]);
 
   // Get all unique tags
   const allTags = useMemo(() => {
