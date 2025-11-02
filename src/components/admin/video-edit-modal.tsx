@@ -649,7 +649,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                   </p>
                   <p className="text-sm text-yellow-700/90 dark:text-yellow-500/90 mt-1">
                     This playlist is marked as <strong>free</strong> but contains <strong>{freePlaylistWarning.count} premium video{freePlaylistWarning.count > 1 ? 's' : ''}</strong> out of {freePlaylistWarning.total} total.
-                    Non-subscribers will not be able to see {freePlaylistWarning.count > 1 ? 'these videos' : 'this video'} in the playlist.
+                    Premium videos will not show in a free playlist.
                   </p>
                   {freePlaylistWarning.count <= 3 && (
                     <ul className="text-xs text-yellow-700/80 dark:text-yellow-500/80 mt-2 space-y-1 list-disc list-inside">
