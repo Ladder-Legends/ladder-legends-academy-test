@@ -35,12 +35,24 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   };
 
   const videoIsPlaylist = isPlaylist(video);
-  const thumbnailId = getThumbnailYoutubeId(video);
 
-  // Get thumbnail URL based on video source
-  const thumbnailUrl = isMuxVideo(video)
-    ? `/thumbnails/${video.id}.jpg` // Use static Mux thumbnail
-    : `https://img.youtube.com/vi/${thumbnailId}/hqdefault.jpg`; // YouTube thumbnail
+  // Get thumbnail URL based on video type
+  const thumbnailUrl = (() => {
+    // Playlist videos: use their pre-set thumbnail field
+    if (videoIsPlaylist) {
+      return video.thumbnail;
+    }
+    // Mux videos: use static thumbnail file
+    if (isMuxVideo(video)) {
+      return `/thumbnails/${video.id}.jpg`;
+    }
+    // YouTube videos: construct thumbnail URL from youtubeId
+    if (video.youtubeId) {
+      return `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+    }
+    // Fallback: use thumbnail field
+    return video.thumbnail;
+  })();
 
   return (
     <div className="relative group h-full">
