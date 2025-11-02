@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import videos from '@/data/videos.json';
 import coaches from '@/data/coaches.json';
 import { MuxUpload } from './mux-upload';
-import { Plus } from 'lucide-react';
+import { VideoSelector } from './video-selector-enhanced';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -435,74 +435,13 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
 
         {/* Conditional Video Input - YouTube, Mux, or Playlist */}
         {isPlaylistMode ? (
-          <div>
-            <label className="block text-sm font-medium mb-1">Playlist Videos *</label>
-            <div className="space-y-2">
-              {/* Show selected videos */}
-              {formData.videoIds && formData.videoIds.length > 0 && (
-                <div className="space-y-2 mb-3">
-                  {formData.videoIds.map((videoId, index) => {
-                    const vid = (videos as Video[]).find(v => v.id === videoId);
-                    return (
-                      <div
-                        key={videoId}
-                        className="flex items-center gap-2 px-3 py-2 border border-border rounded-md bg-muted/50"
-                      >
-                        <span className="text-sm text-muted-foreground font-medium w-6">
-                          {index + 1}.
-                        </span>
-                        <span className="flex-1 text-sm">{vid?.title || videoId}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFormData({
-                              ...formData,
-                              videoIds: formData.videoIds?.filter(id => id !== videoId)
-                            });
-                          }}
-                          className="text-destructive hover:text-destructive/70"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Simple dropdown to add videos to playlist */}
-              <div>
-                <select
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                  value=""
-                  onChange={(e) => {
-                    const selectedId = e.target.value;
-                    if (selectedId && !formData.videoIds?.includes(selectedId)) {
-                      setFormData({
-                        ...formData,
-                        videoIds: [...(formData.videoIds || []), selectedId]
-                      });
-                    }
-                  }}
-                >
-                  <option value="">Add video to playlist...</option>
-                  {(videos as Video[])
-                    .filter(v => v.youtubeId || v.muxPlaybackId) // Only single videos, not other playlists
-                    .filter(v => !formData.videoIds?.includes(v.id))
-                    .map(v => (
-                      <option key={v.id} value={v.id}>
-                        {v.title} ({v.source === 'mux' ? 'Mux' : 'YouTube'})
-                      </option>
-                    ))
-                  }
-                </select>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Select videos from the library to create a playlist. Only single videos (not other playlists) can be added.
-              </p>
-            </div>
-          </div>
+          <VideoSelector
+            mode="playlist"
+            selectedVideoIds={formData.videoIds || []}
+            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+            label="Playlist Videos"
+            suggestedTitle={formData.title}
+          />
         ) : formData.source === 'mux' ? (
           <div>
             <label className="block text-sm font-medium mb-1">Upload Video to Mux *</label>
