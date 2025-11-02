@@ -20,7 +20,12 @@
     "gameDate": "2025-01-15",
     "uploadDate": "2025-01-16",
     "coach": "Hino",
-    "tags": ["roach", "ravager", "defense", "zvt"],
+    "tags": [
+      "roach",
+      "ravager",
+      "defense",
+      "zvt"
+    ],
     "patch": "5.0.14",
     "notes": "Example of defending early tank push with roach/ravager",
     "downloadUrl": "https://example.com/replays/hino-zvt-roach-defense.SC2Replay",
@@ -28,8 +33,8 @@
   },
   {
     "id": "replay-2",
-    "title": "Nico 1-1-1 Timing vs Masters Protoss",
-    "map": "Babylon LE",
+    "title": "Nico's RFE 5-1-1 Timing vs Protoss",
+    "map": "Pylon LE",
     "matchup": "TvP",
     "player1": {
       "name": "CoachNico",
@@ -38,19 +43,26 @@
       "result": "win"
     },
     "player2": {
-      "name": "MastersP",
+      "name": "NA",
       "race": "protoss",
-      "mmr": 4800,
+      "mmr": 1,
       "result": "loss"
     },
-    "duration": "11:45",
+    "duration": "11:32",
     "gameDate": "2025-01-14",
     "uploadDate": "2025-01-15",
-    "coach": "Nico",
-    "tags": ["1-1-1", "timing", "tvp", "tank"],
-    "patch": "5.0.14",
-    "notes": "Clean execution of 1-1-1 tank timing",
-    "downloadUrl": "https://example.com/replays/nico-tvp-111-timing.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/5-1-1%20RFE%20vs%20Toss%20-HGTDPyXGkAHWKTfnnNobu2gVmYLsER.SC2Replay",
+    "videoId": "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
+    "coach": "coach nico",
+    "tags": [
+      "timing",
+      "tvp",
+      "tank",
+      "5-1-1"
+    ],
+    "patch": "5.0.15",
+    "notes": "Clean execution of 5-1-1 tank timing vs AI ",
+    "isFree": false
   },
   {
     "id": "replay-3",
@@ -73,7 +85,11 @@
     "gameDate": "2025-01-13",
     "uploadDate": "2025-01-14",
     "coach": "Groovy",
-    "tags": ["cheese defense", "pvp", "proxy"],
+    "tags": [
+      "cheese defense",
+      "pvp",
+      "proxy"
+    ],
     "patch": "5.0.14",
     "notes": "Perfect defense vs proxy 2 gate"
   }
