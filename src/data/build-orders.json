@@ -72,66 +72,1130 @@
   },
   {
     "id": "bo-2",
-    "name": "1-1-1 Tank Push",
+    "name": "RFE 5-1-1 vs Protoss",
     "race": "terran",
     "vsRace": "protoss",
     "type": "timing",
     "difficulty": "intermediate",
     "coach": "Nico",
     "coachId": "coach nico",
-    "description": "Standard 1-1-1 timing with tanks and stimmed marines. Strong midgame pressure against Protoss.",
+    "description": "Standard 5-1-1 timing with tanks and stimmed marines. Strong midgame pressure against Protoss intended to end the game, this variation is best vs storm and passive protoss players. ",
+    "videoId": "jNQXAC9IVRw",
     "steps": [
       {
+        "supply": 13,
+        "time": "0:24",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 13,
+        "time": "0:34",
+        "action": "SCV"
+      },
+      {
         "supply": 14,
-        "action": "Supply Depot"
+        "time": "0:51",
+        "action": "SCV"
       },
       {
         "supply": 15,
+        "time": "0:56",
         "action": "Barracks"
       },
       {
-        "supply": 16,
+        "supply": 15,
+        "time": "1:01",
         "action": "Refinery"
       },
       {
+        "supply": 15,
+        "time": "1:11",
+        "action": "SCV"
+      },
+      {
+        "supply": 16,
+        "time": "1:28",
+        "action": "SCV"
+      },
+      {
         "supply": 17,
-        "action": "Reaper"
+        "time": "1:45",
+        "action": "SCV"
+      },
+      {
+        "supply": 18,
+        "time": "2:02",
+        "action": "SCV"
       },
       {
         "supply": 19,
-        "action": "Orbital Command, Supply Depot"
+        "time": "2:23",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 19,
+        "time": "2:35",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 19,
+        "time": "2:38",
+        "action": "MULE"
+      },
+      {
+        "supply": 19,
+        "time": "2:47",
+        "action": "Reaper"
       },
       {
         "supply": 20,
+        "time": "2:55",
+        "action": "SCV"
+      },
+      {
+        "supply": 21,
+        "time": "3:01",
         "action": "Factory"
       },
       {
         "supply": 21,
-        "action": "Command Center"
+        "time": "3:09",
+        "action": "Bunker"
+      },
+      {
+        "supply": 21,
+        "time": "3:12",
+        "action": "SCV"
       },
       {
         "supply": 22,
-        "action": "Reactor on Barracks"
+        "time": "3:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 23,
+        "time": "3:19",
+        "action": "Refinery"
+      },
+      {
+        "supply": 23,
+        "time": "3:26",
+        "action": "KD8Charge"
+      },
+      {
+        "supply": 23,
+        "time": "3:29",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 23,
+        "time": "3:29",
+        "action": "SCV"
       },
       {
         "supply": 24,
-        "time": "3:30",
-        "action": "Starport, 2nd Refinery"
+        "time": "3:47",
+        "action": "KD8Charge"
       },
       {
-        "supply": 28,
-        "time": "4:00",
-        "action": "Tank, Tech Lab on Factory"
+        "supply": 24,
+        "time": "3:53",
+        "action": "SCV"
+      },
+      {
+        "supply": 25,
+        "time": "4:03",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 25,
+        "time": "4:08",
+        "action": "MULE"
+      },
+      {
+        "supply": 25,
+        "time": "4:09",
+        "action": "SCV"
+      },
+      {
+        "supply": 26,
+        "time": "4:17",
+        "action": "Starport"
+      },
+      {
+        "supply": 26,
+        "time": "4:30",
+        "action": "SCV"
+      },
+      {
+        "supply": 27,
+        "time": "4:34",
+        "action": "KD8Charge"
+      },
+      {
+        "supply": 27,
+        "time": "4:41",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 29,
+        "time": "4:42",
+        "action": "MULE"
+      },
+      {
+        "supply": 29,
+        "time": "4:44",
+        "action": "Marine"
+      },
+      {
+        "supply": 30,
+        "time": "4:44",
+        "action": "Marine"
+      },
+      {
+        "supply": 31,
+        "time": "4:47",
+        "action": "SCV"
       },
       {
         "supply": 32,
-        "time": "4:30",
-        "action": "Medivac, Stim"
+        "time": "4:56",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 32,
+        "time": "4:59",
+        "action": "SCV"
+      },
+      {
+        "supply": 33,
+        "time": "5:04",
+        "action": "SCV"
+      },
+      {
+        "supply": 34,
+        "time": "5:11",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 36,
+        "time": "5:13",
+        "action": "FactoryTechLab"
+      },
+      {
+        "supply": 36,
+        "time": "5:14",
+        "action": "Barracks"
+      },
+      {
+        "supply": 36,
+        "time": "5:15",
+        "action": "Marine"
+      },
+      {
+        "supply": 37,
+        "time": "5:15",
+        "action": "Marine"
+      },
+      {
+        "supply": 38,
+        "time": "5:16",
+        "action": "SCV"
+      },
+      {
+        "supply": 39,
+        "time": "5:19",
+        "action": "Barracks"
+      },
+      {
+        "supply": 39,
+        "time": "5:21",
+        "action": "SCV"
+      },
+      {
+        "supply": 40,
+        "time": "5:25",
+        "action": "Refinery"
+      },
+      {
+        "supply": 40,
+        "time": "5:33",
+        "action": "SCV"
+      },
+      {
+        "supply": 41,
+        "time": "5:41",
+        "action": "MULE"
+      },
+      {
+        "supply": 41,
+        "time": "5:45",
+        "action": "SCV"
+      },
+      {
+        "supply": 42,
+        "time": "5:50",
+        "action": "SCV"
+      },
+      {
+        "supply": 43,
+        "time": "5:51",
+        "action": "Marine"
       },
       {
         "supply": 44,
-        "time": "5:30",
-        "action": "Move out with 2 tanks, 16 marines, 1 medivac"
+        "time": "5:51",
+        "action": "Marine"
+      },
+      {
+        "supply": 45,
+        "time": "5:52",
+        "action": "Medivac"
+      },
+      {
+        "supply": 47,
+        "time": "6:02",
+        "action": "SCV"
+      },
+      {
+        "supply": 48,
+        "time": "6:11",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 48,
+        "time": "6:16",
+        "action": "MULE"
+      },
+      {
+        "supply": 48,
+        "time": "6:25",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 51,
+        "time": "6:30",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 51,
+        "time": "6:41",
+        "action": "FactoryReactor"
+      },
+      {
+        "supply": 51,
+        "time": "6:48",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 51,
+        "time": "6:49",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 51,
+        "time": "6:53",
+        "action": "Liberator"
+      },
+      {
+        "supply": 54,
+        "time": "6:54",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 54,
+        "time": "6:57",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 54,
+        "time": "6:58",
+        "action": "SCV"
+      },
+      {
+        "supply": 55,
+        "time": "6:58",
+        "action": "SCV"
+      },
+      {
+        "supply": 54,
+        "time": "7:03",
+        "action": "StarportTechLab"
+      },
+      {
+        "supply": 54,
+        "time": "7:05",
+        "action": "StarportReactor"
+      },
+      {
+        "supply": 54,
+        "time": "7:06",
+        "action": "Marine"
+      },
+      {
+        "supply": 55,
+        "time": "7:06",
+        "action": "Marine"
+      },
+      {
+        "supply": 56,
+        "time": "7:08",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 56,
+        "time": "7:13",
+        "action": "Marauder"
+      },
+      {
+        "supply": 58,
+        "time": "7:17",
+        "action": "MULE"
+      },
+      {
+        "supply": 58,
+        "time": "7:19",
+        "action": "SCV"
+      },
+      {
+        "supply": 59,
+        "time": "7:19",
+        "action": "SCV"
+      },
+      {
+        "supply": 60,
+        "time": "7:28",
+        "action": "Marauder"
+      },
+      {
+        "supply": 62,
+        "time": "7:28",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 62,
+        "time": "7:36",
+        "action": "SCV"
+      },
+      {
+        "supply": 63,
+        "time": "7:36",
+        "action": "SCV"
+      },
+      {
+        "supply": 64,
+        "time": "7:36",
+        "action": "Barracks"
+      },
+      {
+        "supply": 64,
+        "time": "7:40",
+        "action": "Barracks"
+      },
+      {
+        "supply": 64,
+        "time": "7:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 65,
+        "time": "7:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 66,
+        "time": "7:47",
+        "action": "MULE"
+      },
+      {
+        "supply": 66,
+        "time": "7:51",
+        "action": "Marauder"
+      },
+      {
+        "supply": 68,
+        "time": "8:03",
+        "action": "SCV"
+      },
+      {
+        "supply": 69,
+        "time": "8:04",
+        "action": "SCV"
+      },
+      {
+        "supply": 70,
+        "time": "8:08",
+        "action": "Refinery"
+      },
+      {
+        "supply": 70,
+        "time": "8:10",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 70,
+        "time": "8:18",
+        "action": "Marauder"
+      },
+      {
+        "supply": 72,
+        "time": "8:21",
+        "action": "SCV"
+      },
+      {
+        "supply": 73,
+        "time": "8:21",
+        "action": "SCV"
+      },
+      {
+        "supply": 74,
+        "time": "8:24",
+        "action": "Marauder"
+      },
+      {
+        "supply": 76,
+        "time": "8:37",
+        "action": "Marine"
+      },
+      {
+        "supply": 77,
+        "time": "8:38",
+        "action": "Marine"
+      },
+      {
+        "supply": 78,
+        "time": "8:40",
+        "action": "Medivac"
+      },
+      {
+        "supply": 79,
+        "time": "8:43",
+        "action": "SCV"
+      },
+      {
+        "supply": 80,
+        "time": "8:43",
+        "action": "SCV"
+      },
+      {
+        "supply": 81,
+        "time": "8:44",
+        "action": "MULE"
+      },
+      {
+        "supply": 81,
+        "time": "8:48",
+        "action": "Upgrade: ShieldWall"
+      },
+      {
+        "supply": 81,
+        "time": "8:56",
+        "action": "Upgrade: Stimpack"
+      },
+      {
+        "supply": 81,
+        "time": "9:00",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 81,
+        "time": "9:04",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 81,
+        "time": "9:06",
+        "action": "Marauder"
+      },
+      {
+        "supply": 83,
+        "time": "9:07",
+        "action": "Marauder"
+      },
+      {
+        "supply": 85,
+        "time": "9:07",
+        "action": "Medivac"
+      },
+      {
+        "supply": 87,
+        "time": "9:07",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 89,
+        "time": "9:07",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 91,
+        "time": "9:15",
+        "action": "Marine"
+      },
+      {
+        "supply": 92,
+        "time": "9:15",
+        "action": "Marine"
+      },
+      {
+        "supply": 93,
+        "time": "9:16",
+        "action": "Marine"
+      },
+      {
+        "supply": 94,
+        "time": "9:16",
+        "action": "Marine"
+      },
+      {
+        "supply": 95,
+        "time": "9:25",
+        "action": "Medivac"
+      },
+      {
+        "supply": 97,
+        "time": "9:36",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 97,
+        "time": "9:42",
+        "action": "Marauder"
+      },
+      {
+        "supply": 99,
+        "time": "9:43",
+        "action": "Marauder"
+      },
+      {
+        "supply": 101,
+        "time": "9:45",
+        "action": "MULE"
+      },
+      {
+        "supply": 101,
+        "time": "9:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 102,
+        "time": "9:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 103,
+        "time": "9:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 104,
+        "time": "9:55",
+        "action": "Medivac"
+      },
+      {
+        "supply": 106,
+        "time": "9:56",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 108,
+        "time": "9:56",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 110,
+        "time": "10:01",
+        "action": "SCV"
+      },
+      {
+        "supply": 111,
+        "time": "10:01",
+        "action": "SCV"
+      },
+      {
+        "supply": 112,
+        "time": "10:03",
+        "action": "Upgrade: PunisherGrenades"
+      },
+      {
+        "supply": 112,
+        "time": "10:07",
+        "action": "Marine"
+      },
+      {
+        "supply": 113,
+        "time": "10:09",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 113,
+        "time": "10:11",
+        "action": "Upgrade: TerranInfantryWeaponsLevel1"
+      },
+      {
+        "supply": 113,
+        "time": "10:12",
+        "action": "Medivac"
+      },
+      {
+        "supply": 115,
+        "time": "10:19",
+        "action": "Marauder"
+      },
+      {
+        "supply": 117,
+        "time": "10:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 119,
+        "time": "10:39",
+        "action": "Marine"
+      },
+      {
+        "supply": 120,
+        "time": "10:39",
+        "action": "Marine"
+      },
+      {
+        "supply": 121,
+        "time": "10:39",
+        "action": "Marine"
+      },
+      {
+        "supply": 122,
+        "time": "10:40",
+        "action": "Marine"
+      },
+      {
+        "supply": 123,
+        "time": "10:51",
+        "action": "GhostAcademy"
+      },
+      {
+        "supply": 123,
+        "time": "11:00",
+        "action": "Marine"
+      },
+      {
+        "supply": 124,
+        "time": "11:01",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 124,
+        "time": "11:05",
+        "action": "Marauder"
+      },
+      {
+        "supply": 126,
+        "time": "11:06",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 128,
+        "time": "11:06",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 130,
+        "time": "11:08",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 130,
+        "time": "11:08",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 130,
+        "time": "11:09",
+        "action": "SCV"
+      },
+      {
+        "supply": 131,
+        "time": "11:10",
+        "action": "SCV"
+      },
+      {
+        "supply": 132,
+        "time": "11:10",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 132,
+        "time": "11:16",
+        "action": "Armory"
+      },
+      {
+        "supply": 132,
+        "time": "11:24",
+        "action": "Marine"
+      },
+      {
+        "supply": 133,
+        "time": "11:24",
+        "action": "Marine"
+      },
+      {
+        "supply": 134,
+        "time": "11:35",
+        "action": "MULE"
+      },
+      {
+        "supply": 134,
+        "time": "11:40",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 134,
+        "time": "11:41",
+        "action": "Marauder"
+      },
+      {
+        "supply": 136,
+        "time": "11:44",
+        "action": "Marine"
+      },
+      {
+        "supply": 137,
+        "time": "11:49",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 137,
+        "time": "11:49",
+        "action": "Marine"
+      },
+      {
+        "supply": 138,
+        "time": "11:50",
+        "action": "SCV"
+      },
+      {
+        "supply": 139,
+        "time": "11:50",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 141,
+        "time": "11:50",
+        "action": "SCV"
+      },
+      {
+        "supply": 142,
+        "time": "11:50",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 144,
+        "time": "11:52",
+        "action": "Marine"
+      },
+      {
+        "supply": 145,
+        "time": "11:56",
+        "action": "Refinery"
+      },
+      {
+        "supply": 145,
+        "time": "11:59",
+        "action": "Armory"
+      },
+      {
+        "supply": 145,
+        "time": "12:02",
+        "action": "Medivac"
+      },
+      {
+        "supply": 147,
+        "time": "12:08",
+        "action": "Marauder"
+      },
+      {
+        "supply": 149,
+        "time": "12:09",
+        "action": "Medivac"
+      },
+      {
+        "supply": 151,
+        "time": "12:18",
+        "action": "SCV"
+      },
+      {
+        "supply": 152,
+        "time": "12:18",
+        "action": "SCV"
+      },
+      {
+        "supply": 153,
+        "time": "12:31",
+        "action": "MULE"
+      },
+      {
+        "supply": 153,
+        "time": "12:38",
+        "action": "Marine"
+      },
+      {
+        "supply": 154,
+        "time": "12:38",
+        "action": "Marine"
+      },
+      {
+        "supply": 155,
+        "time": "12:38",
+        "action": "MULE"
+      },
+      {
+        "supply": 155,
+        "time": "12:38",
+        "action": "Marine"
+      },
+      {
+        "supply": 156,
+        "time": "12:38",
+        "action": "Marine"
+      },
+      {
+        "supply": 157,
+        "time": "12:38",
+        "action": "Refinery"
+      },
+      {
+        "supply": 157,
+        "time": "12:55",
+        "action": "SCV"
+      },
+      {
+        "supply": 158,
+        "time": "12:56",
+        "action": "GhostAlternate"
+      },
+      {
+        "supply": 158,
+        "time": "12:57",
+        "action": "SCV"
+      },
+      {
+        "supply": 159,
+        "time": "12:58",
+        "action": "GhostAlternate"
+      },
+      {
+        "supply": 159,
+        "time": "12:59",
+        "action": "SCV"
+      },
+      {
+        "supply": 160,
+        "time": "13:03",
+        "action": "MULE"
+      },
+      {
+        "supply": 160,
+        "time": "13:05",
+        "action": "GhostAlternate"
+      },
+      {
+        "supply": 160,
+        "time": "13:12",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 162,
+        "time": "13:12",
+        "action": "SCV"
+      },
+      {
+        "supply": 163,
+        "time": "13:14",
+        "action": "SCV"
+      },
+      {
+        "supply": 164,
+        "time": "13:16",
+        "action": "SCV"
+      },
+      {
+        "supply": 165,
+        "time": "13:17",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 167,
+        "time": "13:24",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 169,
+        "time": "13:29",
+        "action": "SCV"
+      },
+      {
+        "supply": 170,
+        "time": "13:30",
+        "action": "Barracks"
+      },
+      {
+        "supply": 170,
+        "time": "13:31",
+        "action": "SCV"
+      },
+      {
+        "supply": 171,
+        "time": "13:32",
+        "action": "Barracks"
+      },
+      {
+        "supply": 171,
+        "time": "13:33",
+        "action": "SCV"
+      },
+      {
+        "supply": 172,
+        "time": "13:37",
+        "action": "Marauder"
+      },
+      {
+        "supply": 174,
+        "time": "13:37",
+        "action": "Marauder"
+      },
+      {
+        "supply": 176,
+        "time": "13:38",
+        "action": "Marauder"
+      },
+      {
+        "supply": 178,
+        "time": "13:43",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 178,
+        "time": "13:46",
+        "action": "SCV"
+      },
+      {
+        "supply": 179,
+        "time": "13:48",
+        "action": "SCV"
+      },
+      {
+        "supply": 180,
+        "time": "13:49",
+        "action": "Upgrade: TerranInfantryArmorsLevel1"
+      },
+      {
+        "supply": 180,
+        "time": "13:56",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 180,
+        "time": "14:03",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 180,
+        "time": "14:15",
+        "action": "Marauder"
+      },
+      {
+        "supply": 182,
+        "time": "14:15",
+        "action": "Marauder"
+      },
+      {
+        "supply": 184,
+        "time": "14:15",
+        "action": "Marauder"
+      },
+      {
+        "supply": 186,
+        "time": "14:19",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 188,
+        "time": "14:25",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 188,
+        "time": "14:25",
+        "action": "SensorTower"
+      },
+      {
+        "supply": 188,
+        "time": "14:27",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 190,
+        "time": "14:28",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 190,
+        "time": "14:38",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 190,
+        "time": "14:39",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 190,
+        "time": "14:43",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 190,
+        "time": "14:46",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 190,
+        "time": "14:55",
+        "action": "GhostAlternate"
+      },
+      {
+        "supply": 190,
+        "time": "14:55",
+        "action": "Marauder"
+      },
+      {
+        "supply": 192,
+        "time": "14:55",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 192,
+        "time": "14:56",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 192,
+        "time": "15:13",
+        "action": "FusionCore"
+      },
+      {
+        "supply": 191,
+        "time": "15:25",
+        "action": "Upgrade: TerranShipWeaponsLevel1"
+      },
+      {
+        "supply": 191,
+        "time": "15:38",
+        "action": "Refinery"
+      },
+      {
+        "supply": 191,
+        "time": "15:39",
+        "action": "Refinery"
       }
     ],
     "tags": [
@@ -140,9 +1204,9 @@
       "tank",
       "intermediate"
     ],
-    "patch": "5.0.14",
-    "updatedAt": "2025-01-10",
-    "videoId": "jNQXAC9IVRw"
+    "patch": "5.0.15.95299",
+    "updatedAt": "2025-11-02",
+    "isFree": false
   },
   {
     "id": "bo-3",
