@@ -90,6 +90,11 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-1 rounded text-xs text-white flex items-center gap-1">
                 <ListVideo className="w-3 h-3" />
                 Playlist
+                {video.videoIds && video.videoIds.length > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-[10px] font-medium">
+                    {video.videoIds.length}
+                  </span>
+                )}
               </div>
             )}
             {!video.isFree && !hasSubscriberRole && (
