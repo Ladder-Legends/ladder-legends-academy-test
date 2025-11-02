@@ -156,7 +156,7 @@ export function VideoLibraryContent() {
         if (videoCoachId !== tag.toLowerCase()) return false;
       } else if (sectionId === 'contentType') {
         if (tag === 'playlist' && !videoIsPlaylist) return false;
-        if (tag === 'single' && !videoIsPlaylist) return false;
+        if (tag === 'single' && videoIsPlaylist) return false;
       } else if (sectionId === 'accessLevel') {
         const videoIsFree = video.isFree || false;
         if (tag === 'free' && !videoIsFree) return false;
