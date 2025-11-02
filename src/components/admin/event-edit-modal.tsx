@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import eventsData from '@/data/events.json';
 import { CoachSelector } from '@/components/shared/coach-selector';
+import { VideoSelector } from '@/components/admin/video-selector';
 import dynamic from 'next/dynamic';
 
 // Dynamically import the markdown editor (client-side only)
@@ -270,6 +271,59 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
               value={formData.coach || ''}
               onChange={(coachId) => setFormData({ ...formData, coach: coachId })}
             />
+          </div>
+        </div>
+
+        {/* Videos Section */}
+        <div className="border border-border rounded-lg p-4 bg-muted/30">
+          <h3 className="text-sm font-medium mb-3">Associated Videos (Optional)</h3>
+          <div className="space-y-3">
+            {/* Display selected videos */}
+            {formData.videoIds && formData.videoIds.length > 0 && (
+              <div className="space-y-2">
+                {formData.videoIds.map((videoId, index) => (
+                  <div
+                    key={videoId}
+                    className="flex items-center gap-2 px-3 py-2 border border-border rounded-md bg-background"
+                  >
+                    <span className="text-sm text-muted-foreground font-medium w-6">
+                      {index + 1}.
+                    </span>
+                    <span className="flex-1 text-sm">{videoId}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          videoIds: formData.videoIds?.filter(id => id !== videoId)
+                        });
+                      }}
+                      className="text-destructive hover:text-destructive/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add Video Selector */}
+            <VideoSelector
+              selectedVideoId={undefined}
+              onVideoSelect={(videoId) => {
+                if (videoId && !formData.videoIds?.includes(videoId)) {
+                  setFormData({
+                    ...formData,
+                    videoIds: [...(formData.videoIds || []), videoId]
+                  });
+                }
+              }}
+              label="Add Video"
+              suggestedTitle={formData.title || ''}
+            />
+            <p className="text-xs text-muted-foreground">
+              Attach videos to this event (e.g., recordings, tutorials, or related content).
+            </p>
           </div>
         </div>
 

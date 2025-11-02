@@ -8,7 +8,8 @@ import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Video, isPlaylist, getYoutubeIds, isMuxVideo } from '@/types/video';
+import { Video, isPlaylist, isMuxVideo } from '@/types/video';
+import videos from '@/data/videos.json';
 import { ArrowLeft, CalendarDays, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,15 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const videoIsPlaylist = isPlaylist(video);
-  const youtubeIds = getYoutubeIds(video);
-  const currentYoutubeId = youtubeIds[currentVideoIndex];
+
+  // For playlists, load the referenced videos
+  const playlistVideos = videoIsPlaylist
+    ? (video.videoIds || []).map(id => (videos as Video[]).find(v => v.id === id)).filter(Boolean) as Video[]
+    : [];
+
+  // Get current video to play
+  const currentVideo = videoIsPlaylist ? playlistVideos[currentVideoIndex] : video;
+  const currentYoutubeId = currentVideo?.youtubeId;
 
   // Track video view
   useTrackPageView({
@@ -38,7 +46,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       is_free: video.isFree || false,
       coach: video.coach || undefined,
       tags: video.tags,
-      video_count: videoIsPlaylist ? youtubeIds.length : 1,
+      video_count: videoIsPlaylist ? playlistVideos.length : 1,
     },
   });
 
@@ -183,7 +191,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                       {videoIsPlaylist && (
                         <>
                           <span>•</span>
-                          <span>{youtubeIds.length} videos</span>
+                          <span>{playlistVideos.length} videos</span>
                         </>
                       )}
                     </div>
@@ -220,12 +228,12 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                   <div className="border border-border rounded-lg bg-card overflow-hidden sticky top-24">
                     <div className="p-4 border-b border-border bg-muted/50">
                       <h2 className="font-semibold">Playlist</h2>
-                      <p className="text-sm text-muted-foreground">{youtubeIds.length} videos</p>
+                      <p className="text-sm text-muted-foreground">{playlistVideos.length} videos</p>
                     </div>
                     <div className="max-h-[600px] overflow-y-auto">
-                      {youtubeIds.map((ytId, index) => (
+                      {playlistVideos.map((plVideo, index) => (
                         <button
-                          key={index}
+                          key={plVideo.id}
                           onClick={() => setCurrentVideoIndex(index)}
                           className={`w-full p-3 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0 ${
                             currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
@@ -238,15 +246,15 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                             <div className="flex-1 min-w-0">
                               <div className="aspect-video bg-muted rounded overflow-hidden mb-2">
                                 <Image
-                                  src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`}
-                                  alt={`Video ${index + 1}`}
+                                  src={plVideo.youtubeId ? `https://img.youtube.com/vi/${plVideo.youtubeId}/mqdefault.jpg` : plVideo.thumbnail}
+                                  alt={plVideo.title}
                                   width={120}
                                   height={68}
                                   unoptimized
                                   className="object-cover w-full h-full"
                                 />
                               </div>
-                              <p className="text-sm font-medium line-clamp-2">
+                              <p className="text-sm font-medium line-clamp-2">{plVideo.title}
                                 {index === 0 ? video.title : `Part ${index + 1}`}
                               </p>
                             </div>
