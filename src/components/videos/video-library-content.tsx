@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUrlState } from '@/hooks/use-url-state';
 import { VideoGrid } from '@/components/videos/video-grid';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
@@ -19,31 +20,22 @@ const videos = videosData as Video[];
 
 export function VideoLibraryContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { addChange } = usePendingChanges();
 
   // Initialize state from URL parameters
-  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => {
-    const races = searchParams.get('races')?.split(',').filter(Boolean) || [];
-    const general = searchParams.get('general')?.split(',').filter(Boolean) || [];
-    const coaches = searchParams.get('coach')?.split(',').filter(Boolean) || [];
-    const contentType = searchParams.get('type')?.split(',').filter(Boolean) || [];
-    const accessLevel = searchParams.get('access')?.split(',').filter(Boolean) || [];
-
-    return {
-      races,
-      general,
-      coaches,
-      contentType,
-      accessLevel,
-    };
-  });
-  const [selectedTags, setSelectedTags] = useState<string[]>(() => {
-    return searchParams.get('tags')?.split(',').filter(Boolean) || [];
-  });
-  const [searchQuery, setSearchQuery] = useState(() => {
-    return searchParams.get('q') || '';
-  });
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>(() => ({
+    races: searchParams.get('races')?.split(',').filter(Boolean) || [],
+    general: searchParams.get('general')?.split(',').filter(Boolean) || [],
+    coaches: searchParams.get('coach')?.split(',').filter(Boolean) || [],
+    contentType: searchParams.get('type')?.split(',').filter(Boolean) || [],
+    accessLevel: searchParams.get('access')?.split(',').filter(Boolean) || [],
+  }));
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    searchParams.get('tags')?.split(',').filter(Boolean) || []
+  );
+  const [searchQuery, setSearchQuery] = useState(() =>
+    searchParams.get('q') || ''
+  );
 
   // Modal state for editing
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
@@ -51,41 +43,15 @@ export function VideoLibraryContent() {
   const [isNewVideo, setIsNewVideo] = useState(false);
 
   // Sync filters to URL whenever they change
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    // Add search query
-    if (searchQuery) {
-      params.set('q', searchQuery);
-    }
-
-    // Add selected items
-    if (selectedItems.races?.length > 0) {
-      params.set('races', selectedItems.races.join(','));
-    }
-    if (selectedItems.general?.length > 0) {
-      params.set('general', selectedItems.general.join(','));
-    }
-    if (selectedItems.coaches?.length > 0) {
-      params.set('coach', selectedItems.coaches.join(','));
-    }
-    if (selectedItems.contentType?.length > 0) {
-      params.set('type', selectedItems.contentType.join(','));
-    }
-    if (selectedItems.accessLevel?.length > 0) {
-      params.set('access', selectedItems.accessLevel.join(','));
-    }
-
-    // Add selected tags
-    if (selectedTags.length > 0) {
-      params.set('tags', selectedTags.join(','));
-    }
-
-    // Update URL without adding to history (using replace instead of push)
-    const queryString = params.toString();
-    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
-  }, [selectedItems, selectedTags, searchQuery, router]);
+  useUrlState({
+    q: searchQuery,
+    races: selectedItems.races,
+    general: selectedItems.general,
+    coach: selectedItems.coaches,
+    type: selectedItems.contentType,
+    access: selectedItems.accessLevel,
+    tags: selectedTags,
+  });
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUrlState } from '@/hooks/use-url-state';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import buildOrdersData from '@/data/build-orders.json';
@@ -20,7 +21,6 @@ const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
@@ -45,22 +45,16 @@ export function BuildOrdersContent() {
   const [isNewBuildOrder, setIsNewBuildOrder] = useState(false);
 
   // Sync filters to URL whenever they change
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (searchQuery) params.set('q', searchQuery);
-    if (selectedItems.terran?.length > 0) params.set('terran', selectedItems.terran.join(','));
-    if (selectedItems.zerg?.length > 0) params.set('zerg', selectedItems.zerg.join(','));
-    if (selectedItems.protoss?.length > 0) params.set('protoss', selectedItems.protoss.join(','));
-    if (selectedItems.difficulty?.length > 0) params.set('difficulty', selectedItems.difficulty.join(','));
-    if (selectedItems.type?.length > 0) params.set('type', selectedItems.type.join(','));
-    if (selectedItems.accessLevel?.length > 0) params.set('access', selectedItems.accessLevel.join(','));
-    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
-  }, [selectedItems, selectedTags, searchQuery, router]);
+  useUrlState({
+    q: searchQuery,
+    terran: selectedItems.terran,
+    zerg: selectedItems.zerg,
+    protoss: selectedItems.protoss,
+    difficulty: selectedItems.difficulty,
+    type: selectedItems.type,
+    access: selectedItems.accessLevel,
+    tags: selectedTags,
+  });
 
   // Get all unique tags
   const allTags = useMemo(() => {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUrlState } from '@/hooks/use-url-state';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import masterclassesData from '@/data/masterclasses.json';
@@ -20,7 +21,6 @@ const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const { addChange } = usePendingChanges();
@@ -41,18 +41,12 @@ export function MasterclassesContent() {
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
 
   // Sync filters to URL whenever they change
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (searchQuery) params.set('q', searchQuery);
-    if (selectedItems.coaches?.length > 0) params.set('coach', selectedItems.coaches.join(','));
-    if (selectedItems.accessLevel?.length > 0) params.set('access', selectedItems.accessLevel.join(','));
-    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
-  }, [selectedItems, selectedTags, searchQuery, router]);
+  useUrlState({
+    q: searchQuery,
+    coach: selectedItems.coaches,
+    access: selectedItems.accessLevel,
+    tags: selectedTags,
+  });
 
   // Get all unique tags
   const allTags = useMemo(() => {

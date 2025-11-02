@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUrlState } from '@/hooks/use-url-state';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import eventsData from '@/data/events.json';
@@ -18,7 +19,6 @@ const allEvents = eventsData as Event[];
 
 export function EventsContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
@@ -37,17 +37,11 @@ export function EventsContent() {
   );
 
   // Sync filters to URL whenever they change
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (searchQuery) params.set('q', searchQuery);
-    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
-    if (showPastEvents) params.set('past', 'true');
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
-  }, [selectedTags, searchQuery, showPastEvents, router]);
+  useUrlState({
+    q: searchQuery,
+    tags: selectedTags,
+    past: showPastEvents,
+  });
 
   // Get all unique tags
   const allTags = useMemo(() => {
