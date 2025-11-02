@@ -20,11 +20,18 @@
     "gameDate": "2025-01-15",
     "uploadDate": "2025-01-16",
     "coach": "Hino",
-    "tags": ["roach", "ravager", "defense", "zvt"],
+    "tags": [
+      "roach",
+      "ravager",
+      "defense",
+      "zvt"
+    ],
     "patch": "5.0.14",
     "notes": "Example of defending early tank push with roach/ravager",
     "downloadUrl": "https://example.com/replays/hino-zvt-roach-defense.SC2Replay",
-    "coachingVideoId": "dQw4w9WgXcQ"
+    "videoIds": [
+      "dQw4w9WgXcQ"
+    ]
   },
   {
     "id": "replay-2",
@@ -47,10 +54,16 @@
     "gameDate": "2025-01-14",
     "uploadDate": "2025-01-15",
     "coach": "Nico",
-    "tags": ["1-1-1", "timing", "tvp", "tank"],
+    "tags": [
+      "1-1-1",
+      "timing",
+      "tvp",
+      "tank"
+    ],
     "patch": "5.0.14",
     "notes": "Clean execution of 1-1-1 tank timing",
-    "downloadUrl": "https://example.com/replays/nico-tvp-111-timing.SC2Replay"
+    "downloadUrl": "https://example.com/replays/nico-tvp-111-timing.SC2Replay",
+    "videoIds": []
   },
   {
     "id": "replay-3",
@@ -73,8 +86,13 @@
     "gameDate": "2025-01-13",
     "uploadDate": "2025-01-14",
     "coach": "Groovy",
-    "tags": ["cheese defense", "pvp", "proxy"],
+    "tags": [
+      "cheese defense",
+      "pvp",
+      "proxy"
+    ],
     "patch": "5.0.14",
-    "notes": "Perfect defense vs proxy 2 gate"
+    "notes": "Perfect defense vs proxy 2 gate",
+    "videoIds": []
   }
 ]

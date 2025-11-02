@@ -9,6 +9,7 @@
     "timezone": "America/New_York",
     "duration": 120,
     "coach": "gamerrichy",
+    "videoIds": [],
     "isFree": true,
     "tags": [
       "Team Games",
@@ -32,6 +33,7 @@
     "time": "14:00",
     "timezone": "America/New_York",
     "duration": 240,
+    "videoIds": [],
     "isFree": false,
     "tags": [
       "Tournament",
@@ -52,6 +54,7 @@
     "timezone": "America/New_York",
     "duration": 90,
     "coach": "coach-nico",
+    "videoIds": [],
     "isFree": false,
     "tags": [
       "Terran",
@@ -71,6 +74,7 @@
     "time": "18:00",
     "timezone": "America/New_York",
     "duration": 60,
+    "videoIds": [],
     "isFree": false,
     "tags": [],
     "recurring": {

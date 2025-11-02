@@ -7,7 +7,10 @@ export interface Masterclass {
   coach: string;
   coachId: string;
   race: Race;
-  videoId: string;
+
+  // Video support - array of video IDs from videos.json (empty array = no videos)
+  videoIds: string[];
+
   replayIds?: string[]; // Multiple example replays demonstrating the concepts
   duration?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';

@@ -27,6 +27,10 @@ export interface Event {
   timezone: string; // IANA timezone (e.g., "America/New_York")
   duration?: number; // Duration in minutes
   coach?: string; // Coach ID
+
+  // Video support - array of video IDs from videos.json (empty array = no videos)
+  videoIds: string[];
+
   isFree: boolean;
   tags: string[];
   recurring?: RecurringConfig;

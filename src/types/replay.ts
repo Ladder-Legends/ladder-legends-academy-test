@@ -19,7 +19,10 @@ export interface Replay {
   gameDate: string;
   uploadDate: string;
   downloadUrl?: string;
-  videoId?: string; // Link to coaching video in library
+
+  // Video support - array of video IDs from videos.json (empty array = no videos)
+  videoIds: string[];
+
   coach?: string;
   coachId?: string; // Link to coach in coaches collection
   tags: string[];
