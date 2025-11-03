@@ -25,26 +25,6 @@
     ]
   },
   {
-    "id": "e742ae6f-fdbf-4e04-b3a7-d8d146f1b577",
-    "title": "TvP 5-1-1 Double gas skipping tanks",
-    "description": "Imported from playlist: The Nicosystem's™ Beginner Terran Builds: ",
-    "source": "youtube",
-    "youtubeId": "I3pzBYSUfr8",
-    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
-    "date": "2025-11-02",
-    "tags": [
-      "nico",
-      "terran",
-      "tvt",
-      "tvp",
-      "tvz"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico",
-    "isFree": false
-  },
-  {
     "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
     "title": "chad test video tes",
     "description": "",
@@ -114,43 +94,6 @@
     "youtubeId": "5BLEYQBSF7I",
     "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
     "isFree": false
-  },
-  {
-    "id": "818baec2-d5df-49ea-983c-6931bf8d24ca",
-    "title": "Nicosystem™ Beginner Terran Builds: 2-1-1 Stimbat Timing Push.",
-    "description": "This build is a variation of the common 2-1-1 16 marine stim timing developed by GamerRichy that has been passed down to me to share with you guys. This build focuses on a huge push at 6:40 that catches many zergs off-guard as it is an unknown opener and difficult to defend without significant cuts in economy and tech. ",
-    "youtubeId": "aLP0tR22PO0",
-    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [
-      "nico",
-      "terran",
-      "tvz",
-      "timing push",
-      "macro"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
-    "id": "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
-    "title": "Nico's RFE 5-1-1 Timing vs Protoss",
-    "description": "The most effective standard style of TvP currently available, this build is designed around killing a Protoss at the 7-9 minute mark. Conceptually, this build defends any Protoss opener and strikes the most vulnerable Protoss timing before they begin to scale into the late game, with several variations that can be used to keep your opponent guessing. ",
-    "youtubeId": "5xh1WVcRoSA",
-    "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [
-      "nico",
-      "terran",
-      "tvp",
-      "timing push",
-      "macro",
-      "replay"
-    ],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
   },
   {
     "id": "9a675b9a-ccde-4d70-8ba7-d2089e9ea3a3",
