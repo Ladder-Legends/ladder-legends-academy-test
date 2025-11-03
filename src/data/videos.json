@@ -4,7 +4,10 @@
     "title": "The Nicosystem's™ Beginner Terran Builds: ",
     "description": "A collection of my Beginner build orders for all MU's at all levels. ",
     "source": "playlist",
-    "thumbnail": "https://img.youtube.com/vi/I3pzBYSUfr8/hqdefault.jpg",
+    "videoIds": [
+      "fe056d66-e846-4665-9262-1d8e60b057ad"
+    ],
+    "thumbnail": "https://image.mux.com/FAivPdmApP9tgAuWv6DQ7mUY402Jy1mnzJNiXBQyWVr00/thumbnail.jpg",
     "date": "2025-11-02",
     "tags": [
       "nico",
@@ -16,13 +19,7 @@
     "race": "terran",
     "coach": "Nico",
     "coachId": "coach-nico",
-    "isFree": false,
-    "videoIds": [
-      "e742ae6f-fdbf-4e04-b3a7-d8d146f1b577",
-      "818baec2-d5df-49ea-983c-6931bf8d24ca",
-      "0dfc1aa6-0ab6-4c3c-8ffa-09a422155dad",
-      "28"
-    ]
+    "isFree": false
   },
   {
     "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
