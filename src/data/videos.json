@@ -3,10 +3,10 @@
     "id": "fe056d66-e846-4665-9262-1d8e60b057ad",
     "title": "The Nicosystem's™ Beginner Terran Builds: ",
     "description": "Hello everyone! This is a collection of builds I recommend newcomer and veteran Terran players alike to start learning in order to succeed in tournament series and on ladder. ",
-    "source": "mux",
-    "muxAssetId": "gNiv1WUi4ZLoofJtHL5fqRQ54cKUCp00WsMqHOE02j0201s",
-    "muxPlaybackId": "WzrghxwPAsGvn4F39144w01kIstiwEU00zOmp8HiRksqw",
-    "muxAssetStatus": "ready",
+    "source": "playlist",
+    "videoIds": [
+      "d71a9493-cb0d-4439-9674-8982d829360d"
+    ],
     "thumbnail": "https://image.mux.com/WzrghxwPAsGvn4F39144w01kIstiwEU00zOmp8HiRksqw/thumbnail.jpg",
     "date": "2025-11-02",
     "tags": [
