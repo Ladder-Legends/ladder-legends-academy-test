@@ -6,39 +6,17 @@
     "coach": "Hino",
     "coachId": "hino",
     "race": "zerg",
-    "videoIds": ["dQw4w9WgXcQ"],
+    "videoIds": [
+      "dQw4w9WgXcQ"
+    ],
     "duration": "24:15",
     "difficulty": "beginner",
-    "tags": ["fundamentals", "zerg", "mechanics"],
+    "tags": [
+      "fundamentals",
+      "zerg",
+      "mechanics"
+    ],
     "createdAt": "2024-12-01",
     "updatedAt": "2025-01-10"
-  },
-  {
-    "id": "mc-2",
-    "title": "Nico's Terran Bio Masterclass",
-    "description": "Advanced bio play from opening to late game, including splits, drops, and multitasking.",
-    "coach": "Nico",
-    "coachId": "coach nico",
-    "race": "terran",
-    "videoIds": ["dQw4w9WgXcQ"],
-    "duration": "28:12",
-    "difficulty": "intermediate",
-    "tags": ["bio", "terran", "micro"],
-    "createdAt": "2024-11-15",
-    "updatedAt": "2025-01-05"
-  },
-  {
-    "id": "mc-3",
-    "title": "Groovy's Map Awareness Series",
-    "description": "Learn to read the map, scout effectively, and make better decisions across all matchups.",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "race": "all",
-    "videoIds": ["dQw4w9WgXcQ"],
-    "duration": "21:15",
-    "difficulty": "all",
-    "tags": ["macro", "strategy", "game sense"],
-    "createdAt": "2024-12-20",
-    "updatedAt": "2025-01-08"
   }
 ]

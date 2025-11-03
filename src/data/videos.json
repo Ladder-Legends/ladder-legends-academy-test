@@ -24,42 +24,6 @@
     "isFree": false
   },
   {
-    "id": "cfcc5347-6ad7-4516-8301-f558f49891f5",
-    "title": "chad test video tes",
-    "description": "",
-    "source": "mux",
-    "muxAssetId": "O56Ta9022BHapWfo2hdlomJ2tBJdXoyDlhNATnwQZSh4",
-    "muxPlaybackId": "e01U1v2AuiUJ6K7ZY5dUPJQQlvufyb02KqdxapJcPMitw",
-    "muxAssetStatus": "ready",
-    "thumbnail": "/thumbnails/cfcc5347-6ad7-4516-8301-f558f49891f5.jpg",
-    "date": "2025-10-30",
-    "tags": [],
-    "race": "terran",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "isFree": false
-  },
-  {
-    "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
-    "title": "Video n85AUGyZtPk",
-    "description": "Imported from playlist: Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
-    "date": "2025-10-23",
-    "tags": [
-      "tipsandtricks",
-      "zerg",
-      "terran",
-      "micro",
-      "protoss"
-    ],
-    "race": "all",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "source": "youtube",
-    "youtubeId": "n85AUGyZtPk",
-    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
-    "isFree": false
-  },
-  {
     "id": "31f4310c-2d87-4c18-866e-01ae1b2b26aa",
     "title": "Video gHDUWDA-5g",
     "description": "Imported from playlist: Sc2 Tools for Improvement #2: Big Brain Game",
@@ -75,66 +39,6 @@
     "youtubeId": "gHDUWDA-5g",
     "thumbnail": "https://img.youtube.com/vi/gHDUWDA-5g/hqdefault.jpg",
     "isFree": false
-  },
-  {
-    "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
-    "title": "Video 5BLEYQBSF7I",
-    "description": "Imported from playlist: Simple Early Game Zerg Setup vs Protoss",
-    "date": "2025-10-23",
-    "tags": [
-      "zerg",
-      "macro",
-      "tipsntricks"
-    ],
-    "race": "zerg",
-    "coach": "Groovy",
-    "coachId": "groovy",
-    "source": "youtube",
-    "youtubeId": "5BLEYQBSF7I",
-    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
-    "isFree": false
-  },
-  {
-    "id": "9a675b9a-ccde-4d70-8ba7-d2089e9ea3a3",
-    "title": "test playlist",
-    "description": "",
-    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg",
-    "date": "2025-10-22",
-    "tags": [],
-    "race": "terran",
-    "coach": "Eon",
-    "coachId": "eon",
-    "videoIds": [
-      "0923e175-1b61-4819-9c33-84be180933df",
-      "671e14f1-8f49-43fc-9676-76c09caa1046"
-    ],
-    "source": "playlist"
-  },
-  {
-    "id": "0923e175-1b61-4819-9c33-84be180933df",
-    "title": "Video 5530I_pYjbo",
-    "description": "Imported from playlist: test playlist",
-    "date": "2025-10-22",
-    "tags": [],
-    "race": "terran",
-    "coach": "Eon",
-    "coachId": "eon",
-    "source": "youtube",
-    "youtubeId": "5530I_pYjbo",
-    "thumbnail": "https://img.youtube.com/vi/5530I_pYjbo/hqdefault.jpg"
-  },
-  {
-    "id": "671e14f1-8f49-43fc-9676-76c09caa1046",
-    "title": "Video vx2u5uUu3DE",
-    "description": "Imported from playlist: test playlist",
-    "date": "2025-10-22",
-    "tags": [],
-    "race": "terran",
-    "coach": "Eon",
-    "coachId": "eon",
-    "source": "youtube",
-    "youtubeId": "vx2u5uUu3DE",
-    "thumbnail": "https://img.youtube.com/vi/vx2u5uUu3DE/hqdefault.jpg"
   },
   {
     "id": "1",
