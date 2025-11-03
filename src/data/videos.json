@@ -829,5 +829,26 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "80191635-11e9-49aa-a451-9d24e9a7285f",
+    "title": "The Nicosystem™ 2-1-1 Stimbat Guide",
+    "description": "filler ",
+    "source": "mux",
+    "muxAssetId": "La00yUyGPJPYkuq5GDRERwF3d6vnsmkv8PxRRnKAm4aE",
+    "muxPlaybackId": "peAKMFp00571pxBPPkPQe00iQIS023UxFJZlEmTB9XY00aw",
+    "muxAssetStatus": "ready",
+    "thumbnail": "https://image.mux.com/peAKMFp00571pxBPPkPQe00iQIS023UxFJZlEmTB9XY00aw/thumbnail.jpg",
+    "date": "2025-11-03",
+    "tags": [
+      "nico",
+      "tvz",
+      "timing",
+      "macro"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
