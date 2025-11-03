@@ -5,6 +5,7 @@ import videosData from '@/data/videos.json';
 import { BuildOrder } from '@/types/build-order';
 import { Video, getVideoThumbnailUrl } from '@/types/video';
 import { BuildOrderDetailClient } from './build-order-detail-client';
+import { BuildOrderStructuredData } from '@/components/seo/structured-data';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 const allVideos = videosData as Video[];
@@ -82,5 +83,10 @@ export default function BuildOrderDetailPage({ params }: { params: { id: string 
     notFound();
   }
 
-  return <BuildOrderDetailClient buildOrder={buildOrder} />;
+  return (
+    <>
+      <BuildOrderStructuredData buildOrder={buildOrder} />
+      <BuildOrderDetailClient buildOrder={buildOrder} />
+    </>
+  );
 }

@@ -5,6 +5,7 @@ import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
 import { Video, getVideoThumbnailUrl } from '@/types/video';
 import { ReplayDetailClient } from './replay-detail-client';
+import { ReplayStructuredData } from '@/components/seo/structured-data';
 
 const allReplays = replaysData as Replay[];
 const allVideos = videosData as Video[];
@@ -81,5 +82,10 @@ export default function ReplayDetailPage({ params }: { params: { id: string } })
     notFound();
   }
 
-  return <ReplayDetailClient replay={replay} />;
+  return (
+    <>
+      <ReplayStructuredData replay={replay} />
+      <ReplayDetailClient replay={replay} />
+    </>
+  );
 }

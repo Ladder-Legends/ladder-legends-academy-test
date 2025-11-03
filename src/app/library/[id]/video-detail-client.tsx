@@ -176,9 +176,9 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
             </div>
 
             {/* Video Player and Playlist Layout */}
-            <div className={videoIsPlaylist ? 'grid lg:grid-cols-3 gap-6' : ''}>
+            <div className={videoIsPlaylist ? 'grid lg:grid-cols-4 gap-6' : ''}>
               {/* Main Video Player Section */}
-              <div className={videoIsPlaylist ? 'lg:col-span-2' : ''}>
+              <div className={videoIsPlaylist ? 'lg:col-span-3' : ''}>
                 {/* Video Player */}
                 {isMuxVideo(currentVideo) ? (
                   // Mux Video Player
@@ -271,33 +271,28 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                       {playlistVideos.map((plVideo, index) => (
                         <div
                           key={plVideo.id}
-                          className={`relative group border-b-2 border-border last:border-b-0 ${
+                          className={`relative group border-b-2 border-foreground/20 last:border-b-0 ${
                             currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
                           }`}
                         >
                           <button
                             onClick={() => setCurrentVideoIndex(index)}
-                            className="w-full p-1 text-left hover:bg-muted/50 transition-colors"
+                            className="w-full p-2 hover:bg-muted/50 transition-colors"
                           >
-                            <div className="flex gap-3">
-                              <div className="flex-shrink-0 text-sm text-muted-foreground font-medium w-6">
-                                {index + 1}
+                            <div className="flex flex-col px-2">
+                              {/* Thumbnail - uses helper to get correct URL for YouTube/Mux videos */}
+                              <div className="aspect-video bg-muted rounded overflow-hidden mb-2 w-full">
+                                <Image
+                                  key={`${plVideo.id}-thumb`}
+                                  src={getVideoThumbnailUrl(plVideo, 'medium')}
+                                  alt={plVideo.title}
+                                  width={320}
+                                  height={180}
+                                  unoptimized
+                                  className="object-cover w-full h-full"
+                                />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                {/* Thumbnail - uses helper to get correct URL for YouTube/Mux videos */}
-                                <div className="aspect-video bg-muted rounded overflow-hidden mb-2">
-                                  <Image
-                                    key={`${plVideo.id}-thumb`}
-                                    src={getVideoThumbnailUrl(plVideo, 'medium')}
-                                    alt={plVideo.title}
-                                    width={120}
-                                    height={68}
-                                    unoptimized
-                                    className="object-cover w-full h-full"
-                                  />
-                                </div>
-                                <p className="text-sm font-medium line-clamp-2 pb-2">{plVideo.title}</p>
-                              </div>
+                              <p className="text-xs font-medium line-clamp-2 text-center pb-1 w-full">{plVideo.title}</p>
                             </div>
                           </button>
 

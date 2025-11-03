@@ -5,6 +5,7 @@ import videosData from '@/data/videos.json';
 import { Masterclass } from '@/types/masterclass';
 import { Video, getVideoThumbnailUrl } from '@/types/video';
 import { MasterclassDetailClient } from './masterclass-detail-client';
+import { MasterclassStructuredData } from '@/components/seo/structured-data';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 const allVideos = videosData as Video[];
@@ -82,5 +83,10 @@ export default function MasterclassDetailPage({ params }: { params: { id: string
     notFound();
   }
 
-  return <MasterclassDetailClient masterclass={masterclass} />;
+  return (
+    <>
+      <MasterclassStructuredData masterclass={masterclass} />
+      <MasterclassDetailClient masterclass={masterclass} />
+    </>
+  );
 }

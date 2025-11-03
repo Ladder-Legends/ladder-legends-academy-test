@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import videosData from '@/data/videos.json';
 import { Video, getVideoThumbnailUrl, isPlaylist } from '@/types/video';
 import { VideoDetailClient } from './video-detail-client';
+import { VideoStructuredData } from '@/components/seo/structured-data';
 
 const allVideos = videosData as Video[];
 
@@ -80,5 +81,10 @@ export default async function VideoDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <VideoDetailClient video={video} />;
+  return (
+    <>
+      <VideoStructuredData video={video} />
+      <VideoDetailClient video={video} />
+    </>
+  );
 }
