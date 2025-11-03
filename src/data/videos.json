@@ -808,5 +808,26 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "fce29407-cde6-42d1-8ca1-8011712bbe4e",
+    "title": "The Nicosystem™ 5-1-1 Tank Push vs Toss",
+    "description": "filler ",
+    "source": "mux",
+    "muxAssetId": "I1fg01fzqlBoQtcftfzoauKyYR9CYpQynnjX1OUdUIRY",
+    "muxPlaybackId": "flk6Td02ZUMkY022v5YKGAGeEWq43NWOiLaw6X5mOUA14",
+    "muxAssetStatus": "ready",
+    "thumbnail": "https://image.mux.com/flk6Td02ZUMkY022v5YKGAGeEWq43NWOiLaw6X5mOUA14/thumbnail.jpg",
+    "date": "2025-11-03",
+    "tags": [
+      "nico",
+      "tvp",
+      "macro",
+      "timing"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
