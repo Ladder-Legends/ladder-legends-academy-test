@@ -415,30 +415,6 @@
     "coachId": "hino"
   },
   {
-    "id": "22",
-    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellaneous Guide:",
-    "description": "A compilation guide of some hotkeys I use to optimise my control in-game.\n",
-    "youtubeId": "xqTohXpzkQU",
-    "thumbnail": "https://img.youtube.com/vi/xqTohXpzkQU/hqdefault.jpg",
-    "date": "2025-09-01",
-    "tags": [],
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
-    "id": "23",
-    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-01",
-    "tags": [],
-    "youtubeId": "pHi_OBQ0WPg",
-    "thumbnail": "https://img.youtube.com/vi/pHi_OBQ0WPg/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
     "id": "24",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
@@ -499,20 +475,6 @@
     "coachId": "groovy"
   },
   {
-    "id": "30",
-    "title": "Countering meta-playstyles with the Nicosystem",
-    "description": "Here's an indepth guide analysing one of my replays where I play against gateway opener into storm, along with discussing the things I did to put myself in a position to succeed, despite my sub-par...",
-    "date": "2025-08-14",
-    "tags": [
-      "micro"
-    ],
-    "youtubeId": "DG9kRNRAHZE",
-    "thumbnail": "https://img.youtube.com/vi/DG9kRNRAHZE/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
     "id": "31",
     "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
     "description": "Coaching video for Starcraft 2",
@@ -523,18 +485,6 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy"
-  },
-  {
-    "id": "32",
-    "title": "The Nicosystem™ Beginner Terran Builds",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-08",
-    "tags": [],
-    "youtubeId": "aLP0tR22PO0",
-    "thumbnail": "https://img.youtube.com/vi/aLP0tR22PO0/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
   },
   {
     "id": "33",
@@ -693,18 +643,6 @@
     "coachId": "hino"
   },
   {
-    "id": "46",
-    "title": "The Nicosystem™  Resources, Tips and Tricks and Miscellanious Guide:",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-29",
-    "tags": [],
-    "youtubeId": "9UxGYUQZzlM",
-    "thumbnail": "https://img.youtube.com/vi/9UxGYUQZzlM/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
     "id": "47",
     "title": "Untitled Video",
     "description": "Coaching video for Starcraft 2",
@@ -739,30 +677,6 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino"
-  },
-  {
-    "id": "50",
-    "title": "The Nicosystem™ Ladder VOD compendium",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-09",
-    "tags": [],
-    "youtubeId": "TIT8dP33keE",
-    "thumbnail": "https://img.youtube.com/vi/TIT8dP33keE/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
-  },
-  {
-    "id": "51",
-    "title": "The Nicosystem™ Ladder VOD compendium",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-09",
-    "tags": [],
-    "youtubeId": "5xh1WVcRoSA",
-    "thumbnail": "https://img.youtube.com/vi/5xh1WVcRoSA/hqdefault.jpg",
-    "race": "terran",
-    "coach": "Nico",
-    "coachId": "coach-nico"
   },
   {
     "id": "53",
