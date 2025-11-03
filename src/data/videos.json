@@ -785,5 +785,28 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino"
+  },
+  {
+    "id": "d71a9493-cb0d-4439-9674-8982d829360d",
+    "title": "Scouting Zerg with 3cc Hellion Banshee",
+    "description": "Hello everyone! In this video I show you guys the current golden standard build of TvZ alongside how to effectively scout your opponent with key timings at a high level. ",
+    "source": "mux",
+    "muxAssetId": "zcTlLYvrQrLFS2DW02QhNzXVHviQPYrMQgvc3GUFvJX4",
+    "muxPlaybackId": "yOo02Lhi4gxzsiATg8ONroQ85Zb02c00J02jTVf2Ws3NhRY",
+    "muxAssetStatus": "ready",
+    "thumbnail": "https://image.mux.com/yOo02Lhi4gxzsiATg8ONroQ85Zb02c00J02jTVf2Ws3NhRY/thumbnail.jpg",
+    "date": "2025-11-03",
+    "tags": [
+      "terran",
+      "nico",
+      "tvz",
+      "scouting",
+      "macro",
+      "build order"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
