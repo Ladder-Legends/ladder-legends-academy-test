@@ -29,12 +29,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!video) {
     return {
-      title: 'Video Not Found | Ladder Legends Academy',
+      title: 'Video Not Found',
       description: 'The requested video could not be found.',
     };
   }
 
-  const title = `${video.title} | Ladder Legends Academy`;
+  const title = video.title;
   const description = video.description || 'Master Starcraft 2 with expert coaching from Ladder Legends Academy';
   const thumbnailUrl = getVideoThumbnailUrl(video, 'high');
   const absoluteThumbnailUrl = thumbnailUrl.startsWith('http')
@@ -47,8 +47,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     openGraph: {
-      title,
+      title: `${title} | Ladder Legends Academy`,
       description,
+      url: `https://www.ladderlegendsacademy.com/library/${id}`,
       type: 'video.other',
       images: [
         {
@@ -62,9 +63,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: `${title} | Ladder Legends Academy`,
       description,
       images: [absoluteThumbnailUrl],
+    },
+    alternates: {
+      canonical: `https://www.ladderlegendsacademy.com/library/${id}`,
     },
     other: {
       'video:tag': video.tags.join(', '),

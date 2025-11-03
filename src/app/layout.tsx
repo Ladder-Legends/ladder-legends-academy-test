@@ -18,8 +18,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ladder Legends Academy | Starcraft 2 Coaching",
+  metadataBase: new URL('https://www.ladderlegendsacademy.com'),
+  title: {
+    default: "Ladder Legends Academy | Starcraft 2 Coaching",
+    template: "%s | Ladder Legends Academy",
+  },
   description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy",
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://www.ladderlegendsacademy.com',
+    siteName: 'Ladder Legends Academy',
+    title: "Ladder Legends Academy | Starcraft 2 Coaching",
+    description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Ladder Legends Academy | Starcraft 2 Coaching",
+    description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy",
+  },
 };
 
 export default function RootLayout({

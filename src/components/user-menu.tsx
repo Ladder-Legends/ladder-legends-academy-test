@@ -2,105 +2,109 @@
 
 import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
-import { Button } from "@/components/ui/button";
-import { LogOut, User, LogIn, Activity } from "lucide-react";
+import { LogOut, User, LogIn, Activity, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { isOwner } from "@/lib/permissions";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
-function SignOutButton() {
-  const [isSigningOut, setIsSigningOut] = React.useState(false);
+function UserAvatar({ name, email }: { name?: string | null; email?: string | null }) {
+  const displayName = name || email || 'User';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <Button
-      onClick={async () => {
-        console.log('[CLIENT] Sign out button clicked');
-        setIsSigningOut(true);
-        try {
-          // Use NextAuth's client-side signOut which handles everything
-          console.log('[CLIENT] Calling clientSignOut with redirect...');
-          await clientSignOut({
-            callbackUrl: '/',
-            redirect: true
-          });
-          console.log('[CLIENT] clientSignOut completed');
-        } catch (error) {
-          console.error('[CLIENT] Sign out error:', error);
-          setIsSigningOut(false);
-        }
-      }}
-      variant="outline"
-      size="sm"
-      className="gap-2"
-      disabled={isSigningOut}
-    >
-      <LogOut className="w-4 h-4" />
-      {isSigningOut ? 'Signing out...' : 'Sign out'}
-    </Button>
-  );
-}
-
-function UserInfo({ session }: { session: { user: { name?: string | null; email?: string | null } } }) {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <User className="w-4 h-4 text-primary" />
-      <span className="text-muted-foreground">
-        {session.user.name || session.user.email}
-      </span>
+    <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+      {initial}
     </div>
   );
 }
 
 export function UserMenu() {
   const { data: session } = useSession();
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
 
   React.useEffect(() => {
     console.log('[CLIENT] UserMenu session state:', session);
   }, [session]);
 
-  // Not logged in - show login button
+  const handleSignOut = async () => {
+    console.log('[CLIENT] Sign out button clicked');
+    setIsSigningOut(true);
+    try {
+      console.log('[CLIENT] Calling clientSignOut with redirect...');
+      await clientSignOut({
+        callbackUrl: '/',
+        redirect: true
+      });
+      console.log('[CLIENT] clientSignOut completed');
+    } catch (error) {
+      console.error('[CLIENT] Sign out error:', error);
+      setIsSigningOut(false);
+    }
+  };
+
+  // Not logged in - show simple login button
   if (!session?.user) {
     return (
       <Link href="/login">
-        <Button size="sm" className="gap-2">
-          <LogIn className="w-4 h-4" />
-          Sign in
-        </Button>
+        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
+          <User className="w-5 h-5" />
+        </div>
       </Link>
     );
   }
 
-  // Logged in but not subscribed - show subscribe CTA + sign out
-  if (!session.user.hasSubscriberRole) {
-    return (
-      <div className="flex items-center gap-3">
-        <Link href="/subscribe">
-          <Button size="sm" className="gap-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
-            Subscribe
-          </Button>
-        </Link>
-        <UserInfo session={session} />
-        <SignOutButton />
-      </div>
-    );
-  }
+  const userName = session.user.name || session.user.email || 'User';
+  const isSubscribed = session.user.hasSubscriberRole;
+  const isAdmin = isOwner(session);
 
-  // Logged in and subscribed - show user info + sign out
   return (
-    <div className="flex items-center gap-4">
-      {isOwner(session) && (
-        <Link href="/admin/checkup">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <Activity className="w-4 h-4" />
-            Checkup
-          </Button>
-        </Link>
+    <DropdownMenu
+      trigger={<UserAvatar name={session.user.name} email={session.user.email} />}
+      align="right"
+    >
+      <DropdownMenuLabel>
+        <div className="flex flex-col">
+          <span className="font-semibold">{userName}</span>
+          {session.user.email && session.user.name && (
+            <span className="text-xs text-muted-foreground font-normal">{session.user.email}</span>
+          )}
+        </div>
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
+
+      {!isSubscribed && (
+        <>
+          <Link href="/subscribe">
+            <DropdownMenuItem>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Subscribe
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
+        </>
       )}
-      <UserInfo session={session} />
-      <SignOutButton />
-    </div>
+
+      {isAdmin && (
+        <>
+          <Link href="/admin/checkup">
+            <DropdownMenuItem>
+              <Activity className="w-4 h-4 mr-2" />
+              Checkup
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
+        </>
+      )}
+
+      <DropdownMenuItem onClick={handleSignOut} className={isSigningOut ? 'opacity-50' : ''}>
+        <LogOut className="w-4 h-4 mr-2" />
+        {isSigningOut ? 'Signing out...' : 'Sign out'}
+      </DropdownMenuItem>
+    </DropdownMenu>
   );
 }
