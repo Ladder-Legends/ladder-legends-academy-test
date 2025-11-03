@@ -14,8 +14,9 @@ export async function generateStaticParams() {
   }));
 }
 
-// Use dynamic rendering to ensure metadata is always fresh
-export const dynamic = 'force-dynamic';
+// Enable static generation with revalidation
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
 
 interface PageProps {
   params: Promise<{ id: string }>;

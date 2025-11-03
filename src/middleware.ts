@@ -7,6 +7,14 @@ export const runtime = 'experimental-edge';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Allow bots and crawlers to access content for SEO/social sharing
+  const userAgent = request.headers.get('user-agent') || '';
+  const isBot = /bot|crawl|slurp|spider|facebook|twitter|whatsapp|linkedin|telegram|discord/i.test(userAgent);
+
+  if (isBot) {
+    return NextResponse.next();
+  }
+
   // Early return for public routes - no auth check needed
   // This saves compute by not calling auth() unnecessarily
   if (
