@@ -28,7 +28,7 @@ export function MuxVideoPlayer({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Use static thumbnail instead of generating token
+  // Use static thumbnail file for poster (downloaded at build time)
   const posterUrl = videoId ? `/thumbnails/${videoId}.jpg` : undefined;
 
   useEffect(() => {

@@ -10,8 +10,11 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const VERCEL_DEPLOY_HOOK = process.env.VERCEL_DEPLOY_HOOK;
 const MAX_RETRY_ATTEMPTS = 3;
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'file';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'file';
 type Operation = 'create' | 'update' | 'delete';
+
+// Content types that are single objects (not arrays)
+const SINGLE_OBJECT_TYPES: ContentType[] = ['about', 'privacy', 'terms'];
 
 interface Change {
   id: string;
@@ -87,8 +90,9 @@ function applyChanges(
   const updatedFiles = { ...files };
 
   for (const [contentType, typeChanges] of Object.entries(changesByType)) {
-    // Special handling for 'about' content type (single object, not array)
-    if (contentType === 'about') {
+    // Check if this is a single-object type (about, privacy, terms, etc.)
+    if (SINGLE_OBJECT_TYPES.includes(contentType as ContentType)) {
+      // Single object content types - just replace the whole object
       for (const change of typeChanges) {
         if (change.operation === 'update') {
           updatedFiles[contentType] = {

@@ -103,15 +103,16 @@ export function VideoSelector({
 
   const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
     // Create a new video entry
+    const videoId = uuidv4();
     const newVideo: Video = {
-      id: uuidv4(),
+      id: videoId,
       title: uploadingVideoTitle || 'Untitled Video',
       description: '',
       source: 'mux',
       muxAssetId: assetId,
       muxPlaybackId: playbackId,
       muxAssetStatus: 'ready',
-      thumbnail: `https://image.mux.com/${playbackId}/thumbnail.jpg`,
+      thumbnail: `/thumbnails/${videoId}.jpg`,
       date: new Date().toISOString().split('T')[0],
       tags: [],
       race: 'terran',

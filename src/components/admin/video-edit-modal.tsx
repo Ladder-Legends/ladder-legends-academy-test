@@ -114,8 +114,8 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       muxAssetId: assetId,
       muxPlaybackId: playbackId,
       muxAssetStatus: 'ready',
-      // Generate a Mux thumbnail URL
-      thumbnail: `https://image.mux.com/${playbackId}/thumbnail.jpg`,
+      // Use static thumbnail file path (downloaded at build time)
+      thumbnail: `/thumbnails/${formData.id}.jpg`,
     });
     toast.success('Mux video linked successfully');
   };
@@ -258,7 +258,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         muxAssetId: formData.muxAssetId!,
         muxPlaybackId: formData.muxPlaybackId!,
         muxAssetStatus: formData.muxAssetStatus || 'ready',
-        thumbnail: formData.thumbnail || `https://image.mux.com/${formData.muxPlaybackId}/thumbnail.jpg`,
+        thumbnail: formData.thumbnail || `/thumbnails/${formData.id}.jpg`,
         date: formData.date || new Date().toISOString().split('T')[0],
         tags: formData.tags || [],
         race: formData.race!,
@@ -342,7 +342,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(false);
-                setFormData({ ...formData, source: 'youtube', videoIds: undefined });
+                setFormData({ ...formData, source: 'youtube' });
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 !isPlaylistMode && (formData.source || 'youtube') === 'youtube'
@@ -356,7 +356,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(false);
-                setFormData({ ...formData, source: 'mux', videoIds: undefined });
+                setFormData({ ...formData, source: 'mux' });
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 !isPlaylistMode && formData.source === 'mux'
@@ -370,7 +370,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(true);
-                setFormData({ ...formData, source: 'playlist', youtubeId: undefined, muxPlaybackId: undefined, muxAssetId: undefined });
+                setFormData({ ...formData, source: 'playlist' });
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 isPlaylistMode

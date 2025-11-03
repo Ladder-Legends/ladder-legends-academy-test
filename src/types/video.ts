@@ -57,6 +57,32 @@ export function getVideoSource(video: Video): VideoSource {
   return isMuxVideo(video) ? 'mux' : 'youtube';
 }
 
+// Helper to get the appropriate thumbnail URL for a video
+export function getVideoThumbnailUrl(video: Video | undefined, quality: 'low' | 'medium' | 'high' = 'medium'): string {
+  if (!video) {
+    return '/placeholder-thumbnail.jpg';
+  }
+
+  // YouTube video - use YouTube thumbnail
+  if (video.youtubeId) {
+    const qualityMap = {
+      low: 'default',
+      medium: 'mqdefault',
+      high: 'hqdefault'
+    };
+    return `https://img.youtube.com/vi/${video.youtubeId}/${qualityMap[quality]}.jpg`;
+  }
+
+  // Mux video - use static thumbnail file (downloaded at build time)
+  // Mux thumbnails require signed URLs when playback is signed, so we use static files
+  if (video.muxPlaybackId || (video.source === 'mux' && video.muxPlaybackId)) {
+    return `/thumbnails/${video.id}.jpg`;
+  }
+
+  // Fallback to thumbnail field
+  return video.thumbnail || '/placeholder-thumbnail.jpg';
+}
+
 export type TagType =
   | 'terran'
   | 'zerg'

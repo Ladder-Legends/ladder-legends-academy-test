@@ -8,15 +8,17 @@ import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Video, isPlaylist, isMuxVideo } from '@/types/video';
+import { Video, isPlaylist, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
 import videos from '@/data/videos.json';
-import { ArrowLeft, CalendarDays, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Edit, Trash2, X, Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 
 interface VideoDetailClientProps {
   video: Video;
@@ -25,7 +27,10 @@ interface VideoDetailClientProps {
 export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPlaylistVideo, setEditingPlaylistVideo] = useState<Video | null>(null);
+  const [isPlaylistVideoEditModalOpen, setIsPlaylistVideoEditModalOpen] = useState(false);
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   const videoIsPlaylist = isPlaylist(video);
@@ -70,6 +75,27 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       console.log('Delete video:', video.id);
       // The actual delete would be handled by the modal/CMS system
     }
+  };
+
+  const handleEditPlaylistVideo = (plVideo: Video) => {
+    setEditingPlaylistVideo(plVideo);
+    setIsPlaylistVideoEditModalOpen(true);
+  };
+
+  const handleRemoveFromPlaylist = (videoIdToRemove: string) => {
+    if (!video.videoIds) return;
+
+    const updatedVideoIds = video.videoIds.filter(id => id !== videoIdToRemove);
+    const updatedVideo = { ...video, videoIds: updatedVideoIds };
+
+    addChange({
+      id: video.id,
+      contentType: 'videos',
+      operation: 'update',
+      data: updatedVideo as unknown as Record<string, unknown>,
+    });
+
+    toast.success('Video removed from playlist (pending commit)');
   };
 
   const formatDate = (dateString: string) => {
@@ -154,20 +180,20 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
               {/* Main Video Player Section */}
               <div className={videoIsPlaylist ? 'lg:col-span-2' : ''}>
                 {/* Video Player */}
-                {isMuxVideo(video) ? (
+                {isMuxVideo(currentVideo) ? (
                   // Mux Video Player
-                  video.muxPlaybackId ? (
+                  currentVideo?.muxPlaybackId ? (
                     <MuxVideoPlayer
-                      playbackId={video.muxPlaybackId}
-                      videoId={video.id}
-                      title={video.title}
+                      playbackId={currentVideo.muxPlaybackId}
+                      videoId={currentVideo.id}
+                      title={currentVideo.title}
                       className="rounded-lg overflow-hidden"
                     />
                   ) : (
                     <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
                       <div className="text-center p-4">
                         <p className="text-muted-foreground">
-                          {video.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                          {currentVideo?.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
                         </p>
                       </div>
                     </div>
@@ -179,7 +205,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                       width="100%"
                       height="100%"
                       src={`https://www.youtube.com/embed/${currentYoutubeId}`}
-                      title={video.title}
+                      title={currentVideo?.title || video.title}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -247,32 +273,66 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                     </div>
                     <div className="max-h-[600px] overflow-y-auto">
                       {playlistVideos.map((plVideo, index) => (
-                        <button
+                        <div
                           key={plVideo.id}
-                          onClick={() => setCurrentVideoIndex(index)}
-                          className={`w-full p-3 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0 ${
+                          className={`relative group border-b border-border last:border-b-0 ${
                             currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
                           }`}
                         >
-                          <div className="flex gap-3">
-                            <div className="flex-shrink-0 text-sm text-muted-foreground font-medium w-6">
-                              {index + 1}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="aspect-video bg-muted rounded overflow-hidden mb-2">
-                                <Image
-                                  src={plVideo.youtubeId ? `https://img.youtube.com/vi/${plVideo.youtubeId}/mqdefault.jpg` : plVideo.thumbnail}
-                                  alt={plVideo.title}
-                                  width={120}
-                                  height={68}
-                                  unoptimized
-                                  className="object-cover w-full h-full"
-                                />
+                          <button
+                            onClick={() => setCurrentVideoIndex(index)}
+                            className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex gap-3">
+                              <div className="flex-shrink-0 text-sm text-muted-foreground font-medium w-6">
+                                {index + 1}
                               </div>
-                              <p className="text-sm font-medium line-clamp-2">{plVideo.title}</p>
+                              <div className="flex-1 min-w-0">
+                                {/* Thumbnail - uses helper to get correct URL for YouTube/Mux videos */}
+                                <div className="aspect-video bg-muted rounded overflow-hidden mb-2">
+                                  <Image
+                                    key={`${plVideo.id}-thumb`}
+                                    src={getVideoThumbnailUrl(plVideo, 'medium')}
+                                    alt={plVideo.title}
+                                    width={120}
+                                    height={68}
+                                    unoptimized
+                                    className="object-cover w-full h-full"
+                                  />
+                                </div>
+                                <p className="text-sm font-medium line-clamp-2">{plVideo.title}</p>
+                              </div>
                             </div>
-                          </div>
-                        </button>
+                          </button>
+
+                          {/* Edit and Remove buttons (only for coaches/owners) */}
+                          <PermissionGate require="coaches">
+                            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditPlaylistVideo(plVideo);
+                                }}
+                                className="p-1.5 bg-background/90 hover:bg-background border border-border rounded-md transition-colors"
+                                title="Edit video"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm(`Remove "${plVideo.title}" from this playlist?`)) {
+                                    handleRemoveFromPlaylist(plVideo.id);
+                                  }
+                                }}
+                                className="p-1.5 bg-background/90 hover:bg-destructive hover:text-destructive-foreground border border-border hover:border-destructive rounded-md transition-colors"
+                                title="Remove from playlist"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </PermissionGate>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -286,12 +346,24 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       {/* Footer */}
       <Footer />
 
-      {/* Edit Modal */}
+      {/* Edit Modal for Playlist */}
       <VideoEditModal
         video={video}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
       />
+
+      {/* Edit Modal for Individual Playlist Videos */}
+      {editingPlaylistVideo && (
+        <VideoEditModal
+          video={editingPlaylistVideo}
+          isOpen={isPlaylistVideoEditModalOpen}
+          onClose={() => {
+            setIsPlaylistVideoEditModalOpen(false);
+            setEditingPlaylistVideo(null);
+          }}
+        />
+      )}
     </div>
   );
 }

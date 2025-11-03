@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Video, isPlaylist, getThumbnailYoutubeId, isMuxVideo } from "@/types/video";
+import { Video, isPlaylist, getThumbnailYoutubeId, isMuxVideo, getVideoThumbnailUrl } from "@/types/video";
 import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
@@ -42,16 +42,8 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
     if (videoIsPlaylist) {
       return video.thumbnail;
     }
-    // Mux videos: use static thumbnail file
-    if (isMuxVideo(video)) {
-      return `/thumbnails/${video.id}.jpg`;
-    }
-    // YouTube videos: construct thumbnail URL from youtubeId
-    if (video.youtubeId) {
-      return `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
-    }
-    // Fallback: use thumbnail field
-    return video.thumbnail;
+    // Single videos (YouTube or Mux): use helper to get correct thumbnail
+    return getVideoThumbnailUrl(video, 'high');
   })();
 
   return (
