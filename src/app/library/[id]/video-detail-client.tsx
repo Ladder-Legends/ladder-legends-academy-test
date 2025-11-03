@@ -267,21 +267,17 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
               {videoIsPlaylist && (
                 <div className="lg:col-span-1">
                   <div className="border border-border rounded-lg bg-card overflow-hidden sticky top-24">
-                    <div className="p-4 border-b border-border bg-muted/50">
-                      <h2 className="font-semibold">Playlist</h2>
-                      <p className="text-sm text-muted-foreground">{playlistVideos.length} videos</p>
-                    </div>
                     <div className="max-h-[600px] overflow-y-auto">
                       {playlistVideos.map((plVideo, index) => (
                         <div
                           key={plVideo.id}
-                          className={`relative group border-b border-border last:border-b-0 ${
+                          className={`relative group border-b-2 border-border last:border-b-0 ${
                             currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
                           }`}
                         >
                           <button
                             onClick={() => setCurrentVideoIndex(index)}
-                            className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
+                            className="w-full p-1 text-left hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex gap-3">
                               <div className="flex-shrink-0 text-sm text-muted-foreground font-medium w-6">
@@ -300,7 +296,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                                     className="object-cover w-full h-full"
                                   />
                                 </div>
-                                <p className="text-sm font-medium line-clamp-2">{plVideo.title}</p>
+                                <p className="text-sm font-medium line-clamp-2 pb-2">{plVideo.title}</p>
                               </div>
                             </div>
                           </button>
