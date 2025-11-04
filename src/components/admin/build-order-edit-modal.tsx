@@ -11,7 +11,7 @@ import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
 import replays from '@/data/replays.json';
 import { Replay, Matchup, Race as ReplayRace } from '@/types/replay';
-import { Plus, Trash2, MoveUp, MoveDown, X } from 'lucide-react';
+import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 
