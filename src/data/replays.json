@@ -214,5 +214,28 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1400636346086985817.SC2Replay",
     "videoIds": []
+  },
+  {
+    "id": "replay-7df54317-f263-42db-830e-7ccd854cde76",
+    "title": "Ultralove - Mabadi vs A.I. 1 (Very Easy)",
+    "map": "Ultralove",
+    "matchup": "TvP",
+    "player1": {
+      "name": "Mabadi",
+      "race": "terran",
+      "result": "Win"
+    },
+    "player2": {
+      "name": "A.I. 1 (Very Easy)",
+      "race": "protoss",
+      "result": "Loss"
+    },
+    "duration": "08.45",
+    "gameDate": "2025-08-08",
+    "uploadDate": "2025-11-04",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "isFree": false
   }
 ]
