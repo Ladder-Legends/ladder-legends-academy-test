@@ -28,8 +28,13 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('video/')) {
+    // Validate file type - check both MIME type and extension
+    const validExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.wmv', '.flv', '.webm', '.m4v', '.mpeg', '.mpg'];
+    const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    const isValidMimeType = file.type.startsWith('video/');
+    const isValidExtension = validExtensions.includes(fileExtension);
+
+    if (!isValidMimeType && !isValidExtension) {
       toast.error('Please select a valid video file');
       return;
     }

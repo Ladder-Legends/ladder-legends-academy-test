@@ -1,3 +1,5 @@
+import { Video, getVideoThumbnailUrl } from './video';
+
 export type Race = 'terran' | 'zerg' | 'protoss';
 export type Matchup = 'TvT' | 'TvZ' | 'TvP' | 'ZvT' | 'ZvZ' | 'ZvP' | 'PvT' | 'PvZ' | 'PvP';
 
@@ -31,4 +33,21 @@ export interface Replay {
 
   // Access control: undefined or false = premium (default), true = free
   isFree?: boolean;
+}
+
+// Helper to get the appropriate thumbnail URL for a replay
+// Uses the first video's thumbnail if available, otherwise returns null
+export function getReplayThumbnailUrl(replay: Replay, videos: Video[], quality: 'low' | 'medium' | 'high' = 'medium'): string | null {
+  // Try to get thumbnail from first video
+  if (replay.videoIds && replay.videoIds.length > 0) {
+    const firstVideoId = replay.videoIds[0];
+    const firstVideo = videos.find(v => v.id === firstVideoId || v.youtubeId === firstVideoId);
+
+    if (firstVideo) {
+      return getVideoThumbnailUrl(firstVideo, quality);
+    }
+  }
+
+  // No thumbnail available
+  return null;
 }

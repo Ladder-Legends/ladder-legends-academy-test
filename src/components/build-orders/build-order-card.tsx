@@ -1,13 +1,18 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BuildOrder } from "@/types/build-order";
-import { Video, Lock, Edit, Trash2, FileText } from "lucide-react";
+import { BuildOrder, getBuildOrderThumbnailUrl } from "@/types/build-order";
+import { Video as VideoIcon, Lock, Edit, Trash2, FileText } from "lucide-react";
 import Link from "next/link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
+import { Video } from "@/types/video";
+import videosData from "@/data/videos.json";
+import Image from "next/image";
+
+const videos = videosData as Video[];
 
 interface BuildOrderCardProps {
   buildOrder: BuildOrder;
@@ -18,6 +23,7 @@ interface BuildOrderCardProps {
 export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+  const thumbnailUrl = getBuildOrderThumbnailUrl(buildOrder, videos);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -47,10 +53,20 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 overflow-hidden flex items-center justify-center">
-            {/* Matchup Display */}
-            <div className="text-6xl font-bold text-muted-foreground/20">
-              {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
-            </div>
+            {/* Thumbnail or Matchup Display */}
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt={buildOrder.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="text-6xl font-bold text-muted-foreground/20">
+                {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
+              </div>
+            )}
 
             {/* Premium Badge */}
             {!buildOrder.isFree && !hasSubscriberRole && (
@@ -67,7 +83,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
               </div>
               {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
                 <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                  <Video className="w-6 h-6 text-white" />
+                  <VideoIcon className="w-6 h-6 text-white" />
                 </div>
               )}
             </div>

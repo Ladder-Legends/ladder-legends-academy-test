@@ -3,11 +3,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Replay } from "@/types/replay";
-import { CalendarDays, Download, Video, Pencil, Trash2, Lock } from "lucide-react";
+import { Replay, getReplayThumbnailUrl } from "@/types/replay";
+import { CalendarDays, Download, Video as VideoIcon, Pencil, Trash2, Lock } from "lucide-react";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { useSession } from "next-auth/react";
+import { Video } from "@/types/video";
+import videosData from "@/data/videos.json";
+import Image from "next/image";
+
+const videos = videosData as Video[];
 
 interface ReplayCardProps {
   replay: Replay;
@@ -18,6 +23,7 @@ interface ReplayCardProps {
 export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+  const thumbnailUrl = getReplayThumbnailUrl(replay, videos);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -45,10 +51,20 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 overflow-hidden flex items-center justify-center">
-            {/* Matchup Display */}
-            <div className="text-6xl font-bold text-muted-foreground/20">
-              {replay.matchup}
-            </div>
+            {/* Thumbnail or Matchup Display */}
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt={replay.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="text-6xl font-bold text-muted-foreground/20">
+                {replay.matchup}
+              </div>
+            )}
 
             {/* Premium Badge */}
             {!replay.isFree && !hasSubscriberRole && (
@@ -67,7 +83,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
               )}
               {replay.videoIds && replay.videoIds.length > 0 && (
                 <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                  <Video className="w-6 h-6 text-white" />
+                  <VideoIcon className="w-6 h-6 text-white" />
                 </div>
               )}
             </div>
