@@ -83,8 +83,9 @@ async function downloadReplayFromDiscord(url: string, filename: string): Promise
     console.log(`   ✅ Downloaded ${(buffer.length / 1024).toFixed(1)}KB`);
 
     return filepath;
-  } catch (error: any) {
-    console.error(`   ❌ Error downloading:`, error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`   ❌ Error downloading:`, message);
     return null;
   }
 }
@@ -100,19 +101,20 @@ async function uploadToBlob(filepath: string, filename: string): Promise<string 
 
     console.log(`   ✅ Uploaded to blob: ${blob.url}`);
     return blob.url;
-  } catch (error: any) {
+  } catch (error) {
     // If blob already exists, construct the URL and return it
-    if (error.message?.includes('This blob already exists')) {
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('This blob already exists')) {
       const blobUrl = `https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/${filename}`;
       console.log(`   ℹ️  Blob exists, using existing URL: ${blobUrl}`);
       return blobUrl;
     }
-    console.error(`   ❌ Error uploading to blob:`, error.message);
+    console.error(`   ❌ Error uploading to blob:`, message);
     return null;
   }
 }
 
-async function analyzeReplay(filepath: string): Promise<any> {
+async function analyzeReplay(filepath: string): Promise<Record<string, unknown> | null> {
   try {
     const { exec } = await import('child_process');
     const { promisify } = await import('util');
@@ -123,10 +125,11 @@ async function analyzeReplay(filepath: string): Promise<any> {
       `curl -X POST http://localhost:8000/analyze -H "X-API-Key: ***REDACTED_API_KEY***" -F "file=@${filepath}" -s`
     );
 
-    const result = JSON.parse(stdout);
+    const result = JSON.parse(stdout) as Record<string, unknown>;
     return result;
-  } catch (error: any) {
-    console.error(`   ❌ Error analyzing replay:`, error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`   ❌ Error analyzing replay:`, message);
     return null;
   }
 }
@@ -137,7 +140,9 @@ async function main() {
   // Create temp directory
   try {
     mkdirSync(TEMP_DIR, { recursive: true });
-  } catch (e) {}
+  } catch {
+    // Directory already exists, ignore
+  }
 
   // Load scraped replays
   const scrapedReplays: ScrapedReplay[] = JSON.parse(readFileSync(SCRAPED_REPLAYS_PATH, 'utf-8'));
@@ -177,8 +182,8 @@ async function main() {
         continue;
       }
 
-      const metadata = analysis.metadata;
-      const players = metadata.players || [];
+      const metadata = analysis.metadata as Record<string, unknown>;
+      const players = (metadata.players as Array<Record<string, unknown>>) || [];
 
       // Upload to Vercel Blob
       console.log('   ☁️  Uploading to Vercel Blob...');
@@ -193,8 +198,8 @@ async function main() {
       // Determine matchup
       let matchup = 'Unknown';
       if (players.length >= 2) {
-        const race1 = players[0].race?.[0]?.toUpperCase() || '?';
-        const race2 = players[1].race?.[0]?.toUpperCase() || '?';
+        const race1 = String(players[0].race)?.[0]?.toUpperCase() || '?';
+        const race2 = String(players[1].race)?.[0]?.toUpperCase() || '?';
         matchup = `${race1}v${race2}`;
       }
 
@@ -202,26 +207,26 @@ async function main() {
       const stored: StoredReplay = {
         id: replay.id,
         title: replay.title,
-        map: metadata.map_name || 'Unknown Map',
+        map: String(metadata.map_name) || 'Unknown Map',
         matchup,
         player1: {
-          name: players[0]?.name || 'Player 1',
-          race: players[0]?.race?.toLowerCase() || 'unknown',
-          mmr: players[0]?.mmr,
-          result: players[0]?.result?.toLowerCase() || 'unknown',
+          name: String(players[0]?.name) || 'Player 1',
+          race: String(players[0]?.race)?.toLowerCase() || 'unknown',
+          mmr: players[0]?.mmr as number | undefined,
+          result: String(players[0]?.result)?.toLowerCase() || 'unknown',
         },
         player2: {
-          name: players[1]?.name || 'Player 2',
-          race: players[1]?.race?.toLowerCase() || 'unknown',
-          mmr: players[1]?.mmr,
-          result: players[1]?.result?.toLowerCase() || 'unknown',
+          name: String(players[1]?.name) || 'Player 2',
+          race: String(players[1]?.race)?.toLowerCase() || 'unknown',
+          mmr: players[1]?.mmr as number | undefined,
+          result: String(players[1]?.result)?.toLowerCase() || 'unknown',
         },
-        duration: metadata.game_length?.replace('0:', '') || '00:00',
+        duration: String(metadata.game_length)?.replace('0:', '') || '00:00',
         gameDate: replay.gameDate,
         uploadDate: replay.uploadDate,
         coach: replay.coach,
         tags: replay.tags,
-        patch: metadata.release_string,
+        patch: String(metadata.release_string),
         notes: replay.notes,
         downloadUrl: blobUrl,
         videoIds: [],
@@ -230,8 +235,9 @@ async function main() {
       storedReplays.push(stored);
       successCount++;
       console.log(`   ✅ ${stored.map} - ${stored.matchup} (${stored.duration})\n`);
-    } catch (error: any) {
-      console.error(`   ❌ Error processing replay:`, error.message, '\n');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`   ❌ Error processing replay:`, message, '\n');
       failCount++;
     }
   }

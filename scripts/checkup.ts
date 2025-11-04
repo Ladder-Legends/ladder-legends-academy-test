@@ -145,8 +145,9 @@ async function syncDiscordEvents(): Promise<void> {
     writeFileSync(eventsPath, JSON.stringify(syncedEvents, null, 2));
     console.log(`   ✅ Synced ${syncedEvents.length} event(s) to src/data/events.json`);
 
-  } catch (error: any) {
-    console.error(`   ❌ Error syncing events:`, error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`   ❌ Error syncing events:`, message);
   }
 }
 
