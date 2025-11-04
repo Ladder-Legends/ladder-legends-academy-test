@@ -183,6 +183,57 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     }
   };
 
+  const analyzeExistingReplay = async () => {
+    if (!formData.replayId) {
+      toast.error('Please select a replay first');
+      return;
+    }
+
+    const replay = allReplays.find(r => r.id === formData.replayId);
+    if (!replay || !replay.downloadUrl) {
+      toast.error('Replay file not found');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setReplayAnalysisData(null);
+    setSelectedPlayerForImport(null);
+
+    try {
+      // Fetch the replay file
+      const fileResponse = await fetch(replay.downloadUrl);
+      if (!fileResponse.ok) {
+        throw new Error('Failed to download replay file');
+      }
+
+      const blob = await fileResponse.blob();
+      const file = new File([blob], `${replay.id}.SC2Replay`, { type: 'application/octet-stream' });
+
+      // Analyze the replay
+      const analyzeFormData = new FormData();
+      analyzeFormData.append('file', file);
+
+      const response = await fetch('/api/analyze-replay', {
+        method: 'POST',
+        body: analyzeFormData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Analysis failed');
+      }
+
+      const data = await response.json();
+      setReplayAnalysisData(data);
+      toast.success('Replay analyzed! You can now import build steps and metadata.');
+    } catch (error) {
+      console.error('Error analyzing replay:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const clearReplay = () => {
     setFormData({
       ...formData,
@@ -412,8 +463,8 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   };
 
   const handleSave = () => {
-    if (!formData.id || !formData.name || !formData.coach || !formData.coachId) {
-      toast.error('Please fill in all required fields (Name, Coach, Coach ID)');
+    if (!formData.id || !formData.name) {
+      toast.error('Please fill in all required fields (Name)');
       return;
     }
 
@@ -429,8 +480,8 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       vsRace: formData.vsRace || 'terran',
       type: (typeInput.trim() as BuildType) || 'macro',
       difficulty: formData.difficulty || 'beginner',
-      coach: formData.coach,
-      coachId: formData.coachId,
+      coach: formData.coach || '',
+      coachId: formData.coachId || '',
       description: formData.description || '',
       videoIds: formData.videoIds || [],
       steps: formData.steps,
@@ -469,7 +520,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Coach *</label>
+            <label className="block text-sm font-medium mb-1">Coach</label>
             <div className="relative">
               <div className="flex gap-2">
                 <input
@@ -520,13 +571,16 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           </div>
         </div>
 
-        <VideoSelector
-          mode="playlist"
-          selectedVideoIds={formData.videoIds || []}
-          onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
-          label="Videos"
-          suggestedTitle={formData.name}
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
+            value={formData.description || ''}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            rows={2}
+            placeholder="Description of the build order..."
+          />
+        </div>
 
         {/* Replay Link Section */}
         <div>
@@ -689,191 +743,54 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={2}
-            placeholder="Description of the build order..."
-          />
-        </div>
-
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isFree || false}
-              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
-              className="w-4 h-4 rounded border-border"
-            />
-            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
-          </label>
-          <p className="text-xs text-muted-foreground mt-1">
-            Leave unchecked for premium content (subscribers only). Defaults to premium.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Race *</label>
-            <select
-              value={formData.race || 'terran'}
-              onChange={(e) => setFormData({ ...formData, race: e.target.value as Race })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="terran">Terran</option>
-              <option value="zerg">Zerg</option>
-              <option value="protoss">Protoss</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">vs Race *</label>
-            <select
-              value={formData.vsRace || 'terran'}
-              onChange={(e) => setFormData({ ...formData, vsRace: e.target.value as VsRace })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="terran">Terran</option>
-              <option value="zerg">Zerg</option>
-              <option value="protoss">Protoss</option>
-              <option value="all">All</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Type *</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={typeInput}
-                onChange={(e) => setTypeInput(e.target.value)}
-                onFocus={() => setShowTypeDropdown(true)}
-                onBlur={() => setTimeout(() => setShowTypeDropdown(false), 200)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="macro, all-in, timing..."
-              />
-              {/* Type autocomplete dropdown */}
-              {showTypeDropdown && filteredTypes.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredTypes.map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setTypeInput(type)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm capitalize"
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Difficulty *</label>
-            <select
-              value={formData.difficulty || 'beginner'}
-              onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Patch</label>
-            <input
-              type="text"
-              value={formData.patch || ''}
-              onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="5.0.14"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Date</label>
-            <input
-              type="date"
-              value={formData.updatedAt || ''}
-              onChange={(e) => setFormData({ ...formData, updatedAt: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
-          <div className="space-y-2">
-            {/* Selected tags */}
-            {formData.tags && formData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="hover:text-primary/70"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Tag input with autocomplete */}
-            <div className="relative">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                onFocus={() => setShowTagDropdown(true)}
-                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to add tags (press Enter)"
-              />
-
-              {/* Autocomplete dropdown */}
-              {showTagDropdown && filteredTags.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => addTag(tag)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+        {/* Build Order Steps Section */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="block text-sm font-medium">Build Order Steps *</label>
-            <Button onClick={addStep} size="sm" variant="outline">
-              <Plus className="h-4 w-4" />
-              Add Step
-            </Button>
+            <div className="flex gap-2">
+              {formData.replayId && (
+                <Button
+                  onClick={analyzeExistingReplay}
+                  size="sm"
+                  variant="outline"
+                  disabled={isAnalyzing}
+                  type="button"
+                >
+                  {isAnalyzing ? 'Analyzing...' : 'Analyze Replay'}
+                </Button>
+              )}
+              <Button onClick={addStep} size="sm" variant="outline" type="button">
+                <Plus className="h-4 w-4" />
+                Add Step
+              </Button>
+            </div>
           </div>
+
+          {/* Show analysis results if available */}
+          {replayAnalysisData && formData.replayId && (
+            <div className="mb-3 border border-border rounded-lg p-3 bg-muted/30">
+              <label className="block text-sm font-medium mb-2">Import Build Steps From:</label>
+              <div className="grid grid-cols-2 gap-2">
+                {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
+                  <button
+                    key={player.name}
+                    type="button"
+                    onClick={() => importBuildOrderFromPlayer(player.name)}
+                    className={`p-2 border-2 rounded-md text-left transition-colors ${
+                      selectedPlayerForImport === player.name
+                        ? 'border-green-600 bg-green-600/10'
+                        : 'border-border hover:border-primary hover:bg-primary/5'
+                    }`}
+                  >
+                    <div className="font-medium text-sm">{player.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {player.race} • {player.result}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2 max-h-96 overflow-y-auto border border-border rounded-md p-3">
             {formData.steps && formData.steps.length > 0 ? (
@@ -952,6 +869,181 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
               </p>
             )}
           </div>
+        </div>
+
+        {/* Additional Metadata Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Additional Metadata</label>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Race *</label>
+              <select
+                value={formData.race || 'terran'}
+                onChange={(e) => setFormData({ ...formData, race: e.target.value as Race })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="terran">Terran</option>
+                <option value="zerg">Zerg</option>
+                <option value="protoss">Protoss</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">vs Race *</label>
+              <select
+                value={formData.vsRace || 'terran'}
+                onChange={(e) => setFormData({ ...formData, vsRace: e.target.value as VsRace })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="terran">Terran</option>
+                <option value="zerg">Zerg</option>
+                <option value="protoss">Protoss</option>
+                <option value="all">All</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Type *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={typeInput}
+                  onChange={(e) => setTypeInput(e.target.value)}
+                  onFocus={() => setShowTypeDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowTypeDropdown(false), 200)}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                  placeholder="macro, all-in, timing..."
+                />
+                {/* Type autocomplete dropdown */}
+                {showTypeDropdown && filteredTypes.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {filteredTypes.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setTypeInput(type)}
+                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm capitalize"
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Difficulty *</label>
+              <select
+                value={formData.difficulty || 'beginner'}
+                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Patch</label>
+              <input
+                type="text"
+                value={formData.patch || ''}
+                onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="5.0.14"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Date</label>
+              <input
+                type="date"
+                value={formData.updatedAt || ''}
+                onChange={(e) => setFormData({ ...formData, updatedAt: e.target.value })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-1">Tags</label>
+            <div className="space-y-2">
+              {/* Selected tags */}
+              {formData.tags && formData.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="hover:text-primary/70"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Tag input with autocomplete */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagInputKeyDown}
+                  onFocus={() => setShowTagDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                  placeholder="Type to add tags (press Enter)"
+                />
+
+                {/* Autocomplete dropdown */}
+                {showTagDropdown && filteredTags.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {filteredTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => addTag(tag)}
+                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.isFree || false}
+                onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+                className="w-4 h-4 border-border rounded"
+              />
+              <span className="text-sm font-medium">Free Content</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Video Selector */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Linked Videos</label>
+          <VideoSelector
+            mode="playlist"
+            selectedVideoIds={formData.videoIds || []}
+            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+          />
         </div>
 
         <div className="flex gap-2 pt-4">
