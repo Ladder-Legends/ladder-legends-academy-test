@@ -104,6 +104,7 @@ async function main() {
   let successCount = 0;
   let skipCount = 0;
   let errorCount = 0;
+  let notReadyCount = 0;
 
   // Download thumbnails for each Mux video
   for (const video of muxVideos) {
@@ -129,14 +130,23 @@ async function main() {
       successCount++;
 
     } catch (error) {
-      console.error(`   ❌ Failed: ${error.message}`);
-      errorCount++;
+      // Check if this is a "Playback ID not ready" error (412)
+      if (error.message.includes('412')) {
+        console.warn(`   ⏳ Not ready: ${video.title} (Mux video still processing)`);
+        notReadyCount++;
+      } else {
+        console.error(`   ❌ Failed: ${error.message}`);
+        errorCount++;
+      }
     }
   }
 
   console.log('\n' + '='.repeat(50));
   console.log(`✅ Success: ${successCount}`);
   console.log(`⏭️  Skipped: ${skipCount}`);
+  if (notReadyCount > 0) {
+    console.log(`⏳ Not Ready: ${notReadyCount} (videos still processing)`);
+  }
   console.log(`❌ Errors:  ${errorCount}`);
   console.log('='.repeat(50) + '\n');
 
@@ -145,7 +155,11 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('🎉 All Mux thumbnails downloaded successfully!\n');
+  if (notReadyCount > 0) {
+    console.log('⏳ Some Mux videos are still processing. Thumbnails will be available once processing completes.\n');
+  } else {
+    console.log('🎉 All Mux thumbnails downloaded successfully!\n');
+  }
 }
 
 // Run the script
