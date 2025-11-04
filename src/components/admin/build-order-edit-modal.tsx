@@ -9,9 +9,9 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
-import videos from '@/data/videos.json';
-import { Video } from '@/types/video';
-import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
+import replays from '@/data/replays.json';
+import { Replay, Matchup, Race as ReplayRace } from '@/types/replay';
+import { Plus, Trash2, MoveUp, MoveDown, X } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 
@@ -34,6 +34,9 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [replayAnalysisData, setReplayAnalysisData] = useState<SC2AnalysisResponse | null>(null);
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
+  const [replaySearch, setReplaySearch] = useState('');
+  const [showReplayDropdown, setShowReplayDropdown] = useState(false);
+  const [uploadedReplayFile, setUploadedReplayFile] = useState<File | null>(null);
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -77,6 +80,18 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       coach.displayName.toLowerCase().includes(search)
     );
   }, [coachSearch]);
+
+  // Filter replays based on search input
+  const allReplays = replays as Replay[];
+  const filteredReplays = useMemo(() => {
+    if (!replaySearch.trim()) return allReplays.slice(0, 10); // Show first 10 by default
+    const search = replaySearch.toLowerCase();
+    return allReplays.filter(replay =>
+      replay.title.toLowerCase().includes(search) ||
+      replay.matchup.toLowerCase().includes(search) ||
+      replay.map.toLowerCase().includes(search)
+    ).slice(0, 10);
+  }, [replaySearch, allReplays]);
 
   useEffect(() => {
     if (buildOrder) {
@@ -154,6 +169,108 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     setShowCoachDropdown(false);
   };
 
+  const selectReplay = (replayId: string) => {
+    const replay = allReplays.find(r => r.id === replayId);
+    if (replay) {
+      setFormData({
+        ...formData,
+        replayId: replay.id,
+      });
+      setReplaySearch(replay.title);
+      setShowReplayDropdown(false);
+      toast.success(`Linked to replay: ${replay.title}`);
+    }
+  };
+
+  const clearReplay = () => {
+    setFormData({
+      ...formData,
+      replayId: undefined,
+    });
+    setReplaySearch('');
+    setShowReplayDropdown(false);
+  };
+
+  const saveUploadedReplayToDatabase = async () => {
+    if (!uploadedReplayFile || !replayAnalysisData) {
+      toast.error('No replay file to save');
+      return;
+    }
+
+    const { metadata } = replayAnalysisData;
+
+    // Create a new replay entry
+    const newReplay: Replay = {
+      id: `replay-${uuidv4()}`,
+      title: `${metadata.map_name} - ${metadata.players[0].name} vs ${metadata.players[1].name}`,
+      map: metadata.map_name,
+      matchup: `${metadata.players[0].race.charAt(0)}v${metadata.players[1].race.charAt(0)}` as Matchup,
+      player1: {
+        name: metadata.players[0].name,
+        race: metadata.players[0].race.toLowerCase() as ReplayRace,
+        result: metadata.players[0].result as 'win' | 'loss',
+      },
+      player2: {
+        name: metadata.players[1].name,
+        race: metadata.players[1].race.toLowerCase() as ReplayRace,
+        result: metadata.players[1].result as 'win' | 'loss',
+      },
+      duration: metadata.game_length || '0:00',
+      gameDate: metadata.unix_timestamp
+        ? new Date(metadata.unix_timestamp * 1000).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      uploadDate: new Date().toISOString().split('T')[0],
+      videoIds: [],
+      tags: [],
+      patch: metadata.release_string || undefined,
+      isFree: false,
+    };
+
+    // Upload the replay file
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', uploadedReplayFile);
+    uploadFormData.append('metadata', JSON.stringify({
+      title: newReplay.title,
+      map: newReplay.map,
+      matchup: newReplay.matchup,
+    }));
+
+    try {
+      const response = await fetch('/api/upload-replay', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload replay file');
+      }
+
+      const { downloadUrl } = await response.json();
+      newReplay.downloadUrl = downloadUrl;
+
+      // Add to pending changes
+      addChange({
+        id: newReplay.id,
+        contentType: 'replays',
+        operation: 'create',
+        data: newReplay as unknown as Record<string, unknown>,
+      });
+
+      // Link this replay to the build order
+      setFormData({
+        ...formData,
+        replayId: newReplay.id,
+      });
+      setReplaySearch(newReplay.title);
+
+      toast.success('Replay saved and linked to build order!');
+      setUploadedReplayFile(null);
+    } catch (error) {
+      console.error('Error saving replay:', error);
+      toast.error('Failed to save replay to database');
+    }
+  };
+
   const addStep = () => {
     const newStep: BuildOrderStep = {
       supply: 0,
@@ -205,6 +322,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     setIsAnalyzing(true);
     setReplayAnalysisData(null);
     setSelectedPlayerForImport(null);
+    setUploadedReplayFile(file); // Save the file for later upload
 
     try {
       const analyzeFormData = new FormData();
@@ -222,10 +340,11 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
       const data = await response.json();
       setReplayAnalysisData(data);
-      toast.success('Replay analyzed! Select a player to import their build order.');
+      toast.success('Replay analyzed! You can import build steps and/or save the replay.');
     } catch (error) {
       console.error('Error analyzing replay:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');
+      setUploadedReplayFile(null);
     } finally {
       setIsAnalyzing(false);
       // Reset the input
@@ -314,6 +433,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       patch: formData.patch,
       updatedAt: new Date().toISOString().split('T')[0],
       isFree: formData.isFree || false,
+      replayId: formData.replayId,
     };
 
     addChange({
@@ -402,6 +522,64 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           label="Videos"
           suggestedTitle={formData.name}
         />
+
+        {/* Replay Selector */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Linked Replay (Optional)</label>
+          <div className="relative">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={replaySearch}
+                onChange={(e) => {
+                  setReplaySearch(e.target.value);
+                  setShowReplayDropdown(true);
+                }}
+                onFocus={() => setShowReplayDropdown(true)}
+                onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
+                className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
+                placeholder="Search for an existing replay..."
+              />
+              {formData.replayId && (
+                <button
+                  type="button"
+                  onClick={clearReplay}
+                  className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm flex items-center gap-1"
+                >
+                  <X className="h-4 w-4" />
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Replay dropdown */}
+            {showReplayDropdown && filteredReplays.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {filteredReplays.map((replay) => (
+                  <button
+                    key={replay.id}
+                    type="button"
+                    onClick={() => selectReplay(replay.id)}
+                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
+                  >
+                    <div className="font-medium text-sm">{replay.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {replay.matchup} • {replay.map} • {replay.duration}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {formData.replayId && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Linked to replay ID: <strong>{formData.replayId}</strong>
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground mt-1">
+            Link this build order to an example replay, or upload one below
+          </p>
+        </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
@@ -608,27 +786,46 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
             {/* Player Selection */}
             {replayAnalysisData && (
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">Select Player to Import:</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
-                    <button
-                      key={player.name}
-                      type="button"
-                      onClick={() => importBuildOrderFromPlayer(player.name)}
-                      className={`p-3 border-2 rounded-md text-left transition-colors ${
-                        selectedPlayerForImport === player.name
-                          ? 'border-green-600 bg-green-600/10'
-                          : 'border-border hover:border-primary hover:bg-primary/5'
-                      }`}
-                    >
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {player.race} • {player.result} • APM: {player.apm || 'N/A'}
-                      </div>
-                    </button>
-                  ))}
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Select Player to Import Build Steps:</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
+                      <button
+                        key={player.name}
+                        type="button"
+                        onClick={() => importBuildOrderFromPlayer(player.name)}
+                        className={`p-3 border-2 rounded-md text-left transition-colors ${
+                          selectedPlayerForImport === player.name
+                            ? 'border-green-600 bg-green-600/10'
+                            : 'border-border hover:border-primary hover:bg-primary/5'
+                        }`}
+                      >
+                        <div className="font-medium">{player.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {player.race} • {player.result} • APM: {player.apm || 'N/A'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Save Replay to Database Button */}
+                {uploadedReplayFile && (
+                  <div className="pt-2 border-t border-border">
+                    <Button
+                      type="button"
+                      onClick={saveUploadedReplayToDatabase}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Save Replay to Database & Link to Build Order
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1 text-center">
+                      This will upload the replay file and add it to the replays page
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
