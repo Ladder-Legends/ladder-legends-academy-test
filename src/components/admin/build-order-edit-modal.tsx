@@ -501,15 +501,27 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Patch</label>
-          <input
-            type="text"
-            value={formData.patch || ''}
-            onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="5.0.14"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Patch</label>
+            <input
+              type="text"
+              value={formData.patch || ''}
+              onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              placeholder="5.0.14"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Date</label>
+            <input
+              type="date"
+              value={formData.updatedAt || ''}
+              onChange={(e) => setFormData({ ...formData, updatedAt: e.target.value })}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            />
+          </div>
         </div>
 
         <div>

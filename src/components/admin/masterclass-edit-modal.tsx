@@ -258,18 +258,30 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           suggestedTitle={formData.title}
         />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Duration</label>
-          <input
-            type="text"
-            value={formData.duration || ''}
-            onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="24:15"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Video duration (e.g., &quot;24:15&quot;)
-          </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Duration</label>
+            <input
+              type="text"
+              value={formData.duration || ''}
+              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              placeholder="24:15"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Video duration (e.g., &quot;24:15&quot;)
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Date</label>
+            <input
+              type="date"
+              value={formData.createdAt || ''}
+              onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            />
+          </div>
         </div>
 
         <div>
