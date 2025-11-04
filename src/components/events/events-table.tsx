@@ -57,7 +57,9 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
           <tr>
             <th className="text-left px-6 py-4 text-sm font-semibold">Event</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Type</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Date & Time</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold min-w-[120px]">Date</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">Day</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">Time</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Status</th>
@@ -98,7 +100,19 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
                 {getEventTypeBadge(event.type)}
               </td>
               <td className="px-6 py-4">
-                <EventDateDisplay event={event} />
+                <span className="text-sm text-muted-foreground">
+                  <EventDateDisplay event={event} part="date" />
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <span className="text-sm text-muted-foreground">
+                  <EventDateDisplay event={event} part="day" />
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <span className="text-sm text-muted-foreground">
+                  <EventDateDisplay event={event} part="time" />
+                </span>
               </td>
               <td className="px-6 py-4">
                 <span className="text-sm text-muted-foreground">

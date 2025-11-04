@@ -7,9 +7,11 @@ import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../ty
 import { createFilterField } from '../types';
 import { createBooleanPredicate } from '../filter-engine';
 
-// Helper function to parse duration string (e.g., "12:34" or "1:02:34") into minutes
+// Helper function to parse duration string (e.g., "12.34" or "12:34" or "1:02:34") into minutes
 function parseDuration(duration: string): number {
-  const parts = duration.split(':').map(p => parseInt(p, 10));
+  // Support both . and : as separators
+  const separator = duration.includes('.') ? '.' : ':';
+  const parts = duration.split(separator).map(p => parseInt(p, 10));
   if (parts.length === 2) {
     return parts[0];
   } else if (parts.length === 3) {
