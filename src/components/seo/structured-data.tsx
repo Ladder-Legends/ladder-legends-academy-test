@@ -35,6 +35,7 @@ export function VideoStructuredData({ video }: VideoStructuredDataProps) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
     />
   );
 }
@@ -66,6 +67,7 @@ export function ReplayStructuredData({ replay }: ReplayStructuredDataProps) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
     />
   );
 }
@@ -103,6 +105,7 @@ export function BuildOrderStructuredData({ buildOrder }: BuildOrderStructuredDat
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
     />
   );
 }
@@ -144,6 +147,7 @@ export function MasterclassStructuredData({ masterclass }: MasterclassStructured
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
     />
   );
 }
@@ -166,6 +170,7 @@ export function OrganizationStructuredData() {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
     />
   );
 }
