@@ -1,5 +1,95 @@
 [
   {
+    "id": "mc-krystianer-pvt-pvp-aug2025",
+    "title": "Krystianer Masterclass: PvT + PvP",
+    "description": "Comprehensive masterclass covering Protoss vs Terran and Protoss vs Protoss matchups with Krystianer.",
+    "coach": "Krystianer",
+    "coachId": "krystianer",
+    "race": "protoss",
+    "videoIds": [
+      "UFcKAiUhpU0"
+    ],
+    "duration": "",
+    "difficulty": "intermediate",
+    "tags": [
+      "protoss",
+      "pvt",
+      "pvp",
+      "masterclass"
+    ],
+    "createdAt": "2025-08-28",
+    "updatedAt": "2025-08-28",
+    "isFree": false
+  },
+  {
+    "id": "mc-krystianer-newpatch-oct2025",
+    "title": "Krystianer Masterclass: New Patch (PvZ & PvP & PvT) + Live Games",
+    "description": "Masterclass covering the new patch changes across all Protoss matchups with live gameplay examples.",
+    "coach": "Krystianer",
+    "coachId": "krystianer",
+    "race": "protoss",
+    "videoIds": [
+      "uuEGiblseBs"
+    ],
+    "duration": "",
+    "difficulty": "intermediate",
+    "tags": [
+      "protoss",
+      "pvz",
+      "pvp",
+      "pvt",
+      "masterclass",
+      "patch"
+    ],
+    "createdAt": "2025-10-05",
+    "updatedAt": "2025-10-05",
+    "isFree": false
+  },
+  {
+    "id": "mc-nicoract-terran-oct2025",
+    "title": "Nicoract Terran Masterclass",
+    "description": "Complete Terran masterclass featuring ladder replays and strategic analysis from Nicoract.",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "race": "terran",
+    "videoIds": [],
+    "replayIds": [
+      "replay-nico-ladder-tvp-speed",
+      "replay-nico-masters-cup-vs-babymarine-2",
+      "replay-nico-masters-cup-vs-babymarine-1",
+      "replay-nico-ladder-tvp-default",
+      "replay-nico-ladder-tvz-default"
+    ],
+    "duration": "",
+    "difficulty": "intermediate",
+    "tags": [
+      "terran",
+      "masterclass",
+      "ladder"
+    ],
+    "createdAt": "2025-10-13",
+    "updatedAt": "2025-10-13",
+    "isFree": false
+  },
+  {
+    "id": "mc-mixu-oct2025",
+    "title": "Mixu Masterclass",
+    "description": "Learn as many secrets to zerg openings and play by a very high level Zerg",
+    "coach": "",
+    "coachId": "",
+    "race": "zerg",
+    "videoIds": [],
+    "duration": "",
+    "difficulty": "intermediate",
+    "tags": [
+      "masterclass",
+      "zerg"
+    ],
+    "createdAt": "2025-10-09",
+    "updatedAt": "2025-10-09",
+    "isFree": false
+  },
+  {
     "id": "mc-1",
     "title": "Hino's Complete Zerg Fundamentals",
     "description": "Comprehensive series covering everything from injects to late-game compositions for Zerg players.",

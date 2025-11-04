@@ -1,6 +1,6 @@
 [
   {
-    "id": "replay-1428354917432823969",
+    "id": "replay-nico-ladder-tvp-speed",
     "title": "Ladder_tvp_speed",
     "map": "[TLMC21] Ruby Rock",
     "matchup": "TvP",
@@ -27,7 +27,7 @@
     "videoIds": []
   },
   {
-    "id": "replay-1428354917432823969",
+    "id": "replay-nico-masters-cup-vs-babymarine-2",
     "title": "Masters_Cup_150_quali_Nicoract_vs_BabyMarine_2",
     "map": "Tokamak LE",
     "matchup": "TvT",
@@ -54,7 +54,7 @@
     "videoIds": []
   },
   {
-    "id": "replay-1428354917432823969",
+    "id": "replay-nico-masters-cup-vs-babymarine-1",
     "title": "Masters_Cup_150_quali_Nicoract_vs_BabyMarine_1",
     "map": "Ley Lines",
     "matchup": "TvT",
@@ -81,7 +81,7 @@
     "videoIds": []
   },
   {
-    "id": "replay-1428354917432823969",
+    "id": "replay-nico-ladder-tvp-default",
     "title": "ladder_tvp_default",
     "map": "Ley Lines",
     "matchup": "TvP",
@@ -108,7 +108,7 @@
     "videoIds": []
   },
   {
-    "id": "replay-1428354917432823969",
+    "id": "replay-nico-ladder-tvz-default",
     "title": "ladder_tvz_default",
     "map": "Persephone LE",
     "matchup": "TvZ",
