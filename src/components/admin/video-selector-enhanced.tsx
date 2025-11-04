@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Video } from '@/types/video';
-import videos from '@/data/videos.json';
+import videosJson from '@/data/videos.json';
 import { MuxUpload } from './mux-upload';
 import { VideoEditModal } from './video-edit-modal';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { X, Plus, Video as VideoIcon, Edit, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useMergedContent } from '@/hooks/use-merged-content';
 
 interface VideoSelectorProps {
   // Mode
@@ -66,9 +67,12 @@ export function VideoSelector({
     }
   }, [showUpload, suggestedTitle, uploadingVideoTitle]);
 
+  // Merge static videos with pending changes
+  const mergedVideos = useMergedContent(videosJson as Video[], 'videos');
+
   const allVideos = useMemo(() => {
-    return [...(videos as Video[]), ...pendingNewVideos];
-  }, [pendingNewVideos]);
+    return [...mergedVideos, ...pendingNewVideos];
+  }, [mergedVideos, pendingNewVideos]);
 
   // Get video by ID (handles pending videos)
   const getVideoById = (id: string): Video | undefined => {

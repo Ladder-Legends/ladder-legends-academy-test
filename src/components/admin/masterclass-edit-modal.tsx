@@ -4,12 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useMergedContent } from '@/hooks/use-merged-content';
 import { Masterclass, Race } from '@/types/masterclass';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
 import coaches from '@/data/coaches.json';
-import videos from '@/data/videos.json';
+import videosJson from '@/data/videos.json';
 import { Video } from '@/types/video';
 import { VideoSelector } from './video-selector-enhanced';
 
@@ -27,6 +28,9 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   const [coachSearch, setCoachSearch] = useState('');
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
+
+  // Merge static videos with pending changes
+  const allVideos = useMergedContent(videosJson as Video[], 'videos');
 
   // Get all unique tags from existing masterclasses for autocomplete
   const allExistingTags = useMemo(() => {
@@ -127,7 +131,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
     // Get thumbnail from the first video if available
     let thumbnail = formData.thumbnail;
     if (!thumbnail && formData.videoIds && formData.videoIds.length > 0) {
-      const firstVideo = videos.find(v => v.id === formData.videoIds![0]);
+      const firstVideo = allVideos.find(v => v.id === formData.videoIds![0]);
       thumbnail = firstVideo?.thumbnail;
     }
 

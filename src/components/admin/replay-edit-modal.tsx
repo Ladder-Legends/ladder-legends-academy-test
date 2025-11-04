@@ -9,8 +9,6 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
 import coaches from '@/data/coaches.json';
-import videos from '@/data/videos.json';
-import { Video } from '@/types/video';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 

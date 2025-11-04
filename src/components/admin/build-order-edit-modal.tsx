@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useMergedContent } from '@/hooks/use-merged-content';
 import { BuildOrder, BuildOrderStep, Race, VsRace, Difficulty, BuildType } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -64,8 +65,10 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     );
   }, [coachSearch]);
 
+  // Merge static replays with pending changes
+  const allReplays = useMergedContent(replays as Replay[], 'replays');
+
   // Filter replays based on search input
-  const allReplays = replays as Replay[];
   const filteredReplays = useMemo(() => {
     if (!replaySearch.trim()) return allReplays.slice(0, 10); // Show first 10 by default
     const search = replaySearch.toLowerCase();
