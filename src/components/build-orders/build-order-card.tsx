@@ -91,9 +91,11 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
 
           <CardHeader className="flex-1">
             <div className="flex items-start gap-2 mb-2 flex-wrap">
-              <Badge variant="outline" className={getTypeColor(buildOrder.type)}>
-                {buildOrder.type}
-              </Badge>
+              {buildOrder.type && (
+                <Badge variant="outline" className={getTypeColor(buildOrder.type)}>
+                  {buildOrder.type}
+                </Badge>
+              )}
               <Badge variant="outline" className={getDifficultyColor(buildOrder.difficulty)}>
                 {buildOrder.difficulty}
               </Badge>

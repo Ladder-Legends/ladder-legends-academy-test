@@ -44,7 +44,6 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
           <tr>
             <th className="text-left px-6 py-4 text-sm font-semibold">Build Name</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Matchup</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Type</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
@@ -78,11 +77,6 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
                 <span className="text-sm font-medium uppercase">
                   {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
                 </span>
-              </td>
-              <td className="px-6 py-4">
-                <Badge variant="outline" className={getTypeColor(buildOrder.type)}>
-                  {buildOrder.type}
-                </Badge>
               </td>
               <td className="px-6 py-4">
                 <Badge variant="outline" className={getDifficultyColor(buildOrder.difficulty)}>

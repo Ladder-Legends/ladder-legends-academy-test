@@ -17,7 +17,7 @@ export interface BuildOrder {
   name: string;
   race: Race;
   vsRace: VsRace;
-  type: BuildType;
+  type?: BuildType; // Optional - deprecated in favor of tags
   difficulty: Difficulty;
   coach: string;
   coachId: string;

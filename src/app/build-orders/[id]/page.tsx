@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
   const title = `${buildOrder.name} | Ladder Legends Academy`;
   const description = buildOrder.description ||
-    `${buildOrder.race} vs ${buildOrder.vsRace} - ${buildOrder.type} build. ${buildOrder.difficulty} difficulty. ${buildOrder.coach ? `Coached by ${buildOrder.coach}.` : ''}`.trim();
+    `${buildOrder.race} vs ${buildOrder.vsRace}${buildOrder.type ? ` - ${buildOrder.type} build` : ''}. ${buildOrder.difficulty} difficulty. ${buildOrder.coach ? `Coached by ${buildOrder.coach}.` : ''}`.trim();
 
   // Try to get thumbnail from associated video
   let thumbnailUrl = '/placeholder-thumbnail.jpg';
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     other: {
       'buildorder:race': buildOrder.race,
       'buildorder:vsrace': buildOrder.vsRace,
-      'buildorder:type': buildOrder.type,
+      ...(buildOrder.type && { 'buildorder:type': buildOrder.type }),
       'buildorder:difficulty': buildOrder.difficulty,
     },
   };

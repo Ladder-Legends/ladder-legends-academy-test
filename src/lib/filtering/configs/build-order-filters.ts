@@ -92,21 +92,6 @@ const fields: FilterFieldConfig<BuildOrder>[] = [
     },
   },
 
-  // Type filter
-  {
-    id: 'type',
-    urlParam: 'type',
-    predicate: (buildOrder, filters) => {
-      const selectedTypes = filters.type;
-      if (!selectedTypes || (Array.isArray(selectedTypes) && selectedTypes.length === 0)) {
-        return true;
-      }
-
-      const types = Array.isArray(selectedTypes) ? selectedTypes : [String(selectedTypes)];
-      return types.includes(buildOrder.type);
-    },
-  },
-
   // Access level filter
   createFilterField<BuildOrder, 'accessLevel'>({
     id: 'accessLevel',
@@ -162,19 +147,6 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
       { id: 'protoss-pvz', label: 'vs Zerg' },
       { id: 'protoss-pvp', label: 'vs Protoss' },
     ],
-  },
-  {
-    id: 'type',
-    title: 'Type',
-    type: 'checkbox',
-    getOptions: (buildOrders) => {
-      const types = new Set<string>();
-      buildOrders.forEach(bo => types.add(bo.type));
-      return Array.from(types).sort().map(type => ({
-        id: type,
-        label: type.charAt(0).toUpperCase() + type.slice(1),
-      }));
-    },
   },
   {
     id: 'difficulty',

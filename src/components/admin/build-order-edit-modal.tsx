@@ -28,9 +28,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  const [typeInput, setTypeInput] = useState('');
   const [showTagDropdown, setShowTagDropdown] = useState(false);
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [replayAnalysisData, setReplayAnalysisData] = useState<SC2AnalysisResponse | null>(null);
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
@@ -46,13 +44,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     return Array.from(tagSet).sort();
   }, []);
 
-  // Get all unique types from existing build orders for autocomplete
-  const allExistingTypes = useMemo(() => {
-    const typeSet = new Set<string>();
-    buildOrders.forEach(bo => typeSet.add(bo.type));
-    return Array.from(typeSet).sort();
-  }, []);
-
   // Filter tags based on input
   const filteredTags = useMemo(() => {
     if (!tagInput.trim()) return [];
@@ -61,15 +52,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
-
-  // Filter types based on input
-  const filteredTypes = useMemo(() => {
-    if (!typeInput.trim()) return allExistingTypes;
-    const input = typeInput.toLowerCase();
-    return allExistingTypes
-      .filter(type => type.toLowerCase().includes(input))
-      .slice(0, 5);
-  }, [typeInput, allExistingTypes]);
 
   // Filter coaches based on search input (only active coaches)
   const filteredCoaches = useMemo(() => {
@@ -531,7 +513,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       name: formData.name,
       race: formData.race || 'terran',
       vsRace: formData.vsRace || 'terran',
-      type: (typeInput.trim() as BuildType) || 'macro',
       difficulty: formData.difficulty || 'beginner',
       coach: formData.coach || '',
       coachId: formData.coachId || '',
@@ -953,36 +934,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 <option value="protoss">Protoss</option>
                 <option value="all">All</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Type *</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={typeInput}
-                  onChange={(e) => setTypeInput(e.target.value)}
-                  onFocus={() => setShowTypeDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowTypeDropdown(false), 200)}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                  placeholder="macro, all-in, timing..."
-                />
-                {/* Type autocomplete dropdown */}
-                {showTypeDropdown && filteredTypes.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                    {filteredTypes.map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setTypeInput(type)}
-                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm capitalize"
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
 
             <div>

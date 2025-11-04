@@ -139,9 +139,11 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getTypeColor(buildOrder.type)}`}>
-                  {buildOrder.type}
-                </span>
+                {buildOrder.type && (
+                  <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getTypeColor(buildOrder.type)}`}>
+                    {buildOrder.type}
+                  </span>
+                )}
                 <span className={`px-3 py-1.5 text-sm font-medium text-white rounded-full ${getDifficultyColor(buildOrder.difficulty)}`}>
                   {buildOrder.difficulty}
                 </span>
@@ -164,10 +166,12 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
                   <dt className="text-sm text-muted-foreground mb-1">Matchup</dt>
                   <dd className="font-medium capitalize">{buildOrder.race} vs {buildOrder.vsRace}</dd>
                 </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground mb-1">Type</dt>
-                  <dd className="font-medium capitalize">{buildOrder.type}</dd>
-                </div>
+                {buildOrder.type && (
+                  <div>
+                    <dt className="text-sm text-muted-foreground mb-1">Type</dt>
+                    <dd className="font-medium capitalize">{buildOrder.type}</dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1">Difficulty</dt>
                   <dd className="font-medium capitalize">{buildOrder.difficulty}</dd>
