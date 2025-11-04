@@ -71,5 +71,575 @@
     "videoIds": [
       "dQw4w9WgXcQ"
     ]
+  },
+  {
+    "id": "dcef22d4-0f75-4dc6-9149-7404337bc2d2",
+    "name": "Nicroract's Default TvP",
+    "race": "terran",
+    "vsRace": "terran",
+    "difficulty": "beginner",
+    "coach": "",
+    "coachId": "",
+    "description": "",
+    "videoIds": [
+      "22ba6935-7577-4f52-afd3-b92d7dc2c399"
+    ],
+    "steps": [
+      {
+        "supply": 13,
+        "time": "0:16",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 14,
+        "time": "0:30",
+        "action": "Refinery"
+      },
+      {
+        "supply": 15,
+        "time": "0:43",
+        "action": "Barracks"
+      },
+      {
+        "supply": 19,
+        "time": "1:40",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 19,
+        "time": "1:51",
+        "action": "Factory"
+      },
+      {
+        "supply": 19,
+        "time": "2:02",
+        "action": "Reaper"
+      },
+      {
+        "supply": 20,
+        "time": "2:05",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 20,
+        "time": "2:07",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 21,
+        "time": "2:12",
+        "action": "Refinery"
+      },
+      {
+        "supply": 23,
+        "time": "2:41",
+        "action": "Starport"
+      },
+      {
+        "supply": 24,
+        "time": "2:52",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 24,
+        "time": "2:53",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 25,
+        "time": "3:07",
+        "action": "Hellion"
+      },
+      {
+        "supply": 27,
+        "time": "3:08",
+        "action": "Hellion"
+      },
+      {
+        "supply": 30,
+        "time": "3:15",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 31,
+        "time": "3:22",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 31,
+        "time": "3:29",
+        "action": "Hellion"
+      },
+      {
+        "supply": 33,
+        "time": "3:29",
+        "action": "Hellion"
+      },
+      {
+        "supply": 35,
+        "time": "4:10",
+        "action": "Marine"
+      },
+      {
+        "supply": 36,
+        "time": "4:10",
+        "action": "Marine"
+      },
+      {
+        "supply": 35,
+        "time": "4:12",
+        "action": "Bunker"
+      },
+      {
+        "supply": 35,
+        "time": "4:15",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 36,
+        "time": "4:17",
+        "action": "Banshee"
+      },
+      {
+        "supply": 40,
+        "time": "4:22",
+        "action": "Barracks"
+      },
+      {
+        "supply": 41,
+        "time": "4:27",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 44,
+        "time": "4:28",
+        "action": "Refinery"
+      },
+      {
+        "supply": 44,
+        "time": "4:30",
+        "action": "Marine"
+      },
+      {
+        "supply": 45,
+        "time": "4:30",
+        "action": "Marine"
+      },
+      {
+        "supply": 47,
+        "time": "4:38",
+        "action": "Barracks"
+      },
+      {
+        "supply": 47,
+        "time": "4:38",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 48,
+        "time": "4:46",
+        "action": "Refinery"
+      },
+      {
+        "supply": 48,
+        "time": "4:47",
+        "action": "Marine"
+      },
+      {
+        "supply": 49,
+        "time": "4:47",
+        "action": "Marine"
+      },
+      {
+        "supply": 50,
+        "time": "4:50",
+        "action": "Upgrade: BansheeSpeed"
+      },
+      {
+        "supply": 50,
+        "time": "4:50",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 52,
+        "time": "5:00",
+        "action": "Banshee"
+      },
+      {
+        "supply": 55,
+        "time": "5:01",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 57,
+        "time": "5:08",
+        "action": "Marine"
+      },
+      {
+        "supply": 58,
+        "time": "5:08",
+        "action": "StarportReactor"
+      },
+      {
+        "supply": 58,
+        "time": "5:09",
+        "action": "Marine"
+      },
+      {
+        "supply": 59,
+        "time": "5:10",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 63,
+        "time": "5:20",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 64,
+        "time": "5:26",
+        "action": "FactoryReactor"
+      },
+      {
+        "supply": 64,
+        "time": "5:26",
+        "action": "Marine"
+      },
+      {
+        "supply": 65,
+        "time": "5:27",
+        "action": "Marine"
+      },
+      {
+        "supply": 66,
+        "time": "5:31",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 67,
+        "time": "5:37",
+        "action": "Marauder"
+      },
+      {
+        "supply": 69,
+        "time": "5:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 70,
+        "time": "5:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 73,
+        "time": "5:49",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 73,
+        "time": "5:53",
+        "action": "Marauder"
+      },
+      {
+        "supply": 75,
+        "time": "5:57",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 75,
+        "time": "6:00",
+        "action": "Marauder"
+      },
+      {
+        "supply": 78,
+        "time": "6:05",
+        "action": "Marine"
+      },
+      {
+        "supply": 79,
+        "time": "6:05",
+        "action": "Marine"
+      },
+      {
+        "supply": 81,
+        "time": "6:14",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 81,
+        "time": "6:16",
+        "action": "Medivac"
+      },
+      {
+        "supply": 83,
+        "time": "6:18",
+        "action": "Marauder"
+      },
+      {
+        "supply": 85,
+        "time": "6:23",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 87,
+        "time": "6:23",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 89,
+        "time": "6:25",
+        "action": "Marauder"
+      },
+      {
+        "supply": 91,
+        "time": "6:26",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 91,
+        "time": "6:27",
+        "action": "Marine"
+      },
+      {
+        "supply": 92,
+        "time": "6:28",
+        "action": "Marine"
+      },
+      {
+        "supply": 93,
+        "time": "6:30",
+        "action": "Medivac"
+      },
+      {
+        "supply": 95,
+        "time": "6:40",
+        "action": "Marauder"
+      },
+      {
+        "supply": 97,
+        "time": "6:51",
+        "action": "Marine"
+      },
+      {
+        "supply": 98,
+        "time": "6:51",
+        "action": "Marine"
+      },
+      {
+        "supply": 99,
+        "time": "6:53",
+        "action": "Upgrade: ShieldWall"
+      },
+      {
+        "supply": 99,
+        "time": "6:53",
+        "action": "Barracks"
+      },
+      {
+        "supply": 99,
+        "time": "6:54",
+        "action": "Barracks"
+      },
+      {
+        "supply": 100,
+        "time": "6:55",
+        "action": "Upgrade: Stimpack"
+      },
+      {
+        "supply": 100,
+        "time": "6:55",
+        "action": "Marauder"
+      },
+      {
+        "supply": 103,
+        "time": "6:55",
+        "action": "Medivac"
+      },
+      {
+        "supply": 105,
+        "time": "6:57",
+        "action": "GhostAcademy"
+      },
+      {
+        "supply": 105,
+        "time": "7:00",
+        "action": "Medivac"
+      },
+      {
+        "supply": 107,
+        "time": "7:00",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 109,
+        "time": "7:00",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 108,
+        "time": "7:11",
+        "action": "Upgrade: TerranInfantryWeaponsLevel1"
+      },
+      {
+        "supply": 108,
+        "time": "7:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 110,
+        "time": "7:25",
+        "action": "Marine"
+      },
+      {
+        "supply": 111,
+        "time": "7:25",
+        "action": "Marine"
+      },
+      {
+        "supply": 112,
+        "time": "7:27",
+        "action": "Marauder"
+      },
+      {
+        "supply": 90,
+        "time": "7:36",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 92,
+        "time": "7:36",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 94,
+        "time": "7:37",
+        "action": "Upgrade: PunisherGrenades"
+      },
+      {
+        "supply": 94,
+        "time": "7:37",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 94,
+        "time": "7:45",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 94,
+        "time": "7:45",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 96,
+        "time": "7:55",
+        "action": "Medivac"
+      },
+      {
+        "supply": 98,
+        "time": "7:55",
+        "action": "Medivac"
+      },
+      {
+        "supply": 100,
+        "time": "7:56",
+        "action": "Marine"
+      },
+      {
+        "supply": 101,
+        "time": "7:56",
+        "action": "Marine"
+      },
+      {
+        "supply": 102,
+        "time": "8:00",
+        "action": "Marauder"
+      },
+      {
+        "supply": 104,
+        "time": "8:00",
+        "action": "Marauder"
+      },
+      {
+        "supply": 108,
+        "time": "8:07",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 110,
+        "time": "8:07",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 112,
+        "time": "8:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 113,
+        "time": "8:19",
+        "action": "Marine"
+      },
+      {
+        "supply": 116,
+        "time": "8:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 120,
+        "time": "8:33",
+        "action": "Medivac"
+      },
+      {
+        "supply": 122,
+        "time": "8:33",
+        "action": "Medivac"
+      },
+      {
+        "supply": 124,
+        "time": "8:35",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 124,
+        "time": "8:39",
+        "action": "Ghost"
+      },
+      {
+        "supply": 126,
+        "time": "8:44",
+        "action": "Ghost"
+      },
+      {
+        "supply": 128,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 129,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 130,
+        "time": "8:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 123,
+        "time": "8:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 120,
+        "time": "8:55",
+        "action": "Ghost"
+      }
+    ],
+    "tags": [],
+    "patch": "5.0.15.95248",
+    "updatedAt": "2025-11-04",
+    "isFree": false,
+    "replayId": "replay-nico-ladder-tvp-default"
   }
 ]
