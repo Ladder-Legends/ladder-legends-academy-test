@@ -824,5 +824,37 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "4b6740cf-6ee9-47c6-893d-90b3633aad60",
+    "title": "Mixu Masterclass",
+    "description": "",
+    "source": "mux",
+    "muxAssetId": "wRae7Zc3SQh5S2xugRjuo1va9TH5EtyVH7hsm2CG3XE",
+    "muxPlaybackId": "ImwJqdyzx5fk00jRoWBmlGG4yz1RsCh3go00uPt6yLAKs",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/4b6740cf-6ee9-47c6-893d-90b3633aad60.jpg",
+    "date": "2025-11-04",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
+  },
+  {
+    "id": "4124e698-9aeb-41c4-9c14-525132b703cf",
+    "title": "Mixu Masterclass - Ladder Game 1",
+    "description": "",
+    "source": "mux",
+    "muxAssetId": "yiTgpFBwJQOwFEqMaCkKKVRv1y1P9zMuPPk5DxEXrIs",
+    "muxPlaybackId": "n01RxxaULNre02cEPlPBenX9ThFkGEsMrVSOmYFav7DfM",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/4124e698-9aeb-41c4-9c14-525132b703cf.jpg",
+    "date": "2025-11-04",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
