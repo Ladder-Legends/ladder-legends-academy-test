@@ -56,10 +56,13 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   }, [coachSearch]);
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (masterclass) {
       setFormData(masterclass);
       setCoachSearch(masterclass.coach || '');
     } else if (isNew) {
+      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',

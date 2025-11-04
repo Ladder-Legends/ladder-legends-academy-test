@@ -77,10 +77,13 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   }, [replaySearch, allReplays]);
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (buildOrder) {
       setFormData(buildOrder);
       setCoachSearch(buildOrder.coach || '');
     } else if (isNew) {
+      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         name: '',

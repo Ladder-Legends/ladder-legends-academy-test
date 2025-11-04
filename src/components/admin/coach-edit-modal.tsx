@@ -39,9 +39,12 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   }, [specialtyInput, allExistingSpecialties, formData.specialties]);
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (coach) {
       setFormData(coach);
     } else if (isNew) {
+      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         name: '',

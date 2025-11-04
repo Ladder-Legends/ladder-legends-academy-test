@@ -123,12 +123,15 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (replay) {
       setFormData(replay);
       setMapSearch(replay.map || '');
       setPlayer1Search(replay.player1?.name || '');
       setPlayer2Search(replay.player2?.name || '');
     } else if (isNew) {
+      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',

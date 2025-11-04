@@ -84,11 +84,14 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
 
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (video) {
       setFormData(video);
       setCoachSearch(video.coach || '');
       setIsPlaylistMode(video.source === 'playlist');
     } else if (isNew) {
+      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',

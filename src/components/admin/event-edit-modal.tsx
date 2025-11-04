@@ -73,9 +73,12 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
   const [newTag, setNewTag] = useState('');
 
   useEffect(() => {
+    if (!isOpen) return; // Only reset when opening the modal
+
     if (event) {
       setFormData(event);
     } else if (isNew) {
+      // Reset form data when opening in "add new" mode
       setFormData({
         title: '',
         description: '',
@@ -93,7 +96,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         },
       });
     }
-  }, [event, isNew]);
+  }, [event, isNew, isOpen]);
 
   const handleSave = () => {
     // Validation
