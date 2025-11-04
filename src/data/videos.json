@@ -800,13 +800,13 @@
     "title": "Krystianer Masterclass: New Patch (PvZ & PvP & PvT) + Live Games",
     "description": "",
     "source": "youtube",
-    "youtubeId": "https://www.youtube.com/watch?v=uuEGiblseBs",
-    "thumbnail": "https://img.youtube.com/vi/https://www.youtube.com/watch?v=uuEGiblseBs/hqdefault.jpg",
+    "youtubeId": "uuEGiblseBs",
+    "thumbnail": "https://img.youtube.com/vi/uuEGiblseBs/hqdefault.jpg",
     "date": "2025-11-04",
     "tags": [],
     "race": "terran",
-    "coach": "",
-    "coachId": "",
+    "coach": "Krystianer",
+    "coachId": "krystianer",
     "isFree": false
   },
   {
