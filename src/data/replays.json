@@ -260,5 +260,28 @@
     "tags": [],
     "patch": "5.0.14.94137",
     "isFree": false
+  },
+  {
+    "id": "replay-216edeea-a1da-4fae-834f-6d08e98761a8",
+    "title": "Pylon LE - GamerNico vs A.I. 1 (Very Easy)",
+    "map": "Pylon LE",
+    "matchup": "TvZ",
+    "player1": {
+      "name": "GamerNico",
+      "race": "terran",
+      "result": "Win"
+    },
+    "player2": {
+      "name": "A.I. 1 (Very Easy)",
+      "race": "zerg",
+      "result": "Loss"
+    },
+    "duration": "10.09",
+    "gameDate": "2025-07-30",
+    "uploadDate": "2025-11-04",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "isFree": false
   }
 ]

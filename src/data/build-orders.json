@@ -3084,5 +3084,825 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76"
+  },
+  {
+    "id": "c2d27dd1-e299-456d-a3be-f09784402a46",
+    "name": "Basic 2-1-1",
+    "race": "terran",
+    "vsRace": "zerg",
+    "difficulty": "beginner",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "description": "My basic 2-1-1 vs AI replay, without the hellbats in case you want to run an ulterior version. The opening and approach is the same, simply see the stimbat guide in the video for further details and for the hellbat variation if you wish to use it.",
+    "videoIds": [
+      "79396412-d6e3-43df-9b58-5188772ada94"
+    ],
+    "steps": [
+      {
+        "supply": 13,
+        "time": "0:16",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 15,
+        "time": "0:39",
+        "action": "Barracks"
+      },
+      {
+        "supply": 15,
+        "time": "0:43",
+        "action": "Refinery"
+      },
+      {
+        "supply": 19,
+        "time": "1:39",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 19,
+        "time": "1:50",
+        "action": "Barracks"
+      },
+      {
+        "supply": 19,
+        "time": "1:58",
+        "action": "Reaper"
+      },
+      {
+        "supply": 20,
+        "time": "2:01",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 20,
+        "time": "2:06",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 21,
+        "time": "2:15",
+        "action": "Refinery"
+      },
+      {
+        "supply": 22,
+        "time": "2:24",
+        "action": "Factory"
+      },
+      {
+        "supply": 23,
+        "time": "2:36",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 24,
+        "time": "2:50",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 24,
+        "time": "2:55",
+        "action": "Marine"
+      },
+      {
+        "supply": 25,
+        "time": "2:55",
+        "action": "Marine"
+      },
+      {
+        "supply": 28,
+        "time": "3:12",
+        "action": "Starport"
+      },
+      {
+        "supply": 28,
+        "time": "3:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 29,
+        "time": "3:20",
+        "action": "Marine"
+      },
+      {
+        "supply": 30,
+        "time": "3:21",
+        "action": "Marine"
+      },
+      {
+        "supply": 31,
+        "time": "3:22",
+        "action": "FactoryReactor"
+      },
+      {
+        "supply": 33,
+        "time": "3:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 35,
+        "time": "3:40",
+        "action": "Marine"
+      },
+      {
+        "supply": 37,
+        "time": "3:43",
+        "action": "Marine"
+      },
+      {
+        "supply": 38,
+        "time": "3:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 39,
+        "time": "3:50",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 41,
+        "time": "3:59",
+        "action": "Marine"
+      },
+      {
+        "supply": 44,
+        "time": "4:13",
+        "action": "Marine"
+      },
+      {
+        "supply": 45,
+        "time": "4:14",
+        "action": "Marine"
+      },
+      {
+        "supply": 46,
+        "time": "4:15",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 48,
+        "time": "4:30",
+        "action": "Marine"
+      },
+      {
+        "supply": 51,
+        "time": "4:32",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 51,
+        "time": "4:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 52,
+        "time": "4:33",
+        "action": "Marine"
+      },
+      {
+        "supply": 53,
+        "time": "4:35",
+        "action": "Medivac"
+      },
+      {
+        "supply": 55,
+        "time": "4:35",
+        "action": "Medivac"
+      },
+      {
+        "supply": 57,
+        "time": "4:35",
+        "action": "Upgrade: Stimpack"
+      },
+      {
+        "supply": 57,
+        "time": "4:44",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 59,
+        "time": "4:46",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 59,
+        "time": "4:52",
+        "action": "Marine"
+      },
+      {
+        "supply": 60,
+        "time": "4:52",
+        "action": "Marine"
+      },
+      {
+        "supply": 61,
+        "time": "4:52",
+        "action": "Marine"
+      },
+      {
+        "supply": 62,
+        "time": "4:53",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 64,
+        "time": "5:02",
+        "action": "FactoryReactor"
+      },
+      {
+        "supply": 66,
+        "time": "5:10",
+        "action": "Barracks"
+      },
+      {
+        "supply": 66,
+        "time": "5:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 67,
+        "time": "5:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 68,
+        "time": "5:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 69,
+        "time": "5:18",
+        "action": "Refinery"
+      },
+      {
+        "supply": 69,
+        "time": "5:20",
+        "action": "Refinery"
+      },
+      {
+        "supply": 71,
+        "time": "5:32",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 72,
+        "time": "5:42",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 72,
+        "time": "5:44",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 72,
+        "time": "5:45",
+        "action": "Medivac"
+      },
+      {
+        "supply": 74,
+        "time": "5:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 75,
+        "time": "5:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 76,
+        "time": "5:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 79,
+        "time": "6:05",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 79,
+        "time": "6:05",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 81,
+        "time": "6:05",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 83,
+        "time": "6:07",
+        "action": "Upgrade: ShieldWall"
+      },
+      {
+        "supply": 83,
+        "time": "6:10",
+        "action": "Barracks"
+      },
+      {
+        "supply": 85,
+        "time": "6:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 86,
+        "time": "6:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 87,
+        "time": "6:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 88,
+        "time": "6:14",
+        "action": "Barracks"
+      },
+      {
+        "supply": 88,
+        "time": "6:18",
+        "action": "Medivac"
+      },
+      {
+        "supply": 90,
+        "time": "6:26",
+        "action": "Medivac"
+      },
+      {
+        "supply": 94,
+        "time": "6:30",
+        "action": "Marine"
+      },
+      {
+        "supply": 95,
+        "time": "6:31",
+        "action": "Marine"
+      },
+      {
+        "supply": 96,
+        "time": "6:31",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 98,
+        "time": "6:32",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 100,
+        "time": "6:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 101,
+        "time": "6:39",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 101,
+        "time": "6:40",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 103,
+        "time": "6:47",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 103,
+        "time": "6:49",
+        "action": "Bunker"
+      },
+      {
+        "supply": 103,
+        "time": "6:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 104,
+        "time": "6:50",
+        "action": "Marine"
+      },
+      {
+        "supply": 105,
+        "time": "6:51",
+        "action": "Medivac"
+      },
+      {
+        "supply": 107,
+        "time": "6:55",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 107,
+        "time": "6:57",
+        "action": "Medivac"
+      },
+      {
+        "supply": 109,
+        "time": "7:00",
+        "action": "Armory"
+      },
+      {
+        "supply": 109,
+        "time": "7:05",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 109,
+        "time": "7:06",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 109,
+        "time": "7:08",
+        "action": "Barracks"
+      },
+      {
+        "supply": 109,
+        "time": "7:10",
+        "action": "Barracks"
+      },
+      {
+        "supply": 112,
+        "time": "7:16",
+        "action": "Upgrade: TerranInfantryWeaponsLevel1"
+      },
+      {
+        "supply": 112,
+        "time": "7:16",
+        "action": "Barracks"
+      },
+      {
+        "supply": 112,
+        "time": "7:17",
+        "action": "Upgrade: TerranInfantryArmorsLevel1"
+      },
+      {
+        "supply": 112,
+        "time": "7:18",
+        "action": "Marine"
+      },
+      {
+        "supply": 113,
+        "time": "7:18",
+        "action": "Marine"
+      },
+      {
+        "supply": 114,
+        "time": "7:18",
+        "action": "Marine"
+      },
+      {
+        "supply": 115,
+        "time": "7:18",
+        "action": "Marine"
+      },
+      {
+        "supply": 116,
+        "time": "7:22",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 118,
+        "time": "7:22",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 123,
+        "time": "7:31",
+        "action": "Medivac"
+      },
+      {
+        "supply": 125,
+        "time": "7:32",
+        "action": "Medivac"
+      },
+      {
+        "supply": 127,
+        "time": "7:33",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 127,
+        "time": "7:33",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 127,
+        "time": "7:45",
+        "action": "Refinery"
+      },
+      {
+        "supply": 127,
+        "time": "7:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 128,
+        "time": "7:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 129,
+        "time": "7:47",
+        "action": "Marine"
+      },
+      {
+        "supply": 130,
+        "time": "7:47",
+        "action": "Marine"
+      },
+      {
+        "supply": 131,
+        "time": "7:47",
+        "action": "Marine"
+      },
+      {
+        "supply": 132,
+        "time": "7:47",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 132,
+        "time": "7:50",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 134,
+        "time": "7:51",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 139,
+        "time": "8:00",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 139,
+        "time": "8:06",
+        "action": "Marine"
+      },
+      {
+        "supply": 140,
+        "time": "8:06",
+        "action": "Marine"
+      },
+      {
+        "supply": 141,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 142,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 143,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 144,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 145,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 146,
+        "time": "8:12",
+        "action": "Marine"
+      },
+      {
+        "supply": 150,
+        "time": "8:23",
+        "action": "Marine"
+      },
+      {
+        "supply": 151,
+        "time": "8:23",
+        "action": "Marine"
+      },
+      {
+        "supply": 152,
+        "time": "8:24",
+        "action": "Marine"
+      },
+      {
+        "supply": 153,
+        "time": "8:25",
+        "action": "Marine"
+      },
+      {
+        "supply": 154,
+        "time": "8:30",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 154,
+        "time": "8:31",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 154,
+        "time": "8:32",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 157,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 158,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 159,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 160,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 161,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 162,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 163,
+        "time": "8:45",
+        "action": "Marine"
+      },
+      {
+        "supply": 164,
+        "time": "8:46",
+        "action": "Marine"
+      },
+      {
+        "supply": 165,
+        "time": "8:52",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 165,
+        "time": "8:52",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 165,
+        "time": "8:59",
+        "action": "Factory"
+      },
+      {
+        "supply": 168,
+        "time": "9:08",
+        "action": "Marine"
+      },
+      {
+        "supply": 169,
+        "time": "9:08",
+        "action": "Marine"
+      },
+      {
+        "supply": 170,
+        "time": "9:09",
+        "action": "Marine"
+      },
+      {
+        "supply": 171,
+        "time": "9:09",
+        "action": "Marine"
+      },
+      {
+        "supply": 172,
+        "time": "9:09",
+        "action": "Marine"
+      },
+      {
+        "supply": 173,
+        "time": "9:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 174,
+        "time": "9:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 175,
+        "time": "9:17",
+        "action": "Marine"
+      },
+      {
+        "supply": 176,
+        "time": "9:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 178,
+        "time": "9:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 180,
+        "time": "9:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 182,
+        "time": "9:20",
+        "action": "Marauder"
+      },
+      {
+        "supply": 184,
+        "time": "9:22",
+        "action": "Refinery"
+      },
+      {
+        "supply": 187,
+        "time": "9:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 188,
+        "time": "9:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 189,
+        "time": "9:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 190,
+        "time": "9:32",
+        "action": "Marine"
+      },
+      {
+        "supply": 191,
+        "time": "9:36",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 193,
+        "time": "9:36",
+        "action": "WidowMine"
+      },
+      {
+        "supply": 195,
+        "time": "9:40",
+        "action": "Marine"
+      },
+      {
+        "supply": 196,
+        "time": "9:40",
+        "action": "Starport"
+      },
+      {
+        "supply": 196,
+        "time": "9:40",
+        "action": "Starport"
+      },
+      {
+        "supply": 196,
+        "time": "9:41",
+        "action": "FusionCore"
+      },
+      {
+        "supply": 196,
+        "time": "9:43",
+        "action": "Factory"
+      },
+      {
+        "supply": 196,
+        "time": "9:45",
+        "action": "Medivac"
+      },
+      {
+        "supply": 198,
+        "time": "9:45",
+        "action": "Medivac"
+      }
+    ],
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "updatedAt": "2025-11-04",
+    "isFree": false,
+    "replayId": "replay-216edeea-a1da-4fae-834f-6d08e98761a8"
   }
 ]
