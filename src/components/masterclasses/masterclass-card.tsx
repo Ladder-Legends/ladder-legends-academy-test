@@ -1,13 +1,15 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Masterclass } from "@/types/masterclass";
+import { Masterclass, getMasterclassThumbnailUrl } from "@/types/masterclass";
 import { Play, Lock, Edit, Trash2 } from "lucide-react";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
+import videos from "@/data/videos.json";
+import Image from "next/image";
 
 interface MasterclassCardProps {
   masterclass: Masterclass;
@@ -18,6 +20,7 @@ interface MasterclassCardProps {
 export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+  const thumbnailUrl = getMasterclassThumbnailUrl(masterclass, videos);
 
   const getRaceBadgeColor = (race: string) => {
     switch (race.toLowerCase()) {
@@ -37,10 +40,20 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
       >
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50 h-full flex flex-col p-0 pb-4">
           <div className="relative aspect-video bg-gradient-to-br from-primary/5 to-primary/10 overflow-hidden flex items-center justify-center">
-            {/* Race icon background */}
-            <div className="text-6xl font-bold text-primary/10 capitalize">
-              {masterclass.race}
-            </div>
+            {/* Thumbnail or Race icon background */}
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt={masterclass.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="text-6xl font-bold text-primary/10 capitalize">
+                {masterclass.race}
+              </div>
+            )}
 
             {/* Premium Badge */}
             {!masterclass.isFree && !hasSubscriberRole && (
