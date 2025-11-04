@@ -80,14 +80,12 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     if (buildOrder) {
       setFormData(buildOrder);
       setCoachSearch(buildOrder.coach || '');
-      setTypeInput(buildOrder.type || '');
     } else if (isNew) {
       setFormData({
         id: uuidv4(),
         name: '',
         race: 'terran',
         vsRace: 'terran',
-        type: 'macro',
         difficulty: 'beginner',
         coach: '',
         coachId: '',
@@ -100,7 +98,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         isFree: false,
       });
       setCoachSearch('');
-      setTypeInput('macro');
     }
     setTagInput('');
   }, [buildOrder, isNew, isOpen]);

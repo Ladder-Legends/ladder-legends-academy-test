@@ -68,7 +68,7 @@ export function BuildOrdersContent() {
   // Get unique types
   const allTypes = useMemo(() => {
     const types = new Set<string>();
-    allBuildOrders.forEach(bo => types.add(bo.type));
+    allBuildOrders.forEach(bo => bo.type && types.add(bo.type));
     return Array.from(types).sort();
   }, []);
 
@@ -117,7 +117,7 @@ export function BuildOrdersContent() {
       // Apply type filter (excluding if counting type section)
       const selectedTypes = excludeSectionId === 'type' ? [] : (selectedItems.type || []);
       if (selectedTypes.length > 0) {
-        if (!selectedTypes.includes(bo.type)) return false;
+        if (!bo.type || !selectedTypes.includes(bo.type)) return false;
       }
 
       // Apply access level filter (excluding if counting accessLevel section)
@@ -253,7 +253,7 @@ export function BuildOrdersContent() {
       // Apply type filter
       const selectedTypes = selectedItems.type || [];
       if (selectedTypes.length > 0) {
-        if (!selectedTypes.includes(bo.type)) return false;
+        if (!bo.type || !selectedTypes.includes(bo.type)) return false;
       }
 
       // Apply access level filter
