@@ -51,13 +51,8 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "race": "terran",
-    "videoIds": [],
-    "replayIds": [
-      "replay-nico-ladder-tvp-speed",
-      "replay-nico-masters-cup-vs-babymarine-2",
-      "replay-nico-masters-cup-vs-babymarine-1",
-      "replay-nico-ladder-tvp-default",
-      "replay-nico-ladder-tvz-default"
+    "videoIds": [
+      "22ba6935-7577-4f52-afd3-b92d7dc2c399"
     ],
     "difficulty": "intermediate",
     "tags": [
@@ -66,7 +61,7 @@
       "ladder"
     ],
     "createdAt": "2025-10-13",
-    "updatedAt": "2025-10-13",
+    "updatedAt": "2025-11-04",
     "isFree": false
   },
   {

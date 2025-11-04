@@ -808,5 +808,21 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "22ba6935-7577-4f52-afd3-b92d7dc2c399",
+    "title": "Nicoract Terran Masterclass",
+    "description": "",
+    "source": "mux",
+    "muxAssetId": "1yszYD02a4tUQOsFYAMug6ud31b7GRCPaN023TjLyr1sE",
+    "muxPlaybackId": "arofFPRgd00F01ADUvsRYL5AamKPAUCrnUq6V02wZ02kqMA",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/22ba6935-7577-4f52-afd3-b92d7dc2c399.jpg",
+    "date": "2025-11-04",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
