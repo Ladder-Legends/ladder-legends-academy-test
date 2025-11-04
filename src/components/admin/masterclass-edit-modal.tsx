@@ -11,7 +11,11 @@ import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
 import coaches from '@/data/coaches.json';
 import videosJson from '@/data/videos.json';
+import replaysJson from '@/data/replays.json';
+import buildOrdersJson from '@/data/build-orders.json';
 import { Video } from '@/types/video';
+import { Replay } from '@/types/replay';
+import { BuildOrder } from '@/types/build-order';
 import { VideoSelector } from './video-selector-enhanced';
 
 interface MasterclassEditModalProps {
@@ -28,9 +32,15 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   const [coachSearch, setCoachSearch] = useState('');
   const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
+  const [replaySearch, setReplaySearch] = useState('');
+  const [showReplayDropdown, setShowReplayDropdown] = useState(false);
+  const [buildOrderSearch, setBuildOrderSearch] = useState('');
+  const [showBuildOrderDropdown, setShowBuildOrderDropdown] = useState(false);
 
-  // Merge static videos with pending changes
+  // Merge static content with pending changes
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
+  const allReplays = useMergedContent(replaysJson as Replay[], 'replays');
+  const allBuildOrders = useMergedContent(buildOrdersJson as BuildOrder[], 'build-orders');
 
   // Get all unique tags from existing masterclasses for autocomplete
   const allExistingTags = useMemo(() => {
@@ -58,6 +68,27 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       coach.displayName.toLowerCase().includes(search)
     );
   }, [coachSearch]);
+
+  // Filter replays based on search input
+  const filteredReplays = useMemo(() => {
+    if (!replaySearch.trim()) return allReplays.slice(0, 10);
+    const search = replaySearch.toLowerCase();
+    return allReplays.filter(replay =>
+      replay.title.toLowerCase().includes(search) ||
+      replay.matchup.toLowerCase().includes(search) ||
+      replay.map.toLowerCase().includes(search)
+    ).slice(0, 10);
+  }, [replaySearch, allReplays]);
+
+  // Filter build orders based on search input
+  const filteredBuildOrders = useMemo(() => {
+    if (!buildOrderSearch.trim()) return allBuildOrders.slice(0, 10);
+    const search = buildOrderSearch.toLowerCase();
+    return allBuildOrders.filter(buildOrder =>
+      buildOrder.name.toLowerCase().includes(search) ||
+      buildOrder.race.toLowerCase().includes(search)
+    ).slice(0, 10);
+  }, [buildOrderSearch, allBuildOrders]);
 
   useEffect(() => {
     if (!isOpen) return; // Only reset when opening the modal
@@ -139,10 +170,12 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       id: formData.id,
       title: formData.title,
       description: formData.description || '',
-      coach: formData.coach,
-      coachId: formData.coachId,
+      coach: formData.coach || '',
+      coachId: formData.coachId || '',
       race: formData.race || 'all',
       videoIds: formData.videoIds || [],
+      replayIds: formData.replayIds || [],
+      buildOrderIds: formData.buildOrderIds || [],
       difficulty: formData.difficulty || 'beginner',
       tags: formData.tags || [],
       thumbnail: thumbnail,
@@ -227,7 +260,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Race *</label>
+            <label className="block text-sm font-medium mb-1">Race</label>
             <select
               value={formData.race || 'all'}
               onChange={(e) => setFormData({ ...formData, race: e.target.value as Race })}
@@ -241,7 +274,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Difficulty *</label>
+            <label className="block text-sm font-medium mb-1">Difficulty</label>
             <select
               value={formData.difficulty || 'beginner'}
               onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'beginner' | 'intermediate' | 'advanced' | 'all' })}
@@ -260,8 +293,183 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           selectedVideoIds={formData.videoIds || []}
           onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
           label="Videos"
-          suggestedTitle={formData.title}
+          suggestedTitle={formData.title ? `${formData.title}${formData.coach ? ` - ${formData.coach}` : ''}` : ''}
+          suggestedRace={formData.race}
+          suggestedCoach={formData.coach}
+          suggestedCoachId={formData.coachId}
         />
+
+        {/* Replay Selector */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Linked Replays (Optional)</label>
+
+          {/* Selected Replays */}
+          {formData.replayIds && formData.replayIds.length > 0 && (
+            <div className="mb-2 space-y-2">
+              {formData.replayIds.map((replayId) => {
+                const replay = allReplays.find(r => r.id === replayId);
+                if (!replay) return null;
+                return (
+                  <div key={replayId} className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-md border border-border">
+                    <div>
+                      <p className="text-sm font-medium">{replay.title}</p>
+                      <p className="text-xs text-muted-foreground">{replay.matchup} • {replay.map}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          replayIds: formData.replayIds?.filter(id => id !== replayId) || []
+                        });
+                      }}
+                      className="text-destructive hover:text-destructive/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Replay Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              value={replaySearch}
+              onChange={(e) => {
+                setReplaySearch(e.target.value);
+                setShowReplayDropdown(true);
+              }}
+              onFocus={() => setShowReplayDropdown(true)}
+              onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              placeholder="Search replays by title, matchup, or map..."
+            />
+
+            {/* Replay Dropdown */}
+            {showReplayDropdown && filteredReplays.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {filteredReplays.map((replay) => {
+                  const isSelected = formData.replayIds?.includes(replay.id);
+                  return (
+                    <button
+                      key={replay.id}
+                      type="button"
+                      onClick={() => {
+                        if (!isSelected) {
+                          setFormData({
+                            ...formData,
+                            replayIds: [...(formData.replayIds || []), replay.id]
+                          });
+                        }
+                        setReplaySearch('');
+                        setShowReplayDropdown(false);
+                      }}
+                      disabled={isSelected}
+                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${
+                        isSelected ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <div className="font-medium text-sm">{replay.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {replay.matchup} • {replay.map} • {replay.duration}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Build Order Selector */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Linked Build Orders (Optional)</label>
+
+          {/* Selected Build Orders */}
+          {formData.buildOrderIds && formData.buildOrderIds.length > 0 && (
+            <div className="mb-2 space-y-2">
+              {formData.buildOrderIds.map((buildOrderId) => {
+                const buildOrder = allBuildOrders.find(bo => bo.id === buildOrderId);
+                if (!buildOrder) return null;
+                return (
+                  <div key={buildOrderId} className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-md border border-border">
+                    <div>
+                      <p className="text-sm font-medium">{buildOrder.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {buildOrder.race} vs {buildOrder.vsRace} • {buildOrder.difficulty}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          buildOrderIds: formData.buildOrderIds?.filter(id => id !== buildOrderId) || []
+                        });
+                      }}
+                      className="text-destructive hover:text-destructive/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Build Order Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              value={buildOrderSearch}
+              onChange={(e) => {
+                setBuildOrderSearch(e.target.value);
+                setShowBuildOrderDropdown(true);
+              }}
+              onFocus={() => setShowBuildOrderDropdown(true)}
+              onBlur={() => setTimeout(() => setShowBuildOrderDropdown(false), 200)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              placeholder="Search build orders by name or race..."
+            />
+
+            {/* Build Order Dropdown */}
+            {showBuildOrderDropdown && filteredBuildOrders.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {filteredBuildOrders.map((buildOrder) => {
+                  const isSelected = formData.buildOrderIds?.includes(buildOrder.id);
+                  return (
+                    <button
+                      key={buildOrder.id}
+                      type="button"
+                      onClick={() => {
+                        if (!isSelected) {
+                          setFormData({
+                            ...formData,
+                            buildOrderIds: [...(formData.buildOrderIds || []), buildOrder.id]
+                          });
+                        }
+                        setBuildOrderSearch('');
+                        setShowBuildOrderDropdown(false);
+                      }}
+                      disabled={isSelected}
+                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${
+                        isSelected ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <div className="font-medium text-sm">{buildOrder.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {buildOrder.race} vs {buildOrder.vsRace} • {buildOrder.difficulty}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Date</label>

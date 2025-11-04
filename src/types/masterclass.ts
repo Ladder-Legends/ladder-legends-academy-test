@@ -8,13 +8,14 @@ export interface Masterclass {
   description: string;
   coach?: string;
   coachId?: string;
-  race: Race;
+  race?: Race; // Optional - masterclasses can be race-agnostic
 
   // Video support - array of video IDs from videos.json (empty array = no videos)
   videoIds: string[];
 
-  replayIds?: string[]; // Multiple example replays demonstrating the concepts
-  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';
+  replayIds?: string[]; // Optional - example replays demonstrating the concepts
+  buildOrderIds?: string[]; // Optional - example build orders to practice
+  difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'all'; // Optional - can be for all skill levels
   tags: string[];
   thumbnail?: string;
   createdAt: string;

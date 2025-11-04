@@ -74,9 +74,11 @@ export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, o
                 <span className="text-sm text-muted-foreground">{masterclass.coach}</span>
               </td>
               <td className="px-6 py-4">
-                <span className={`text-sm font-medium ${getRaceColor(masterclass.race)}`}>
-                  {masterclass.race}
-                </span>
+                {masterclass.race && (
+                  <span className={`text-sm font-medium ${getRaceColor(masterclass.race)}`}>
+                    {masterclass.race}
+                  </span>
+                )}
               </td>
               <td className="px-6 py-4">
                 {masterclass.difficulty && (

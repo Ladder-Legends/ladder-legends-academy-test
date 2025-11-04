@@ -28,6 +28,9 @@ interface VideoSelectorProps {
   label?: string;
   className?: string;
   suggestedTitle?: string; // Pre-fill upload form with this title
+  suggestedRace?: string;  // Pre-fill race for new videos
+  suggestedCoach?: string; // Pre-fill coach name for new videos
+  suggestedCoachId?: string; // Pre-fill coach ID for new videos
   allowReorder?: boolean;   // Enable drag-to-reorder (playlist mode only) - TODO: Future enhancement
   allowCreate?: boolean;    // Allow creating new videos (default: true)
 }
@@ -41,6 +44,9 @@ export function VideoSelector({
   label = 'Video',
   className = '',
   suggestedTitle = '',
+  suggestedRace = 'terran',
+  suggestedCoach = '',
+  suggestedCoachId = '',
   allowReorder = false,
   allowCreate = true,
 }: VideoSelectorProps) {
@@ -106,11 +112,11 @@ export function VideoSelector({
   }, [searchQuery, allVideos]);
 
   const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
-    // Create a new video entry
+    // Create a new video entry with suggested metadata
     const videoId = uuidv4();
     const newVideo: Video = {
       id: videoId,
-      title: uploadingVideoTitle || 'Untitled Video',
+      title: uploadingVideoTitle || suggestedTitle || 'Untitled Video',
       description: '',
       source: 'mux',
       muxAssetId: assetId,
@@ -119,9 +125,9 @@ export function VideoSelector({
       thumbnail: `/thumbnails/${videoId}.jpg`,
       date: new Date().toISOString().split('T')[0],
       tags: [],
-      race: 'terran',
-      coach: '',
-      coachId: '',
+      race: (suggestedRace || 'terran') as 'terran' | 'zerg' | 'protoss',
+      coach: suggestedCoach || '',
+      coachId: suggestedCoachId || '',
       isFree: false,
     };
 
@@ -146,7 +152,7 @@ export function VideoSelector({
     setShowUpload(false);
     setUploadingVideoTitle('');
     setYoutubeId('');
-    toast.success('Video uploaded and linked successfully');
+    toast.success(`Video auto-created: ${newVideo.title}`);
   };
 
   const handleYoutubeVideoCreate = () => {
@@ -155,24 +161,25 @@ export function VideoSelector({
       return;
     }
 
-    if (!uploadingVideoTitle.trim()) {
+    const videoTitle = uploadingVideoTitle.trim() || suggestedTitle;
+    if (!videoTitle) {
       toast.error('Please enter a video title');
       return;
     }
 
-    // Create a new video entry for YouTube
+    // Create a new video entry for YouTube with suggested metadata
     const newVideo: Video = {
       id: uuidv4(),
-      title: uploadingVideoTitle,
+      title: videoTitle,
       description: '',
       source: 'youtube',
       youtubeId: youtubeId.trim(),
       thumbnail: `https://img.youtube.com/vi/${youtubeId.trim()}/hqdefault.jpg`,
       date: new Date().toISOString().split('T')[0],
       tags: [],
-      race: 'terran',
-      coach: '',
-      coachId: '',
+      race: (suggestedRace || 'terran') as 'terran' | 'zerg' | 'protoss',
+      coach: suggestedCoach || '',
+      coachId: suggestedCoachId || '',
       isFree: false,
     };
 
@@ -197,7 +204,7 @@ export function VideoSelector({
     setShowUpload(false);
     setUploadingVideoTitle('');
     setYoutubeId('');
-    toast.success('YouTube video added and linked successfully');
+    toast.success(`Video auto-created: ${newVideo.title}`);
   };
 
   const handleSelectExisting = (videoId: string) => {

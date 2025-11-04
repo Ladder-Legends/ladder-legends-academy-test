@@ -217,14 +217,18 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
                           <dd className="font-medium">{masterclass.coach}</dd>
                         </div>
                       )}
-                      <div>
-                        <dt className="text-sm text-muted-foreground mb-1">Race</dt>
-                        <dd className={`font-medium capitalize ${getRaceColor(masterclass.race)}`}>{masterclass.race}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm text-muted-foreground mb-1">Difficulty</dt>
-                        <dd className="font-medium capitalize">{masterclass.difficulty}</dd>
-                      </div>
+                      {masterclass.race && (
+                        <div>
+                          <dt className="text-sm text-muted-foreground mb-1">Race</dt>
+                          <dd className={`font-medium capitalize ${getRaceColor(masterclass.race)}`}>{masterclass.race}</dd>
+                        </div>
+                      )}
+                      {masterclass.difficulty && (
+                        <div>
+                          <dt className="text-sm text-muted-foreground mb-1">Difficulty</dt>
+                          <dd className="font-medium capitalize">{masterclass.difficulty}</dd>
+                        </div>
+                      )}
                       <div>
                         <dt className="text-sm text-muted-foreground mb-1">Created</dt>
                         <dd className="font-medium">{new Date(masterclass.createdAt).toLocaleDateString()}</dd>

@@ -76,9 +76,11 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
 
           <CardHeader className="flex-1">
             <div className="flex items-start justify-between gap-2 mb-2">
-              <Badge variant="outline" className={getRaceBadgeColor(masterclass.race)}>
-                {masterclass.race}
-              </Badge>
+              {masterclass.race && (
+                <Badge variant="outline" className={getRaceBadgeColor(masterclass.race)}>
+                  {masterclass.race}
+                </Badge>
+              )}
               {masterclass.difficulty && (
                 <Badge variant="outline">
                   {masterclass.difficulty}

@@ -12,6 +12,7 @@ import videos from '@/data/videos.json';
 import coaches from '@/data/coaches.json';
 import { MuxUpload } from './mux-upload';
 import { VideoSelector } from './video-selector-enhanced';
+import { extractYouTubeId } from '@/lib/youtube-parser';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -174,8 +175,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const handleYoutubeIdKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (youtubeIdInput.trim()) {
-        setFormData({ ...formData, youtubeId: youtubeIdInput.trim() });
+      const extractedId = extractYouTubeId(youtubeIdInput);
+      if (extractedId) {
+        setFormData({ ...formData, youtubeId: extractedId });
         setYoutubeIdInput('');
       }
     }
@@ -217,8 +219,8 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     const hasPlaylistVideos = isPlaylistMode && formData.videoIds && formData.videoIds.length > 0;
 
     // Validate required fields based on source
-    if (!formData.id || !formData.title || !formData.race || !formData.coach || !formData.coachId) {
-      toast.error('Please fill in all required fields (Title, Race, Coach)');
+    if (!formData.id || !formData.title) {
+      toast.error('Please fill in all required fields (Title)');
       return;
     }
 
@@ -247,9 +249,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         thumbnail: formData.thumbnail || '/placeholder-thumbnail.jpg',
         date: formData.date || new Date().toISOString().split('T')[0],
         tags: formData.tags || [],
-        race: formData.race!,
-        coach: formData.coach,
-        coachId: formData.coachId,
+        race: formData.race || 'terran',
+        coach: formData.coach || '',
+        coachId: formData.coachId || '',
         isFree: formData.isFree || false,
       };
     } else if (isMuxVideo) {
@@ -265,9 +267,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         thumbnail: formData.thumbnail || `/thumbnails/${formData.id}.jpg`,
         date: formData.date || new Date().toISOString().split('T')[0],
         tags: formData.tags || [],
-        race: formData.race!,
-        coach: formData.coach,
-        coachId: formData.coachId,
+        race: formData.race || 'terran',
+        coach: formData.coach || '',
+        coachId: formData.coachId || '',
         isFree: formData.isFree || false,
       };
     } else {
@@ -281,9 +283,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         thumbnail: `https://img.youtube.com/vi/${formData.youtubeId}/hqdefault.jpg`,
         date: formData.date || new Date().toISOString().split('T')[0],
         tags: formData.tags || [],
-        race: formData.race!,
-        coach: formData.coach,
-        coachId: formData.coachId,
+        race: formData.race || 'terran',
+        coach: formData.coach || '',
+        coachId: formData.coachId || '',
         isFree: formData.isFree || false,
       };
     }
@@ -396,7 +398,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Race *</label>
+            <label className="block text-sm font-medium mb-1">Race</label>
             <select
               value={formData.race || 'terran'}
               onChange={(e) => setFormData({ ...formData, race: e.target.value as VideoRace })}
@@ -410,7 +412,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Coach *</label>
+            <label className="block text-sm font-medium mb-1">Coach</label>
             <div className="relative">
               <div className="flex gap-2">
                 <input
@@ -592,13 +594,14 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                     onChange={(e) => setYoutubeIdInput(e.target.value)}
                     onKeyDown={handleYoutubeIdKeyDown}
                     className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-                    placeholder="dQw4w9WgXcQ (press Enter to add)"
+                    placeholder="YouTube URL or Video ID (e.g., https://youtube.com/watch?v=... or dQw4w9WgXcQ)"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      if (youtubeIdInput.trim()) {
-                        setFormData({ ...formData, youtubeId: youtubeIdInput.trim() });
+                      const extractedId = extractYouTubeId(youtubeIdInput);
+                      if (extractedId) {
+                        setFormData({ ...formData, youtubeId: extractedId });
                         setYoutubeIdInput('');
                       }
                     }}
@@ -610,7 +613,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               )}
 
               <p className="text-xs text-muted-foreground">
-                The ID from the YouTube URL (e.g., youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong>).
+                YouTube URL or Video ID (e.g., https://youtube.com/watch?v=... or dQw4w9WgXcQ)
               </p>
             </div>
           </div>

@@ -82,7 +82,7 @@ export function MasterclassesContent() {
           !mc.title.toLowerCase().includes(query) &&
           !mc.description.toLowerCase().includes(query) &&
           !(mc.coach?.toLowerCase().includes(query)) &&
-          !mc.race.toLowerCase().includes(query) &&
+          !(mc.race?.toLowerCase().includes(query)) &&
           !mc.tags?.some(tag => tag.toLowerCase().includes(query))
         ) {
           return false;

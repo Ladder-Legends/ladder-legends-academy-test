@@ -236,21 +236,27 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
     const { metadata } = replayAnalysisData;
 
+    // Use build order name for replay title if available
+    const buildOrderName = formData.name?.trim();
+    const replayTitle = buildOrderName
+      ? `${buildOrderName} Replay`
+      : `${metadata.map_name} - ${metadata.players[0].name} vs ${metadata.players[1].name}`;
+
     // Create a new replay entry
     const newReplay: Replay = {
       id: `replay-${uuidv4()}`,
-      title: `${metadata.map_name} - ${metadata.players[0].name} vs ${metadata.players[1].name}`,
+      title: replayTitle,
       map: metadata.map_name,
       matchup: `${metadata.players[0].race.charAt(0)}v${metadata.players[1].race.charAt(0)}` as Matchup,
       player1: {
         name: metadata.players[0].name,
         race: metadata.players[0].race.toLowerCase() as ReplayRace,
-        result: metadata.players[0].result as 'win' | 'loss',
+        result: metadata.players[0].result.toLowerCase() as 'win' | 'loss',
       },
       player2: {
         name: metadata.players[1].name,
         race: metadata.players[1].race.toLowerCase() as ReplayRace,
-        result: metadata.players[1].result as 'win' | 'loss',
+        result: metadata.players[1].result.toLowerCase() as 'win' | 'loss',
       },
       duration: metadata.game_length || '0:00',
       gameDate: metadata.unix_timestamp
@@ -300,7 +306,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       });
       setReplaySearch(newReplay.title);
 
-      toast.success('Replay saved and linked to build order!');
+      toast.success(`Replay auto-saved: ${replayTitle}`);
 
       // Clear upload state
       setUploadedReplayFile(null);
@@ -344,26 +350,10 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     setFormData({ ...formData, steps });
   };
 
-  const handleReplayFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file extension
-    if (!file.name.endsWith('.SC2Replay')) {
-      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
-      return;
-    }
-
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size exceeds maximum allowed size of 5MB');
-      return;
-    }
-
+  const analyzeReplayFile = async (file: File) => {
     setIsAnalyzing(true);
     setReplayAnalysisData(null);
     setSelectedPlayerForImport(null);
-    setUploadedReplayFile(file); // Save the file for later upload
 
     try {
       const analyzeFormData = new FormData();
@@ -385,9 +375,36 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     } catch (error) {
       console.error('Error analyzing replay:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');
-      setUploadedReplayFile(null);
+      throw error;
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleReplayFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file extension
+    if (!file.name.endsWith('.SC2Replay')) {
+      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size exceeds maximum allowed size of 5MB');
+      return;
+    }
+
+    setUploadedReplayFile(file); // Save the file for later upload
+
+    // Auto-analyze the replay
+    try {
+      await analyzeReplayFile(file);
+    } catch (error) {
+      setUploadedReplayFile(null);
+    } finally {
       // Reset the input
       e.target.value = '';
     }
@@ -484,14 +501,19 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         notes: undefined,
       }));
 
-    // Normalize race
+    // Normalize race from SC2 format (Terran/Zerg/Protoss) to app format (terran/zerg/protoss)
     const normalizeRace = (race: string): Race => race.toLowerCase() as Race;
 
-    // Auto-populate form with replay data
+    // Extract opponent's race for vsRace
+    const opponentData = metadata.players.find((p: SC2ReplayPlayer) => p.name !== playerName);
+    const vsRace = opponentData ? normalizeRace(opponentData.race) : formData.vsRace || 'terran';
+
+    // Auto-populate form with replay data including both races
     setFormData({
       ...formData,
       name: formData.name || `${playerData.name} ${metadata.map_name} Build`,
       race: normalizeRace(playerData.race),
+      vsRace: vsRace as VsRace,
       steps: steps,
       patch: metadata.release_string || formData.patch,
     });
@@ -1050,6 +1072,10 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             mode="playlist"
             selectedVideoIds={formData.videoIds || []}
             onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+            suggestedTitle={formData.name ? `${formData.name}${formData.coach ? ` - ${formData.coach}` : ''}` : ''}
+            suggestedRace={formData.race}
+            suggestedCoach={formData.coach}
+            suggestedCoachId={formData.coachId}
           />
         </div>
 

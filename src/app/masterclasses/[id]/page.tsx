@@ -69,8 +69,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       images: [absoluteThumbnailUrl],
     },
     other: {
-      'masterclass:race': masterclass.race,
-      'masterclass:difficulty': masterclass.difficulty,
+      ...(masterclass.race && { 'masterclass:race': masterclass.race }),
+      ...(masterclass.difficulty && { 'masterclass:difficulty': masterclass.difficulty }),
     },
   };
 }

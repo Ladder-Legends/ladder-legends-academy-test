@@ -7,7 +7,7 @@ export interface Video {
   description: string;
   date: string;
   tags: string[];
-  race: VideoRace;
+  race?: VideoRace; // Optional - videos can be race-agnostic
   coach?: string;
   coachId?: string;
 
