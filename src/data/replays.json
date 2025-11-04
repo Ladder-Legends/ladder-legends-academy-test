@@ -237,5 +237,28 @@
     "tags": [],
     "patch": "5.0.14.94137",
     "isFree": false
+  },
+  {
+    "id": "replay-cc3ee635-88f1-4fd9-b53e-82f2d7a4beb0",
+    "title": "Ultralove - GamerNico vs A.I. 1 (Very Easy)",
+    "map": "Ultralove",
+    "matchup": "TvT",
+    "player1": {
+      "name": "GamerNico",
+      "race": "terran",
+      "result": "Win"
+    },
+    "player2": {
+      "name": "A.I. 1 (Very Easy)",
+      "race": "terran",
+      "result": "Loss"
+    },
+    "duration": "11.13",
+    "gameDate": "2025-07-30",
+    "uploadDate": "2025-11-04",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "isFree": false
   }
 ]
