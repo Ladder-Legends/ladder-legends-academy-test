@@ -651,7 +651,9 @@
     "coach": "",
     "coachId": "",
     "description": "",
-    "videoIds": [],
+    "videoIds": [
+      "22ba6935-7577-4f52-afd3-b92d7dc2c399"
+    ],
     "steps": [
       {
         "supply": 13,
