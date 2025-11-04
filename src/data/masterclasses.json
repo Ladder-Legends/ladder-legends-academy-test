@@ -29,9 +29,9 @@
     "coachId": "krystianer",
     "race": "protoss",
     "videoIds": [
-      "uuEGiblseBs"
+      "uuEGiblseBs",
+      "f2eb5d73-247c-4aae-8149-c19caeb2fbc3"
     ],
-    "duration": "",
     "difficulty": "intermediate",
     "tags": [
       "protoss",
@@ -42,7 +42,7 @@
       "patch"
     ],
     "createdAt": "2025-10-05",
-    "updatedAt": "2025-10-05",
+    "updatedAt": "2025-11-04",
     "isFree": false
   },
   {

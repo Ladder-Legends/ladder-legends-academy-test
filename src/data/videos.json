@@ -794,5 +794,19 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "f2eb5d73-247c-4aae-8149-c19caeb2fbc3",
+    "title": "Krystianer Masterclass: New Patch (PvZ & PvP & PvT) + Live Games",
+    "description": "",
+    "source": "youtube",
+    "youtubeId": "https://www.youtube.com/watch?v=uuEGiblseBs",
+    "thumbnail": "https://img.youtube.com/vi/https://www.youtube.com/watch?v=uuEGiblseBs/hqdefault.jpg",
+    "date": "2025-11-04",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
