@@ -645,7 +645,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
           >
             <option value="">-- No Coach --</option>
-            {coaches.map((coach) => (
+            {coaches.filter(coach => coach.isActive !== false).map((coach) => (
               <option key={coach.id} value={coach.name}>
                 {coach.displayName} ({coach.race})
               </option>

@@ -67,11 +67,12 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       .slice(0, 5);
   }, [typeInput, allExistingTypes]);
 
-  // Filter coaches based on search input
+  // Filter coaches based on search input (only active coaches)
   const filteredCoaches = useMemo(() => {
-    if (!coachSearch.trim()) return coaches;
+    const activeCoaches = coaches.filter(coach => coach.isActive !== false);
+    if (!coachSearch.trim()) return activeCoaches;
     const search = coachSearch.toLowerCase();
-    return coaches.filter(coach =>
+    return activeCoaches.filter(coach =>
       coach.name.toLowerCase().includes(search) ||
       coach.displayName.toLowerCase().includes(search)
     );
