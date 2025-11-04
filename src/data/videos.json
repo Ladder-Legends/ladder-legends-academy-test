@@ -856,5 +856,25 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "5b891fa7-d58d-4251-ba52-ea92fdbb6cdd",
+    "title": "The Nicosystem™ Beginner Terran Builds: TvT Defensive Gas First ",
+    "description": "Hello everyone, this build is designed for defensive oriented players that like having an economical advantage. You can be on level playing field vs double gas openers but with additional income as long as you play defensively. This catapults you ahead in the mid-lategame where you can snowball this economic lead. ",
+    "source": "mux",
+    "muxAssetId": "FtbAj02ToYJjNnZQpC7dy0201vFQvt4IADytNAdHbEVcKA",
+    "muxPlaybackId": "SsMyMIadvb3uy702i401Kk8hwZPU6Yi01nxGV3301wvSfjs",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/5b891fa7-d58d-4251-ba52-ea92fdbb6cdd.jpg",
+    "date": "2025-11-04",
+    "tags": [
+      "tvt",
+      "macro",
+      "nico"
+    ],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
