@@ -428,14 +428,67 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       return `${mins}:${remainingSecs.toString().padStart(2, '0')}`;
     };
 
+    // List of abilities, spells, and temporary units to filter out from build orders
+    const excludedActions = [
+      // General
+      'Unknown',
+      'Spray',
+
+      // Terran abilities & temporary units
+      'MULE',
+      'Scan',
+      'ScannerSweep',
+      'KD8Charge',
+      'AutoTurret',
+      'PointDefenseDrone',
+      'Nuke',
+      'SupplyDrop',
+      'Salvage',
+      'CalldownMULE',
+
+      // Zerg abilities & temporary units
+      'Larva',
+      'CreepTumor',
+      'ChangelingMarine',
+      'ChangelingMarineShield',
+      'ChangelingZergling',
+      'ChangelingZealot',
+      'InfestorTerran',
+      'Broodling',
+      'Locust',
+      'LocustMP',
+      'LocustMPFlying',
+
+      // Protoss abilities & temporary units
+      'ForceField',
+      'PylonOvercharge',
+      'Hallucination',
+      'HallucinationArchon',
+      'HallucinationColossus',
+      'HallucinationHighTemplar',
+      'HallucinationImmortal',
+      'HallucinationPhoenix',
+      'HallucinationProbe',
+      'HallucinationStalker',
+      'HallucinationVoidRay',
+      'HallucinationWarpPrism',
+      'HallucinationZealot',
+      'HallucinationAdept',
+      'HallucinationOracle',
+      'HallucinationDisruptor',
+    ];
+
     // Filter and convert events to build order steps
     const steps: BuildOrderStep[] = buildOrderEvents
       .filter((event: SC2BuildOrderEvent) => {
         const action = event.event === 'upgrade'
           ? `Upgrade: ${event.upgrade || 'Unknown'}`
           : event.unit || 'Unknown';
-        // Filter out Unknown and Spray events
-        return action !== 'Unknown' && !action.includes('Spray');
+
+        // Filter out excluded actions (abilities, spells, temporary units)
+        return !excludedActions.some(excluded =>
+          action.toLowerCase().includes(excluded.toLowerCase())
+        );
       })
       .map((event: SC2BuildOrderEvent) => ({
         supply: event.supply,
