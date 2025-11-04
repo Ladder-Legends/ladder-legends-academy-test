@@ -39,13 +39,6 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
       return;
     }
 
-    // Validate file size (max 5GB for free plan)
-    const maxSize = 5 * 1024 * 1024 * 1024; // 5GB
-    if (file.size > maxSize) {
-      toast.error('File size exceeds 5GB limit');
-      return;
-    }
-
     try {
       setUploading(true);
       setProgress(0);
