@@ -135,33 +135,6 @@
     "videoIds": []
   },
   {
-    "id": "replay-1424344164476387329",
-    "title": "Pylon_LE_38",
-    "map": "Pylon LE",
-    "matchup": "PvT",
-    "player1": {
-      "name": "Maplez",
-      "race": "protoss",
-      "mmr": 5775,
-      "result": "win"
-    },
-    "player2": {
-      "name": "Mengsk",
-      "race": "terran",
-      "mmr": 5300,
-      "result": "loss"
-    },
-    "duration": "08.14",
-    "gameDate": "2025-10-05",
-    "uploadDate": "2025-10-05",
-    "coach": "gamerrichy",
-    "tags": [],
-    "patch": "5.0.15.95248",
-    "notes": "",
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1424344164476387329.SC2Replay",
-    "videoIds": []
-  },
-  {
     "id": "replay-1424344132394156042",
     "title": "Enjoy two games i played vs toss on ladder 5.8k 1 loss and 1 win!",
     "map": "Ultralove",
