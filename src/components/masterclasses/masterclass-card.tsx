@@ -8,8 +8,11 @@ import { PermissionGate } from "@/components/auth/permission-gate";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
-import videos from "@/data/videos.json";
+import { Video } from "@/types/video";
+import videosData from "@/data/videos.json";
 import Image from "next/image";
+
+const videos = videosData as Video[];
 
 interface MasterclassCardProps {
   masterclass: Masterclass;

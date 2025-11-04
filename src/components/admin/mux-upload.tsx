@@ -184,13 +184,13 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
               <input
                 id="mux-file-upload"
                 type="file"
-                accept="video/*"
+                accept="video/*,.mkv,.mp4,.mov,.avi,.wmv,.flv,.webm"
                 onChange={handleFileSelect}
                 className="sr-only"
               />
             </label>
             <p className="text-xs text-muted-foreground mt-2">
-              Supported formats: MP4, MOV, AVI, etc.
+              Supported formats: MP4, MOV, AVI, MKV, WebM, etc.
             </p>
           </div>
         ) : (
