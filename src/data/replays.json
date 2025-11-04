@@ -1,36 +1,218 @@
 [
   {
-    "id": "replay-1",
-    "title": "Hino vs Diamond Terran - Roach/Ravager Defense",
-    "map": "Crimson Court LE",
-    "matchup": "ZvT",
+    "id": "replay-1428354917432823969",
+    "title": "Ladder_tvp_speed",
+    "map": "[TLMC21] Ruby Rock",
+    "matchup": "TvP",
     "player1": {
-      "name": "Hino",
-      "race": "zerg",
-      "mmr": 5200,
+      "name": "Nicoract",
+      "race": "terran",
+      "mmr": null,
       "result": "win"
     },
     "player2": {
-      "name": "DiamondPlayer",
-      "race": "terran",
-      "mmr": 4100,
+      "name": "LetaleX",
+      "race": "protoss",
+      "mmr": null,
       "result": "loss"
     },
-    "duration": "14:23",
-    "gameDate": "2025-01-15",
-    "uploadDate": "2025-01-16",
-    "coach": "Hino",
-    "tags": [
-      "roach",
-      "ravager",
-      "defense",
-      "zvt"
-    ],
-    "patch": "5.0.14",
-    "notes": "Example of defending early tank push with roach/ravager",
-    "downloadUrl": "https://example.com/replays/hino-zvt-roach-defense.SC2Replay",
-    "videoIds": [
-      "dQw4w9WgXcQ"
-    ]
+    "duration": "08.56",
+    "gameDate": "2025-10-16",
+    "uploadDate": "2025-10-16",
+    "coach": "nicojuniba",
+    "tags": [],
+    "patch": "5.0.15.95248",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1428354917432823969",
+    "title": "Masters_Cup_150_quali_Nicoract_vs_BabyMarine_2",
+    "map": "Tokamak LE",
+    "matchup": "TvT",
+    "player1": {
+      "name": "BabyMarine",
+      "race": "terran",
+      "mmr": null,
+      "result": "loss"
+    },
+    "player2": {
+      "name": "Nicoract",
+      "race": "terran",
+      "mmr": null,
+      "result": "win"
+    },
+    "duration": "11.53",
+    "gameDate": "2025-10-16",
+    "uploadDate": "2025-10-16",
+    "coach": "nicojuniba",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1428354917432823969",
+    "title": "Masters_Cup_150_quali_Nicoract_vs_BabyMarine_1",
+    "map": "Ley Lines",
+    "matchup": "TvT",
+    "player1": {
+      "name": "Nicoract",
+      "race": "terran",
+      "mmr": null,
+      "result": "win"
+    },
+    "player2": {
+      "name": "BabyMarine",
+      "race": "terran",
+      "mmr": null,
+      "result": "loss"
+    },
+    "duration": "22.32",
+    "gameDate": "2025-10-16",
+    "uploadDate": "2025-10-16",
+    "coach": "nicojuniba",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1428354917432823969",
+    "title": "ladder_tvp_default",
+    "map": "Ley Lines",
+    "matchup": "TvP",
+    "player1": {
+      "name": "Nicoract",
+      "race": "terran",
+      "mmr": null,
+      "result": "win"
+    },
+    "player2": {
+      "name": "ART",
+      "race": "protoss",
+      "mmr": null,
+      "result": "loss"
+    },
+    "duration": "09.34",
+    "gameDate": "2025-10-16",
+    "uploadDate": "2025-10-16",
+    "coach": "nicojuniba",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1428354917432823969",
+    "title": "ladder_tvz_default",
+    "map": "Persephone LE",
+    "matchup": "TvZ",
+    "player1": {
+      "name": "Nicoract",
+      "race": "terran",
+      "mmr": null,
+      "result": "win"
+    },
+    "player2": {
+      "name": "Wayne",
+      "race": "zerg",
+      "mmr": null,
+      "result": "loss"
+    },
+    "duration": "09.58",
+    "gameDate": "2025-10-16",
+    "uploadDate": "2025-10-16",
+    "coach": "nicojuniba",
+    "tags": [],
+    "patch": "5.0.15.95248",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1424344164476387329",
+    "title": "Pylon_LE_38",
+    "map": "Pylon LE",
+    "matchup": "PvT",
+    "player1": {
+      "name": "Maplez",
+      "race": "protoss",
+      "mmr": 5775,
+      "result": "win"
+    },
+    "player2": {
+      "name": "Mengsk",
+      "race": "terran",
+      "mmr": 5300,
+      "result": "loss"
+    },
+    "duration": "08.14",
+    "gameDate": "2025-10-05",
+    "uploadDate": "2025-10-05",
+    "coach": "gamerrichy",
+    "tags": [],
+    "patch": "5.0.15.95248",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1424344164476387329.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1424344132394156042",
+    "title": "Enjoy two games i played vs toss on ladder 5.8k 1 loss and 1 win!",
+    "map": "Ultralove",
+    "matchup": "TvP",
+    "player1": {
+      "name": "Mengsk",
+      "race": "terran",
+      "mmr": 5290,
+      "result": "win"
+    },
+    "player2": {
+      "name": "Maplez",
+      "race": "protoss",
+      "mmr": 5785,
+      "result": "loss"
+    },
+    "duration": "15.07",
+    "gameDate": "2025-10-05",
+    "uploadDate": "2025-10-05",
+    "coach": "gamerrichy",
+    "tags": [],
+    "patch": "5.0.15.95248",
+    "notes": "Enjoy two games i played vs toss on ladder 5.8k 1 loss and 1 win!",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1424344132394156042.SC2Replay",
+    "videoIds": []
+  },
+  {
+    "id": "replay-1400636346086985817",
+    "title": "Tokamak_LE_6",
+    "map": "Tokamak LE",
+    "matchup": "TvP",
+    "player1": {
+      "name": "IIIIIIIIIIII",
+      "race": "terran",
+      "mmr": 4622,
+      "result": "loss"
+    },
+    "player2": {
+      "name": "Proxyimba",
+      "race": "protoss",
+      "mmr": 4414,
+      "result": "win"
+    },
+    "duration": "09.10",
+    "gameDate": "2025-08-01",
+    "uploadDate": "2025-08-01",
+    "coach": "groovyman12",
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "notes": "",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1400636346086985817.SC2Replay",
+    "videoIds": []
   }
 ]
