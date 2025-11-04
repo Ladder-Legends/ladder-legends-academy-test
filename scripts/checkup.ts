@@ -40,6 +40,15 @@ interface StaleAssets {
 
 const DISCORD_GUILD_ID = '1386735340517195959';
 
+interface DiscordEvent {
+  id: string;
+  name: string;
+  description?: string;
+  scheduled_start_time: string;
+  scheduled_end_time?: string;
+  created_at?: string;
+}
+
 async function syncDiscordEvents(): Promise<void> {
   console.log('\n📅 Syncing Discord scheduled events...');
 
@@ -65,11 +74,11 @@ async function syncDiscordEvents(): Promise<void> {
       return;
     }
 
-    const events = await response.json();
+    const events = await response.json() as DiscordEvent[];
     console.log(`   ✅ Found ${events.length} Discord event(s)`);
 
     // Transform Discord events to our format
-    const syncedEvents = events.map((event: any) => {
+    const syncedEvents = events.map((event: DiscordEvent) => {
       const startTime = new Date(event.scheduled_start_time);
       const endTime = event.scheduled_end_time ? new Date(event.scheduled_end_time) : null;
       const duration = endTime ? Math.round((endTime.getTime() - startTime.getTime()) / 60000) : 120;
