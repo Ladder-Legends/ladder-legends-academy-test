@@ -6,8 +6,8 @@ export interface Masterclass {
   id: string;
   title: string;
   description: string;
-  coach: string;
-  coachId: string;
+  coach?: string;
+  coachId?: string;
   race: Race;
 
   // Video support - array of video IDs from videos.json (empty array = no videos)

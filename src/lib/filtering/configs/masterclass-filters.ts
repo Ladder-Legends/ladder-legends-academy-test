@@ -22,7 +22,7 @@ const fields: FilterFieldConfig<Masterclass>[] = [
       }
 
       const coaches = Array.isArray(selectedCoaches) ? selectedCoaches : [String(selectedCoaches)];
-      return coaches.includes(masterclass.coach);
+      return masterclass.coach ? coaches.includes(masterclass.coach) : false;
     },
   },
 
@@ -49,7 +49,9 @@ const sections: FilterSectionConfig<Masterclass>[] = [
     type: 'checkbox',
     getOptions: (masterclasses) => {
       const coaches = new Set<string>();
-      masterclasses.forEach(mc => coaches.add(mc.coach));
+      masterclasses.forEach(mc => {
+        if (mc.coach) coaches.add(mc.coach);
+      });
       return Array.from(coaches).sort().map(coach => ({
         id: coach,
         label: coach,

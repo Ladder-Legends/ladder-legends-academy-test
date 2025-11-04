@@ -60,7 +60,9 @@ export function MasterclassesContent() {
   // Get unique coaches
   const allCoaches = useMemo(() => {
     const coaches = new Set<string>();
-    allMasterclasses.forEach(mc => coaches.add(mc.coach));
+    allMasterclasses.forEach(mc => {
+      if (mc.coach) coaches.add(mc.coach);
+    });
     return Array.from(coaches).sort();
   }, []);
 
@@ -79,7 +81,7 @@ export function MasterclassesContent() {
         if (
           !mc.title.toLowerCase().includes(query) &&
           !mc.description.toLowerCase().includes(query) &&
-          !mc.coach.toLowerCase().includes(query) &&
+          !(mc.coach?.toLowerCase().includes(query)) &&
           !mc.race.toLowerCase().includes(query) &&
           !mc.tags?.some(tag => tag.toLowerCase().includes(query))
         ) {
@@ -96,7 +98,7 @@ export function MasterclassesContent() {
 
       // Coach filters
       if (selectedItems.coaches && selectedItems.coaches.length > 0) {
-        if (!selectedItems.coaches.includes(mc.coach)) return false;
+        if (!mc.coach || !selectedItems.coaches.includes(mc.coach)) return false;
       }
 
       // Access level filters

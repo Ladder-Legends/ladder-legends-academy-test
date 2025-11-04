@@ -116,8 +116,8 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
   };
 
   const handleSave = () => {
-    if (!formData.id || !formData.title || !formData.coach || !formData.coachId) {
-      toast.error('Please fill in all required fields (Title, Coach)');
+    if (!formData.id || !formData.title) {
+      toast.error('Please fill in all required fields (Title)');
       return;
     }
 
@@ -182,7 +182,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Coach *</label>
+          <label className="block text-sm font-medium mb-1">Coach</label>
           <div className="relative">
             <input
               type="text"
