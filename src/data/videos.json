@@ -856,5 +856,19 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "b45b11de-5477-4ef6-a58a-9af617c9cbcb",
+    "title": "5-1-1 2 base tank push in TvP",
+    "description": "",
+    "source": "youtube",
+    "youtubeId": "https://youtu.be/5xh1WVcRoSA",
+    "thumbnail": "https://img.youtube.com/vi/https://youtu.be/5xh1WVcRoSA/hqdefault.jpg",
+    "date": "2025-11-04",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]

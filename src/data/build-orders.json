@@ -2512,14 +2512,16 @@
   },
   {
     "id": "01b835ed-860c-4dc4-aec1-8f31e2894be8",
-    "name": "Nico's TvP 5-1-1",
+    "name": "5-1-1 2 base tank push in TvP",
     "race": "terran",
     "vsRace": "terran",
     "difficulty": "beginner",
     "coach": "Nico",
     "coachId": "coach-nico",
     "description": "A smoother vs AI replay for studying timings for TvP 5-1-1",
-    "videoIds": [],
+    "videoIds": [
+      "b45b11de-5477-4ef6-a58a-9af617c9cbcb"
+    ],
     "steps": [
       {
         "supply": 13,
