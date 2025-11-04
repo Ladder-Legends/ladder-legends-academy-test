@@ -721,6 +721,12 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
             onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
             label="Videos"
             suggestedTitle={formData.title}
+            suggestedRace={
+              formData.player1?.result === 'win'
+                ? formData.player1.race
+                : formData.player2?.race
+            }
+            suggestedCoach={formData.coach}
           />
         </div>
 
