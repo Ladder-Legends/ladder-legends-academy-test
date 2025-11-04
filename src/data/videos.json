@@ -41,6 +41,44 @@
     "isFree": false
   },
   {
+    "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
+    "title": "Starcraft 2 Tips and Tricks #72: When to A-move vs When to Right click",
+    "description": "This video goes over the differential of when to a-move vs when to right click and specific situations for each.",
+    "date": "2025-10-23",
+    "tags": [
+      "tipsandtricks",
+      "zerg",
+      "terran",
+      "micro",
+      "protoss"
+    ],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "source": "youtube",
+    "youtubeId": "n85AUGyZtPk",
+    "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
+    "isFree": false
+  },
+  {
+    "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
+    "title": "Simple Early Game Zerg Setup vs Protoss",
+    "description": "This video goes over how you want to position your queens and when to get your spores / how to scout.",
+    "date": "2025-10-23",
+    "tags": [
+      "zerg",
+      "macro",
+      "tipsntricks"
+    ],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "source": "youtube",
+    "youtubeId": "5BLEYQBSF7I",
+    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
+    "isFree": false
+  },
+  {
     "id": "1",
     "title": "Diamond 2 Coaching session with Equinox",
     "description": "This is a current up to date coaching session with equinox that I wanted to showcase so people can see my coaching style ",
