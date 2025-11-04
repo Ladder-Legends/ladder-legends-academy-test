@@ -43,7 +43,6 @@ export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, o
             <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Race</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
           </tr>
         </thead>
@@ -85,11 +84,6 @@ export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, o
                     {masterclass.difficulty}
                   </Badge>
                 )}
-              </td>
-              <td className="px-6 py-4">
-                <span className="text-sm text-muted-foreground">
-                  {masterclass.duration || '—'}
-                </span>
               </td>
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">

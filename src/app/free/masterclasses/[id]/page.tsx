@@ -113,15 +113,6 @@ export default async function FreeMasterclassDetailPage({ params }: PageProps) {
                   <dt className="text-sm text-muted-foreground mb-1">Race</dt>
                   <dd className={`font-medium capitalize ${getRaceColor(masterclass.race)}`}>{masterclass.race}</dd>
                 </div>
-                {masterclass.duration && (
-                  <div>
-                    <dt className="text-sm text-muted-foreground mb-1">Duration</dt>
-                    <dd className="font-medium flex items-center gap-1.5">
-                      <Clock className="h-4 w-4" />
-                      {masterclass.duration}
-                    </dd>
-                  </div>
-                )}
                 <div>
                   <dt className="text-sm text-muted-foreground mb-1">Difficulty</dt>
                   <dd className="font-medium capitalize">{masterclass.difficulty}</dd>

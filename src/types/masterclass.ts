@@ -12,7 +12,6 @@ export interface Masterclass {
   videoIds: string[];
 
   replayIds?: string[]; // Multiple example replays demonstrating the concepts
-  duration?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';
   tags: string[];
   thumbnail?: string;

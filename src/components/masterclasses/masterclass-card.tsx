@@ -81,11 +81,6 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Coach: {masterclass.coach}</span>
             </div>
-            {masterclass.duration && (
-              <div className="text-sm text-muted-foreground">
-                {masterclass.duration}
-              </div>
-            )}
           </CardContent>
         </Card>
       </PaywallLink>

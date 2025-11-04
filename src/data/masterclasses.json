@@ -9,7 +9,6 @@
     "videoIds": [
       "UFcKAiUhpU0"
     ],
-    "duration": "",
     "difficulty": "intermediate",
     "tags": [
       "protoss",
@@ -60,7 +59,6 @@
       "replay-nico-ladder-tvp-default",
       "replay-nico-ladder-tvz-default"
     ],
-    "duration": "",
     "difficulty": "intermediate",
     "tags": [
       "terran",
@@ -79,7 +77,6 @@
     "coachId": "",
     "race": "zerg",
     "videoIds": [],
-    "duration": "",
     "difficulty": "intermediate",
     "tags": [
       "masterclass",
@@ -99,7 +96,6 @@
     "videoIds": [
       "dQw4w9WgXcQ"
     ],
-    "duration": "24:15",
     "difficulty": "beginner",
     "tags": [
       "fundamentals",

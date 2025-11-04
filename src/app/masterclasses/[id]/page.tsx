@@ -71,7 +71,6 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     other: {
       'masterclass:race': masterclass.race,
       'masterclass:difficulty': masterclass.difficulty,
-      'masterclass:duration': masterclass.duration || '',
     },
   };
 }
