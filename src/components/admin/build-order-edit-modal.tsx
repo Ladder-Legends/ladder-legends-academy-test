@@ -37,6 +37,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [replaySearch, setReplaySearch] = useState('');
   const [showReplayDropdown, setShowReplayDropdown] = useState(false);
   const [uploadedReplayFile, setUploadedReplayFile] = useState<File | null>(null);
+  const [replayLinkMode, setReplayLinkMode] = useState<'existing' | 'upload'>('existing');
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -264,7 +265,11 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       setReplaySearch(newReplay.title);
 
       toast.success('Replay saved and linked to build order!');
+
+      // Clear upload state
       setUploadedReplayFile(null);
+      setReplayAnalysisData(null);
+      setSelectedPlayerForImport(null);
     } catch (error) {
       console.error('Error saving replay:', error);
       toast.error('Failed to save replay to database');
@@ -523,62 +528,165 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
           suggestedTitle={formData.name}
         />
 
-        {/* Replay Selector */}
+        {/* Replay Link Section */}
         <div>
           <label className="block text-sm font-medium mb-1">Linked Replay (Optional)</label>
-          <div className="relative">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={replaySearch}
-                onChange={(e) => {
-                  setReplaySearch(e.target.value);
-                  setShowReplayDropdown(true);
-                }}
-                onFocus={() => setShowReplayDropdown(true)}
-                onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
-                className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Search for an existing replay..."
-              />
-              {formData.replayId && (
+
+          {/* Show linked replay if one exists */}
+          {formData.replayId ? (
+            <div className="border border-border rounded-lg p-4 bg-muted/50">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-green-600">Replay linked successfully</p>
+                  <p className="text-xs text-muted-foreground">
+                    {replaySearch || `Replay ID: ${formData.replayId}`}
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={clearReplay}
-                  className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm flex items-center gap-1"
+                  className="px-3 py-1 text-sm text-destructive hover:text-destructive/70"
                 >
-                  <X className="h-4 w-4" />
-                  Clear
+                  Remove
                 </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Tab buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setReplayLinkMode('existing')}
+                  className={`px-4 py-2 border rounded-md transition-colors ${
+                    replayLinkMode === 'existing'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:bg-muted'
+                  }`}
+                >
+                  Link Existing
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReplayLinkMode('upload')}
+                  className={`px-4 py-2 border rounded-md transition-colors ${
+                    replayLinkMode === 'upload'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:bg-muted'
+                  }`}
+                >
+                  Upload New
+                </button>
+              </div>
+
+              {/* Content based on selected mode */}
+              {replayLinkMode === 'existing' ? (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={replaySearch}
+                    onChange={(e) => {
+                      setReplaySearch(e.target.value);
+                      setShowReplayDropdown(true);
+                    }}
+                    onFocus={() => setShowReplayDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                    placeholder="Search for an existing replay..."
+                  />
+
+                  {/* Replay dropdown */}
+                  {showReplayDropdown && filteredReplays.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {filteredReplays.map((replay) => (
+                        <button
+                          key={replay.id}
+                          type="button"
+                          onClick={() => selectReplay(replay.id)}
+                          className="w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
+                        >
+                          <div className="font-medium text-sm">{replay.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {replay.matchup} • {replay.map} • {replay.duration}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Search by title, matchup, or map name
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {/* Upload replay to link AND import build order */}
+                  <div>
+                    <label className="block">
+                      <input
+                        type="file"
+                        accept=".SC2Replay"
+                        onChange={handleReplayFileSelect}
+                        disabled={isAnalyzing}
+                        className="hidden"
+                      />
+                      <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
+                        isAnalyzing
+                          ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'border-primary text-primary bg-transparent hover:bg-primary/10'
+                      }`}>
+                        {isAnalyzing ? 'Analyzing...' : 'Upload Replay File'}
+                      </span>
+                    </label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Upload a .SC2Replay file to extract build order and link it to this build order
+                    </p>
+                  </div>
+
+                  {/* Show player selection and import/link actions */}
+                  {replayAnalysisData && (
+                    <div className="border border-border rounded-lg p-4 bg-muted/30 space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Import Build Steps From:</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
+                            <button
+                              key={player.name}
+                              type="button"
+                              onClick={() => importBuildOrderFromPlayer(player.name)}
+                              className={`p-3 border-2 rounded-md text-left transition-colors ${
+                                selectedPlayerForImport === player.name
+                                  ? 'border-green-600 bg-green-600/10'
+                                  : 'border-border hover:border-primary hover:bg-primary/5'
+                              }`}
+                            >
+                              <div className="font-medium">{player.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {player.race} • {player.result} • APM: {player.apm || 'N/A'}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Save & Link Button */}
+                      <div className="pt-2 border-t border-border">
+                        <Button
+                          type="button"
+                          onClick={saveUploadedReplayToDatabase}
+                          className="w-full"
+                        >
+                          Save Replay & Link to Build Order
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-1 text-center">
+                          This will upload the replay file and add it to the replays page
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
-
-            {/* Replay dropdown */}
-            {showReplayDropdown && filteredReplays.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {filteredReplays.map((replay) => (
-                  <button
-                    key={replay.id}
-                    type="button"
-                    onClick={() => selectReplay(replay.id)}
-                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
-                  >
-                    <div className="font-medium text-sm">{replay.title}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {replay.matchup} • {replay.map} • {replay.duration}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          {formData.replayId && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Linked to replay ID: <strong>{formData.replayId}</strong>
-            </p>
           )}
-          <p className="text-xs text-muted-foreground mt-1">
-            Link this build order to an example replay, or upload one below
-          </p>
         </div>
 
         <div>
@@ -755,79 +863,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Import from Replay Section */}
-        <div className="border border-border rounded-md p-4 bg-muted/30">
-          <h3 className="text-sm font-semibold mb-3">Import from Replay (Optional)</h3>
-          <div className="space-y-3">
-            <div>
-              <label className="block">
-                <input
-                  type="file"
-                  accept=".SC2Replay"
-                  onChange={handleReplayFileSelect}
-                  disabled={isAnalyzing}
-                  className="hidden"
-                />
-                <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
-                  isAnalyzing
-                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'border-primary text-primary bg-transparent hover:bg-primary/10'
-                }`}>
-                  {isAnalyzing ? 'Analyzing...' : 'Upload Replay to Import Build Order'}
-                </span>
-              </label>
-              <p className="text-xs text-muted-foreground mt-1">
-                Upload a .SC2Replay file to automatically extract build order steps
-              </p>
-            </div>
-
-            {/* Player Selection */}
-            {replayAnalysisData && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Select Player to Import Build Steps:</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {replayAnalysisData.metadata.players.map((player: SC2ReplayPlayer) => (
-                      <button
-                        key={player.name}
-                        type="button"
-                        onClick={() => importBuildOrderFromPlayer(player.name)}
-                        className={`p-3 border-2 rounded-md text-left transition-colors ${
-                          selectedPlayerForImport === player.name
-                            ? 'border-green-600 bg-green-600/10'
-                            : 'border-border hover:border-primary hover:bg-primary/5'
-                        }`}
-                      >
-                        <div className="font-medium">{player.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {player.race} • {player.result} • APM: {player.apm || 'N/A'}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Save Replay to Database Button */}
-                {uploadedReplayFile && (
-                  <div className="pt-2 border-t border-border">
-                    <Button
-                      type="button"
-                      onClick={saveUploadedReplayToDatabase}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Save Replay to Database & Link to Build Order
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-1 text-center">
-                      This will upload the replay file and add it to the replays page
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
