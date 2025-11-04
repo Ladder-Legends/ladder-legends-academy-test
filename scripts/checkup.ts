@@ -4,6 +4,7 @@
  * Checkup script - Identifies stale assets and offers cleanup
  *
  * Checks for:
+ * - Syncs Discord scheduled events to events.json
  * - Mux assets not linked to any video
  * - Blob replays not linked to any replay entry
  * - Broken references (replays/builds/masterclasses referencing missing resources)
@@ -14,6 +15,8 @@ import { config } from 'dotenv';
 import { list as listBlobs } from '@vercel/blob';
 import Mux from '@mux/mux-node';
 import * as readline from 'readline';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 // Load .env.local
 config({ path: '.env.local' });
@@ -33,6 +36,118 @@ interface StaleAssets {
   brokenBuildOrderRefs: { id: string; field: string; missingId: string }[];
   brokenMasterclassRefs: { id: string; field: string; missingId: string }[];
   staleEvents: { id: string; title: string; reason: string }[];
+}
+
+const DISCORD_GUILD_ID = '1386735340517195959';
+
+async function syncDiscordEvents(): Promise<void> {
+  console.log('\n📅 Syncing Discord scheduled events...');
+
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) {
+    console.log('   ⚠️  DISCORD_BOT_TOKEN not found in .env.local - skipping sync');
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`,
+      {
+        headers: {
+          'Authorization': `Bot ${botToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.log(`   ⚠️  Could not fetch events (${response.status}) - skipping sync`);
+      return;
+    }
+
+    const events = await response.json();
+    console.log(`   ✅ Found ${events.length} Discord event(s)`);
+
+    // Transform Discord events to our format
+    const syncedEvents = events.map((event: any) => {
+      const startTime = new Date(event.scheduled_start_time);
+      const endTime = event.scheduled_end_time ? new Date(event.scheduled_end_time) : null;
+      const duration = endTime ? Math.round((endTime.getTime() - startTime.getTime()) / 60000) : 120;
+
+      // Detect event type
+      const text = (event.name + ' ' + (event.description || '')).toLowerCase();
+      let type: 'tournament' | 'coaching' | 'arcade' | 'other' = 'other';
+      if (text.includes('tournament')) type = 'tournament';
+      else if (text.includes('coaching') || text.includes('workshop') || text.includes('lesson') || text.includes('replay analysis') || text.includes('micro monday')) type = 'coaching';
+      else if (text.includes('team game') || text.includes('arcade') || text.includes('casual') || text.includes('inhouse')) type = 'arcade';
+
+      // Extract tags
+      const tags = new Set<string>();
+      if (text.includes('replay analysis')) tags.add('replay analysis');
+      if (text.includes('coaching')) tags.add('coaching');
+      if (text.includes('ladder')) tags.add('ladder');
+      if (text.includes('gameplay')) tags.add('gameplay');
+      if (text.includes('commentary')) tags.add('commentary');
+      if (text.includes('team games') || text.includes('team game')) tags.add('team games');
+      if (text.includes('casual')) tags.add('casual');
+      if (text.includes('micro')) tags.add('micro');
+      if (text.includes('competition')) tags.add('competition');
+
+      // Detect coach
+      let coach: string | undefined;
+      const coaches = ['hino', 'nico', 'groovy', 'gamerrichy', 'krystianer', 'eon'];
+      for (const c of coaches) {
+        if (text.includes(c)) {
+          coach = c;
+          break;
+        }
+      }
+
+      // Check for recurring patterns in description
+      let recurring: { enabled: boolean; frequency: 'weekly' | 'monthly'; dayOfWeek?: number } | undefined;
+      if (text.includes('micro monday') || text.includes('mondays')) {
+        recurring = { enabled: true, frequency: 'weekly', dayOfWeek: 1 };
+      }
+
+      // Enhance description
+      let description = event.description || '';
+      if (!description && text.includes('replay analysis')) {
+        description = 'Join Groovy for live analysis of subscriber replays. Submit your games for professional feedback!';
+      } else if (!description && text.includes('ladder grind')) {
+        description = 'Watch high-level ladder gameplay and learn advanced strategies.';
+      } else if (!description && text.includes('team game')) {
+        description = 'Join us for casual team games and inhouse matches! All skill levels welcome.';
+      } else if (!description && text.includes('ladder commentary')) {
+        description = `Watch ${coach || 'our coach'} climb the ladder with live commentary and analysis.`;
+      }
+
+      return {
+        id: event.id,
+        title: event.name,
+        description,
+        type,
+        date: startTime.toISOString().split('T')[0],
+        time: startTime.toTimeString().split(' ')[0].slice(0, 5),
+        timezone: 'America/New_York',
+        duration,
+        ...(coach && { coach }),
+        videoIds: [],
+        isFree: false,
+        tags: Array.from(tags),
+        ...(recurring && { recurring }),
+        createdAt: event.created_at || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    });
+
+    // Write to events.json
+    const eventsPath = join(process.cwd(), 'src', 'data', 'events.json');
+    writeFileSync(eventsPath, JSON.stringify(syncedEvents, null, 2));
+    console.log(`   ✅ Synced ${syncedEvents.length} event(s) to src/data/events.json`);
+
+  } catch (error: any) {
+    console.error(`   ❌ Error syncing events:`, error.message);
+  }
 }
 
 async function checkMuxAssets(): Promise<string[]> {
@@ -333,6 +448,9 @@ async function cleanupAssets(staleAssets: StaleAssets): Promise<void> {
 async function main() {
   console.log('🔍 Running asset checkup...');
   console.log('━'.repeat(60));
+
+  // First sync Discord events
+  await syncDiscordEvents();
 
   const staleAssets: StaleAssets = {
     muxAssets: await checkMuxAssets(),
