@@ -31,22 +31,6 @@
     "updatedAt": "2025-11-03T23:56:52.854Z"
   },
   {
-    "id": "1419519962963247204",
-    "title": "Hino Ladder Commentary",
-    "description": "Join Hino for live ladder games with commentary explaining decision-making and strategy.",
-    "type": "other",
-    "date": "2025-11-08",
-    "time": "12:00",
-    "timezone": "America/New_York",
-    "duration": 120,
-    "coach": "hino",
-    "videoIds": [],
-    "isFree": false,
-    "tags": ["ladder", "commentary"],
-    "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
-  },
-  {
     "id": "1419520251833487500",
     "title": "Team Games Night",
     "description": "Join us for casual team games and inhouse matches! All skill levels welcome.",
