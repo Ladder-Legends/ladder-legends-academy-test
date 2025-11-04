@@ -1705,13 +1705,13 @@
   },
   {
     "id": "e5aea996-7e9e-4bc5-9dce-1a31d40e7173",
-    "name": "TvT Guide - RFE",
+    "name": "Nico's TvT Guide - RFE",
     "race": "terran",
     "vsRace": "terran",
     "difficulty": "beginner",
-    "coach": "",
-    "coachId": "",
-    "description": "a build I'd recommend using in each matchup for best average ladder results. These are strong builds in the current meta, with capability for reaction to basically every build your ladder opponent can execute.",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "description": "A build I'd recommend using in each matchup for best average ladder results. These are strong builds in the current meta, with capability for reaction to basically every build your ladder opponent can execute.",
     "videoIds": [],
     "steps": [
       {
