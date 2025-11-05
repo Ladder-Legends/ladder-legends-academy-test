@@ -422,15 +422,17 @@
   },
   {
     "id": "29",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-15",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks: Effectively Dealing with Economy Harassment",
+    "description": "A How-To Guide on dealing with worker harassment that shows you how to mitigate lost mining time and get more resources back faster.",
+    "source": "youtube",
     "youtubeId": "tysHGsJTwqE",
     "thumbnail": "https://img.youtube.com/vi/tysHGsJTwqE/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-15",
+    "tags": [],
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "31",
