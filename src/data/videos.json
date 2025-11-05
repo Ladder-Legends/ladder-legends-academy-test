@@ -518,15 +518,17 @@
   },
   {
     "id": "38",
-    "title": "GamerRichy - 10+ years of Coaching experience",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-06",
-    "tags": [],
+    "title": "Mentality Coaching 1 ",
+    "description": "Ladder Legends Mentality Coaching",
+    "source": "youtube",
     "youtubeId": "CoLkQk6M0ao",
     "thumbnail": "https://img.youtube.com/vi/CoLkQk6M0ao/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-06",
+    "tags": [],
+    "race": "all",
     "coach": "GamerRichy",
-    "coachId": "gamerrichy"
+    "coachId": "gamerrichy",
+    "isFree": true
   },
   {
     "id": "39",
