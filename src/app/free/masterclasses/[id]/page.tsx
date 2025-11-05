@@ -155,41 +155,82 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
             <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
               {/* Main Video Player Section */}
               <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
-                {/* Video Player */}
-                {currentVideo ? (
-                  isMuxVideo(currentVideo) ? (
-                    // Mux Video Player
-                    currentVideo.muxPlaybackId ? (
-                      <MuxVideoPlayer
-                        playbackId={currentVideo.muxPlaybackId}
-                        videoId={currentVideo.id}
-                        title={currentVideo.title}
-                        className="rounded-lg overflow-hidden"
-                      />
-                    ) : (
-                      <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                        <div className="text-center p-4">
-                          <p className="text-muted-foreground">
-                            {currentVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                          </p>
+                {/* Video Player - render all playlist videos but hide inactive ones to avoid reload */}
+                {hasMultipleVideos ? (
+                  <div className="relative">
+                    {masterclassVideos.map((video, index) => (
+                      <div
+                        key={video.id}
+                        className={currentVideoIndex === index ? 'block' : 'hidden'}
+                      >
+                        {isMuxVideo(video) ? (
+                          video.muxPlaybackId ? (
+                            <MuxVideoPlayer
+                              playbackId={video.muxPlaybackId}
+                              videoId={video.id}
+                              title={video.title}
+                              className="rounded-lg overflow-hidden"
+                            />
+                          ) : (
+                            <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+                              <div className="text-center p-4">
+                                <p className="text-muted-foreground">
+                                  {video.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                              title={video.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            ></iframe>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // Single video (not a playlist)
+                  currentVideo ? (
+                    isMuxVideo(currentVideo) ? (
+                      currentVideo.muxPlaybackId ? (
+                        <MuxVideoPlayer
+                          playbackId={currentVideo.muxPlaybackId}
+                          videoId={currentVideo.id}
+                          title={currentVideo.title}
+                          className="rounded-lg overflow-hidden"
+                        />
+                      ) : (
+                        <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+                          <div className="text-center p-4">
+                            <p className="text-muted-foreground">
+                              {currentVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                            </p>
+                          </div>
                         </div>
+                      )
+                    ) : (
+                      <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
+                          title={currentVideo.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        ></iframe>
                       </div>
                     )
-                  ) : (
-                    // YouTube Video Player
-                    <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
-                        title={currentVideo.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )
-                ) : null}
+                  ) : null
+                )}
 
                 {/* Masterclass Info */}
                 <div className="mt-6 space-y-4">

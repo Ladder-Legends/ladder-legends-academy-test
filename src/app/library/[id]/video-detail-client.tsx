@@ -211,38 +211,81 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
             <div className={videoIsPlaylist ? 'grid lg:grid-cols-4 gap-6' : ''}>
               {/* Main Video Player Section */}
               <div className={videoIsPlaylist ? 'lg:col-span-3' : ''}>
-                {/* Video Player */}
-                {isMuxVideo(currentVideo) ? (
-                  // Mux Video Player
-                  currentVideo?.muxPlaybackId ? (
-                    <MuxVideoPlayer
-                      playbackId={currentVideo.muxPlaybackId}
-                      videoId={currentVideo.id}
-                      title={currentVideo.title}
-                      className="rounded-lg overflow-hidden"
-                    />
-                  ) : (
-                    <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                      <div className="text-center p-4">
-                        <p className="text-muted-foreground">
-                          {currentVideo?.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                        </p>
+                {/* Video Player - render all playlist videos but hide inactive ones to avoid reload */}
+                {videoIsPlaylist ? (
+                  <div className="relative">
+                    {playlistVideos.map((plVideo, index) => (
+                      <div
+                        key={plVideo.id}
+                        className={currentVideoIndex === index ? 'block' : 'hidden'}
+                      >
+                        {isMuxVideo(plVideo) ? (
+                          plVideo.muxPlaybackId ? (
+                            <MuxVideoPlayer
+                              playbackId={plVideo.muxPlaybackId}
+                              videoId={plVideo.id}
+                              title={plVideo.title}
+                              className="rounded-lg overflow-hidden"
+                            />
+                          ) : (
+                            <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+                              <div className="text-center p-4">
+                                <p className="text-muted-foreground">
+                                  {plVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={`https://www.youtube.com/embed/${plVideo.youtubeId}`}
+                              title={plVideo.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            ></iframe>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )
-                ) : (
-                  // YouTube Video Player
-                  <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      src={`https://www.youtube.com/embed/${currentYoutubeId}`}
-                      title={currentVideo?.title || video.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    ></iframe>
+                    ))}
                   </div>
+                ) : (
+                  // Single video (not a playlist)
+                  <>
+                    {isMuxVideo(currentVideo) ? (
+                      currentVideo?.muxPlaybackId ? (
+                        <MuxVideoPlayer
+                          playbackId={currentVideo.muxPlaybackId}
+                          videoId={currentVideo.id}
+                          title={currentVideo.title}
+                          className="rounded-lg overflow-hidden"
+                        />
+                      ) : (
+                        <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+                          <div className="text-center p-4">
+                            <p className="text-muted-foreground">
+                              {currentVideo?.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    ) : (
+                      <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`https://www.youtube.com/embed/${currentYoutubeId}`}
+                          title={currentVideo?.title || video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Video Info */}
