@@ -436,15 +436,17 @@
   },
   {
     "id": "31",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-08",
-    "tags": [],
+    "title": "Mentality Coaching: Playing the Player not the matchup ",
+    "description": "An example and explanation of what playing the player instead of the matchup looks like, Featuring NetMech",
+    "source": "youtube",
     "youtubeId": "bAKRVkDi1zY",
     "thumbnail": "https://img.youtube.com/vi/bAKRVkDi1zY/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-08",
+    "tags": [],
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": true
   },
   {
     "id": "33",
