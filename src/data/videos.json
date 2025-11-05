@@ -95,15 +95,17 @@
   },
   {
     "id": "2",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
+    "title": "Mentality Coaching: How to make a comeback ",
+    "description": "We have all been on the backfoot time and time again, but there is no victory sweeter than the victory one makes from being behind. ",
+    "source": "youtube",
     "youtubeId": "SeCbT1S0lwc",
     "thumbnail": "https://img.youtube.com/vi/SeCbT1S0lwc/hqdefault.jpg",
     "date": "2025-10-18",
     "tags": [],
     "race": "zerg",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "3",
