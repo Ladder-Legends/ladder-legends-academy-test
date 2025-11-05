@@ -492,15 +492,17 @@
   },
   {
     "id": "36",
-    "title": "GamerRichy - 10+ years of Coaching experience",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-06",
-    "tags": [],
+    "title": "TVT basics - Snowball to victory",
+    "description": "Basic concepts in TVT to be safe while opening double gas and making the right decision for the final fight!",
+    "source": "youtube",
     "youtubeId": "Wi23Q3G1lPo",
     "thumbnail": "https://img.youtube.com/vi/Wi23Q3G1lPo/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-06",
+    "tags": [],
+    "race": "terran",
     "coach": "GamerRichy",
-    "coachId": "gamerrichy"
+    "coachId": "gamerrichy",
+    "isFree": false
   },
   {
     "id": "37",
