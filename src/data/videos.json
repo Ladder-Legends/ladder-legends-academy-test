@@ -234,7 +234,9 @@
   {
     "id": "12",
     "title": "Mentality Coaching: How to navigate a basetrade",
-    "description": "This video goes over how to navigate a basetrade+-",
+    "description": "This video goes over how to navigate a basetrade, the mentality surrounding it and how your goals should shift to accommodate your new updated goal",
+    "source": "youtube",
+    "youtubeId": "MTmqREZ4-KU",
     "thumbnail": "https://img.youtube.com/vi/MTmqREZ4-KU/hqdefault.jpg",
     "date": "2025-09-29",
     "tags": [
@@ -245,8 +247,7 @@
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "MTmqREZ4-KU"
+    "isFree": false
   },
   {
     "id": "13",
