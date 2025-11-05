@@ -616,15 +616,17 @@
   },
   {
     "id": "47",
-    "title": "Untitled Video",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-28",
-    "tags": [],
+    "title": " Annatar Vs legoland Master's Zerg Replay Analysis",
+    "description": "This is a vod specific for a potential student of ladder legends!",
+    "source": "youtube",
     "youtubeId": "FtPleJIVkGE",
     "thumbnail": "https://img.youtube.com/vi/FtPleJIVkGE/hqdefault.jpg",
+    "date": "2025-07-28",
+    "tags": [],
     "race": "zerg",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "48",
