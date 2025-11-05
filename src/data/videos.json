@@ -406,7 +406,9 @@
     "youtubeId": "4ptStp8f1C8",
     "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/hqdefault.jpg",
     "date": "2025-08-27",
-    "tags": [],
+    "tags": [
+      "macro micro"
+    ],
     "race": "protoss",
     "coach": "Groovy",
     "coachId": "groovy",
