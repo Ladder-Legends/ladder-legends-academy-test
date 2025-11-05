@@ -295,15 +295,17 @@
   },
   {
     "id": "16",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-14",
-    "tags": [],
+    "title": "Alternative TvT opener: Marauder Reaper into Mech",
+    "description": "This is a game where I showcase an alternative eco cheese opening in tvt that lets you skip the raven bs phase entirely if you are lucky and will outright win the game sometimes.",
+    "source": "youtube",
     "youtubeId": "lhmCLqDoetY",
     "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-14",
+    "tags": [],
+    "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "17",
