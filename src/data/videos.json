@@ -150,15 +150,17 @@
   },
   {
     "id": "6",
-    "title": "New Patch, New ZERG STYLE",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-10",
-    "tags": [],
+    "title": "How to defend cannon rush as Zerg from HinO",
+    "description": "This video showcases a proper response to cannon rush as zerg",
+    "source": "youtube",
     "youtubeId": "zOZIHS9ShLk",
     "thumbnail": "https://img.youtube.com/vi/zOZIHS9ShLk/hqdefault.jpg",
+    "date": "2025-10-10",
+    "tags": [],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "7",
