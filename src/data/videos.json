@@ -464,15 +464,17 @@
   },
   {
     "id": "34",
-    "title": "GamerRichy - 10+ years of Coaching experience",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-06",
-    "tags": [],
+    "title": "TVP basics - Constant Aggression",
+    "description": "Looking at TVP from a perspective of constant aggression in the first stage of the game. \n\nThis is a really good opener to ultimately keep protoss on their toes! ",
+    "source": "youtube",
     "youtubeId": "glmN4_wiXhw",
     "thumbnail": "https://img.youtube.com/vi/glmN4_wiXhw/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-06",
+    "tags": [],
+    "race": "terran",
     "coach": "GamerRichy",
-    "coachId": "gamerrichy"
+    "coachId": "gamerrichy",
+    "isFree": false
   },
   {
     "id": "35",
