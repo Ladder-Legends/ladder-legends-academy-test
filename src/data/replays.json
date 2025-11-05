@@ -317,5 +317,38 @@
     "patch": "5.0.15.95299",
     "notes": "Replay PvP - Krystianer/Hero - Sparkling Tuna Cup",
     "isFree": false
+  },
+  {
+    "id": "cfba6397-7510-4877-b675-4f09fb7b9051",
+    "title": "PVZ vs Rogue",
+    "map": "[TLMC21] 10000 Feet",
+    "matchup": "PvZ",
+    "player1": {
+      "name": "Krystianer",
+      "race": "protoss",
+      "result": "win",
+      "mmr": 6440
+    },
+    "player2": {
+      "name": "Rogue",
+      "race": "zerg",
+      "result": "loss",
+      "mmr": 6307
+    },
+    "duration": "16:02",
+    "gameDate": "2025-10-25",
+    "uploadDate": "2025-11-05",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/KrystianerVSRogue-VCEk9t2iT0whrB0ZFRBzmL8Rm0Rymj.SC2Replay",
+    "videoIds": [],
+    "coach": "krystianer",
+    "tags": [
+      "pvz",
+      "protoss",
+      "krystianer",
+      "pro"
+    ],
+    "patch": "5.0.15.95299",
+    "notes": "PvZ - Wardi TV Tournament",
+    "isFree": false
   }
 ]
