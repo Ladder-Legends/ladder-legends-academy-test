@@ -478,15 +478,17 @@
   },
   {
     "id": "35",
-    "title": "GamerRichy - 10+ years of Coaching experience",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-06",
-    "tags": [],
+    "title": "TVZ Basics - GamerRichy",
+    "description": "Hi all, \n\nWhether you are Bronze to Masters and your looking to identify standard build orders or looking for something specific in terms of a scouting timing, please see the first 5 mins of a game of TVZ playing safe and ultimately easy damage! \n",
+    "source": "youtube",
     "youtubeId": "_fshWRSTWJQ",
     "thumbnail": "https://img.youtube.com/vi/_fshWRSTWJQ/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-06",
+    "tags": [],
+    "race": "terran",
     "coach": "GamerRichy",
-    "coachId": "gamerrichy"
+    "coachId": "gamerrichy",
+    "isFree": false
   },
   {
     "id": "36",
