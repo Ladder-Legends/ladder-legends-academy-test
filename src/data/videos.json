@@ -450,15 +450,17 @@
   },
   {
     "id": "33",
-    "title": "GamerRichy - 10+ years of Coaching experience",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-07",
-    "tags": [],
+    "title": "Sc2 fundamental Skills",
+    "description": "Identify skills that you are missing through this video if you are looking to get to the next level in your game!\n",
+    "source": "youtube",
     "youtubeId": "6jRs9JIBqUM",
     "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-07",
+    "tags": [],
+    "race": "all",
     "coach": "GamerRichy",
-    "coachId": "gamerrichy"
+    "coachId": "gamerrichy",
+    "isFree": true
   },
   {
     "id": "34",
