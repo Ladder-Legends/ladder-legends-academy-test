@@ -347,7 +347,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
               {videoIsPlaylist && (
                 <div className="lg:col-span-1">
                   <div className="border border-border rounded-lg bg-card overflow-hidden sticky top-24">
-                    <div className="max-h-[600px] overflow-y-auto">
+                    <div className="h-[calc(100vh-7rem)] overflow-y-auto">
                       {playlistVideos.map((plVideo, index) => (
                         <div
                           key={plVideo.id}
