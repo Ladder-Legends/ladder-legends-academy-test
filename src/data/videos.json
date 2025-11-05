@@ -374,15 +374,17 @@
   },
   {
     "id": "25",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-30",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks #62: Defense tip for Terran Players + BONUS tip for High level Terrans",
+    "description": "This video showcases a good defensive tool for terrans of any level as well as a slightly higher level maneuver to kill annoying probes as a moral victory against toss",
+    "source": "youtube",
     "youtubeId": "H9RajuDOTVc",
     "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-30",
+    "tags": [],
+    "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "26",
