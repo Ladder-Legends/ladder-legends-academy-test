@@ -334,7 +334,11 @@
     "youtubeId": "1FlqiOloZfs",
     "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/hqdefault.jpg",
     "date": "2025-09-14",
-    "tags": [],
+    "tags": [
+      "macro",
+      "terran",
+      "micro"
+    ],
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
