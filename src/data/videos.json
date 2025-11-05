@@ -205,18 +205,20 @@
     "id": "10",
     "title": "Basic Base camera Locations Guide",
     "description": "This video goes over how to set and use camera locations in starcraft",
+    "source": "youtube",
+    "youtubeId": "iYzl-AYAOr0",
     "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg",
     "date": "2025-10-04",
     "tags": [
       "terran",
       "zerg",
-      "protoss"
+      "protoss",
+      "macro"
     ],
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "iYzl-AYAOr0"
+    "isFree": false
   },
   {
     "id": "11",
