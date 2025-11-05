@@ -350,5 +350,38 @@
     "patch": "5.0.15.95299",
     "notes": "PvZ - Wardi TV Tournament",
     "isFree": false
+  },
+  {
+    "id": "931ad0a5-d608-415b-9c65-904ca19daa34",
+    "title": "ByuN vs Krystianer - PvT",
+    "map": "Hecate LE",
+    "matchup": "PvT",
+    "player1": {
+      "name": "ByuN",
+      "race": "terran",
+      "result": "loss",
+      "mmr": 6482
+    },
+    "player2": {
+      "name": "Krystianer",
+      "race": "protoss",
+      "result": "win",
+      "mmr": 6440
+    },
+    "duration": "9:50",
+    "gameDate": "2025-11-01",
+    "uploadDate": "2025-11-05",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/KrystianerVSByun2-DwWQNeqQO18aFTSLsOlOFjVw0cl70q.SC2Replay",
+    "videoIds": [],
+    "coach": "krystianer",
+    "tags": [
+      "protoss",
+      "krystianer",
+      "pro",
+      "replay"
+    ],
+    "patch": "5.0.15.95299",
+    "notes": "TvP OSC Mid Season Playoffs Vs Byun",
+    "isFree": false
   }
 ]
