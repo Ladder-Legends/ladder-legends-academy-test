@@ -224,17 +224,19 @@
     "id": "11",
     "title": "Starcraft Tips and Tricks: Stutter step micro level 2",
     "description": "This video goes over an advanced concept when stutter step microing, featuring the goatgod himself: Clem ",
+    "source": "youtube",
+    "youtubeId": "zrort3y-fRc",
     "thumbnail": "https://img.youtube.com/vi/zrort3y-fRc/hqdefault.jpg",
     "date": "2025-09-29",
     "tags": [
       "terran",
-      "micro"
+      "micro",
+      "advanced"
     ],
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "zrort3y-fRc"
+    "isFree": false
   },
   {
     "id": "12",
