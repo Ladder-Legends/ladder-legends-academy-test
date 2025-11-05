@@ -314,15 +314,17 @@
   },
   {
     "id": "17",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-14",
-    "tags": [],
+    "title": "Starcraft Tips and Tricks: Pick up Repair",
+    "description": "Did you know scvs can repair while they are flying? this video goes over how to execute it and situations where it is useful.",
+    "source": "youtube",
     "youtubeId": "1FlqiOloZfs",
     "thumbnail": "https://img.youtube.com/vi/1FlqiOloZfs/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-14",
+    "tags": [],
+    "race": "terran",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "18",
