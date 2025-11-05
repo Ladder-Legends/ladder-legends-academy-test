@@ -135,7 +135,9 @@
   {
     "id": "5",
     "title": "How to defend proxy void ray/ cannon rush as terran",
-    "description": "Coaching video for Starcraft 2",
+    "description": "Old school but still relevant way to delay and buy yourself time to properly deal with a cannon into tempest rush",
+    "source": "youtube",
+    "youtubeId": "gIyt8YAVuKo",
     "thumbnail": "https://img.youtube.com/vi/gIyt8YAVuKo/hqdefault.jpg",
     "date": "2025-10-13",
     "tags": [
@@ -144,8 +146,7 @@
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "gIyt8YAVuKo"
+    "isFree": false
   },
   {
     "id": "6",
