@@ -286,7 +286,9 @@
   {
     "id": "15",
     "title": "Starcraft 2 Tips and Tricks: How and When to Tech Switch",
-    "description": "Coaching video for Starcraft 2",
+    "description": "In this video we discuss the importance of being able to switch tech paths very quickly and how to do so effectively",
+    "source": "youtube",
+    "youtubeId": "VBksDLgd3hc",
     "thumbnail": "https://img.youtube.com/vi/VBksDLgd3hc/hqdefault.jpg",
     "date": "2025-09-22",
     "tags": [
@@ -294,11 +296,10 @@
       "zerg",
       "protoss"
     ],
-    "race": "all",
+    "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "VBksDLgd3hc"
+    "isFree": false
   },
   {
     "id": "16",
