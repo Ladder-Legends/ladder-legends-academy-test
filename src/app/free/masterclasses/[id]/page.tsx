@@ -6,7 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
 import { Play, ArrowLeft } from 'lucide-react';
@@ -16,7 +16,7 @@ import { getContentVideoUrl } from '@/lib/video-helpers';
 import { Video, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import videosData from '@/data/videos.json';
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import replaysData from '@/data/replays.json';
@@ -30,8 +30,19 @@ interface PageProps {
 
 export default function FreeMasterclassDetailPage({ params }: PageProps) {
   const { id } = use(params);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const masterclass = allMasterclasses.find(mc => mc.id === id);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+
+  // Initialize from URL query param if present
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
+    const vParam = searchParams.get('v');
+    if (vParam !== null) {
+      const index = parseInt(vParam, 10);
+      return !isNaN(index) && index >= 0 ? index : 0;
+    }
+    return 0;
+  });
 
   // 404 if masterclass doesn't exist OR if it's not free
   if (!masterclass || !masterclass.isFree) {
@@ -57,6 +68,27 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
 
   const hasMultipleVideos = masterclassVideos.length > 1;
   const currentVideo = masterclassVideos[currentVideoIndex] || null;
+
+  // Update URL when video index changes in playlists
+  const handleVideoSelect = (index: number) => {
+    setCurrentVideoIndex(index);
+
+    // Update URL with query param for playlists
+    if (hasMultipleVideos) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('v', index.toString());
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+  };
+
+  // Update document title when video changes
+  useEffect(() => {
+    const displayTitle = hasMultipleVideos && currentVideo
+      ? `${currentVideo.title} - ${masterclass.title} | Ladder Legends Academy`
+      : `${masterclass.title} | Ladder Legends Academy`;
+
+    document.title = displayTitle;
+  }, [currentVideoIndex, hasMultipleVideos, currentVideo, masterclass.title]);
 
   // Look up replays
   const allReplays = replaysData as Replay[];
@@ -286,7 +318,7 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
                           }`}
                         >
                           <button
-                            onClick={() => setCurrentVideoIndex(index)}
+                            onClick={() => handleVideoSelect(index)}
                             className="w-full p-2 hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex flex-col px-2">

@@ -12,6 +12,7 @@ const mux = new Mux({
 /**
  * Cached token generation function
  * Caches tokens for 23 hours (tokens are valid for 24h)
+ * Each playbackId gets its own cache entry
  */
 const getCachedMuxTokens = unstable_cache(
   async (playbackId: string) => {
@@ -38,7 +39,7 @@ const getCachedMuxTokens = unstable_cache(
       thumbnail: thumbnailToken,
     };
   },
-  ['mux-tokens'],
+  ['mux-tokens'], // This will be combined with the playbackId parameter for unique cache keys
   {
     revalidate: 82800, // 23 hours in seconds
     tags: ['mux-playback-tokens'],

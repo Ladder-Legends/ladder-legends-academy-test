@@ -11,11 +11,17 @@ interface MuxVideoPlayerProps {
   autoPlay?: boolean;
 }
 
+interface CachedToken {
+  token: string;
+  expiresAt: number; // Unix timestamp
+}
+
 /**
  * MuxVideoPlayer component
  *
  * Plays Mux videos with signed URLs for secure playback.
  * Fetches a signed token from the API before playing the video.
+ * Implements client-side caching to avoid refetching valid tokens.
  */
 export function MuxVideoPlayer({
   playbackId,
@@ -32,7 +38,53 @@ export function MuxVideoPlayer({
   const posterUrl = videoId ? `/thumbnails/${videoId}.jpg` : undefined;
 
   useEffect(() => {
-    // Fetch signed playback tokens
+    // Check if we have a valid cached token first
+    const getCachedToken = (): string | null => {
+      try {
+        const cacheKey = `mux-token-${playbackId}`;
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached) {
+          const data: CachedToken = JSON.parse(cached);
+          const now = Date.now();
+
+          // Check if token is still valid (with 1 hour buffer)
+          if (data.expiresAt > now + (60 * 60 * 1000)) {
+            console.log('[MUX PLAYER] Using cached token for:', playbackId);
+            return data.token;
+          } else {
+            // Token expired or about to expire, remove from cache
+            localStorage.removeItem(cacheKey);
+          }
+        }
+      } catch (err) {
+        console.warn('[MUX PLAYER] Error reading cached token:', err);
+      }
+      return null;
+    };
+
+    // Save token to cache
+    const cacheToken = (token: string) => {
+      try {
+        const cacheKey = `mux-token-${playbackId}`;
+        const expiresAt = Date.now() + (23 * 60 * 60 * 1000); // 23 hours
+
+        const cached: CachedToken = { token, expiresAt };
+        localStorage.setItem(cacheKey, JSON.stringify(cached));
+      } catch (err) {
+        console.warn('[MUX PLAYER] Error caching token:', err);
+      }
+    };
+
+    // Try to get cached token first
+    const cachedToken = getCachedToken();
+    if (cachedToken) {
+      setPlaybackToken(cachedToken);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch signed playback tokens from API
     const fetchTokens = async () => {
       try {
         setLoading(true);
@@ -46,15 +98,13 @@ export function MuxVideoPlayer({
         }
 
         const data = await response.json();
-        console.log('[MUX PLAYER] Received token data:', {
-          hasPlayback: !!data.playback,
-          hasLegacyToken: !!data.token,
-          playbackType: typeof data.playback,
-        });
+        console.log('[MUX PLAYER] Received fresh token for:', playbackId);
 
         // Support both new format (playback) and legacy format (token)
         const pbToken = data.playback || data.token;
 
+        // Cache the token for future use
+        cacheToken(pbToken);
         setPlaybackToken(pbToken);
       } catch (err) {
         console.error('Error fetching playback tokens:', err);

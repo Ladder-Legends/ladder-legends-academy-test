@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import videosData from '@/data/videos.json';
 import { Video, getVideoThumbnailUrl, isPlaylist } from '@/types/video';
 import { VideoDetailClient } from './video-detail-client';
@@ -20,11 +21,13 @@ export const revalidate = 3600; // Revalidate every hour
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata for SEO and social sharing
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  const searchParamsResolved = await searchParams;
   const video = allVideos.find(v => v.id === id);
 
   if (!video) {
@@ -34,12 +37,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = video.title;
-  const description = video.description || 'Master Starcraft 2 with expert coaching from Ladder Legends Academy';
-  const thumbnailUrl = getVideoThumbnailUrl(video, 'high');
+  // For playlists, check if a specific video is requested via ?v= query param
+  let displayVideo = video;
+  let playlistContext = '';
+
+  if (isPlaylist(video) && video.videoIds && video.videoIds.length > 0) {
+    const vParam = searchParamsResolved.v;
+    const videoIndex = typeof vParam === 'string' ? parseInt(vParam, 10) : 0;
+
+    if (!isNaN(videoIndex) && videoIndex >= 0 && videoIndex < video.videoIds.length) {
+      // Find the specific video in the playlist
+      const playlistVideo = allVideos.find(v => v.id === video.videoIds![videoIndex]);
+      if (playlistVideo) {
+        displayVideo = playlistVideo;
+        playlistContext = ` - ${video.title}`;
+      }
+    }
+  }
+
+  const title = displayVideo.title + playlistContext;
+  const description = displayVideo.description || video.description || 'Master Starcraft 2 with expert coaching from Ladder Legends Academy';
+  const thumbnailUrl = getVideoThumbnailUrl(displayVideo, 'high');
   const absoluteThumbnailUrl = thumbnailUrl.startsWith('http')
     ? thumbnailUrl
     : `https://www.ladderlegendsacademy.com${thumbnailUrl}`;
+
+  // Build the canonical URL with query param if in playlist
+  let canonicalUrl = `https://www.ladderlegendsacademy.com/library/${id}`;
+  if (isPlaylist(video) && displayVideo.id !== video.id) {
+    const vParam = searchParamsResolved.v;
+    if (vParam) {
+      canonicalUrl += `?v=${vParam}`;
+    }
+  }
 
   const contentType = isPlaylist(video) ? 'Playlist' : 'Video';
 
@@ -49,14 +79,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${title} | Ladder Legends Academy`,
       description,
-      url: `https://www.ladderlegendsacademy.com/library/${id}`,
+      url: canonicalUrl,
       type: 'video.other',
       images: [
         {
           url: absoluteThumbnailUrl,
           width: 1280,
           height: 720,
-          alt: video.title,
+          alt: displayVideo.title,
         },
       ],
       siteName: 'Ladder Legends Academy',
@@ -68,10 +98,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [absoluteThumbnailUrl],
     },
     alternates: {
-      canonical: `https://www.ladderlegendsacademy.com/library/${id}`,
+      canonical: canonicalUrl,
     },
     other: {
-      'video:tag': video.tags.join(', '),
+      'video:tag': displayVideo.tags.join(', '),
       'content:type': contentType,
     },
   };
@@ -88,7 +118,9 @@ export default async function VideoDetailPage({ params }: PageProps) {
   return (
     <>
       <VideoStructuredData video={video} />
-      <VideoDetailClient video={video} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <VideoDetailClient video={video} />
+      </Suspense>
     </>
   );
 }

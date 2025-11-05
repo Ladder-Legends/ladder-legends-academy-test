@@ -14,7 +14,7 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { getContentVideoUrl } from '@/lib/video-helpers';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { Video, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
@@ -23,14 +23,26 @@ import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface MasterclassDetailClientProps {
   masterclass: Masterclass;
 }
 
 export function MasterclassDetailClient({ masterclass }: MasterclassDetailClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+
+  // Initialize from URL query param if present
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
+    const vParam = searchParams.get('v');
+    if (vParam !== null) {
+      const index = parseInt(vParam, 10);
+      return !isNaN(index) && index >= 0 ? index : 0;
+    }
+    return 0;
+  });
 
   useTrackPageView({
     contentType: 'masterclass',
@@ -69,6 +81,27 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
 
   const hasMultipleVideos = masterclassVideos.length > 1;
   const currentVideo = masterclassVideos[currentVideoIndex] || null;
+
+  // Update URL when video index changes in playlists
+  const handleVideoSelect = (index: number) => {
+    setCurrentVideoIndex(index);
+
+    // Update URL with query param for playlists
+    if (hasMultipleVideos) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('v', index.toString());
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+  };
+
+  // Update document title when video changes
+  useEffect(() => {
+    const displayTitle = hasMultipleVideos && currentVideo
+      ? `${currentVideo.title} - ${masterclass.title} | Ladder Legends Academy`
+      : `${masterclass.title} | Ladder Legends Academy`;
+
+    document.title = displayTitle;
+  }, [currentVideoIndex, hasMultipleVideos, currentVideo, masterclass.title]);
 
   // Look up replays
   const allReplays = replaysData as Replay[];
@@ -329,7 +362,7 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
                           }`}
                         >
                           <button
-                            onClick={() => setCurrentVideoIndex(index)}
+                            onClick={() => handleVideoSelect(index)}
                             className="w-full p-2 hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex flex-col px-2">

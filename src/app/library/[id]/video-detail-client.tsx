@@ -13,19 +13,30 @@ import videos from '@/data/videos.json';
 import { ArrowLeft, CalendarDays, Edit, Trash2, X, Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { toast } from 'sonner';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface VideoDetailClientProps {
   video: Video;
 }
 
 export function VideoDetailClient({ video }: VideoDetailClientProps) {
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
+    // Initialize from URL query param if present
+    const vParam = searchParams.get('v');
+    if (vParam !== null) {
+      const index = parseInt(vParam, 10);
+      return !isNaN(index) && index >= 0 ? index : 0;
+    }
+    return 0;
+  });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPlaylistVideo, setEditingPlaylistVideo] = useState<Video | null>(null);
   const [isPlaylistVideoEditModalOpen, setIsPlaylistVideoEditModalOpen] = useState(false);
@@ -105,6 +116,27 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       year: 'numeric'
     });
   };
+
+  // Update URL when video index changes in playlists
+  const handleVideoSelect = (index: number) => {
+    setCurrentVideoIndex(index);
+
+    // Update URL with query param for playlists
+    if (videoIsPlaylist) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('v', index.toString());
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+  };
+
+  // Update document title when video changes
+  useEffect(() => {
+    const displayTitle = videoIsPlaylist && currentVideo
+      ? `${currentVideo.title} - ${video.title} | Ladder Legends Academy`
+      : `${video.title} | Ladder Legends Academy`;
+
+    document.title = displayTitle;
+  }, [currentVideoIndex, videoIsPlaylist, currentVideo, video.title]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -281,7 +313,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                           }`}
                         >
                           <button
-                            onClick={() => setCurrentVideoIndex(index)}
+                            onClick={() => handleVideoSelect(index)}
                             className="w-full p-2 hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex flex-col px-2">
