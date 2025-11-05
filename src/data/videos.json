@@ -166,18 +166,6 @@
     "isFree": false
   },
   {
-    "id": "7",
-    "title": "Masterclass content",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-09",
-    "tags": [],
-    "youtubeId": "UFcKAiUhpU0",
-    "thumbnail": "https://img.youtube.com/vi/UFcKAiUhpU0/hqdefault.jpg",
-    "race": "zerg",
-    "coach": "Krystianer",
-    "coachId": "krystianer"
-  },
-  {
     "id": "8",
     "title": "Krystianers Khala- How to play like the Rank 1 Grandmaster",
     "description": "Coaching video for Starcraft 2",
