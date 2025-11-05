@@ -3905,5 +3905,27 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-216edeea-a1da-4fae-834f-6d08e98761a8"
+  },
+  {
+    "id": "f941978c-7e01-4523-9c7a-08f473562c01",
+    "name": "PVP standard macro game",
+    "race": "protoss",
+    "vsRace": "protoss",
+    "difficulty": "intermediate",
+    "coach": "Krystianer",
+    "coachId": "krystianer",
+    "description": "",
+    "videoIds": [],
+    "steps": [
+      {
+        "supply": 0,
+        "action": ""
+      }
+    ],
+    "tags": [],
+    "patch": "5.0.15",
+    "updatedAt": "2025-11-05",
+    "isFree": false,
+    "replayId": "8225f0a6-e432-4a37-9785-37308dfbdf2f"
   }
 ]
