@@ -110,14 +110,20 @@
   {
     "id": "3",
     "title": "New Patch, New ZERG STYLE",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-16",
-    "tags": [],
+    "description": "Zerg style vs Terran Mech ",
+    "source": "youtube",
     "youtubeId": "oIKSVTpF-eg",
     "thumbnail": "https://img.youtube.com/vi/oIKSVTpF-eg/hqdefault.jpg",
+    "date": "2025-10-16",
+    "tags": [
+      "zerg",
+      "macro",
+      "meta"
+    ],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "4",
