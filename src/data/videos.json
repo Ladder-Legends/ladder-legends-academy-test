@@ -568,15 +568,17 @@
   },
   {
     "id": "42",
-    "title": "Untitled Video",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-30",
-    "tags": [],
+    "title": "Iconic Vs Diamond Zerg Replay Analysis",
+    "description": "Lots of improvements over here from iconic. Looking forward to seeing more gameplay improvements from one of my students!",
+    "source": "youtube",
     "youtubeId": "i3y1pPoff2c",
     "thumbnail": "https://img.youtube.com/vi/i3y1pPoff2c/hqdefault.jpg",
+    "date": "2025-07-30",
+    "tags": [],
     "race": "zerg",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "43",
