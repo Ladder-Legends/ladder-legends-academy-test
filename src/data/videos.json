@@ -528,15 +528,17 @@
   },
   {
     "id": "39",
-    "title": "Untitled Video",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-31",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks Series #54 The BEST Counter To Swarmhosts as Protoss",
+    "description": "This is actually the most cost efficent counter to locusts that I have ever come across. If this is common knowledge I would be shocked",
+    "source": "youtube",
     "youtubeId": "pPFwmoTwwHs",
     "thumbnail": "https://img.youtube.com/vi/pPFwmoTwwHs/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-07-31",
+    "tags": [],
+    "race": "protoss",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "40",
