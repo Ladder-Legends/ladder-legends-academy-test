@@ -388,15 +388,17 @@
   },
   {
     "id": "26",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-27",
-    "tags": [],
+    "title": "Starcraft 2 Tips and tricks Series #60: Illegal Wall for Protoss",
+    "description": "This video showcases how to make a full wall that is escapable as protoss",
+    "source": "youtube",
     "youtubeId": "4ptStp8f1C8",
     "thumbnail": "https://img.youtube.com/vi/4ptStp8f1C8/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-27",
+    "tags": [],
+    "race": "protoss",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "27",
