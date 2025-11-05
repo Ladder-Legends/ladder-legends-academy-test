@@ -11,6 +11,7 @@ interface PaywallLinkProps {
   className?: string;
   external?: boolean;
   isFree?: boolean; // If true, bypass paywall (free content)
+  download?: boolean; // If true, trigger download instead of navigation
 }
 
 /**
@@ -33,15 +34,15 @@ interface PaywallLinkProps {
  * <PaywallLink href="https://youtube.com/..." external>Watch on YouTube</PaywallLink>
  * ```
  */
-export function PaywallLink({ href, children, className, external = false, isFree = false }: PaywallLinkProps) {
+export function PaywallLink({ href, children, className, external = false, isFree = false, download = false }: PaywallLinkProps) {
   const { data: session } = useSession();
   const router = useRouter();
 
   // Free content bypasses paywall, otherwise check subscription
   const hasAccess = isFree || (session?.user?.hasSubscriberRole ?? false);
 
-  // For free content, prepend /free to the route
-  const actualHref = isFree ? `/free${href}` : href;
+  // For free content, prepend /free to the route (but not for downloads or external links)
+  const actualHref = (isFree && !download && !external) ? `/free${href}` : href;
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!hasAccess) {
@@ -49,6 +50,20 @@ export function PaywallLink({ href, children, className, external = false, isFre
       router.push('/subscribe');
     }
   };
+
+  // For download links
+  if (download) {
+    return (
+      <a
+        href={hasAccess ? href : '/subscribe'}
+        onClick={handleClick}
+        className={className}
+        download
+      >
+        {children}
+      </a>
+    );
+  }
 
   // For external links (YouTube, etc.)
   if (external) {

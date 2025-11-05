@@ -53,17 +53,18 @@ export function getFirstVideoId(content: VideoReference): string | undefined {
 
 /**
  * Get the appropriate video URL based on whether the video/content is free
+ * Note: This returns the base path - PaywallLink will add /free prefix if needed
  *
  * @param videoId - The ID of the video
- * @param isFree - Whether the video or parent content is free
- * @returns The URL path to the video (either /library or /free/library)
+ * @param isFree - Whether the video or parent content is free (currently unused, kept for backwards compatibility)
+ * @returns The URL path to the video (/library/{id})
  *
  * @example
- * getVideoUrl('abc123', true) // '/free/library/abc123'
+ * getVideoUrl('abc123', true) // '/library/abc123' (PaywallLink will handle /free prefix)
  * getVideoUrl('abc123', false) // '/library/abc123'
  */
 export function getVideoUrl(videoId: string, isFree: boolean): string {
-  return isFree ? `/free/library/${videoId}` : `/library/${videoId}`;
+  return `/library/${videoId}`;
 }
 
 /**

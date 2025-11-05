@@ -201,10 +201,15 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
                 <div className="mt-6 space-y-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h1 className="text-3xl font-bold">{masterclass.title}</h1>
+                      <h1 className="text-3xl font-bold">{hasMultipleVideos ? currentVideo?.title || masterclass.title : masterclass.title}</h1>
                       <SubscriberBadge isFree={masterclass.isFree} />
                     </div>
-                    <p className="text-lg text-muted-foreground leading-relaxed">{masterclass.description}</p>
+                    {hasMultipleVideos && currentVideo && (
+                      <p className="text-sm text-muted-foreground">
+                        From masterclass: {masterclass.title}
+                      </p>
+                    )}
+                    <p className="text-lg text-muted-foreground leading-relaxed">{hasMultipleVideos ? currentVideo?.description || masterclass.description : masterclass.description}</p>
                   </div>
 
                   {/* Info Card */}

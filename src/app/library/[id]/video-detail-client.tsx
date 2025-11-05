@@ -216,17 +216,22 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">
                   <div className="space-y-2">
-                    <h1 className="text-3xl font-bold">{video.title}</h1>
+                    <h1 className="text-3xl font-bold">{videoIsPlaylist ? currentVideo?.title || video.title : video.title}</h1>
+                    {videoIsPlaylist && currentVideo && (
+                      <p className="text-sm text-muted-foreground">
+                        From playlist: {video.title}
+                      </p>
+                    )}
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-4 h-4" />
-                        <span>{formatDate(video.date)}</span>
+                        <span>{formatDate(videoIsPlaylist ? currentVideo?.date || video.date : video.date)}</span>
                       </div>
-                      {video.coach && (
+                      {(videoIsPlaylist ? currentVideo?.coach || video.coach : video.coach) && (
                         <>
                           <span>•</span>
-                          <span>Coach: {video.coach}</span>
+                          <span>Coach: {videoIsPlaylist ? currentVideo?.coach || video.coach : video.coach}</span>
                         </>
                       )}
                       {videoIsPlaylist && (
@@ -239,9 +244,9 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                   </div>
 
                   {/* Tags */}
-                  {video.tags && video.tags.length > 0 && (
+                  {((videoIsPlaylist ? currentVideo?.tags : video.tags) && (videoIsPlaylist ? currentVideo?.tags : video.tags)!.length > 0) && (
                     <div className="flex flex-wrap gap-2">
-                      {video.tags.map(tag => (
+                      {(videoIsPlaylist ? currentVideo?.tags || video.tags : video.tags).map(tag => (
                         <Badge
                           key={tag}
                           variant="secondary"
@@ -254,10 +259,10 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                   )}
 
                   {/* Description */}
-                  {video.description && (
+                  {(videoIsPlaylist ? currentVideo?.description || video.description : video.description) && (
                     <div className="border border-border rounded-lg p-6 bg-card">
                       <h2 className="text-xl font-semibold mb-3">About</h2>
-                      <p className="text-muted-foreground leading-relaxed">{video.description}</p>
+                      <p className="text-muted-foreground leading-relaxed">{videoIsPlaylist ? currentVideo?.description || video.description : video.description}</p>
                     </div>
                   )}
                 </div>

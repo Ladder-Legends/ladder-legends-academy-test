@@ -9,13 +9,17 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BuildOrder } from '@/types/build-order';
-import { Video, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Video, ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { getContentVideoUrl } from '@/lib/video-helpers';
+import replaysData from '@/data/replays.json';
+import { Replay } from '@/types/replay';
+
+const allReplays = replaysData as Replay[];
 
 interface BuildOrderDetailClientProps {
   buildOrder: BuildOrder;
@@ -61,6 +65,11 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
       default: return 'bg-muted text-muted-foreground';
     }
   };
+
+  // Look up replay if replayId is present
+  const linkedReplay = buildOrder.replayId
+    ? allReplays.find(r => r.id === buildOrder.replayId)
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -189,6 +198,34 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
               </dl>
             </div>
 
+            {/* Video & Replay Links */}
+            {(getContentVideoUrl(buildOrder) || linkedReplay?.downloadUrl) && (
+              <div className="flex flex-wrap gap-4">
+                {getContentVideoUrl(buildOrder) && (
+                  <PaywallLink
+                    href={getContentVideoUrl(buildOrder)!}
+                    isFree={buildOrder.isFree}
+                    className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                  >
+                    <Video className="h-5 w-5" />
+                    Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
+                  </PaywallLink>
+                )}
+
+                {linkedReplay?.downloadUrl && (
+                  <PaywallLink
+                    href={linkedReplay.downloadUrl}
+                    isFree={buildOrder.isFree}
+                    download
+                    className="flex items-center gap-2 px-6 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium"
+                  >
+                    <Download className="h-5 w-5" />
+                    Download Replay
+                  </PaywallLink>
+                )}
+              </div>
+            )}
+
             {/* Build Order Steps */}
             <div className="border border-border rounded-lg p-6 bg-card">
               <h2 className="text-xl font-semibold mb-4">Build Order Steps</h2>
@@ -233,20 +270,6 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Video Link */}
-            {getContentVideoUrl(buildOrder) && (
-              <div className="flex gap-4">
-                <PaywallLink
-                  href={getContentVideoUrl(buildOrder)!}
-                  isFree={buildOrder.isFree}
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-                >
-                  <Video className="h-5 w-5" />
-                  Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
-                </PaywallLink>
               </div>
             )}
           </div>
