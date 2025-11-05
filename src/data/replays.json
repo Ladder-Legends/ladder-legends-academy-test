@@ -283,5 +283,39 @@
     "tags": [],
     "patch": "5.0.14.94137",
     "isFree": false
+  },
+  {
+    "id": "8225f0a6-e432-4a37-9785-37308dfbdf2f",
+    "title": "herO vs Krystianer",
+    "map": "Tokamak LE",
+    "matchup": "PvP",
+    "player1": {
+      "name": "herO",
+      "race": "protoss",
+      "result": "loss",
+      "mmr": 6550
+    },
+    "player2": {
+      "name": "Krystianer",
+      "race": "protoss",
+      "result": "win",
+      "mmr": 6440
+    },
+    "duration": "9:47",
+    "gameDate": "2025-10-26",
+    "uploadDate": "2025-11-05",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/KrystianerVSherO-NKE8L9qQHggLY5IFjearRhYWT6w0xJ.SC2Replay",
+    "videoIds": [],
+    "coach": "krystianer",
+    "tags": [
+      "krystianer",
+      "pvp",
+      "protoss",
+      "pro",
+      "replay"
+    ],
+    "patch": "5.0.15.95299",
+    "notes": "Replay PvP - Krystianer/Hero - Sparkling Tuna Cup",
+    "isFree": false
   }
 ]
