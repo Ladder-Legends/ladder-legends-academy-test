@@ -404,15 +404,17 @@
   },
   {
     "id": "27",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-21",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks: How to Spot Observers ",
+    "description": "This video showcases how to spot observers, It is more useful for terran than the other races but can be useful for all races",
+    "source": "youtube",
     "youtubeId": "T-hnKW0cAnM",
     "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-08-21",
+    "tags": [],
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "29",
