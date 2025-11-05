@@ -506,15 +506,17 @@
   },
   {
     "id": "37",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-08-06",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks #55 A different way to Inject",
+    "description": "Queens can inject via the minimap. Might make it easier/more streamlined for some of the zerg players out there if they choose to commit this to muscle memory.",
+    "source": "youtube",
     "youtubeId": "EN7Pfa9Xebk",
     "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/hqdefault.jpg",
+    "date": "2025-08-06",
+    "tags": [],
     "race": "zerg",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "38",
