@@ -129,7 +129,7 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino",
-    "isFree": false
+    "isFree": true
   },
   {
     "id": "4",
