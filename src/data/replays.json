@@ -435,5 +435,31 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "d655e11f-7c2b-4631-82c5-8db08496c3aa",
+    "title": "EON vs XionS",
+    "map": "Ultralove",
+    "matchup": "ZvP",
+    "player1": {
+      "name": "EON",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "XionS",
+      "race": "protoss",
+      "result": "loss"
+    },
+    "duration": "11:30",
+    "gameDate": "2025-11-04",
+    "uploadDate": "2025-11-06",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/EON%20VS%20XionS-mX5pUU2OauDLROalnQdECAwM8EZAUU.SC2Replay",
+    "videoIds": [],
+    "coach": "eon",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
