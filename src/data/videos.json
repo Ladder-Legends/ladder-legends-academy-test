@@ -224,7 +224,7 @@
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": true
   },
   {
     "id": "11",
