@@ -466,7 +466,7 @@
     "id": "replay-503d5519-ff29-400e-b68a-7154efa43dda",
     "title": "ZvP Baneling bust example Replay",
     "map": "Pylon LE",
-    "matchup": "PvZ",
+    "matchup": "ZvP",
     "player1": {
       "name": "Kitten",
       "race": "protoss",
