@@ -485,5 +485,28 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false
+  },
+  {
+    "id": "replay-f00d30af-e81c-4e06-8c0f-e7d503c95917",
+    "title": "ZvT pool first Into Ling Ravager Allin Replay",
+    "map": "Magannatha LE",
+    "matchup": "ZvT",
+    "player1": {
+      "name": "EONs",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "pVkIlwhfp",
+      "race": "terran",
+      "result": "loss"
+    },
+    "duration": "06.30",
+    "gameDate": "2025-11-05",
+    "uploadDate": "2025-11-06",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "isFree": false
   }
 ]
