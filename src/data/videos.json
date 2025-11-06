@@ -135,7 +135,11 @@
     "id": "4",
     "title": "How to Engage Tanks in TvT",
     "description": "This video goes over how to engage tanks as bio in TvT",
-    "thumbnail": "https://img.youtube.com/vi/9HNzKoMNCHk/hqdefault.jpg",
+    "source": "mux",
+    "muxAssetId": "l1q1c3u6dP6Y4PBOfV00xLiEQzbuIUZN02Lg6AsNZnxEQ",
+    "muxPlaybackId": "xFVUI6HPRNTKDLRQe02r2vP6u8CR02KFgEq3CVdjCeRt4",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/4.jpg",
     "date": "2025-10-14",
     "tags": [
       "terran",
@@ -144,8 +148,7 @@
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false,
-    "youtubeId": "9HNzKoMNCHk"
+    "isFree": false
   },
   {
     "id": "5",
