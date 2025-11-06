@@ -483,7 +483,11 @@
     "youtubeId": "6jRs9JIBqUM",
     "thumbnail": "https://img.youtube.com/vi/6jRs9JIBqUM/hqdefault.jpg",
     "date": "2025-08-07",
-    "tags": [],
+    "tags": [
+      "terran",
+      "zerg",
+      "protoss"
+    ],
     "race": "all",
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
