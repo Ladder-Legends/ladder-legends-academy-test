@@ -64,7 +64,11 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
         console.error('[MUX UPLOAD CLIENT] Failed to create upload URL:', {
           status: createResponse.status,
           error,
+          code: error.code,
+          details: error.details,
+          retryable: error.retryable,
         });
+        // Show user-friendly error message
         throw new Error(error.error || 'Failed to create upload URL');
       }
 
@@ -131,11 +135,15 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
         const response = await fetch(`/api/mux/upload?uploadId=${uploadId}`);
 
         if (!response.ok) {
+          const error = await response.json();
           console.error('[MUX UPLOAD CLIENT] Failed to check upload status:', {
             status: response.status,
             uploadId,
+            error,
+            code: error.code,
+            details: error.details,
           });
-          throw new Error('Failed to check upload status');
+          throw new Error(error.error || 'Failed to check upload status');
         }
 
         const { status, assetId, error } = await response.json();
@@ -163,11 +171,15 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
           });
 
           if (!assetResponse.ok) {
+            const error = await assetResponse.json();
             console.error('[MUX UPLOAD CLIENT] Failed to get asset info:', {
               status: assetResponse.status,
               assetId,
+              error,
+              code: error.code,
+              details: error.details,
             });
-            throw new Error('Failed to get asset information');
+            throw new Error(error.error || 'Failed to get asset information');
           }
 
           const assetData = await assetResponse.json();

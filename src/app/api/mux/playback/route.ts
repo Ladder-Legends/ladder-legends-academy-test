@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
 import { auth } from '@/lib/auth';
 import { unstable_cache } from 'next/cache';
+import { handleMuxError, createErrorResponse } from '@/lib/api-errors';
 
 // Initialize Mux client
 const mux = new Mux({
@@ -103,19 +104,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const playbackId = searchParams.get('playbackId');
 
-    console.error('[MUX PLAYBACK] Error generating signed playback URL:', {
-      playbackId,
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    return NextResponse.json(
-      {
-        error: 'Failed to generate signed playback URL',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    const { status, response } = handleMuxError(error, `Generating playback token for ${playbackId}`);
+    return createErrorResponse(status, response);
   }
 }
 
@@ -185,25 +175,14 @@ export async function POST(request: NextRequest) {
       createdAt: asset.created_at,
     });
   } catch (error) {
-    // Try to get assetId from body for logging
+    // Try to get assetId from body for logging context
     let assetId = 'unknown';
     try {
       const body = await request.json();
       assetId = body.assetId || 'unknown';
     } catch {}
 
-    console.error('[MUX ASSET] Error retrieving asset information:', {
-      assetId,
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    return NextResponse.json(
-      {
-        error: 'Failed to retrieve asset information',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    const { status, response } = handleMuxError(error, `Retrieving asset info for ${assetId}`);
+    return createErrorResponse(status, response);
   }
 }

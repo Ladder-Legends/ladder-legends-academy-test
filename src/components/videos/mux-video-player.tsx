@@ -94,6 +94,15 @@ export function MuxVideoPlayer({
 
         if (!response.ok) {
           const errorData = await response.json();
+          console.error('[MUX PLAYER] Failed to fetch playback token:', {
+            status: response.status,
+            playbackId,
+            error: errorData.error,
+            code: errorData.code,
+            details: errorData.details,
+            retryable: errorData.retryable,
+          });
+          // Show user-friendly error message
           throw new Error(errorData.error || 'Failed to fetch playback token');
         }
 

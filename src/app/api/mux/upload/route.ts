@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
 import { auth } from '@/lib/auth';
 import { hasPermission } from '@/lib/permissions';
+import { handleMuxError, createErrorResponse } from '@/lib/api-errors';
 
 // Initialize Mux client
 const mux = new Mux({
@@ -70,19 +71,8 @@ export async function POST(request: NextRequest) {
       message: 'Upload URL created successfully. Upload your video to the provided URL.',
     });
   } catch (error) {
-    console.error('[MUX UPLOAD] Error creating upload URL:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined,
-    });
-    return NextResponse.json(
-      {
-        error: 'Failed to create upload URL. Please try again.',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    const { status, response } = handleMuxError(error, 'Creating upload URL');
+    return createErrorResponse(status, response);
   }
 }
 
@@ -131,18 +121,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const uploadId = searchParams.get('uploadId');
 
-    console.error('[MUX UPLOAD] Error checking upload status:', {
-      uploadId,
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    return NextResponse.json(
-      {
-        error: 'Failed to check upload status',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    const { status, response } = handleMuxError(error, `Checking upload status for ${uploadId}`);
+    return createErrorResponse(status, response);
   }
 }

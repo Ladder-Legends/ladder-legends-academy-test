@@ -34,11 +34,28 @@ export function CommitButton() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Commit failed:', errorData);
+        console.error('[COMMIT] Failed to commit changes:', {
+          status: response.status,
+          error: errorData.error,
+          code: errorData.code,
+          details: errorData.details,
+          retryable: errorData.retryable,
+          changesCount: changes.length,
+        });
+
+        // Show specific error message if retryable
+        if (errorData.retryable) {
+          throw new Error(`${errorData.error} (You can try again)`);
+        }
         throw new Error(errorData.error || 'Failed to commit changes');
       }
 
-      await response.json();
+      const result = await response.json();
+      console.log('[COMMIT] Success:', {
+        changesApplied: result.changesApplied,
+        attempts: result.attempts,
+        commitSha: result.commit?.sha,
+      });
 
       // Track successful commit in PostHog
       posthog.capture('cms_commit', {
@@ -54,8 +71,14 @@ export function CommitButton() {
       clearAllChanges();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      toast.error(`Failed to commit: ${errorMessage}`);
-      console.error(error);
+      toast.error(`Failed to commit: ${errorMessage}`, {
+        duration: 8000, // Show errors longer
+      });
+      console.error('[COMMIT] Error:', {
+        error,
+        message: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
     } finally {
       setIsCommitting(false);
     }

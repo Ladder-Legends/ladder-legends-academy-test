@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isCoach, isOwner } from '@/lib/permissions';
+import { handleGitHubError, createErrorResponse, ErrorCodes } from '@/lib/api-errors';
 
 // GitHub API configuration
 const GITHUB_API_URL = 'https://api.github.com';
@@ -483,10 +484,7 @@ Co-Authored-By: ${session.user.name || 'User'} <${session.user.email || 'noreply
     });
 
   } catch (error) {
-    console.error('Error in /api/admin/commit:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    const { status, response } = handleGitHubError(error, 'Committing changes');
+    return createErrorResponse(status, response);
   }
 }
