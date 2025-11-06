@@ -327,15 +327,17 @@
     "id": "16",
     "title": "Alternative TvT opener: Marauder Reaper into Mech",
     "description": "This is a game where I showcase an alternative eco cheese opening in tvt that lets you skip the raven bs phase entirely if you are lucky and will outright win the game sometimes.\n",
-    "source": "youtube",
-    "youtubeId": "lhmCLqDoetY",
-    "thumbnail": "https://img.youtube.com/vi/lhmCLqDoetY/hqdefault.jpg",
+    "source": "mux",
+    "muxAssetId": "Q0201F00DrW6MGnuGjnWj4COgLsqfSbHrMbd0072V3UVito",
+    "muxPlaybackId": "o5VCBHQRGMrVfniy3HUn5HMMCwgpqd9OsICF01oCSOW00",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/16.jpg",
     "date": "2025-09-14",
     "tags": [],
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": true
   },
   {
     "id": "17",
