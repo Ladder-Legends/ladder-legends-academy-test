@@ -405,7 +405,11 @@
     "youtubeId": "H9RajuDOTVc",
     "thumbnail": "https://img.youtube.com/vi/H9RajuDOTVc/hqdefault.jpg",
     "date": "2025-08-30",
-    "tags": [],
+    "tags": [
+      "terran",
+      "defense",
+      "tipsandtricks"
+    ],
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
