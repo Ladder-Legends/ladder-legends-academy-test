@@ -461,5 +461,28 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "replay-503d5519-ff29-400e-b68a-7154efa43dda",
+    "title": "ZvP Baneling bust example Replay",
+    "map": "Pylon LE",
+    "matchup": "PvZ",
+    "player1": {
+      "name": "Kitten",
+      "race": "protoss",
+      "result": "loss"
+    },
+    "player2": {
+      "name": "EONs",
+      "race": "zerg",
+      "result": "win"
+    },
+    "duration": "08.15",
+    "gameDate": "2025-11-05",
+    "uploadDate": "2025-11-06",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "isFree": false
   }
 ]
