@@ -383,5 +383,31 @@
     "patch": "5.0.15.95299",
     "notes": "TvP OSC Mid Season Playoffs Vs Byun",
     "isFree": false
+  },
+  {
+    "id": "fb1a44f5-c850-47b4-bdd1-52c85e82c200",
+    "title": "EON vs Inexorable",
+    "map": "Ley Lines",
+    "matchup": "ZvT",
+    "player1": {
+      "name": "EON",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "INexorable",
+      "race": "terran",
+      "result": "loss"
+    },
+    "duration": "9:36",
+    "gameDate": "2025-11-04",
+    "uploadDate": "2025-11-06",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/EON%20vs%20INexorable-9RRMsM4We91oOAtpHbjgEoltPfVYbC.SC2Replay",
+    "videoIds": [],
+    "coach": "eon",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
