@@ -30,24 +30,38 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, description } = body;
 
+    console.log('[MUX UPLOAD] Creating upload URL for:', {
+      title: title || 'Untitled Video',
+      titleLength: (title || 'Untitled Video').length,
+      user: session.user?.email || session.user?.name,
+    });
+
     // Create a direct upload URL
     // Note: Mux updated their API - now uses 'video_quality' instead of 'encoding_tier'
     // 'basic' = free tier (up to 1080p), 'plus' = paid tier (adaptive encoding)
     const videoQuality = process.env.MUX_VIDEO_QUALITY || 'basic';
+
+    // Mux has a 255 character limit on passthrough - just store title (truncated if needed)
+    const videoTitle = (title || 'Untitled Video').substring(0, 250);
+
+    console.log('[MUX UPLOAD] Passthrough data:', {
+      videoTitle,
+      length: videoTitle.length,
+    });
 
     const upload = await mux.video.uploads.create({
       cors_origin: process.env.NEXT_PUBLIC_APP_URL || '*',
       new_asset_settings: {
         playback_policies: ['signed'], // Use signed URLs for security
         video_quality: videoQuality as 'basic' | 'plus', // basic = free tier, plus = paid tier
-        // Add metadata
-        passthrough: JSON.stringify({
-          title: title || 'Untitled Video',
-          description: description || '',
-          uploadedBy: session.user?.email || session.user?.name || 'Unknown',
-          uploadedAt: new Date().toISOString(),
-        }),
+        // Store just the video title (max 255 chars)
+        passthrough: videoTitle,
       },
+    });
+
+    console.log('[MUX UPLOAD] Upload URL created:', {
+      uploadId: upload.id,
+      status: upload.status,
     });
 
     return NextResponse.json({
@@ -56,7 +70,12 @@ export async function POST(request: NextRequest) {
       message: 'Upload URL created successfully. Upload your video to the provided URL.',
     });
   } catch (error) {
-    console.error('Error creating Mux upload URL:', error);
+    console.error('[MUX UPLOAD] Error creating upload URL:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
+    });
     return NextResponse.json(
       {
         error: 'Failed to create upload URL. Please try again.',
@@ -96,13 +115,28 @@ export async function GET(request: NextRequest) {
     // Get upload status
     const upload = await mux.video.uploads.retrieve(uploadId);
 
+    console.log('[MUX UPLOAD] Status check:', {
+      uploadId,
+      status: upload.status,
+      assetId: upload.asset_id,
+      error: upload.error,
+    });
+
     return NextResponse.json({
       status: upload.status,
       assetId: upload.asset_id,
       error: upload.error,
     });
   } catch (error) {
-    console.error('Error checking Mux upload status:', error);
+    const { searchParams } = new URL(request.url);
+    const uploadId = searchParams.get('uploadId');
+
+    console.error('[MUX UPLOAD] Error checking upload status:', {
+      uploadId,
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       {
         error: 'Failed to check upload status',

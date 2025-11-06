@@ -44,6 +44,14 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
       setProgress(0);
       setStatus('Creating upload URL...');
 
+      console.log('[MUX UPLOAD CLIENT] Starting upload:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        title,
+        titleLength: (title || '').length,
+      });
+
       // Step 1: Create upload URL
       const createResponse = await fetch('/api/mux/upload', {
         method: 'POST',
@@ -53,10 +61,20 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
 
       if (!createResponse.ok) {
         const error = await createResponse.json();
+        console.error('[MUX UPLOAD CLIENT] Failed to create upload URL:', {
+          status: createResponse.status,
+          error,
+        });
         throw new Error(error.error || 'Failed to create upload URL');
       }
 
       const { uploadId, uploadUrl } = await createResponse.json();
+
+      console.log('[MUX UPLOAD CLIENT] Upload URL created:', {
+        uploadId,
+        hasUploadUrl: !!uploadUrl,
+      });
+
       setStatus('Uploading video to Mux...');
 
       // Step 2: Upload file to Mux using UpChunk for better reliability
@@ -74,6 +92,7 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
 
       // Handle upload success
       upload.on('success', async () => {
+        console.log('[MUX UPLOAD CLIENT] File upload complete, waiting for asset creation');
         setStatus('Processing video...');
         setProgress(100);
 
@@ -83,11 +102,19 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
 
       // Handle upload errors with retries
       upload.on('error', (error) => {
-        console.error('UpChunk error:', error);
+        console.error('[MUX UPLOAD CLIENT] UpChunk error:', {
+          error,
+          detail: error.detail,
+          message: error.detail?.message,
+        });
         throw new Error(error.detail?.message || 'Upload failed');
       });
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('[MUX UPLOAD CLIENT] Upload error:', {
+        error,
+        message: error instanceof Error ? error.message : 'Upload failed',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       toast.error(error instanceof Error ? error.message : 'Upload failed');
       setUploading(false);
       setProgress(0);
@@ -104,16 +131,30 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
         const response = await fetch(`/api/mux/upload?uploadId=${uploadId}`);
 
         if (!response.ok) {
+          console.error('[MUX UPLOAD CLIENT] Failed to check upload status:', {
+            status: response.status,
+            uploadId,
+          });
           throw new Error('Failed to check upload status');
         }
 
         const { status, assetId, error } = await response.json();
+
+        console.log('[MUX UPLOAD CLIENT] Poll status:', {
+          uploadId,
+          status,
+          assetId,
+          hasError: !!error,
+          attempts,
+        });
 
         if (error) {
           throw new Error(error.message || 'Upload failed');
         }
 
         if (status === 'asset_created' && assetId) {
+          console.log('[MUX UPLOAD CLIENT] Asset created, getting playback ID');
+
           // Asset created, now get the playback ID
           const assetResponse = await fetch('/api/mux/playback', {
             method: 'POST',
@@ -122,10 +163,19 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
           });
 
           if (!assetResponse.ok) {
+            console.error('[MUX UPLOAD CLIENT] Failed to get asset info:', {
+              status: assetResponse.status,
+              assetId,
+            });
             throw new Error('Failed to get asset information');
           }
 
           const assetData = await assetResponse.json();
+
+          console.log('[MUX UPLOAD CLIENT] Upload complete!', {
+            assetId,
+            playbackId: assetData.playbackId,
+          });
 
           toast.success('Video uploaded successfully!');
           setStatus('Video ready');
@@ -142,7 +192,12 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
 
         setTimeout(poll, 5000); // Poll every 5 seconds
       } catch (error) {
-        console.error('Polling error:', error);
+        console.error('[MUX UPLOAD CLIENT] Polling error:', {
+          error,
+          message: error instanceof Error ? error.message : 'Failed to process video',
+          uploadId,
+          attempts,
+        });
         toast.error(error instanceof Error ? error.message : 'Failed to process video');
         setUploading(false);
         setStatus('');

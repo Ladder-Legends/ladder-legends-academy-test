@@ -100,7 +100,15 @@ export async function GET(request: NextRequest) {
       expiresIn: '24h',
     });
   } catch (error) {
-    console.error('Error generating signed playback URL:', error);
+    const { searchParams } = new URL(request.url);
+    const playbackId = searchParams.get('playbackId');
+
+    console.error('[MUX PLAYBACK] Error generating signed playback URL:', {
+      playbackId,
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       {
         error: 'Failed to generate signed playback URL',
@@ -136,6 +144,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log('[MUX ASSET] Retrieving asset:', { assetId });
 
     // Get asset information
     const asset = await mux.video.assets.retrieve(assetId);
@@ -175,7 +185,19 @@ export async function POST(request: NextRequest) {
       createdAt: asset.created_at,
     });
   } catch (error) {
-    console.error('Error retrieving asset information:', error);
+    // Try to get assetId from body for logging
+    let assetId = 'unknown';
+    try {
+      const body = await request.json();
+      assetId = body.assetId || 'unknown';
+    } catch {}
+
+    console.error('[MUX ASSET] Error retrieving asset information:', {
+      assetId,
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       {
         error: 'Failed to retrieve asset information',
