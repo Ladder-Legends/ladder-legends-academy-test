@@ -1,26 +1,5 @@
 [
   {
-    "id": "mc-krystianer-pvt-pvp-aug2025",
-    "title": "Krystianer Masterclass: PvT + PvP",
-    "description": "Comprehensive masterclass covering Protoss vs Terran and Protoss vs Protoss matchups with Krystianer.",
-    "coach": "Krystianer",
-    "coachId": "krystianer",
-    "race": "protoss",
-    "videoIds": [
-      "UFcKAiUhpU0"
-    ],
-    "difficulty": "intermediate",
-    "tags": [
-      "protoss",
-      "pvt",
-      "pvp",
-      "masterclass"
-    ],
-    "createdAt": "2025-08-28",
-    "updatedAt": "2025-08-28",
-    "isFree": false
-  },
-  {
     "id": "mc-krystianer-newpatch-oct2025",
     "title": "Krystianer Masterclass: New Patch (PvZ & PvP & PvT) + Live Games",
     "description": "Masterclass covering the new patch changes across all Protoss matchups with live gameplay examples.",
