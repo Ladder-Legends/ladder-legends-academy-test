@@ -3927,5 +3927,787 @@
     "updatedAt": "2025-11-05",
     "isFree": false,
     "replayId": "8225f0a6-e432-4a37-9785-37308dfbdf2f"
+  },
+  {
+    "id": "0683f0d3-5353-428f-a14d-b7864ca34809",
+    "name": "ZvT pool first Into Ling Ravager Allin",
+    "race": "zerg",
+    "vsRace": "terran",
+    "difficulty": "intermediate",
+    "coach": "Eon",
+    "coachId": "eon",
+    "description": "pool first build into ling ravager. Can be played as macro build by delaying 2nd and 3rd gas.",
+    "videoIds": [],
+    "steps": [
+      {
+        "supply": 13,
+        "time": "0:40",
+        "action": "Drone"
+      },
+      {
+        "supply": 14,
+        "time": "0:42",
+        "action": "Overlord"
+      },
+      {
+        "supply": 14,
+        "time": "0:56",
+        "action": "SpawningPool"
+      },
+      {
+        "supply": 14,
+        "time": "0:59",
+        "action": "Drone"
+      },
+      {
+        "supply": 15,
+        "time": "0:59",
+        "action": "Drone"
+      },
+      {
+        "supply": 16,
+        "time": "1:18",
+        "action": "Drone"
+      },
+      {
+        "supply": 17,
+        "time": "1:21",
+        "action": "Drone"
+      },
+      {
+        "supply": 18,
+        "time": "1:32",
+        "action": "Hatchery"
+      },
+      {
+        "supply": 18,
+        "time": "1:47",
+        "action": "Extractor"
+      },
+      {
+        "supply": 18,
+        "time": "1:54",
+        "action": "Drone"
+      },
+      {
+        "supply": 17,
+        "time": "2:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 17,
+        "time": "2:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 18,
+        "time": "2:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 18,
+        "time": "2:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 19,
+        "time": "2:27",
+        "action": "Zergling"
+      },
+      {
+        "supply": 19,
+        "time": "2:27",
+        "action": "Zergling"
+      },
+      {
+        "supply": 20,
+        "time": "2:42",
+        "action": "Overlord"
+      },
+      {
+        "supply": 20,
+        "time": "2:50",
+        "action": "Drone"
+      },
+      {
+        "supply": 21,
+        "time": "2:58",
+        "action": "Queen"
+      },
+      {
+        "supply": 23,
+        "time": "3:05",
+        "action": "Drone"
+      },
+      {
+        "supply": 23,
+        "time": "3:20",
+        "action": "Drone"
+      },
+      {
+        "supply": 22,
+        "time": "3:41",
+        "action": "Drone"
+      },
+      {
+        "supply": 23,
+        "time": "3:47",
+        "action": "Drone"
+      },
+      {
+        "supply": 24,
+        "time": "3:48",
+        "action": "Queen"
+      },
+      {
+        "supply": 26,
+        "time": "3:55",
+        "action": "Drone"
+      },
+      {
+        "supply": 27,
+        "time": "3:57",
+        "action": "Drone"
+      },
+      {
+        "supply": 28,
+        "time": "4:03",
+        "action": "Drone"
+      },
+      {
+        "supply": 29,
+        "time": "4:05",
+        "action": "Queen"
+      },
+      {
+        "supply": 31,
+        "time": "4:13",
+        "action": "Drone"
+      },
+      {
+        "supply": 32,
+        "time": "4:18",
+        "action": "Drone"
+      },
+      {
+        "supply": 33,
+        "time": "4:20",
+        "action": "Overlord"
+      },
+      {
+        "supply": 33,
+        "time": "4:23",
+        "action": "Drone"
+      },
+      {
+        "supply": 34,
+        "time": "4:27",
+        "action": "Drone"
+      },
+      {
+        "supply": 35,
+        "time": "4:32",
+        "action": "Drone"
+      },
+      {
+        "supply": 36,
+        "time": "4:39",
+        "action": "Drone"
+      },
+      {
+        "supply": 37,
+        "time": "4:39",
+        "action": "Hatchery"
+      },
+      {
+        "supply": 37,
+        "time": "4:45",
+        "action": "Drone"
+      },
+      {
+        "supply": 38,
+        "time": "4:58",
+        "action": "Drone"
+      },
+      {
+        "supply": 39,
+        "time": "5:08",
+        "action": "Upgrade: zerglingmovementspeed"
+      },
+      {
+        "supply": 39,
+        "time": "5:08",
+        "action": "Drone"
+      },
+      {
+        "supply": 40,
+        "time": "5:09",
+        "action": "Drone"
+      },
+      {
+        "supply": 41,
+        "time": "5:12",
+        "action": "Extractor"
+      },
+      {
+        "supply": 41,
+        "time": "5:13",
+        "action": "Drone"
+      },
+      {
+        "supply": 42,
+        "time": "5:13",
+        "action": "Overlord"
+      },
+      {
+        "supply": 42,
+        "time": "5:14",
+        "action": "Extractor"
+      },
+      {
+        "supply": 42,
+        "time": "5:16",
+        "action": "Drone"
+      },
+      {
+        "supply": 43,
+        "time": "5:17",
+        "action": "RoachWarren"
+      },
+      {
+        "supply": 43,
+        "time": "5:18",
+        "action": "Drone"
+      },
+      {
+        "supply": 44,
+        "time": "5:20",
+        "action": "Drone"
+      },
+      {
+        "supply": 43,
+        "time": "5:46",
+        "action": "Overlord"
+      },
+      {
+        "supply": 43,
+        "time": "5:51",
+        "action": "Drone"
+      },
+      {
+        "supply": 44,
+        "time": "5:51",
+        "action": "Drone"
+      },
+      {
+        "supply": 45,
+        "time": "5:54",
+        "action": "Zergling"
+      },
+      {
+        "supply": 45,
+        "time": "5:54",
+        "action": "Zergling"
+      },
+      {
+        "supply": 46,
+        "time": "5:54",
+        "action": "Drone"
+      },
+      {
+        "supply": 47,
+        "time": "5:55",
+        "action": "Zergling"
+      },
+      {
+        "supply": 47,
+        "time": "5:55",
+        "action": "Zergling"
+      },
+      {
+        "supply": 48,
+        "time": "5:55",
+        "action": "Zergling"
+      },
+      {
+        "supply": 48,
+        "time": "5:55",
+        "action": "Zergling"
+      },
+      {
+        "supply": 49,
+        "time": "5:55",
+        "action": "Drone"
+      },
+      {
+        "supply": 50,
+        "time": "5:58",
+        "action": "Drone"
+      },
+      {
+        "supply": 51,
+        "time": "6:05",
+        "action": "Drone"
+      },
+      {
+        "supply": 50,
+        "time": "6:41",
+        "action": "Roach"
+      },
+      {
+        "supply": 52,
+        "time": "6:41",
+        "action": "Roach"
+      },
+      {
+        "supply": 54,
+        "time": "6:42",
+        "action": "Roach"
+      },
+      {
+        "supply": 56,
+        "time": "6:42",
+        "action": "Roach"
+      },
+      {
+        "supply": 58,
+        "time": "6:42",
+        "action": "Roach"
+      },
+      {
+        "supply": 60,
+        "time": "6:48",
+        "action": "Overlord"
+      },
+      {
+        "supply": 60,
+        "time": "6:48",
+        "action": "Roach"
+      },
+      {
+        "supply": 62,
+        "time": "6:48",
+        "action": "Roach"
+      },
+      {
+        "supply": 64,
+        "time": "6:49",
+        "action": "Roach"
+      },
+      {
+        "supply": 66,
+        "time": "6:52",
+        "action": "Overlord"
+      },
+      {
+        "supply": 66,
+        "time": "6:55",
+        "action": "Overlord"
+      },
+      {
+        "supply": 66,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 66,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 67,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 67,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 68,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 68,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 69,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 69,
+        "time": "7:25",
+        "action": "Zergling"
+      },
+      {
+        "supply": 70,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 70,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 71,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 71,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 72,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 72,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 73,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 73,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "7:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 76,
+        "time": "7:28",
+        "action": "Drone"
+      },
+      {
+        "supply": 77,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 77,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 79,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 79,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 80,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 80,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 81,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 81,
+        "time": "7:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 80,
+        "time": "7:52",
+        "action": "Overlord"
+      },
+      {
+        "supply": 74,
+        "time": "7:56",
+        "action": "Overlord"
+      },
+      {
+        "supply": 69,
+        "time": "8:08",
+        "action": "Overlord"
+      },
+      {
+        "supply": 62,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 62,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 63,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 63,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 64,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 64,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 65,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 65,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 66,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 66,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 67,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 67,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 68,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 68,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 69,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 69,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 70,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 70,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 71,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 71,
+        "time": "8:26",
+        "action": "Zergling"
+      },
+      {
+        "supply": 72,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 72,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 73,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 73,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "8:33",
+        "action": "Zergling"
+      },
+      {
+        "supply": 76,
+        "time": "8:37",
+        "action": "Zergling"
+      },
+      {
+        "supply": 76,
+        "time": "8:37",
+        "action": "Zergling"
+      },
+      {
+        "supply": 77,
+        "time": "8:44",
+        "action": "Zergling"
+      },
+      {
+        "supply": 77,
+        "time": "8:44",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "8:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "8:46",
+        "action": "Zergling"
+      },
+      {
+        "supply": 73,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 74,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 75,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 76,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 76,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 77,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 77,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 78,
+        "time": "8:59",
+        "action": "Zergling"
+      },
+      {
+        "supply": 79,
+        "time": "8:59",
+        "action": "Zergling"
+      }
+    ],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "updatedAt": "2025-11-06",
+    "isFree": false
   }
 ]
