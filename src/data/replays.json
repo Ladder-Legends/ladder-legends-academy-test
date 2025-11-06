@@ -409,5 +409,31 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "ca8810ae-75e3-4e2c-ac1f-fdf3f0e69a34",
+    "title": "EONs vs RyoGin",
+    "map": "Pylon LE",
+    "matchup": "ZvZ",
+    "player1": {
+      "name": "EON",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "RyoGin",
+      "race": "zerg",
+      "result": "loss"
+    },
+    "duration": "5:12",
+    "gameDate": "2025-11-05",
+    "uploadDate": "2025-11-06",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/EON%20vs%20Ryogin-dbNbJAZjpxcwyFoaFUXqWrTM0SiVNf.SC2Replay",
+    "videoIds": [],
+    "coach": "",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
