@@ -554,7 +554,10 @@
     "youtubeId": "EN7Pfa9Xebk",
     "thumbnail": "https://img.youtube.com/vi/EN7Pfa9Xebk/hqdefault.jpg",
     "date": "2025-08-06",
-    "tags": [],
+    "tags": [
+      "zerg",
+      "micro"
+    ],
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
