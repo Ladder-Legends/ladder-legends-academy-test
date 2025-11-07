@@ -1009,5 +1009,21 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "2dfe7d61-e390-433f-b8c3-3a40871e4518",
+    "title": "ZvT ling queen opener into nydus allin (anti BC)",
+    "description": "Zvt against Juggernaut Jason with a standard opener showcasing a counter to Terran's Battle Cruiser openings.",
+    "source": "mux",
+    "muxAssetId": "LTL1hoQIaUIQk7Lfnew5PWmNp00XMYXYJPv7019jNjGhU",
+    "muxPlaybackId": "01vTF202K111PjS9eYiw5hjmf02yGVggjBxvaXhhxrwQzw",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/2dfe7d61-e390-433f-b8c3-3a40871e4518.jpg",
+    "date": "2025-11-07",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
