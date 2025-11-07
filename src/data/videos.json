@@ -199,15 +199,20 @@
   },
   {
     "id": "9",
-    "title": "New Patch, New ZERG STYLE",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-10-04",
-    "tags": [],
+    "title": "Spire Play against Protoss",
+    "description": "In this video HinO goes over how and when to drop a spire against protoss",
+    "source": "youtube",
     "youtubeId": "sSecT2uPlO0",
     "thumbnail": "https://img.youtube.com/vi/sSecT2uPlO0/hqdefault.jpg",
+    "date": "2025-10-04",
+    "tags": [
+      "zerg",
+      "macro"
+    ],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "10",
