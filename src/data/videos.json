@@ -465,7 +465,11 @@
     "youtubeId": "T-hnKW0cAnM",
     "thumbnail": "https://img.youtube.com/vi/T-hnKW0cAnM/hqdefault.jpg",
     "date": "2025-08-21",
-    "tags": [],
+    "tags": [
+      "terran",
+      "zerg",
+      "protoss"
+    ],
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
