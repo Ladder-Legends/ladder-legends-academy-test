@@ -643,15 +643,21 @@
   },
   {
     "id": "41",
-    "title": "hinO GM Zerg VOD ladder",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-30",
-    "tags": [],
+    "title": "ZvZ GM 13/12 Execution",
+    "description": "This video showcases how to execute a 13/12 against zerg",
+    "source": "youtube",
     "youtubeId": "xNb224IJD0g",
     "thumbnail": "https://img.youtube.com/vi/xNb224IJD0g/hqdefault.jpg",
+    "date": "2025-07-30",
+    "tags": [
+      "zerg",
+      "micro",
+      "cheese"
+    ],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "42",
