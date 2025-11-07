@@ -701,15 +701,21 @@
   },
   {
     "id": "45",
-    "title": "hinO GM Zerg VOD ladder",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-07-29",
-    "tags": [],
+    "title": "Standard ZvP game against 5.4k GM Toss",
+    "description": "This game showcases how zerg is playing in the current meta against protoss at the highest level",
+    "source": "youtube",
     "youtubeId": "AglrgNltSxY",
     "thumbnail": "https://img.youtube.com/vi/AglrgNltSxY/hqdefault.jpg",
+    "date": "2025-07-29",
+    "tags": [
+      "zerg",
+      "macro",
+      "playstyle"
+    ],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "47",
