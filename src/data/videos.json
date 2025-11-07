@@ -385,15 +385,21 @@
   },
   {
     "id": "20",
-    "title": "hinO GM Zerg VOD ladder",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-05",
-    "tags": [],
+    "title": "Zerg Scouting Against Protoss ",
+    "description": "In this video HinO goes over how to scout against protoss",
+    "source": "youtube",
     "youtubeId": "qvOEtJIDzkI",
     "thumbnail": "https://img.youtube.com/vi/qvOEtJIDzkI/hqdefault.jpg",
+    "date": "2025-09-05",
+    "tags": [
+      "macro",
+      "zerg",
+      "scouting"
+    ],
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "isFree": false
   },
   {
     "id": "24",
