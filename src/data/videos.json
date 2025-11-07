@@ -403,15 +403,23 @@
   },
   {
     "id": "24",
-    "title": "The Mystery Machine: Groovy's One Stop Shop to SC2 Proficency",
-    "description": "Coaching video for Starcraft 2",
-    "date": "2025-09-01",
-    "tags": [],
+    "title": "Starcraft 2 Tips and Tricks Series #63: Base Centralization (WORKS FOR ALL RACES)",
+    "description": "This is a tool any player can use to up the smoothness of their gameplay. This is something that I learned recently and wanted to share with the community.",
+    "source": "youtube",
     "youtubeId": "Pewd9C8n_Ok",
     "thumbnail": "https://img.youtube.com/vi/Pewd9C8n_Ok/hqdefault.jpg",
-    "race": "zerg",
+    "date": "2025-09-01",
+    "tags": [
+      "terran",
+      "zerg",
+      "protoss",
+      "macro",
+      "tipsandtricks"
+    ],
+    "race": "all",
     "coach": "Groovy",
-    "coachId": "groovy"
+    "coachId": "groovy",
+    "isFree": false
   },
   {
     "id": "25",
