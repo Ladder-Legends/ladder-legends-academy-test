@@ -65,6 +65,11 @@
     "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
     "title": "Simple Early Game Zerg Setup vs Protoss",
     "description": "This video goes over how you want to position your queens and when to get your spores / how to scout.",
+    "source": "mux",
+    "muxAssetId": "3IpFiHXLpeQ01A8u4cGb65hUZ2Ny02a5RHaDxS01tHZuEg",
+    "muxPlaybackId": "RjUV242TeZFmbTbjXS00e9iSpnYEROLXITOGnEcdHrMI",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/f391207c-0ba7-4681-8a78-c054d5298d05.jpg",
     "date": "2025-10-23",
     "tags": [
       "zerg",
@@ -74,9 +79,6 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "source": "youtube",
-    "youtubeId": "5BLEYQBSF7I",
-    "thumbnail": "https://img.youtube.com/vi/5BLEYQBSF7I/hqdefault.jpg",
     "isFree": false
   },
   {
