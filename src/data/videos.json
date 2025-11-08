@@ -1025,5 +1025,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "9400d216-d6b9-4855-836a-71c455317a87",
+    "title": "A quick guide to 12 pool worker pull ZvP",
+    "description": "Learn the basic setup of a 12pool worker pull, how to execute, and a small micro lesson with workers",
+    "source": "mux",
+    "muxAssetId": "EJH51BLSeEEj02tDrd01T5ZAemtlNe3j7c6qKT7qGQBdE",
+    "muxPlaybackId": "KnNp6Kw2nW75g6K9Cd511eNQLoae1EMyvg7KSjdGZN4",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/9400d216-d6b9-4855-836a-71c455317a87.jpg",
+    "date": "2025-11-08",
+    "tags": [],
+    "race": "zerg",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
