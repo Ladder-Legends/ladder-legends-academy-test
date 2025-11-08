@@ -1057,5 +1057,19 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "0e9a28fa-9a18-42ca-97e5-535746ce403d",
+    "title": "Worker Micro Tutorials ",
+    "description": "Learn how to micro workers with ease for all races",
+    "source": "youtube",
+    "youtubeId": "T3AWsoX90-Y",
+    "thumbnail": "https://img.youtube.com/vi/T3AWsoX90-Y/hqdefault.jpg",
+    "date": "2025-11-08",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
