@@ -1041,5 +1041,21 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "09fc41db-bc7a-48f4-a312-dbf7026c0f15",
+    "title": "ZvX Learning the basic Zerg build order",
+    "description": "Learn what the basic Zerg order looks like as well as how your macro cycle should be at the start and later stages of the game.",
+    "source": "mux",
+    "muxAssetId": "viFzuun02egTuxNbbDqxibOWpekLpK02TSirXlFqu00l3o",
+    "muxPlaybackId": "HpgKd1N90213sGHRJx89l6U2eXG2LztmQh3BYYe100GiI",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/09fc41db-bc7a-48f4-a312-dbf7026c0f15.jpg",
+    "date": "2025-11-08",
+    "tags": [],
+    "race": "zerg",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
