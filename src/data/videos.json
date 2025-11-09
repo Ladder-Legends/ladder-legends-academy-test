@@ -1071,5 +1071,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "7a48669b-1055-4048-8a7e-a362701b16ed",
+    "title": "ZvT Gasless 4 queen opener into roach hydra",
+    "description": "Guide to how a gasless opener works versus Terran and a quick rundown of roach hydra engagements and positioning. Game covers some late game aspects for the transitions as well.",
+    "source": "mux",
+    "muxAssetId": "ieL02p2cMwZPwO1yNkfJPmm7R01hC005eZTw3mHlVv1Ds4",
+    "muxPlaybackId": "K302A00GCoVO2UBCpOj8021sw3t87Xq3jl7BdganRnK4I4",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/7a48669b-1055-4048-8a7e-a362701b16ed.jpg",
+    "date": "2025-11-09",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
