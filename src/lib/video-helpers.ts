@@ -69,17 +69,52 @@ export function getVideoUrl(videoId: string, isFree: boolean): string {
 
 /**
  * Get the appropriate video URL for content with videos
- * Uses the first video ID and the content's isFree flag
+ * Intelligently finds a valid video/playlist from the videoIds array
+ *
+ * Strategy:
+ * 1. Check if any videoId matches a playlist in videos.json
+ * 2. If not, check if any videoId exists as a standalone video
+ * 3. Otherwise return undefined (no valid video found)
  *
  * @param content - Content with videoIds and isFree properties
- * @returns The URL path to the first video, or undefined if no videos
+ * @param allVideos - Array of all videos to check against
+ * @returns The URL path to a valid video/playlist, or undefined if none found
  *
  * @example
- * getContentVideoUrl({ videoIds: ['abc'], isFree: true }) // '/free/library/abc'
- * getContentVideoUrl({ videoIds: [], isFree: false }) // undefined
+ * getContentVideoUrl({ videoIds: ['abc'], isFree: true }, allVideos) // '/library/abc'
+ * getContentVideoUrl({ videoIds: ['invalid'], isFree: false }, allVideos) // undefined
  */
-export function getContentVideoUrl(content: VideoReference & { isFree?: boolean }): string | undefined {
-  const firstVideoId = getFirstVideoId(content);
-  if (!firstVideoId) return undefined;
-  return getVideoUrl(firstVideoId, content.isFree ?? false);
+export function getContentVideoUrl(
+  content: VideoReference & { isFree?: boolean },
+  allVideos?: Array<{ id: string; source?: string; videoIds?: string[] }>
+): string | undefined {
+  if (!content.videoIds || content.videoIds.length === 0) return undefined;
+
+  // If we don't have allVideos to validate against, use the first videoId (legacy behavior)
+  if (!allVideos) {
+    const firstVideoId = getFirstVideoId(content);
+    if (!firstVideoId) return undefined;
+    return getVideoUrl(firstVideoId, content.isFree ?? false);
+  }
+
+  // Strategy 1: Find a playlist that contains any of our videoIds
+  for (const videoId of content.videoIds) {
+    const playlist = allVideos.find(
+      v => v.source === 'playlist' && v.videoIds?.includes(videoId)
+    );
+    if (playlist) {
+      return getVideoUrl(playlist.id, content.isFree ?? false);
+    }
+  }
+
+  // Strategy 2: Find any standalone video that matches our videoIds
+  for (const videoId of content.videoIds) {
+    const video = allVideos.find(v => v.id === videoId);
+    if (video) {
+      return getVideoUrl(video.id, content.isFree ?? false);
+    }
+  }
+
+  // No valid video found
+  return undefined;
 }

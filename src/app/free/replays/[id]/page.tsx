@@ -11,8 +11,11 @@ import { Download, Video, ArrowLeft, Calendar, Clock, Map } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { getContentVideoUrl } from '@/lib/video-helpers';
+import videosData from '@/data/videos.json';
+import { Video as VideoType } from '@/types/video';
 
 const allReplays = replaysData as Replay[];
+const allVideos = videosData as VideoType[];
 
 // Generate static paths for all FREE replays at build time
 export async function generateStaticParams() {
@@ -243,9 +246,9 @@ export default async function FreeReplayDetailPage({ params }: PageProps) {
                   Download Replay
                 </a>
               )}
-              {getContentVideoUrl(replay) && (
+              {getContentVideoUrl(replay, allVideos) && (
                 <PaywallLink
-                  href={getContentVideoUrl(replay)!}
+                  href={getContentVideoUrl(replay, allVideos)!}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

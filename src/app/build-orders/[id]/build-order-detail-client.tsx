@@ -9,7 +9,7 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BuildOrder } from '@/types/build-order';
-import { Video, ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
+import { Video as VideoIcon, ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,12 @@ import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { getContentVideoUrl } from '@/lib/video-helpers';
 import replaysData from '@/data/replays.json';
+import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
+import { Video } from '@/types/video';
 
 const allReplays = replaysData as Replay[];
+const allVideos = videosData as Video[];
 
 interface BuildOrderDetailClientProps {
   buildOrder: BuildOrder;
@@ -199,15 +202,15 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
             </div>
 
             {/* Video & Replay Links */}
-            {(getContentVideoUrl(buildOrder) || linkedReplay?.downloadUrl) && (
+            {(getContentVideoUrl(buildOrder, allVideos) || linkedReplay?.downloadUrl) && (
               <div className="flex flex-wrap gap-4">
-                {getContentVideoUrl(buildOrder) && (
+                {getContentVideoUrl(buildOrder, allVideos) && (
                   <PaywallLink
-                    href={getContentVideoUrl(buildOrder)!}
+                    href={getContentVideoUrl(buildOrder, allVideos)!}
                     isFree={buildOrder.isFree}
                     className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                   >
-                    <Video className="h-5 w-5" />
+                    <VideoIcon className="h-5 w-5" />
                     Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
                   </PaywallLink>
                 )}

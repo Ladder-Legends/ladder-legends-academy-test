@@ -11,7 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 import buildOrders from '@/data/build-orders.json';
 import coaches from '@/data/coaches.json';
 import replays from '@/data/replays.json';
+import videosJson from '@/data/videos.json';
 import { Replay, Matchup, Race as ReplayRace } from '@/types/replay';
+import { Video } from '@/types/video';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
@@ -37,6 +39,9 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [showReplayDropdown, setShowReplayDropdown] = useState(false);
   const [uploadedReplayFile, setUploadedReplayFile] = useState<File | null>(null);
   const [replayLinkMode, setReplayLinkMode] = useState<'existing' | 'upload'>('existing');
+
+  // Merge static videos with pending changes for validation
+  const allVideos = useMergedContent(videosJson as Video[], 'videos');
 
   // Get all unique tags from existing build orders for autocomplete
   const allExistingTags = useMemo(() => {
@@ -531,6 +536,17 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     if (!formData.steps || formData.steps.length === 0) {
       toast.error('Please add at least one build order step');
       return;
+    }
+
+    // Validate that all videoIds reference existing videos (if any videoIds present)
+    if (formData.videoIds && formData.videoIds.length > 0) {
+      const invalidVideoIds = formData.videoIds.filter(
+        id => !allVideos.find(v => v.id === id)
+      );
+      if (invalidVideoIds.length > 0) {
+        toast.error(`Invalid video references found: ${invalidVideoIds.join(', ')}. Please remove them before saving.`);
+        return;
+      }
     }
 
     const buildOrderData: BuildOrder = {

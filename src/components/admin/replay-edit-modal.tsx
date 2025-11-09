@@ -4,11 +4,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useMergedContent } from '@/hooks/use-merged-content';
 import { Replay, Race, Matchup, ReplayPlayer } from '@/types/replay';
+import { Video } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
 import coaches from '@/data/coaches.json';
+import videosJson from '@/data/videos.json';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 
@@ -21,6 +24,7 @@ interface ReplayEditModalProps {
 
 export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: ReplayEditModalProps) {
   const { addChange } = usePendingChanges();
+  const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Replay>>({});
   const [tagInput, setTagInput] = useState('');
   const [mapSearch, setMapSearch] = useState('');
@@ -346,6 +350,17 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     if (!formData.id || !formData.title || !formData.map || !formData.player1?.name || !formData.player2?.name) {
       toast.error('Please fill in all required fields (Title, Map, Player Names)');
       return;
+    }
+
+    // Validate that all videoIds reference existing videos (if any videoIds present)
+    if (formData.videoIds && formData.videoIds.length > 0) {
+      const invalidVideoIds = formData.videoIds.filter(
+        id => !allVideos.find(v => v.id === id)
+      );
+      if (invalidVideoIds.length > 0) {
+        toast.error(`Invalid video references found: ${invalidVideoIds.join(', ')}. Please remove them before saving.`);
+        return;
+      }
     }
 
     const replayData: Replay = {

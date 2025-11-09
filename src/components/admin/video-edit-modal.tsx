@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { useMergedContent } from '@/hooks/use-merged-content';
 import { Video, VideoRace } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +24,7 @@ interface VideoEditModalProps {
 
 export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoEditModalProps) {
   const { addChange } = usePendingChanges();
+  const mergedVideos = useMergedContent(videos as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Video>>({});
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
@@ -236,6 +238,17 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       return;
     }
 
+    // For playlists, validate that all videoIds reference existing videos
+    if (formData.source === 'playlist' && formData.videoIds && formData.videoIds.length > 0) {
+      const invalidVideoIds = formData.videoIds.filter(
+        id => !mergedVideos.find(v => v.id === id)
+      );
+      if (invalidVideoIds.length > 0) {
+        toast.error(`Invalid video references in playlist: ${invalidVideoIds.join(', ')}. Please remove them before saving.`);
+        return;
+      }
+    }
+
     let videoData: Video;
 
     if (isPlaylistMode) {
@@ -245,7 +258,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         title: formData.title,
         description: formData.description || '',
         source: 'playlist',
-        videoIds: formData.videoIds!,
+        videoIds: formData.videoIds || [],
         thumbnail: formData.thumbnail || '/placeholder-thumbnail.jpg',
         date: formData.date || new Date().toISOString().split('T')[0],
         tags: formData.tags || [],

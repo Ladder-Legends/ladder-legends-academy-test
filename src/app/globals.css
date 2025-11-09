@@ -4,35 +4,35 @@
 @theme {
   /* Light mode colors */
   --color-background: #f5f5f5;
-  --color-foreground: #0d0d0d;
+  --color-foreground: #2a2a28;
   --color-card: #ffffff;
-  --color-card-foreground: #0d0d0d;
+  --color-card-foreground: #2a2a28;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0d0d0d;
-  --color-primary: #e63f31;
+  --color-popover-foreground: #2a2a28;
+  --color-primary: #e52322;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #e2e2e2;
-  --color-secondary-foreground: #0d0d0d;
-  --color-muted: #e2e2e2;
+  --color-secondary: #dadada;
+  --color-secondary-foreground: #2a2a28;
+  --color-muted: #dadada;
   --color-muted-foreground: #595959;
-  --color-accent: #e63f31;
+  --color-accent: #e52322;
   --color-accent-foreground: #ffffff;
-  --color-destructive: #e63f31;
+  --color-destructive: #e52322;
   --color-destructive-foreground: #ffffff;
-  --color-border: #e0e0e0;
-  --color-input: #e2e2e2;
-  --color-ring: #e63f31;
+  --color-border: #d0d0d0;
+  --color-input: #dadada;
+  --color-ring: #e52322;
 
   /* Starcraft race colors */
-  --color-chart-1: #e63f31;
+  --color-chart-1: #e52322;
   --color-chart-2: #ff8c1a;
   --color-chart-3: #b84acf;
   --color-chart-4: #ff6633;
   --color-chart-5: #e84855;
 
   /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-lexend);
+  --font-secondary: Arial, sans-serif;
 
   /* Radius */
   --radius-sm: 0.125rem;
@@ -49,38 +49,75 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
     background-image:
       radial-gradient(at 0% 0%, hsl(4 85% 95% / 0.4) 0px, transparent 50%),
       radial-gradient(at 100% 100%, hsl(30 90% 95% / 0.3) 0px, transparent 50%);
   }
 
-  /* Dark mode colors */
+  /* Dark mode colors - override the theme */
   .dark {
     --color-background: #141414;
-    --color-foreground: #f2f2f2;
+    --color-foreground: #f5f5f5;
     --color-card: #1a1a1a;
-    --color-card-foreground: #f2f2f2;
+    --color-card-foreground: #f5f5f5;
     --color-popover: #1a1a1a;
-    --color-popover-foreground: #f2f2f2;
-    --color-primary: #e63f31;
+    --color-popover-foreground: #f5f5f5;
+    --color-primary: #e52322;
     --color-primary-foreground: #ffffff;
     --color-secondary: #2d2d2d;
-    --color-secondary-foreground: #f2f2f2;
+    --color-secondary-foreground: #f5f5f5;
     --color-muted: #2d2d2d;
-    --color-muted-foreground: #999999;
-    --color-accent: #e63f31;
+    --color-muted-foreground: #dadada;
+    --color-accent: #e52322;
     --color-accent-foreground: #ffffff;
-    --color-destructive: #e63f31;
+    --color-destructive: #e52322;
     --color-destructive-foreground: #ffffff;
-    --color-border: #4a4a4a;
+    --color-border: #2d2d2d;
     --color-input: #2d2d2d;
-    --color-ring: #e63f31;
+    --color-ring: #e52322;
+  }
+
+  /* Body text and paragraphs use Arial */
+  p, .prose p, li, .prose li, td, th, span {
+    font-family: var(--font-secondary);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2d2d2d;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #404040;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: var(--color-card);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #dadada;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #f5f5f5;
   }
 
   .dark body {
     background-image:
-      radial-gradient(at 0% 0%, hsl(4 85% 12% / 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsl(30 90% 12% / 0.3) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsl(4 65% 8% / 0.3) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(30 70% 8% / 0.2) 0px, transparent 50%);
   }
 
   /* Subtle accent effects */
@@ -99,7 +136,7 @@
       inset 0 0 2px hsl(4 85% 55% / 0.1);
   }
 
-  /* Gradient heading styles - consistent across all headings */
+  /* Heading styles - no gradient, clean text */
   h1, h2, h3, h4, h5, h6,
   .prose :where(h1):not(:where([class~="not-prose"] *)),
   .prose :where(h2):not(:where([class~="not-prose"] *)),
@@ -107,26 +144,10 @@
   .prose :where(h4):not(:where([class~="not-prose"] *)),
   .prose :where(h5):not(:where([class~="not-prose"] *)),
   .prose :where(h6):not(:where([class~="not-prose"] *)) {
-    background: linear-gradient(135deg, #0d0d0d 0%, #404040 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-foreground);
     font-weight: 700;
-    line-height: 1.2;
-    display: block;
-  }
-
-  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
-  .dark .prose :where(h1):not(:where([class~="not-prose"] *)),
-  .dark .prose :where(h2):not(:where([class~="not-prose"] *)),
-  .dark .prose :where(h3):not(:where([class~="not-prose"] *)),
-  .dark .prose :where(h4):not(:where([class~="not-prose"] *)),
-  .dark .prose :where(h5):not(:where([class~="not-prose"] *)),
-  .dark .prose :where(h6):not(:where([class~="not-prose"] *)) {
-    background: linear-gradient(135deg, #f2f2f2 0%, #b0b0b0 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    line-height: 1.3;
+    font-family: var(--font-sans);
   }
 
   /* Prose (Markdown) styling */

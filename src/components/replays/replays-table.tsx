@@ -7,6 +7,8 @@ import { PaywallLink } from '@/components/auth/paywall-link';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { getContentVideoUrl } from '@/lib/video-helpers';
+import videosData from '@/data/videos.json';
+import { Video as VideoType } from '@/types/video';
 
 interface ReplaysTableProps {
   replays: Replay[];
@@ -16,6 +18,8 @@ interface ReplaysTableProps {
 }
 
 export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: ReplaysTableProps) {
+  const allVideos = videosData as VideoType[];
+
   // Helper to get race color
   const getRaceColor = (race: string) => {
     switch (race) {
@@ -110,9 +114,9 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
                       </Button>
                     </PaywallLink>
                   )}
-                  {getContentVideoUrl(replay) && (
+                  {getContentVideoUrl(replay, allVideos) && (
                     <PaywallLink
-                      href={getContentVideoUrl(replay)!}
+                      href={getContentVideoUrl(replay, allVideos)!}
                       isFree={replay.isFree}
                     >
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

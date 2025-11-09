@@ -159,6 +159,21 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       return;
     }
 
+    // Validate that masterclass has at least one video
+    if (!formData.videoIds || formData.videoIds.length === 0) {
+      toast.error('Please add at least one video to the masterclass');
+      return;
+    }
+
+    // Validate that all videoIds reference existing videos
+    const invalidVideoIds = formData.videoIds.filter(
+      id => !allVideos.find(v => v.id === id)
+    );
+    if (invalidVideoIds.length > 0) {
+      toast.error(`Invalid video references found: ${invalidVideoIds.join(', ')}. Please remove them before saving.`);
+      return;
+    }
+
     // Get thumbnail from the first video if available
     let thumbnail = formData.thumbnail;
     if (!thumbnail && formData.videoIds && formData.videoIds.length > 0) {

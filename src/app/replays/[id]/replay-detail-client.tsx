@@ -16,12 +16,15 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { getContentVideoUrl } from '@/lib/video-helpers';
+import videosData from '@/data/videos.json';
+import { Video as VideoType } from '@/types/video';
 
 interface ReplayDetailClientProps {
   replay: Replay;
 }
 
 export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
+  const allVideos = videosData as VideoType[];
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useTrackPageView({
@@ -272,9 +275,9 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                   Download Replay
                 </a>
               )}
-              {getContentVideoUrl(replay) && (
+              {getContentVideoUrl(replay, allVideos) && (
                 <PaywallLink
-                  href={getContentVideoUrl(replay)!}
+                  href={getContentVideoUrl(replay, allVideos)!}
                   isFree={replay.isFree}
                   className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
                 >

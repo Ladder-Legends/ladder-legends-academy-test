@@ -13,9 +13,12 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { getContentVideoUrl } from '@/lib/video-helpers';
 import replaysData from '@/data/replays.json';
 import { Replay } from '@/types/replay';
+import videosData from '@/data/videos.json';
+import { Video as VideoType } from '@/types/video';
 
 const allBuildOrders = buildOrdersData as BuildOrder[];
 const allReplays = replaysData as Replay[];
+const allVideos = videosData as VideoType[];
 
 // Generate static paths for all FREE build orders at build time
 export async function generateStaticParams() {
@@ -169,11 +172,11 @@ export default async function FreeBuildOrderDetailPage({ params }: PageProps) {
             </div>
 
             {/* Video & Replay Links */}
-            {(getContentVideoUrl(buildOrder) || linkedReplay?.downloadUrl) && (
+            {(getContentVideoUrl(buildOrder, allVideos) || linkedReplay?.downloadUrl) && (
               <div className="flex flex-wrap gap-4">
-                {getContentVideoUrl(buildOrder) && (
+                {getContentVideoUrl(buildOrder, allVideos) && (
                   <PaywallLink
-                    href={getContentVideoUrl(buildOrder)!}
+                    href={getContentVideoUrl(buildOrder, allVideos)!}
                     isFree={buildOrder.isFree}
                     className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                   >

@@ -1,6 +1,7 @@
 'use client';
 
 import { BuildOrder } from '@/types/build-order';
+import { Video as VideoType } from '@/types/video';
 import Link from 'next/link';
 import { FileText, Video, Lock, Edit, Trash2 } from 'lucide-react';
 import { PermissionGate } from '@/components/auth/permission-gate';
@@ -8,6 +9,9 @@ import { PaywallLink } from '@/components/auth/paywall-link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getContentVideoUrl } from '@/lib/video-helpers';
+import videosData from '@/data/videos.json';
+
+const allVideos = videosData as VideoType[];
 
 interface BuildOrdersTableProps {
   buildOrders: BuildOrder[];
@@ -95,9 +99,9 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
                       <FileText className="h-4 w-4" />
                     </Button>
                   </Link>
-                  {getContentVideoUrl(buildOrder) && (
+                  {getContentVideoUrl(buildOrder, allVideos) && (
                     <PaywallLink
-                      href={getContentVideoUrl(buildOrder)!}
+                      href={getContentVideoUrl(buildOrder, allVideos)!}
                       isFree={buildOrder.isFree}
                     >
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
