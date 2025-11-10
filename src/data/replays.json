@@ -623,5 +623,33 @@
       "analysis",
       "matchups.zvt"
     ]
+  },
+  {
+    "id": "b0f44bce-0dd7-44c8-a2ce-4de14bde735c",
+    "title": "8 Rax Bio 3 Factory Tank vs 5.5k Zerg",
+    "map": "Persephone LE",
+    "matchup": "TvZ",
+    "player1": {
+      "name": "Groovy",
+      "race": "terran",
+      "result": "win",
+      "mmr": 5107
+    },
+    "player2": {
+      "name": "EON",
+      "race": "zerg",
+      "result": "loss",
+      "mmr": 5500
+    },
+    "duration": "",
+    "gameDate": "2025-11-10",
+    "uploadDate": "2025-11-10",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Persephone%20LE%20%2857%29-pUQMoSCJVj4Ci0Xq7CkNTR8XTIiSac.SC2Replay",
+    "videoIds": [],
+    "coach": "groovy",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
