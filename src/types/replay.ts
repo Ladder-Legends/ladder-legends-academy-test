@@ -1,4 +1,5 @@
-import { Video, getVideoThumbnailUrl } from './video';
+import { Video, getVideoThumbnailUrl, Difficulty } from './video';
+import type { PrimaryCategory, SecondaryCategory } from '@/lib/taxonomy';
 
 export type Race = 'terran' | 'zerg' | 'protoss';
 export type Matchup = 'TvT' | 'TvZ' | 'TvP' | 'ZvT' | 'ZvZ' | 'ZvP' | 'PvT' | 'PvZ' | 'PvP';
@@ -22,12 +23,19 @@ export interface Replay {
   uploadDate: string;
   downloadUrl?: string;
 
+  // Hierarchical categories (replaces tags)
+  primaryCategory?: PrimaryCategory;
+  secondaryCategory?: SecondaryCategory;
+  difficulty?: Difficulty; // Optional difficulty level
+
+  // Legacy tags field (will be removed after migration)
+  tags: string[];
+
   // Video support - array of video IDs from videos.json (empty array = no videos)
   videoIds: string[];
 
   coach?: string;
   coachId?: string; // Link to coach in coaches collection
-  tags: string[];
   patch?: string;
   notes?: string;
 

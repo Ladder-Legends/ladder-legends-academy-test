@@ -153,9 +153,9 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
     title: 'Difficulty',
     type: 'checkbox',
     options: [
-      { id: 'beginner', label: 'Beginner' },
+      { id: 'basic', label: 'Basic' },
       { id: 'intermediate', label: 'Intermediate' },
-      { id: 'advanced', label: 'Advanced' },
+      { id: 'expert', label: 'Expert' },
     ],
   },
 ];

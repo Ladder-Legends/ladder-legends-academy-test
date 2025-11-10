@@ -1,4 +1,5 @@
-import { Video, getVideoThumbnailUrl } from './video';
+import { Video, getVideoThumbnailUrl, Difficulty } from './video';
+import type { PrimaryCategory, SecondaryCategory } from '@/lib/taxonomy';
 
 export type Race = 'terran' | 'zerg' | 'protoss' | 'all';
 
@@ -10,13 +11,19 @@ export interface Masterclass {
   coachId?: string;
   race?: Race; // Optional - masterclasses can be race-agnostic
 
+  // Hierarchical categories (replaces tags)
+  primaryCategory?: PrimaryCategory;
+  secondaryCategory?: SecondaryCategory;
+  difficulty?: Difficulty; // Difficulty level (Basic/Intermediate/Expert)
+
+  // Legacy tags field (will be removed after migration)
+  tags: string[];
+
   // Video support - array of video IDs from videos.json (empty array = no videos)
   videoIds: string[];
 
   replayIds?: string[]; // Optional - example replays demonstrating the concepts
   buildOrderIds?: string[]; // Optional - example build orders to practice
-  difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'all'; // Optional - can be for all skill levels
-  tags: string[];
   thumbnail?: string;
   createdAt: string;
   updatedAt: string;
