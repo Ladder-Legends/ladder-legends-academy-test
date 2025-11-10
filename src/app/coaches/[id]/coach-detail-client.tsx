@@ -146,8 +146,8 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
 
               {/* Link to filtered library */}
               <Link
-                href={`/library?coach=${encodeURIComponent(coach.name)}`}
-                className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors text-sm font-medium"
+                href={`/library?coach=${encodeURIComponent(coach.id)}`}
+                className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
               >
                 <Filter className="h-4 w-4" />
                 Advanced Filtering
