@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -19,20 +19,197 @@ function DiscordIcon({ className }: { className?: string }) {
   );
 }
 
-const navItems = [
+interface NavItem {
+  href?: string;
+  label: string;
+  external?: boolean;
+  icon?: string;
+  children?: NavItem[];
+}
+
+const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/library', label: 'VOD Library' },
-  { href: '/build-orders', label: 'Build Orders' },
-  { href: '/replays', label: 'Replays' },
-  { href: '/masterclasses', label: 'Masterclasses' },
+  {
+    label: 'Content',
+    children: [
+      { href: '/library', label: 'VOD Library' },
+      { href: '/build-orders', label: 'Build Orders' },
+      { href: '/replays', label: 'Replays' },
+      { href: '/masterclasses', label: 'Masterclasses' },
+    ],
+  },
   { href: '/events', label: 'Events' },
-  { href: '/coaches', label: 'Meet the Coaches' },
-  { href: '/about', label: 'About' },
-  { href: 'https://discord.gg/uHzvKAqu3F', label: 'Discord', external: true, icon: 'discord' },
+  { href: '/coaches', label: 'Coaches' },
+  {
+    label: 'Community',
+    children: [
+      { href: '/about', label: 'About' },
+      { href: 'https://discord.gg/uHzvKAqu3F', label: 'Discord', external: true, icon: 'discord' },
+    ],
+  },
 ];
 
-export function MainNav() {
+function DesktopNavItem({ item }: { item: NavItem }) {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // If item has children, render dropdown
+  if (item.children) {
+    const hasActiveChild = item.children.some(child => child.href === pathname);
+
+    return (
+      <div
+        className="relative"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <button
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            hasActiveChild
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
+          }`}
+        >
+          {item.label}
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+
+        {/* Dropdown Menu */}
+        {isOpen && (
+          <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-card border border-border rounded-md shadow-lg py-1 z-50">
+            {item.children.map((child) => {
+              const isActive = pathname === child.href;
+              const linkProps = child.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+              return (
+                <Link
+                  key={child.href || child.label}
+                  href={child.href || '#'}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  }`}
+                  {...linkProps}
+                >
+                  {child.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
+                  {child.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Regular link item
+  const isActive = pathname === item.href;
+  const linkProps = item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
+  return (
+    <Link
+      href={item.href || '#'}
+      className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
+      }`}
+      {...linkProps}
+    >
+      {item.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
+      {item.label}
+    </Link>
+  );
+}
+
+function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
+  const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // If item has children, render expandable section
+  if (item.children) {
+    const hasActiveChild = item.children.some(child => child.href === pathname);
+
+    return (
+      <div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors ${
+            hasActiveChild
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+          }`}
+        >
+          <span>{item.label}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isExpanded && (
+          <div className="ml-4 mt-1 space-y-1">
+            {item.children.map((child) => {
+              const isActive = pathname === child.href;
+              const linkProps = child.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+              return (
+                <Link
+                  key={child.href || child.label}
+                  href={child.href || '#'}
+                  onClick={onClose}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  {...linkProps}
+                >
+                  {child.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
+                  {child.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Regular link item
+  const isActive = pathname === item.href;
+  const linkProps = item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
+  return (
+    <Link
+      href={item.href || '#'}
+      onClick={onClose}
+      className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+      }`}
+      {...linkProps}
+    >
+      {item.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
+      {item.label}
+    </Link>
+  );
+}
+
+export function MainNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -68,26 +245,13 @@ export function MainNav() {
             </button>
           </div>
           <nav className="space-y-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              const linkProps = item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                  {...linkProps}
-                >
-                  {item.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
-                  {item.label}
-                </Link>
-              );
-            })}
+            {navItems.map((item) => (
+              <MobileNavItem
+                key={item.href || item.label}
+                item={item}
+                onClose={() => setIsMobileMenuOpen(false)}
+              />
+            ))}
           </nav>
         </div>
       </div>
@@ -98,25 +262,9 @@ export function MainNav() {
     <>
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex gap-1">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const linkProps = item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
-              }`}
-              {...linkProps}
-            >
-              {item.icon === 'discord' && <DiscordIcon className="h-4 w-4" />}
-              {item.label}
-            </Link>
-          );
-        })}
+        {navItems.map((item) => (
+          <DesktopNavItem key={item.href || item.label} item={item} />
+        ))}
       </nav>
 
       {/* Mobile Menu Button */}
