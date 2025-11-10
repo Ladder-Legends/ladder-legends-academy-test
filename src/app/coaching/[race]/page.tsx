@@ -76,9 +76,11 @@ export async function generateMetadata({ params }: { params: { race: string } })
       siteName: 'Ladder Legends Academy',
       images: [
         {
-          url: 'https://www.ladderlegendsacademy.com/LL_LOGO.png',
-          width: 512,
-          height: 512,
+          url: race === 'terran'
+            ? 'https://www.ladderlegendsacademy.com/terran-hero-bg.png'
+            : 'https://www.ladderlegendsacademy.com/LL_LOGO.png',
+          width: race === 'terran' ? 1200 : 512,
+          height: race === 'terran' ? 630 : 512,
           alt: `${config.title} Coaching - Ladder Legends Academy`,
         },
       ],
@@ -87,7 +89,9 @@ export async function generateMetadata({ params }: { params: { race: string } })
       card: 'summary_large_image',
       title: `${title} | Ladder Legends Academy`,
       description,
-      images: ['https://www.ladderlegendsacademy.com/LL_LOGO.png'],
+      images: [race === 'terran'
+        ? 'https://www.ladderlegendsacademy.com/terran-hero-bg.png'
+        : 'https://www.ladderlegendsacademy.com/LL_LOGO.png'],
     },
     alternates: {
       canonical: url,
