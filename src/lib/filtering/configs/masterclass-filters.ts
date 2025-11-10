@@ -34,11 +34,11 @@ const fields: FilterFieldConfig<Masterclass>[] = [
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
 
-  // Category filter (hierarchical)
+  // Category filter (multi-category support)
   createFilterField<Masterclass, 'categories'>({
     id: 'categories',
     urlParam: 'categories',
-    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+    predicate: createCategoryPredicate('categories', 'categories'),
   }),
 ];
 
@@ -84,14 +84,17 @@ const sections: FilterSectionConfig<Masterclass>[] = [
       const categoryCounts = new Map<string, number>();
 
       masterclasses.forEach(masterclass => {
-        if (masterclass.primaryCategory) {
-          const primaryKey = masterclass.primaryCategory;
-          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+        if (masterclass.categories && Array.isArray(masterclass.categories)) {
+          masterclass.categories.forEach(category => {
+            // Count the category itself
+            categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
 
-          if (masterclass.secondaryCategory) {
-            const secondaryKey = `${masterclass.primaryCategory}.${masterclass.secondaryCategory}`;
-            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
-          }
+            // Also count the primary category if this is a secondary
+            if (category.includes('.')) {
+              const primary = category.split('.')[0];
+              categoryCounts.set(primary, (categoryCounts.get(primary) || 0) + 1);
+            }
+          });
         }
       });
 

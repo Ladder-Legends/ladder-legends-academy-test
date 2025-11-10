@@ -23,8 +23,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "tvt"
+    "categories": [
+      "matchups.tvt"
+    ]
   },
   {
     "id": "31f4310c-2d87-4c18-866e-01ae1b2b26aa",
@@ -42,8 +43,9 @@
     "youtubeId": "-gHDUWDA-5g",
     "thumbnail": "https://img.youtube.com/vi/-gHDUWDA-5g/hqdefault.jpg",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
@@ -64,8 +66,9 @@
     "youtubeId": "n85AUGyZtPk",
     "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
@@ -86,8 +89,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "1",
@@ -108,8 +112,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "2",
@@ -123,7 +128,8 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "3",
@@ -142,8 +148,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": true,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "4",
@@ -163,8 +170,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "5",
@@ -184,8 +192,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "defensive"
+    "categories": [
+      "builds.defensive"
+    ]
   },
   {
     "id": "6",
@@ -199,7 +208,8 @@
     "race": "zerg",
     "coach": "Hino",
     "coachId": "hino",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "9",
@@ -217,8 +227,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "10",
@@ -238,8 +249,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "11",
@@ -260,8 +272,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "12",
@@ -282,8 +295,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "13",
@@ -304,8 +318,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "14",
@@ -323,8 +338,9 @@
     "coachId": "groovy",
     "isFree": false,
     "youtubeId": "LD4qZIo11LQ",
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "15",
@@ -345,8 +361,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "16",
@@ -362,7 +379,8 @@
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": true
+    "isFree": true,
+    "categories": []
   },
   {
     "id": "17",
@@ -383,8 +401,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "18",
@@ -400,8 +419,9 @@
     "coachId": "groovy",
     "isFree": true,
     "youtubeId": "2jAprwtFPIQ",
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "19",
@@ -415,7 +435,8 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "20",
@@ -434,8 +455,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "strategy",
-    "secondaryCategory": "scouting"
+    "categories": [
+      "strategy.scouting"
+    ]
   },
   {
     "id": "24",
@@ -456,8 +478,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "25",
@@ -476,8 +499,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "defensive"
+    "categories": [
+      "builds.defensive"
+    ]
   },
   {
     "id": "26",
@@ -496,8 +520,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "27",
@@ -516,8 +541,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "29",
@@ -538,8 +564,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "defensive"
+    "categories": [
+      "builds.defensive"
+    ]
   },
   {
     "id": "31",
@@ -559,8 +586,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "33",
@@ -579,8 +607,9 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": true,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "34",
@@ -594,7 +623,8 @@
     "race": "terran",
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "35",
@@ -608,7 +638,8 @@
     "race": "terran",
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "36",
@@ -622,7 +653,8 @@
     "race": "terran",
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "37",
@@ -640,8 +672,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "38",
@@ -661,8 +694,9 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": true,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "39",
@@ -676,7 +710,8 @@
     "race": "protoss",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "40",
@@ -694,8 +729,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "41",
@@ -714,8 +750,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "cheese"
+    "categories": [
+      "builds.cheese"
+    ]
   },
   {
     "id": "42",
@@ -732,8 +769,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "43",
@@ -745,7 +783,8 @@
     "thumbnail": "https://img.youtube.com/vi/wTnMLensxMY/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "44",
@@ -757,7 +796,8 @@
     "thumbnail": "https://img.youtube.com/vi/eKoUCkxJegA/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "45",
@@ -776,8 +816,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "categories": [
+      "builds.macro"
+    ]
   },
   {
     "id": "47",
@@ -791,7 +832,8 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "48",
@@ -803,7 +845,8 @@
     "thumbnail": "https://img.youtube.com/vi/Sp1eOkMFt2A/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "49",
@@ -815,7 +858,8 @@
     "thumbnail": "https://img.youtube.com/vi/5AQWCNU8ovQ/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "53",
@@ -827,7 +871,8 @@
     "thumbnail": "https://img.youtube.com/vi/TL5OpQbvl04/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "54",
@@ -839,7 +884,8 @@
     "thumbnail": "https://img.youtube.com/vi/P0krpJGgXGA/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "55",
@@ -851,7 +897,8 @@
     "thumbnail": "https://img.youtube.com/vi/Jpkqq1x1RUQ/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "60",
@@ -863,7 +910,8 @@
     "thumbnail": "https://img.youtube.com/vi/kGS4_1xBcJg/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "61",
@@ -875,7 +923,8 @@
     "thumbnail": "https://img.youtube.com/vi/k-j60WNHjyQ/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "62",
@@ -887,7 +936,8 @@
     "thumbnail": "https://img.youtube.com/vi/dv6EhFz-G1U/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "63",
@@ -899,7 +949,8 @@
     "thumbnail": "https://img.youtube.com/vi/crPnPIELWLY/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "64",
@@ -911,7 +962,8 @@
     "thumbnail": "https://img.youtube.com/vi/8442DlxTJtM/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "67",
@@ -923,7 +975,8 @@
     "thumbnail": "https://img.youtube.com/vi/JcK6iVIvkd4/hqdefault.jpg",
     "race": "zerg",
     "coach": "Hino",
-    "coachId": "hino"
+    "coachId": "hino",
+    "categories": []
   },
   {
     "id": "d71a9493-cb0d-4439-9674-8982d829360d",
@@ -947,8 +1000,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "tvz"
+    "categories": [
+      "matchups.tvz"
+    ]
   },
   {
     "id": "fce29407-cde6-42d1-8ca1-8011712bbe4e",
@@ -970,8 +1024,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "timing-attack"
+    "categories": [
+      "builds.timing-attack"
+    ]
   },
   {
     "id": "80191635-11e9-49aa-a451-9d24e9a7285f",
@@ -993,8 +1048,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "timing-attack"
+    "categories": [
+      "builds.timing-attack"
+    ]
   },
   {
     "id": "f2eb5d73-247c-4aae-8149-c19caeb2fbc3",
@@ -1008,7 +1064,8 @@
     "race": "terran",
     "coach": "Krystianer",
     "coachId": "krystianer",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "22ba6935-7577-4f52-afd3-b92d7dc2c399",
@@ -1024,7 +1081,8 @@
     "race": "terran",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "4b6740cf-6ee9-47c6-893d-90b3633aad60",
@@ -1040,7 +1098,8 @@
     "race": "terran",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "4124e698-9aeb-41c4-9c14-525132b703cf",
@@ -1056,7 +1115,8 @@
     "race": "terran",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "5b891fa7-d58d-4251-ba52-ea92fdbb6cdd",
@@ -1077,8 +1137,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "tvt"
+    "categories": [
+      "matchups.tvt"
+    ]
   },
   {
     "id": "2dfe7d61-e390-433f-b8c3-3a40871e4518",
@@ -1094,7 +1155,8 @@
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "9400d216-d6b9-4855-836a-71c455317a87",
@@ -1110,7 +1172,8 @@
     "race": "zerg",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "09fc41db-bc7a-48f4-a312-dbf7026c0f15",
@@ -1126,7 +1189,8 @@
     "race": "zerg",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "0e9a28fa-9a18-42ca-97e5-535746ce403d",
@@ -1140,7 +1204,8 @@
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "7a48669b-1055-4048-8a7e-a362701b16ed",
@@ -1156,7 +1221,8 @@
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "8f20b4bb-9ce3-4014-9f4c-ef107b504cae",
@@ -1172,7 +1238,8 @@
     "race": "zerg",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "02ad6079-76a0-47e6-ab1e-f3e1eea5ff0c",
@@ -1188,7 +1255,8 @@
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   },
   {
     "id": "eff5ed0f-39c9-4b56-9592-18d1012bb3b3",
@@ -1204,6 +1272,7 @@
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false
+    "isFree": false,
+    "categories": []
   }
 ]

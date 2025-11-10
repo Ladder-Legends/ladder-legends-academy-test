@@ -1,5 +1,3 @@
-import type { PrimaryCategory, SecondaryCategory } from '@/lib/taxonomy';
-
 export type EventType =
   | 'tournament'
   | 'coaching'
@@ -30,11 +28,10 @@ export interface Event {
   duration?: number; // Duration in minutes
   coach?: string; // Coach ID
 
-  // Hierarchical categories (replaces tags)
-  primaryCategory?: PrimaryCategory;
-  secondaryCategory?: SecondaryCategory;
+  // Multiple categories support - each entry is "primary" or "primary.secondary"
+  categories?: string[];
 
-  // Legacy tags field (will be removed after migration)
+  // Legacy tags field (kept for other metadata)
   tags: string[];
 
   // Video support - array of video IDs from videos.json (empty array = no videos)

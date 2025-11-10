@@ -14,7 +14,7 @@ import coaches from '@/data/coaches.json';
 import { MuxUpload } from './mux-upload';
 import { VideoSelector } from './video-selector-enhanced';
 import { extractYouTubeId } from '@/lib/youtube-parser';
-import { CategorySelector } from './category-selector';
+import { MultiCategorySelector } from './multi-category-selector';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -685,11 +685,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           )}
         </div>
 
-        <CategorySelector
-          primaryCategory={formData.primaryCategory}
-          secondaryCategory={formData.secondaryCategory}
-          onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
-          onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+        <MultiCategorySelector
+          categories={formData.categories || []}
+          onChange={(categories) => setFormData({ ...formData, categories })}
         />
 
         <div>

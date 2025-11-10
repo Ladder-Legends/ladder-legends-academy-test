@@ -17,7 +17,7 @@ import { Video } from '@/types/video';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
-import { CategorySelector } from './category-selector';
+import { MultiCategorySelector } from './multi-category-selector';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -1031,11 +1031,9 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             </div>
           </div>
 
-          <CategorySelector
-            primaryCategory={formData.primaryCategory}
-            secondaryCategory={formData.secondaryCategory}
-            onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
-            onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+          <MultiCategorySelector
+            categories={formData.categories || []}
+            onChange={(categories) => setFormData({ ...formData, categories })}
             className="mt-4"
           />
 

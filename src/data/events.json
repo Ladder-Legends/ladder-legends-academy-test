@@ -17,8 +17,9 @@
     ],
     "createdAt": "2025-11-03T23:56:52.854Z",
     "updatedAt": "2025-11-03T23:56:52.854Z",
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   },
   {
     "id": "1419519767127134373",
@@ -37,8 +38,9 @@
     ],
     "createdAt": "2025-11-03T23:56:52.854Z",
     "updatedAt": "2025-11-03T23:56:52.854Z",
-    "primaryCategory": "analysis",
-    "secondaryCategory": "ladder-games"
+    "categories": [
+      "analysis.ladder-games"
+    ]
   },
   {
     "id": "1419520251833487500",
@@ -57,8 +59,9 @@
     ],
     "createdAt": "2025-11-03T23:56:52.854Z",
     "updatedAt": "2025-11-03T23:56:52.854Z",
-    "primaryCategory": "misc",
-    "secondaryCategory": "casual"
+    "categories": [
+      "misc.casual"
+    ]
   },
   {
     "id": "1425932981045956702",
@@ -83,8 +86,9 @@
     },
     "createdAt": "2025-11-03T23:56:52.854Z",
     "updatedAt": "2025-11-03T23:56:52.854Z",
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "1433294303450628096",
@@ -104,7 +108,8 @@
     ],
     "createdAt": "2025-11-03T23:56:52.854Z",
     "updatedAt": "2025-11-03T23:56:52.854Z",
-    "primaryCategory": "analysis",
-    "secondaryCategory": "ladder-games"
+    "categories": [
+      "analysis.ladder-games"
+    ]
   }
 ]

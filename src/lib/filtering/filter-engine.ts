@@ -243,12 +243,12 @@ export function createBooleanPredicate<T>(
 }
 
 /**
- * Create a predicate for hierarchical category filtering
- * Format: "primary" for primary categories, "primary.secondary" for secondary categories
+ * Create a predicate for multi-category filtering
+ * Items can have multiple categories in the format ["primary", "primary.secondary", ...]
+ * Filter matches if ANY of the item's categories match ANY of the selected filter categories
  */
 export function createCategoryPredicate<T>(
-  primaryField: keyof T,
-  secondaryField: keyof T,
+  categoriesField: keyof T,
   filterKey: string
 ): FilterPredicate<T> {
   return (item, filters) => {
@@ -258,21 +258,29 @@ export function createCategoryPredicate<T>(
     }
 
     const selectedCategories = Array.isArray(filterValue) ? filterValue : [filterValue];
-    const itemPrimary = item[primaryField];
-    const itemSecondary = item[secondaryField];
+    const itemCategories = item[categoriesField];
 
-    return selectedCategories.some(category => {
-      if (typeof category !== 'string') return false;
+    // If item has no categories, don't match
+    if (!Array.isArray(itemCategories) || itemCategories.length === 0) {
+      return false;
+    }
 
-      // Check if it's a secondary category (format: "primary.secondary")
-      if (category.includes('.')) {
-        const [primary, secondary] = category.split('.');
-        return itemPrimary === primary && itemSecondary === secondary;
+    // Check if any of the item's categories match any selected filter
+    return selectedCategories.some(filterCategory => {
+      if (typeof filterCategory !== 'string') return false;
+
+      // Check if it's a secondary category filter (format: "primary.secondary")
+      if (filterCategory.includes('.')) {
+        // Must match exactly
+        return itemCategories.includes(filterCategory);
       }
 
-      // It's a primary category - match if item's primary matches
-      // (regardless of secondary category)
-      return itemPrimary === category;
+      // It's a primary category filter - match if item has this primary
+      // (either standalone "primary" or as part of "primary.secondary")
+      return itemCategories.some(itemCat =>
+        typeof itemCat === 'string' &&
+        (itemCat === filterCategory || itemCat.startsWith(`${filterCategory}.`))
+      );
     });
   };
 }

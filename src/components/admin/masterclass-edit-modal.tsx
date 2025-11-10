@@ -18,7 +18,7 @@ import { Video } from '@/types/video';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import { VideoSelector } from './video-selector-enhanced';
-import { CategorySelector } from './category-selector';
+import { MultiCategorySelector } from './multi-category-selector';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -512,11 +512,9 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           </p>
         </div>
 
-        <CategorySelector
-          primaryCategory={formData.primaryCategory}
-          secondaryCategory={formData.secondaryCategory}
-          onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
-          onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+        <MultiCategorySelector
+          categories={formData.categories || []}
+          onChange={(categories) => setFormData({ ...formData, categories })}
         />
 
         <div>

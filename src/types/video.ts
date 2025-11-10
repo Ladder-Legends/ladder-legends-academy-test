@@ -1,5 +1,3 @@
-import type { PrimaryCategory, SecondaryCategory } from '@/lib/taxonomy';
-
 export type VideoRace = 'terran' | 'zerg' | 'protoss' | 'all';
 export type VideoSource = 'youtube' | 'mux';
 export type Difficulty = 'basic' | 'intermediate' | 'expert';
@@ -10,11 +8,11 @@ export interface Video {
   description: string;
   date: string;
 
-  // Hierarchical categories (replaces tags)
-  primaryCategory?: PrimaryCategory;
-  secondaryCategory?: SecondaryCategory;
+  // Multiple categories support - each entry is "primary" or "primary.secondary"
+  // e.g., ["builds.cheese", "analysis.replay-reviews", "mechanics.micro"]
+  categories?: string[];
 
-  // Legacy tags field (will be removed after migration)
+  // Legacy tags field (kept for race and other metadata)
   tags: string[];
 
   race?: VideoRace; // Optional - videos can be race-agnostic

@@ -184,6 +184,55 @@ export function isValidCategoryPair(
 }
 
 /**
+ * Helper to validate a category string (e.g., "builds" or "builds.cheese")
+ */
+export function isValidCategoryString(categoryStr: string): boolean {
+  const parts = categoryStr.split('.');
+
+  if (parts.length === 1) {
+    // Primary category only
+    return TAXONOMY.some(cat => cat.id === parts[0]);
+  } else if (parts.length === 2) {
+    // Primary.secondary
+    const [primaryId, secondaryId] = parts;
+    return isValidCategoryPair(primaryId as PrimaryCategory, secondaryId as SecondaryCategory);
+  }
+
+  return false;
+}
+
+/**
+ * Parse a category string into primary and optional secondary
+ */
+export function parseCategoryString(categoryStr: string): { primary: string; secondary?: string } | null {
+  if (!isValidCategoryString(categoryStr)) return null;
+
+  const parts = categoryStr.split('.');
+  return {
+    primary: parts[0],
+    secondary: parts[1],
+  };
+}
+
+/**
+ * Get label for a category string
+ */
+export function getCategoryLabel(categoryStr: string): string | null {
+  const parsed = parseCategoryString(categoryStr);
+  if (!parsed) return null;
+
+  const primary = getPrimaryCategory(parsed.primary as PrimaryCategory);
+  if (!primary) return null;
+
+  if (!parsed.secondary) {
+    return primary.label;
+  }
+
+  const secondary = primary.secondaryCategories?.find(sec => sec.id === parsed.secondary);
+  return secondary ? `${primary.label} > ${secondary.label}` : null;
+}
+
+/**
  * Filter option type for use in filter configs
  */
 export interface CategoryFilterOption {

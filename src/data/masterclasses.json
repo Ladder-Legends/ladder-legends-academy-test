@@ -22,8 +22,9 @@
     "createdAt": "2025-10-05",
     "updatedAt": "2025-11-04",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "pvt"
+    "categories": [
+      "matchups.pvt"
+    ]
   },
   {
     "id": "mc-nicoract-terran-oct2025",
@@ -44,8 +45,9 @@
     "createdAt": "2025-10-13",
     "updatedAt": "2025-11-04",
     "isFree": false,
-    "primaryCategory": "analysis",
-    "secondaryCategory": "ladder-games"
+    "categories": [
+      "analysis.ladder-games"
+    ]
   },
   {
     "id": "mc-mixu-oct2025",
@@ -69,7 +71,8 @@
     "createdAt": "2025-10-09",
     "updatedAt": "2025-11-06",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": null
+    "categories": [
+      "misc"
+    ]
   }
 ]

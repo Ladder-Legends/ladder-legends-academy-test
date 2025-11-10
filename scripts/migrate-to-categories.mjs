@@ -81,6 +81,11 @@ const TAG_TO_CATEGORY = {
   'team-games': { primary: 'misc', secondary: 'team-games' },
   'casual': { primary: 'misc', secondary: 'casual' },
   'meta': { primary: 'misc', secondary: 'meta-discussion' },
+  'gamecast': { primary: 'misc', secondary: 'casual' },
+  'mindgames': { primary: 'misc', secondary: 'meta-discussion' },
+  'fundamental': { primary: 'misc', secondary: 'tips-tricks' },
+  'fundamentals': { primary: 'misc', secondary: 'tips-tricks' },
+  'mentality': { primary: 'misc', secondary: 'meta-discussion' },
 };
 
 function categorizeTags(tags) {
@@ -102,6 +107,7 @@ function categorizeTags(tags) {
     // Broad categories (lower priority)
     'macro', 'mechanics', 'strategy', 'mindset', 'analysis',
     // Misc (lowest priority)
+    'gamecast', 'mindgames', 'mentality', 'fundamental', 'fundamentals',
     'tipsandtricks', 'tipsntricks', 'tips-tricks', 'maps', 'team-games', 'casual', 'meta'
   ];
 
@@ -126,8 +132,8 @@ function categorizeTags(tags) {
     }
   }
 
-  // Default to misc if no match found
-  return { primaryCategory: 'misc', secondaryCategory: null };
+  // Default to misc.casual if no match found
+  return { primaryCategory: 'misc', secondaryCategory: 'casual' };
 }
 
 function migrateDifficulty(difficulty) {

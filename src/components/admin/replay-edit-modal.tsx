@@ -14,7 +14,7 @@ import coaches from '@/data/coaches.json';
 import videosJson from '@/data/videos.json';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
-import { CategorySelector } from './category-selector';
+import { MultiCategorySelector } from './multi-category-selector';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -772,11 +772,9 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           </p>
         </div>
 
-        <CategorySelector
-          primaryCategory={formData.primaryCategory}
-          secondaryCategory={formData.secondaryCategory}
-          onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
-          onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+        <MultiCategorySelector
+          categories={formData.categories || []}
+          onChange={(categories) => setFormData({ ...formData, categories })}
         />
 
         <div>

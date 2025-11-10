@@ -63,11 +63,11 @@ const fields: FilterFieldConfig<Video>[] = [
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
 
-  // Category filter (hierarchical)
+  // Category filter (multi-category support)
   createFilterField<Video, 'categories'>({
     id: 'categories',
     urlParam: 'categories',
-    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+    predicate: createCategoryPredicate('categories', 'categories'),
   }),
 ];
 
@@ -108,14 +108,17 @@ const sections: FilterSectionConfig<Video>[] = [
       const categoryCounts = new Map<string, number>();
 
       videos.forEach(video => {
-        if (video.primaryCategory) {
-          const primaryKey = video.primaryCategory;
-          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+        if (video.categories && Array.isArray(video.categories)) {
+          video.categories.forEach(category => {
+            // Count the category itself
+            categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
 
-          if (video.secondaryCategory) {
-            const secondaryKey = `${video.primaryCategory}.${video.secondaryCategory}`;
-            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
-          }
+            // Also count the primary category if this is a secondary
+            if (category.includes('.')) {
+              const primary = category.split('.')[0];
+              categoryCounts.set(primary, (categoryCounts.get(primary) || 0) + 1);
+            }
+          });
         }
       });
 
