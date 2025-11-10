@@ -72,7 +72,21 @@ export function RaceCoachingClient({
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative px-8 py-16 md:py-24 overflow-hidden">
-          <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-10`} />
+          {/* Background Image - Terran only */}
+          {race === 'terran' && (
+            <div className="absolute inset-0">
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat grayscale opacity-20"
+                style={{
+                  backgroundImage: 'url(/terran-hero-bg.png)',
+                  backgroundPosition: 'center 60%',
+                  backgroundSize: 'cover',
+                }}
+              />
+            </div>
+          )}
+          {/* Gradient Overlay */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${config.color} ${race === 'terran' ? 'opacity-30' : 'opacity-10'}`} />
           <div className="relative max-w-7xl mx-auto">
             <div className="text-center space-y-6 mb-12">
               <h1 className="text-4xl md:text-6xl font-bold">
