@@ -125,7 +125,7 @@ function DesktopNavItem({ item }: { item: NavItem }) {
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-card border border-border rounded-md shadow-lg py-1 z-50">
+          <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-card border border-border rounded-md shadow-lg py-1 z-[100]">
             {item.children.map((child) => {
               const isActive = pathname === child.href;
               const linkProps = child.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};

@@ -118,28 +118,6 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
             <div className="text-sm text-muted-foreground">
               {replay.map}
             </div>
-
-            {replay.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {replay.tags.slice(0, 3).map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="bg-muted hover:bg-muted/80 text-foreground border-0"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-                {replay.tags.length > 3 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-muted hover:bg-muted/80 text-foreground border-0"
-                  >
-                    +{replay.tags.length - 3}
-                  </Badge>
-                )}
-              </div>
-            )}
           </CardContent>
         </Card>
       </PaywallLink>

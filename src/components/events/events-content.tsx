@@ -281,10 +281,10 @@ export function EventsContent() {
         defaultView="table"
         showViewToggle={true}
         headerActions={headerActions}
-        tags={allTags}
+        searchQuery={searchQuery}
         selectedTags={selectedTags}
-        onTagToggle={toggleTag}
-        onClearTags={() => setSelectedTags([])}
+        onClearSearch={() => setSearchQuery('')}
+        onRemoveTag={toggleTag}
       />
 
       {/* Edit Modal */}

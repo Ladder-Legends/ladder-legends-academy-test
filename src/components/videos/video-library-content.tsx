@@ -27,6 +27,7 @@ export function VideoLibraryContent() {
     filtered: filteredVideos,
     filters,
     setFilter,
+    clearFilters,
     searchQuery,
     setSearchQuery,
     selectedTags,
@@ -150,10 +151,19 @@ export function VideoLibraryContent() {
         defaultView="grid"
         showViewToggle={false}
         headerActions={headerActions}
-        tags={allTags}
+        filters={filters}
+        searchQuery={searchQuery}
         selectedTags={selectedTags}
-        onTagToggle={toggleTag}
-        onClearTags={clearTags}
+        onClearFilters={clearFilters}
+        onRemoveFilter={(key) => setFilter(key, [])}
+        onClearSearch={() => setSearchQuery('')}
+        onRemoveTag={toggleTag}
+        filterLabels={{
+          coaches: 'Coach',
+          races: 'Race',
+          accessLevel: 'Access',
+          categories: 'Category',
+        }}
       />
 
       <VideoEditModal

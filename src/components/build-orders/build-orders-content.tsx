@@ -29,6 +29,7 @@ export function BuildOrdersContent() {
     filtered: filteredBuildOrders,
     filters,
     setFilter,
+    clearFilters,
     searchQuery,
     setSearchQuery,
     selectedTags,
@@ -164,10 +165,19 @@ export function BuildOrdersContent() {
         defaultView="grid"
         showViewToggle={true}
         headerActions={headerActions}
-        tags={allTags}
+        filters={filters}
+        searchQuery={searchQuery}
         selectedTags={selectedTags}
-        onTagToggle={toggleTag}
-        onClearTags={clearTags}
+        onClearFilters={clearFilters}
+        onRemoveFilter={(key) => setFilter(key, [])}
+        onClearSearch={() => setSearchQuery('')}
+        onRemoveTag={toggleTag}
+        filterLabels={{
+          races: 'Race',
+          vsRaces: 'Vs Race',
+          types: 'Type',
+          categories: 'Category',
+        }}
       />
 
       <BuildOrderEditModal

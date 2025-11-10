@@ -29,6 +29,7 @@ export function MasterclassesContent() {
     filtered: filteredMasterclasses,
     filters,
     setFilter,
+    clearFilters,
     searchQuery,
     setSearchQuery,
     selectedTags,
@@ -164,10 +165,14 @@ export function MasterclassesContent() {
         defaultView="grid"
         showViewToggle={true}
         headerActions={headerActions}
-        tags={allTags}
+        filters={filters}
+        searchQuery={searchQuery}
         selectedTags={selectedTags}
-        onTagToggle={toggleTag}
-        onClearTags={clearTags}
+        onClearFilters={clearFilters}
+        onRemoveFilter={(key) => setFilter(key, [])}
+        onClearSearch={() => setSearchQuery('')}
+        onRemoveTag={toggleTag}
+        filterLabels={{}}
       />
 
       <MasterclassEditModal

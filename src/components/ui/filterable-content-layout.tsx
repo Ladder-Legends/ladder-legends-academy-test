@@ -1,10 +1,11 @@
 'use client';
 
 import { ReactNode, useState, cloneElement, isValidElement } from 'react';
-import { X } from 'lucide-react';
 import { ViewToggle } from './view-toggle';
 import { HorizontalScrollContainer } from './horizontal-scroll-container';
 import { MobileFilterButton } from '../shared/filter-sidebar';
+import { ActiveFilters } from '../shared/active-filters';
+import type { FilterState } from '@/lib/filtering/types';
 
 interface FilterableContentLayoutProps {
   // Header content
@@ -25,11 +26,16 @@ interface FilterableContentLayoutProps {
   // Additional header actions (e.g., "Show Past Events")
   headerActions?: ReactNode;
 
-  // Tag filtering (optional)
-  tags?: string[];
+  // Active filters display
+  filters?: FilterState;
+  searchQuery?: string;
   selectedTags?: string[];
-  onTagToggle?: (tag: string) => void;
-  onClearTags?: () => void;
+  onClearFilters?: () => void;
+  onRemoveFilter?: (key: string) => void;
+  onClearSearch?: () => void;
+  onRemoveTag?: (tag: string) => void;
+  filterLabels?: Record<string, string>;
+  optionLabels?: Record<string, Record<string, string>>;
 }
 
 export function FilterableContentLayout({
@@ -41,10 +47,15 @@ export function FilterableContentLayout({
   defaultView = 'table',
   showViewToggle = true,
   headerActions,
-  tags,
+  filters,
+  searchQuery,
   selectedTags,
-  onTagToggle,
-  onClearTags,
+  onClearFilters,
+  onRemoveFilter,
+  onClearSearch,
+  onRemoveTag,
+  filterLabels,
+  optionLabels,
 }: FilterableContentLayoutProps) {
   const [view, setView] = useState<'grid' | 'table'>(defaultView);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -88,40 +99,18 @@ export function FilterableContentLayout({
             </div>
           )}
 
-          {/* Tag Filters */}
-          {tags && tags.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Filter by Tags</h3>
-                {selectedTags && selectedTags.length > 0 && onClearTags && (
-                  <button
-                    onClick={onClearTags}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Clear tags
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => onTagToggle?.(tag)}
-                    className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
-                      selectedTags?.includes(tag)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                  >
-                    {tag}
-                    {selectedTags?.includes(tag) && (
-                      <X className="inline-block ml-1 h-3 w-3" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Active Filters */}
+          <ActiveFilters
+            filters={filters || {}}
+            searchQuery={searchQuery}
+            selectedTags={selectedTags}
+            onClearFilters={onClearFilters}
+            onRemoveFilter={onRemoveFilter}
+            onClearSearch={onClearSearch}
+            onRemoveTag={onRemoveTag}
+            filterLabels={filterLabels}
+            optionLabels={optionLabels}
+          />
 
           {/* Content Area */}
           {view === 'table' ? (
