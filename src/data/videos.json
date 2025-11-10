@@ -1367,8 +1367,8 @@
     "date": "2025-11-10",
     "tags": [],
     "race": "terran",
-    "coach": "",
-    "coachId": "",
+    "coach": "Nico",
+    "coachId": "coach-nico",
     "isFree": true
   },
   {
