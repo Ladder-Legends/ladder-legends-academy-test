@@ -28,25 +28,28 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Home' },
   {
     label: 'Content',
     children: [
       { href: '/library', label: 'VOD Library' },
+      { href: '/masterclasses', label: 'Masterclasses' },
       { href: '/build-orders', label: 'Build Orders' },
       { href: '/replays', label: 'Replays' },
-      { href: '/masterclasses', label: 'Masterclasses' },
     ],
   },
-  { href: '/events', label: 'Events' },
-  { href: '/coaches', label: 'Coaches' },
   {
     label: 'Community',
     children: [
-      { href: '/about', label: 'About' },
+      { href: '/coaches', label: 'Coaches' },
+      { href: '/events', label: 'Events' },
       { href: 'https://discord.gg/uHzvKAqu3F', label: 'Discord', external: true, icon: 'discord' },
+      // Placeholder for future community features
+      // { href: '/sponsors', label: 'Sponsors' },
+      // { href: '/participants', label: 'Participants' },
+      // { href: '/tournaments', label: 'Tournaments' },
     ],
   },
+  { href: '/about', label: 'About' },
 ];
 
 function DesktopNavItem({ item }: { item: NavItem }) {
