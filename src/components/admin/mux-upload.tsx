@@ -1,13 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import * as UpChunk from '@mux/upchunk';
 
 interface MuxUploadProps {
-  onUploadComplete: (assetId: string, playbackId: string) => void;
+  onUploadComplete: (assetId: string, playbackId: string, thumbnail?: string) => void;
   title?: string;
   description?: string;
+  showThumbnailUpload?: boolean;
+  thumbnailUploadLabel?: string;
 }
 
 /**
@@ -17,12 +20,21 @@ interface MuxUploadProps {
  * 1. Creates an upload URL from the API
  * 2. Uploads the file directly to Mux
  * 3. Polls for upload completion
- * 4. Returns the asset ID and playback ID
+ * 4. Returns the asset ID, playback ID, and optional custom thumbnail
  */
-export function MuxUpload({ onUploadComplete, title, description }: MuxUploadProps) {
+export function MuxUpload({
+  onUploadComplete,
+  title,
+  description,
+  showThumbnailUpload = false,
+  thumbnailUploadLabel = 'Custom Thumbnail (Optional)'
+}: MuxUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>('');
+  const [customThumbnail, setCustomThumbnail] = useState<string | null>(null);
+  const [uploadedAssetId, setUploadedAssetId] = useState<string | null>(null);
+  const [uploadedPlaybackId, setUploadedPlaybackId] = useState<string | null>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -191,7 +203,14 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
 
           toast.success('Video uploaded successfully!');
           setStatus('Video ready');
-          onUploadComplete(assetId, assetData.playbackId);
+          setUploadedAssetId(assetId);
+          setUploadedPlaybackId(assetData.playbackId);
+
+          // If thumbnail upload is enabled, wait for user to upload thumbnail or click done
+          // Otherwise, complete immediately
+          if (!showThumbnailUpload) {
+            onUploadComplete(assetId, assetData.playbackId, undefined);
+          }
           setUploading(false);
           return;
         }
@@ -217,6 +236,34 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
     };
 
     await poll();
+  };
+
+  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type and size
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setCustomThumbnail(base64);
+      toast.success('Custom thumbnail uploaded');
+    };
+    reader.onerror = () => {
+      toast.error('Failed to read image file');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -271,6 +318,77 @@ export function MuxUpload({ onUploadComplete, title, description }: MuxUploadPro
           </div>
         )}
       </div>
+
+      {/* Thumbnail Upload - shown after video upload completes when enabled */}
+      {showThumbnailUpload && uploadedAssetId && (
+        <div>
+          <label className="block text-sm font-medium mb-2">{thumbnailUploadLabel}</label>
+          <div className="space-y-3">
+            {customThumbnail ? (
+              <div className="relative">
+                <div className="relative w-full aspect-video rounded-lg border border-border overflow-hidden">
+                  <Image
+                    src={customThumbnail}
+                    alt="Custom thumbnail preview"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCustomThumbnail(null)}
+                  className="absolute top-2 right-2 px-3 py-1 bg-destructive text-destructive-foreground rounded-md text-sm hover:bg-destructive/90"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailUpload}
+                  className="hidden"
+                  id="mux-thumbnail-upload"
+                />
+                <label
+                  htmlFor="mux-thumbnail-upload"
+                  className="cursor-pointer flex flex-col items-center gap-2"
+                >
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                    <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Click to upload custom thumbnail</p>
+                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 2MB</p>
+                  </div>
+                </label>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {customThumbnail
+                ? 'This custom thumbnail will be used for the video.'
+                : 'If not uploaded, Mux will generate a thumbnail automatically.'}
+            </p>
+          </div>
+
+          {/* Done Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (uploadedAssetId && uploadedPlaybackId) {
+                onUploadComplete(uploadedAssetId, uploadedPlaybackId, customThumbnail || undefined);
+              }
+            }}
+            className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
+          >
+            {customThumbnail ? 'Continue with Custom Thumbnail' : 'Continue without Thumbnail'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
