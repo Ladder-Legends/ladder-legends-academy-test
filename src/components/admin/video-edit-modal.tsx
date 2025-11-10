@@ -14,6 +14,7 @@ import coaches from '@/data/coaches.json';
 import { MuxUpload } from './mux-upload';
 import { VideoSelector } from './video-selector-enhanced';
 import { extractYouTubeId } from '@/lib/youtube-parser';
+import { CategorySelector } from './category-selector';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -684,8 +685,15 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           )}
         </div>
 
+        <CategorySelector
+          primaryCategory={formData.primaryCategory}
+          secondaryCategory={formData.secondaryCategory}
+          onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
+          onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+        />
+
         <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
+          <label className="block text-sm font-medium mb-1">Tags (legacy - use categories instead)</label>
           <div className="space-y-2">
             {/* Selected tags */}
             {formData.tags && formData.tags.length > 0 && (

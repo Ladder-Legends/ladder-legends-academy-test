@@ -18,6 +18,7 @@ import { Video } from '@/types/video';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import { VideoSelector } from './video-selector-enhanced';
+import { CategorySelector } from './category-selector';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -511,8 +512,15 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           </p>
         </div>
 
+        <CategorySelector
+          primaryCategory={formData.primaryCategory}
+          secondaryCategory={formData.secondaryCategory}
+          onPrimaryCategoryChange={(category) => setFormData({ ...formData, primaryCategory: category })}
+          onSecondaryCategoryChange={(category) => setFormData({ ...formData, secondaryCategory: category })}
+        />
+
         <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
+          <label className="block text-sm font-medium mb-1">Tags (legacy - use categories instead)</label>
           <div className="space-y-2">
             {/* Selected tags */}
             {formData.tags && formData.tags.length > 0 && (
