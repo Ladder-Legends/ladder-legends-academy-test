@@ -37,16 +37,83 @@ export function DashboardContent() {
   const featuredReplays = allReplays.slice(0, 6);
   const featuredBuildOrders = allBuildOrders.slice(0, 6);
 
+  // Calculate stats for marketing
+  const totalVideos = allVideos.length;
+  const totalCoaches = allCoaches.filter(c => c.isActive !== false).length;
+  const totalMasterclasses = allMasterclasses.length;
+  const totalContent = totalVideos + totalMasterclasses + allReplays.length + allBuildOrders.length;
+
   return (
-    <main className="flex-1 px-8 py-8">
-      <div className="max-w-[1920px] mx-auto space-y-12">
-        {/* Hero Section */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold">Welcome to Ladder Legends Academy</h1>
-          <p className="text-lg text-muted-foreground">
-            Master StarCraft 2 with coaching videos, build orders, and expert guidance
-          </p>
-        </div>
+    <main className="flex-1">
+      <div className="max-w-[1920px] mx-auto">
+        {/* Hero Section - Enhanced marketing style */}
+        <section className="relative px-8 py-16 md:py-24 lg:py-32 overflow-hidden">
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+
+          <div className="relative max-w-5xl mx-auto text-center space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+                Master StarCraft 2 with
+                <span className="block text-primary mt-2">Expert Coaching</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+                Learn from professional coaches through video tutorials, build orders, masterclasses, and personalized guidance
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              {!session ? (
+                <>
+                  <Link
+                    href="/library"
+                    className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Browse Free Content
+                  </Link>
+                  <Link
+                    href="/subscribe"
+                    className="px-8 py-4 bg-card border-2 border-primary text-foreground rounded-lg font-semibold text-lg hover:bg-primary/10 transition-colors"
+                  >
+                    Get Premium Access
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/library"
+                  className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors shadow-lg hover:shadow-xl"
+                >
+                  Explore Content Library
+                </Link>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 max-w-4xl mx-auto">
+              <div className="space-y-1">
+                <div className="text-4xl font-bold text-primary">{totalContent}+</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wide">Lessons</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-4xl font-bold text-primary">{totalCoaches}</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wide">Expert Coaches</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-4xl font-bold text-primary">{totalMasterclasses}+</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wide">Masterclasses</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-4xl font-bold text-primary">{allBuildOrders.length}+</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wide">Build Orders</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Content sections with consistent padding */}
+        <div className="px-8 py-8 space-y-16">
 
         {/* Latest VODs */}
         <HorizontalVideoScroller
@@ -131,14 +198,52 @@ export function DashboardContent() {
           </section>
         )}
 
-        {/* Meet Our Coaches */}
-        <HorizontalCoachScroller
-          title="Meet Our Coaches"
-          coaches={allCoaches}
-          viewAllHref="/coaches"
-        />
+          {/* Meet Our Coaches */}
+          <HorizontalCoachScroller
+            title="Meet Our Coaches"
+            coaches={allCoaches}
+            viewAllHref="/coaches"
+          />
+        </div>
+
+        {/* Final CTA Section */}
+        <section className="relative px-8 py-16 md:py-24 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-background" />
+          <div className="relative max-w-4xl mx-auto text-center space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold">
+              Ready to Climb the Ladder?
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Join thousands of players improving their game with Ladder Legends Academy
+            </p>
+            {!session ? (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <Link
+                  href="/subscribe"
+                  className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors shadow-lg"
+                >
+                  Start Learning Today
+                </Link>
+                <Link
+                  href="/library"
+                  className="px-8 py-4 text-foreground rounded-lg font-semibold text-lg hover:bg-muted transition-colors"
+                >
+                  Browse Free Lessons
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/library"
+                className="inline-block px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                Continue Learning
+              </Link>
+            )}
+          </div>
+        </section>
+
+        <div className="mb-12" />
       </div>
-      <div className="mb-12" />
     </main>
   );
 }
