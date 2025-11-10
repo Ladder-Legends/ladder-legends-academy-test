@@ -76,17 +76,18 @@ export function RaceCoachingClient({
           {race === 'terran' && (
             <div className="absolute inset-0">
               <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat grayscale opacity-20"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
                 style={{
                   backgroundImage: 'url(/terran-hero-bg.png)',
                   backgroundPosition: 'center 60%',
                   backgroundSize: 'cover',
+                  filter: 'grayscale(100%) sepia(20%) hue-rotate(320deg) saturate(50%)',
                 }}
               />
             </div>
           )}
           {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${config.color} ${race === 'terran' ? 'opacity-30' : 'opacity-10'}`} />
+          <div className={`absolute inset-0 bg-gradient-to-br ${config.color} ${race === 'terran' ? 'opacity-20' : 'opacity-10'}`} />
           <div className="relative max-w-7xl mx-auto">
             <div className="text-center space-y-6 mb-12">
               <h1 className="text-4xl md:text-6xl font-bold">
