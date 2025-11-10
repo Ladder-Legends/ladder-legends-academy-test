@@ -175,62 +175,70 @@ export function EventsContent() {
     }
   };
 
-  // Filter content with date picker
-  const filterContent = (
-    <div className="space-y-6">
-      {/* Date Range Picker */}
-      <div className="px-4 py-3 border-b border-border">
-        <h3 className="text-sm font-medium mb-3">Date Range</h3>
-        <div className="space-y-3">
-          <div>
-            <label htmlFor="start-date" className="text-xs text-muted-foreground block mb-1">
-              From
-            </label>
-            <input
-              id="start-date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label htmlFor="end-date" className="text-xs text-muted-foreground block mb-1">
-              To
-            </label>
-            <input
-              id="end-date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          {(startDate || endDate) && (
-            <button
-              onClick={() => {
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="text-xs text-primary hover:underline"
-            >
-              Clear dates
-            </button>
-          )}
+  // Date picker component to inject into sidebar
+  const datePickerSection = (
+    <div className="pb-4 mb-4 border-b border-border">
+      <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+        <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        Date Range
+      </h3>
+      <div className="space-y-3">
+        <div>
+          <label htmlFor="start-date" className="text-xs font-medium text-muted-foreground block mb-1.5">
+            From
+          </label>
+          <input
+            id="start-date"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          />
         </div>
+        <div>
+          <label htmlFor="end-date" className="text-xs font-medium text-muted-foreground block mb-1.5">
+            To
+          </label>
+          <input
+            id="end-date"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          />
+        </div>
+        {(startDate || endDate) && (
+          <button
+            onClick={() => {
+              setStartDate('');
+              setEndDate('');
+            }}
+            className="text-xs text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear dates
+          </button>
+        )}
       </div>
-
-      {/* Standard filters */}
-      <FilterSidebar
-        searchEnabled={true}
-        searchPlaceholder="Search events..."
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        sections={filterSections}
-        selectedItems={selectedItems}
-        onSelectionChange={setSelectedItems}
-      />
     </div>
+  );
+
+  // Filter content
+  const filterContent = (
+    <FilterSidebar
+      searchEnabled={true}
+      searchPlaceholder="Search events..."
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      customSectionAfterSearch={datePickerSection}
+      sections={filterSections}
+      selectedItems={selectedItems}
+      onSelectionChange={setSelectedItems}
+    />
   );
 
   // Table content

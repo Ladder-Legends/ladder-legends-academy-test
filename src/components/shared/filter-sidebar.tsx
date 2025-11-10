@@ -26,6 +26,9 @@ interface FilterSidebarProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 
+  // Custom content injection
+  customSectionAfterSearch?: React.ReactNode;
+
   // Sections
   sections: FilterSection[];
 
@@ -45,6 +48,7 @@ export function FilterSidebar({
   searchPlaceholder = 'Search...',
   searchQuery = '',
   onSearchChange,
+  customSectionAfterSearch,
   sections,
   selectedItems,
   onItemToggle,
@@ -223,6 +227,9 @@ export function FilterSidebar({
           )}
         </div>
       )}
+
+      {/* Custom Section After Search */}
+      {customSectionAfterSearch && customSectionAfterSearch}
 
       {/* Sections */}
       {sections.map(section => {
