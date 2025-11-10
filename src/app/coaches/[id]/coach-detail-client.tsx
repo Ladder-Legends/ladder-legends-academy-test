@@ -111,25 +111,6 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
                 </Link>
               )}
             </div>
-
-            {/* Specialties */}
-            {coach.specialties && coach.specialties.length > 0 && (
-              <div className="mb-6">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Specialties
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {coach.specialties.map((specialty) => (
-                    <span
-                      key={specialty}
-                      className="px-3 py-1.5 bg-muted rounded-md text-sm font-medium"
-                    >
-                      {specialty}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Videos Section */}

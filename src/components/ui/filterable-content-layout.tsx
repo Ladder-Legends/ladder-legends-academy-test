@@ -89,15 +89,15 @@ export function FilterableContentLayout({
                 <p className="text-muted-foreground">{description}</p>
               )}
             </div>
-            {headerActions}
-          </div>
 
-          {/* View Toggle */}
-          {showViewToggle && (
-            <div className="flex items-center justify-end">
-              <ViewToggle view={view} onViewChange={setView} />
+            {/* Header Actions and View Toggle */}
+            <div className="flex items-center gap-3">
+              {headerActions}
+              {showViewToggle && (
+                <ViewToggle view={view} onViewChange={setView} />
+              )}
             </div>
-          )}
+          </div>
 
           {/* Active Filters */}
           <ActiveFilters

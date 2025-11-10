@@ -30,22 +30,7 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
         </div>
 
         {/* Bio */}
-        <p className="text-muted-foreground text-sm">{coach.bio}</p>
-
-        {/* Specialties */}
-        <div className="flex-1">
-          <h4 className="text-sm font-semibold mb-2">Specialties</h4>
-          <div className="flex flex-wrap gap-2">
-            {coach.specialties.map((specialty) => (
-              <span
-                key={specialty}
-                className="inline-block px-3 py-1 text-xs bg-background/80 border border-border rounded-full"
-              >
-                {specialty}
-              </span>
-            ))}
-          </div>
-        </div>
+        <p className="text-muted-foreground text-sm flex-1">{coach.bio}</p>
 
         {/* Buttons */}
         <div className="flex gap-2 mt-auto">
