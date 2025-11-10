@@ -4,6 +4,7 @@ import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
 import masterclassesData from '@/data/masterclasses.json';
 import coachesData from '@/data/coaches.json';
+import eventsData from '@/data/events.json';
 import { Video } from '@/types/video';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
@@ -14,6 +15,7 @@ const allReplays = replaysData as Replay[];
 const allBuildOrders = buildOrdersData as BuildOrder[];
 const allMasterclasses = masterclassesData as Masterclass[];
 const allCoaches = coachesData;
+const allEvents = eventsData;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.ladderlegendsacademy.com';
@@ -118,6 +120,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }));
 
+  // Event pages
+  const eventPages = allEvents.map((event: { id: string; updatedAt?: string; createdAt?: string }) => ({
+    url: `${baseUrl}/events/${event.id}`,
+    lastModified: new Date(event.updatedAt || event.createdAt || Date.now()),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }));
+
   return [
     ...staticPages,
     ...videoPages,
@@ -125,5 +135,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...buildOrderPages,
     ...masterclassPages,
     ...coachPages,
+    ...eventPages,
   ];
 }
