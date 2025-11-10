@@ -57,8 +57,8 @@
     "id": "mc-mixu-oct2025",
     "title": "Mixu Masterclass",
     "description": "Learn as many secrets to zerg openings and play by a very high level Zerg",
-    "coach": "krystianer",
-    "coachId": "krystianer",
+    "coach": "eon",
+    "coachId": "eon",
     "race": "zerg",
     "videoIds": [
       "4b6740cf-6ee9-47c6-893d-90b3633aad60",
@@ -73,11 +73,7 @@
     ],
     "thumbnail": "/thumbnails/4b6740cf-6ee9-47c6-893d-90b3633aad60.jpg",
     "createdAt": "2025-10-09",
-    "updatedAt": "2025-11-06",
-    "isFree": false,
-    "categories": [
-      "analysis",
-      "misc"
-    ]
+    "updatedAt": "2025-11-10",
+    "isFree": false
   }
 ]
