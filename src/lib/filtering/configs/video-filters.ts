@@ -9,7 +9,6 @@ import type { FilterConfig, FilterFieldConfig, FilterSectionConfig, FilterState 
 import { createFilterField } from '../types';
 import { createTagPredicate, createFieldMatchPredicate, createBooleanPredicate, validateFilterConfig } from '../filter-engine';
 import { isOwner } from '@/lib/permissions';
-import { isPlaylist } from '@/types/video';
 import coachesData from '@/data/coaches.json';
 
 const allCoaches = coachesData as Coach[];
@@ -63,26 +62,6 @@ const fields: FilterFieldConfig<Video>[] = [
     },
   },
 
-  // Content type filter (playlist vs single)
-  {
-    id: 'contentType',
-    urlParam: 'type',
-    predicate: (video, filters) => {
-      const selectedTypes = filters.contentType;
-      if (!selectedTypes || (Array.isArray(selectedTypes) && selectedTypes.length === 0)) {
-        return true;
-      }
-
-      const types = Array.isArray(selectedTypes) ? selectedTypes : [selectedTypes];
-      const videoIsPlaylist = isPlaylist(video);
-
-      return types.some(type =>
-        (type === 'playlist' && videoIsPlaylist) ||
-        (type === 'single' && !videoIsPlaylist)
-      );
-    },
-  },
-
   // Access level filter (free vs premium)
   createFilterField<Video, 'accessLevel'>({
     id: 'accessLevel',
@@ -107,15 +86,6 @@ const sections: FilterSectionConfig<Video>[] = [
     options: [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
-    ],
-  },
-  {
-    id: 'contentType',
-    title: 'Content Type',
-    type: 'checkbox',
-    options: [
-      { id: 'single', label: 'Single Videos' },
-      { id: 'playlist', label: 'Playlists' },
     ],
   },
   {

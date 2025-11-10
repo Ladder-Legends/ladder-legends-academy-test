@@ -44,6 +44,15 @@ const sections: FilterSectionConfig<Masterclass>[] = [
     type: 'search',
   },
   {
+    id: 'accessLevel',
+    title: 'Access Level',
+    type: 'checkbox',
+    options: [
+      { id: 'free', label: 'Free' },
+      { id: 'premium', label: 'Premium' },
+    ],
+  },
+  {
     id: 'coaches',
     title: 'Coach',
     type: 'checkbox',
@@ -57,15 +66,6 @@ const sections: FilterSectionConfig<Masterclass>[] = [
         label: coach,
       }));
     },
-  },
-  {
-    id: 'accessLevel',
-    title: 'Access Level',
-    type: 'checkbox',
-    options: [
-      { id: 'free', label: 'Free' },
-      { id: 'premium', label: 'Premium' },
-    ],
   },
 ];
 
