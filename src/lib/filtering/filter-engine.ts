@@ -243,6 +243,41 @@ export function createBooleanPredicate<T>(
 }
 
 /**
+ * Create a predicate for hierarchical category filtering
+ * Format: "primary" for primary categories, "primary.secondary" for secondary categories
+ */
+export function createCategoryPredicate<T>(
+  primaryField: keyof T,
+  secondaryField: keyof T,
+  filterKey: string
+): FilterPredicate<T> {
+  return (item, filters) => {
+    const filterValue = filters[filterKey];
+    if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0)) {
+      return true;
+    }
+
+    const selectedCategories = Array.isArray(filterValue) ? filterValue : [filterValue];
+    const itemPrimary = item[primaryField];
+    const itemSecondary = item[secondaryField];
+
+    return selectedCategories.some(category => {
+      if (typeof category !== 'string') return false;
+
+      // Check if it's a secondary category (format: "primary.secondary")
+      if (category.includes('.')) {
+        const [primary, secondary] = category.split('.');
+        return itemPrimary === primary && itemSecondary === secondary;
+      }
+
+      // It's a primary category - match if item's primary matches
+      // (regardless of secondary category)
+      return itemPrimary === category;
+    });
+  };
+}
+
+/**
  * Sanitize filter values based on permissions
  * Removes values that the user doesn't have permission to see
  */

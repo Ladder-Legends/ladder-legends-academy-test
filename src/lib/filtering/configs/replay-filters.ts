@@ -5,7 +5,8 @@
 import type { Replay } from '@/types/replay';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
-import { createBooleanPredicate } from '../filter-engine';
+import { createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
+import { getCategoryFilterOptions } from '@/lib/taxonomy';
 
 // Helper function to parse duration string (e.g., "12.34" or "12:34" or "1:02:34") into minutes
 function parseDuration(duration: string): number {
@@ -98,6 +99,13 @@ const fields: FilterFieldConfig<Replay>[] = [
     urlParam: 'accessLevel',
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
+
+  // Category filter (hierarchical)
+  createFilterField<Replay, 'categories'>({
+    id: 'categories',
+    urlParam: 'categories',
+    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+  }),
 ];
 
 /**
@@ -117,6 +125,12 @@ const sections: FilterSectionConfig<Replay>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    options: getCategoryFilterOptions(),
   },
   {
     id: 'terran',

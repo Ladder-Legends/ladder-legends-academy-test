@@ -5,7 +5,8 @@
 import type { Masterclass } from '@/types/masterclass';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
-import { createBooleanPredicate } from '../filter-engine';
+import { createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
+import { getCategoryFilterOptions } from '@/lib/taxonomy';
 
 /**
  * Filter field configurations
@@ -32,6 +33,13 @@ const fields: FilterFieldConfig<Masterclass>[] = [
     urlParam: 'accessLevel',
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
+
+  // Category filter (hierarchical)
+  createFilterField<Masterclass, 'categories'>({
+    id: 'categories',
+    urlParam: 'categories',
+    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+  }),
 ];
 
 /**
@@ -51,6 +59,12 @@ const sections: FilterSectionConfig<Masterclass>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    options: getCategoryFilterOptions(),
   },
   {
     id: 'coaches',

@@ -5,7 +5,8 @@
 import type { BuildOrder } from '@/types/build-order';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
-import { createTagPredicate, createBooleanPredicate } from '../filter-engine';
+import { createTagPredicate, createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
+import { getCategoryFilterOptions } from '@/lib/taxonomy';
 
 /**
  * Filter field configurations
@@ -98,6 +99,13 @@ const fields: FilterFieldConfig<BuildOrder>[] = [
     urlParam: 'accessLevel',
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
+
+  // Category filter (hierarchical)
+  createFilterField<BuildOrder, 'categories'>({
+    id: 'categories',
+    urlParam: 'categories',
+    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+  }),
 ];
 
 /**
@@ -117,6 +125,12 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    options: getCategoryFilterOptions(),
   },
   {
     id: 'terran',

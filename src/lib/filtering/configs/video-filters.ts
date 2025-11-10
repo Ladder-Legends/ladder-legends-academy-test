@@ -7,8 +7,9 @@ import type { Video } from '@/types/video';
 import type { Coach } from '@/types/coach';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig, FilterState } from '../types';
 import { createFilterField } from '../types';
-import { createTagPredicate, createFieldMatchPredicate, createBooleanPredicate, validateFilterConfig } from '../filter-engine';
+import { createTagPredicate, createFieldMatchPredicate, createBooleanPredicate, createCategoryPredicate, validateFilterConfig } from '../filter-engine';
 import { isOwner } from '@/lib/permissions';
+import { getCategoryFilterOptions } from '@/lib/taxonomy';
 import coachesData from '@/data/coaches.json';
 
 const allCoaches = coachesData as Coach[];
@@ -68,6 +69,13 @@ const fields: FilterFieldConfig<Video>[] = [
     urlParam: 'accessLevel', // Type-safe: must match id!
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
+
+  // Category filter (hierarchical)
+  createFilterField<Video, 'categories'>({
+    id: 'categories',
+    urlParam: 'categories',
+    predicate: createCategoryPredicate('primaryCategory', 'secondaryCategory', 'categories'),
+  }),
 ];
 
 /**
@@ -87,6 +95,12 @@ const sections: FilterSectionConfig<Video>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    options: getCategoryFilterOptions(),
   },
   {
     id: 'races',

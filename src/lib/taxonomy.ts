@@ -182,3 +182,28 @@ export function isValidCategoryPair(
   // Check if secondary belongs to this primary
   return primary.secondaryCategories?.some(sec => sec.id === secondaryId) || false;
 }
+
+/**
+ * Filter option type for use in filter configs
+ */
+export interface CategoryFilterOption {
+  id: string;
+  label: string;
+  children?: CategoryFilterOption[];
+}
+
+/**
+ * Convert TAXONOMY into hierarchical filter options
+ * Format: primary categories with their secondaries as children
+ * IDs use dot notation for secondaries: "primary.secondary"
+ */
+export function getCategoryFilterOptions(): CategoryFilterOption[] {
+  return TAXONOMY.map(primary => ({
+    id: primary.id,
+    label: primary.label,
+    children: primary.secondaryCategories?.map(secondary => ({
+      id: `${primary.id}.${secondary.id}`,
+      label: secondary.label,
+    })) || [],
+  }));
+}
