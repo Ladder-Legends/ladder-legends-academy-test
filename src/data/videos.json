@@ -1370,5 +1370,21 @@
     "coach": "",
     "coachId": "",
     "isFree": true
+  },
+  {
+    "id": "c12a0000-55a9-4110-b340-f9f79b08e91f",
+    "title": "Eco with Nico - A Nicosystem™ Guide to Greed and Cheese:",
+    "description": "One of the key principles in Starcraft is having a strong economy because having a larger army or more upgrades usually lends a strategic advantage to winning games. Many players like having a strong economy so here are some strong builds designed to give you an economic advantage on the ladder; or alternatively, remove your opponent's capability to acquire resources through unexpected cheese timings which remove their workers from the game. ",
+    "source": "playlist",
+    "videoIds": [
+      "d71a9493-cb0d-4439-9674-8982d829360d"
+    ],
+    "thumbnail": "/placeholder-thumbnail.jpg",
+    "date": "2025-11-10",
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
