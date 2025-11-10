@@ -23,7 +23,10 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "categories": [
-      "matchups.pvt"
+      "analysis",
+      "matchups.pvp",
+      "matchups.pvt",
+      "matchups.pvz"
     ]
   },
   {
@@ -46,6 +49,7 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "categories": [
+      "analysis",
       "analysis.ladder-games"
     ]
   },
@@ -72,6 +76,7 @@
     "updatedAt": "2025-11-06",
     "isFree": false,
     "categories": [
+      "analysis",
       "misc"
     ]
   }

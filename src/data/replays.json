@@ -25,7 +25,10 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "replay-nico-masters-cup-vs-babymarine-2",
@@ -53,7 +56,11 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "analysis.tournament-games",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "replay-nico-masters-cup-vs-babymarine-1",
@@ -81,7 +88,11 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "analysis.tournament-games",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "replay-nico-ladder-tvp-default",
@@ -109,7 +120,10 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "replay-nico-ladder-tvz-default",
@@ -137,7 +151,10 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1428354917432823969.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvz"
+    ]
   },
   {
     "id": "replay-1424344164476387329",
@@ -165,7 +182,10 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1424344164476387329.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.pvt"
+    ]
   },
   {
     "id": "replay-1424344132394156042",
@@ -193,7 +213,10 @@
     "notes": "Enjoy two games i played vs toss on ladder 5.8k 1 loss and 1 win!",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1424344132394156042.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "replay-1400636346086985817",
@@ -221,7 +244,10 @@
     "notes": "",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/replay-1400636346086985817.SC2Replay",
     "videoIds": [],
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "replay-7df54317-f263-42db-830e-7ccd854cde76",
@@ -246,7 +272,10 @@
     "patch": "5.0.14.94137",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvP%205-1-1%20AI%20replay-vyAPxKrkawOrSwlyfQ9lTIAZLIbgYt.SC2Replay",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "replay-cc3ee635-88f1-4fd9-b53e-82f2d7a4beb0",
@@ -271,7 +300,10 @@
     "patch": "5.0.14.94137",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20guide%20-%20RFE-1mfFBlofZyUG0Ylkl8zF2hQ4Y1A3bP.SC2Replay",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "replay-216edeea-a1da-4fae-834f-6d08e98761a8",
@@ -296,7 +328,10 @@
     "patch": "5.0.14.94137",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvZ%202-1-1%20basic%20guide-L0XWHhnPSV5Ydb6bDZdqzMrEeG74Pb.SC2Replay",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.tvz"
+    ]
   },
   {
     "id": "8225f0a6-e432-4a37-9785-37308dfbdf2f",
@@ -332,6 +367,7 @@
     "notes": "Replay PvP - Krystianer/Hero - Sparkling Tuna Cup",
     "isFree": false,
     "categories": [
+      "analysis",
       "matchups.pvp"
     ]
   },
@@ -368,6 +404,7 @@
     "notes": "PvZ - Wardi TV Tournament",
     "isFree": false,
     "categories": [
+      "analysis",
       "matchups.pvz"
     ]
   },
@@ -404,7 +441,9 @@
     "notes": "TvP OSC Mid Season Playoffs Vs Byun",
     "isFree": false,
     "categories": [
-      "analysis.replay-reviews"
+      "analysis",
+      "analysis.replay-reviews",
+      "matchups.pvt"
     ]
   },
   {
@@ -432,7 +471,10 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvt"
+    ]
   },
   {
     "id": "ca8810ae-75e3-4e2c-ac1f-fdf3f0e69a34",
@@ -459,7 +501,10 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvz"
+    ]
   },
   {
     "id": "d655e11f-7c2b-4631-82c5-8db08496c3aa",
@@ -486,7 +531,10 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvp"
+    ]
   },
   {
     "id": "replay-503d5519-ff29-400e-b68a-7154efa43dda",
@@ -512,7 +560,10 @@
     "patch": "5.0.15.95299",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/EON%20banebust%20into%20macro%20example-TkFYz6fVFUV0YZQkZxOieQnIOZb376.SC2Replay",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvp"
+    ]
   },
   {
     "id": "replay-f00d30af-e81c-4e06-8c0f-e7d503c95917",
@@ -538,7 +589,10 @@
     "patch": "5.0.15.95299",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/EON%20pool%20first%20Ling%20Ravager%20example-zy6fJKCMd5N74BhQlsIzGLzHvkotXi.SC2Replay",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvt"
+    ]
   },
   {
     "id": "cdeea40d-57ed-4a45-b19d-20717e38f008",
@@ -565,6 +619,9 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis",
+      "matchups.zvt"
+    ]
   }
 ]

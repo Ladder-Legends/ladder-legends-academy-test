@@ -566,7 +566,10 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-nico-ladder-tvp-default",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "3c0873f0-4ee9-4505-b53c-56343f1ea580",
@@ -1135,7 +1138,10 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-nico-ladder-tvp-speed",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "a2f85072-8348-4743-8db9-511088e1148a",
@@ -1704,7 +1710,10 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-nico-ladder-tvz-default",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "e5aea996-7e9e-4bc5-9dce-1a31d40e7173",
@@ -2512,7 +2521,10 @@
     "patch": "5.0.14.94137",
     "updatedAt": "2025-11-04",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "01b835ed-860c-4dc4-aec1-8f31e2894be8",
@@ -3088,7 +3100,11 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76",
-    "categories": []
+    "categories": [
+      "builds",
+      "builds.timing-attack",
+      "matchups.tvt"
+    ]
   },
   {
     "id": "c2d27dd1-e299-456d-a3be-f09784402a46",
@@ -3910,7 +3926,10 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "replayId": "replay-216edeea-a1da-4fae-834f-6d08e98761a8",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.tvz"
+    ]
   },
   {
     "id": "f941978c-7e01-4523-9c7a-08f473562c01",
@@ -3933,7 +3952,10 @@
     "updatedAt": "2025-11-05",
     "isFree": false,
     "replayId": "8225f0a6-e432-4a37-9785-37308dfbdf2f",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.pvp"
+    ]
   },
   {
     "id": "0683f0d3-5353-428f-a14d-b7864ca34809",
@@ -4717,7 +4739,11 @@
     "updatedAt": "2025-11-06",
     "isFree": false,
     "replayId": "replay-f00d30af-e81c-4e06-8c0f-e7d503c95917",
-    "categories": []
+    "categories": [
+      "builds",
+      "builds.all-in",
+      "matchups.zvt"
+    ]
   },
   {
     "id": "8009b276-7999-4075-8105-b0289d073b64",
@@ -5831,6 +5857,9 @@
     "updatedAt": "2025-11-06",
     "isFree": false,
     "replayId": "replay-503d5519-ff29-400e-b68a-7154efa43dda",
-    "categories": []
+    "categories": [
+      "builds",
+      "matchups.zvp"
+    ]
   }
 ]

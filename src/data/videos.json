@@ -24,7 +24,9 @@
     "coachId": "coach-nico",
     "isFree": false,
     "categories": [
-      "matchups.tvt"
+      "matchups.tvp",
+      "matchups.tvt",
+      "matchups.tvz"
     ]
   },
   {
@@ -67,7 +69,8 @@
     "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -90,7 +93,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -113,6 +117,8 @@
     "coachId": "groovy",
     "isFree": true,
     "categories": [
+      "analysis.ladder-games",
+      "builds.macro",
       "mechanics.micro"
     ]
   },
@@ -129,7 +135,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "mindset.decision-making"
+    ]
   },
   {
     "id": "3",
@@ -149,7 +157,8 @@
     "coachId": "hino",
     "isFree": true,
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "misc.meta-discussion"
     ]
   },
   {
@@ -171,6 +180,7 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
+      "matchups.tvt",
       "mechanics.micro"
     ]
   },
@@ -193,7 +203,10 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.defensive"
+      "builds.cheese",
+      "builds.defensive",
+      "builds.macro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -209,7 +222,9 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "builds.cheese"
+    ]
   },
   {
     "id": "9",
@@ -273,7 +288,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -296,6 +312,7 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
+      "mindset.decision-making",
       "misc"
     ]
   },
@@ -319,7 +336,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -339,7 +357,8 @@
     "isFree": false,
     "youtubeId": "LD4qZIo11LQ",
     "categories": [
-      "misc"
+      "misc",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -362,7 +381,9 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "builds.macro",
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -380,7 +401,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "categories": []
+    "categories": [
+      "matchups.tvt"
+    ]
   },
   {
     "id": "17",
@@ -402,7 +425,9 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "builds.macro",
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -420,7 +445,8 @@
     "isFree": true,
     "youtubeId": "2jAprwtFPIQ",
     "categories": [
-      "misc"
+      "misc",
+      "misc.casual"
     ]
   },
   {
@@ -436,7 +462,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "misc.tips-tricks"
+    ]
   },
   {
     "id": "20",
@@ -456,6 +484,7 @@
     "coachId": "hino",
     "isFree": false,
     "categories": [
+      "builds.macro",
       "strategy.scouting"
     ]
   },
@@ -479,7 +508,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -500,7 +530,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.defensive"
+      "builds.defensive",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -521,7 +552,9 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "misc.maps",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -542,7 +575,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "misc"
+      "misc",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -565,7 +599,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "builds.defensive"
+      "builds.defensive",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -587,6 +622,8 @@
     "coachId": "groovy",
     "isFree": true,
     "categories": [
+      "mindset.decision-making",
+      "mindset.game-sense",
       "misc"
     ]
   },
@@ -624,7 +661,9 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.tvp"
+    ]
   },
   {
     "id": "35",
@@ -639,7 +678,9 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.tvz"
+    ]
   },
   {
     "id": "36",
@@ -654,7 +695,9 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.tvt"
+    ]
   },
   {
     "id": "37",
@@ -673,7 +716,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
-      "mechanics.micro"
+      "mechanics.micro",
+      "misc.tips-tricks"
     ]
   },
   {
@@ -695,6 +739,7 @@
     "coachId": "gamerrichy",
     "isFree": true,
     "categories": [
+      "mindset.decision-making",
       "misc"
     ]
   },
@@ -711,7 +756,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "misc.tips-tricks"
+    ]
   },
   {
     "id": "40",
@@ -730,6 +777,8 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
+      "analysis.replay-reviews",
+      "matchups.pvp",
       "misc"
     ]
   },
@@ -751,7 +800,9 @@
     "coachId": "hino",
     "isFree": false,
     "categories": [
-      "builds.cheese"
+      "builds.cheese",
+      "matchups.zvz",
+      "mechanics.micro"
     ]
   },
   {
@@ -770,6 +821,7 @@
     "coachId": "groovy",
     "isFree": false,
     "categories": [
+      "analysis.replay-reviews",
       "misc"
     ]
   },
@@ -817,7 +869,8 @@
     "coachId": "hino",
     "isFree": false,
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "matchups.zvp"
     ]
   },
   {
@@ -833,7 +886,9 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "analysis.replay-reviews"
+    ]
   },
   {
     "id": "48",
@@ -1001,7 +1056,9 @@
     "coachId": "coach-nico",
     "isFree": false,
     "categories": [
-      "matchups.tvz"
+      "builds.macro",
+      "matchups.tvz",
+      "strategy.scouting"
     ]
   },
   {
@@ -1025,7 +1082,9 @@
     "coachId": "coach-nico",
     "isFree": false,
     "categories": [
-      "builds.timing-attack"
+      "builds.macro",
+      "builds.timing-attack",
+      "matchups.tvp"
     ]
   },
   {
@@ -1049,7 +1108,9 @@
     "coachId": "coach-nico",
     "isFree": false,
     "categories": [
-      "builds.timing-attack"
+      "builds.macro",
+      "builds.timing-attack",
+      "matchups.tvz"
     ]
   },
   {
@@ -1065,7 +1126,9 @@
     "coach": "Krystianer",
     "coachId": "krystianer",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.pvz"
+    ]
   },
   {
     "id": "22ba6935-7577-4f52-afd3-b92d7dc2c399",
@@ -1138,6 +1201,7 @@
     "coachId": "coach-nico",
     "isFree": false,
     "categories": [
+      "builds.macro",
       "matchups.tvt"
     ]
   },
@@ -1156,7 +1220,9 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.zvt"
+    ]
   },
   {
     "id": "9400d216-d6b9-4855-836a-71c455317a87",
@@ -1173,7 +1239,10 @@
     "coach": "",
     "coachId": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "builds.cheese",
+      "matchups.zvp"
+    ]
   },
   {
     "id": "09fc41db-bc7a-48f4-a312-dbf7026c0f15",
@@ -1205,7 +1274,9 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "mechanics.micro"
+    ]
   },
   {
     "id": "7a48669b-1055-4048-8a7e-a362701b16ed",
@@ -1222,7 +1293,9 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.zvt"
+    ]
   },
   {
     "id": "8f20b4bb-9ce3-4014-9f4c-ef107b504cae",
@@ -1239,7 +1312,9 @@
     "coach": "",
     "coachId": "",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.zvt"
+    ]
   },
   {
     "id": "02ad6079-76a0-47e6-ab1e-f3e1eea5ff0c",
@@ -1256,7 +1331,10 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "builds.cheese",
+      "matchups.zvp"
+    ]
   },
   {
     "id": "eff5ed0f-39c9-4b56-9592-18d1012bb3b3",
@@ -1273,6 +1351,8 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false,
-    "categories": []
+    "categories": [
+      "matchups.zvt"
+    ]
   }
 ]
