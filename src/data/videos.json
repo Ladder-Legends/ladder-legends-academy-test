@@ -1087,5 +1087,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "8f20b4bb-9ce3-4014-9f4c-ef107b504cae",
+    "title": "ZvT defending early game pressure using Pool First",
+    "description": "showcasing early game defense using a pool first opener and how to respond. Roughly after 6 minutes in game it becomes a treat as it progresses to lategame.",
+    "source": "mux",
+    "muxAssetId": "ZeG02u7SohtafVl9AGhX1cMt6YCsQl8yYHssuY02oNzcE",
+    "muxPlaybackId": "IKDiLF72VeOz67TB5TwpTO7V5rT01GycxvzcglNjw500w",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/8f20b4bb-9ce3-4014-9f4c-ef107b504cae.jpg",
+    "date": "2025-11-10",
+    "tags": [],
+    "race": "zerg",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
