@@ -11,9 +11,13 @@
     "coach": "groovy",
     "videoIds": [],
     "isFree": false,
-    "tags": ["replay analysis", "coaching"],
+    "tags": [
+      "replay analysis",
+      "coaching"
+    ],
     "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
+    "updatedAt": "2025-11-03T23:56:52.854Z",
+    "primaryCategory": "misc"
   },
   {
     "id": "1419519767127134373",
@@ -26,9 +30,14 @@
     "duration": 120,
     "videoIds": [],
     "isFree": false,
-    "tags": ["ladder", "gameplay"],
+    "tags": [
+      "ladder",
+      "gameplay"
+    ],
     "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
+    "updatedAt": "2025-11-03T23:56:52.854Z",
+    "primaryCategory": "analysis",
+    "secondaryCategory": "ladder-games"
   },
   {
     "id": "1419520251833487500",
@@ -41,9 +50,14 @@
     "duration": 120,
     "videoIds": [],
     "isFree": false,
-    "tags": ["team games", "casual"],
+    "tags": [
+      "team games",
+      "casual"
+    ],
     "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
+    "updatedAt": "2025-11-03T23:56:52.854Z",
+    "primaryCategory": "misc",
+    "secondaryCategory": "casual"
   },
   {
     "id": "1425932981045956702",
@@ -57,14 +71,19 @@
     "coach": "groovy",
     "videoIds": [],
     "isFree": false,
-    "tags": ["micro", "competition"],
+    "tags": [
+      "micro",
+      "competition"
+    ],
     "recurring": {
       "enabled": true,
       "frequency": "weekly",
       "dayOfWeek": 1
     },
     "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
+    "updatedAt": "2025-11-03T23:56:52.854Z",
+    "primaryCategory": "mechanics",
+    "secondaryCategory": "micro"
   },
   {
     "id": "1433294303450628096",
@@ -78,8 +97,13 @@
     "coach": "eon",
     "videoIds": [],
     "isFree": false,
-    "tags": ["ladder", "commentary"],
+    "tags": [
+      "ladder",
+      "commentary"
+    ],
     "createdAt": "2025-11-03T23:56:52.854Z",
-    "updatedAt": "2025-11-03T23:56:52.854Z"
+    "updatedAt": "2025-11-03T23:56:52.854Z",
+    "primaryCategory": "analysis",
+    "secondaryCategory": "ladder-games"
   }
 ]

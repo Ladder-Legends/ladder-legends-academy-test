@@ -319,7 +319,9 @@
     ],
     "patch": "5.0.15.95299",
     "notes": "Replay PvP - Krystianer/Hero - Sparkling Tuna Cup",
-    "isFree": false
+    "isFree": false,
+    "primaryCategory": "matchups",
+    "secondaryCategory": "pvp"
   },
   {
     "id": "cfba6397-7510-4877-b675-4f09fb7b9051",
@@ -352,7 +354,9 @@
     ],
     "patch": "5.0.15.95299",
     "notes": "PvZ - Wardi TV Tournament",
-    "isFree": false
+    "isFree": false,
+    "primaryCategory": "matchups",
+    "secondaryCategory": "pvz"
   },
   {
     "id": "931ad0a5-d608-415b-9c65-904ca19daa34",
@@ -385,7 +389,9 @@
     ],
     "patch": "5.0.15.95299",
     "notes": "TvP OSC Mid Season Playoffs Vs Byun",
-    "isFree": false
+    "isFree": false,
+    "primaryCategory": "analysis",
+    "secondaryCategory": "replay-reviews"
   },
   {
     "id": "fb1a44f5-c850-47b4-bdd1-52c85e82c200",
