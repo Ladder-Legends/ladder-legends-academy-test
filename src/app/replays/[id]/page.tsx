@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
@@ -76,7 +77,9 @@ export default async function ReplayDetailPage({ params }: PageProps) {
   return (
     <>
       <ReplayStructuredData replay={replay} />
-      <ReplayDetailClient replay={replay} />
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <ReplayDetailClient replay={replay} />
+      </Suspense>
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import buildOrdersData from '@/data/build-orders.json';
 import videosData from '@/data/videos.json';
 import { BuildOrder } from '@/types/build-order';
@@ -77,7 +78,9 @@ export default async function BuildOrderDetailPage({ params }: PageProps) {
   return (
     <>
       <BuildOrderStructuredData buildOrder={buildOrder} />
-      <BuildOrderDetailClient buildOrder={buildOrder} />
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <BuildOrderDetailClient buildOrder={buildOrder} />
+      </Suspense>
     </>
   );
 }
