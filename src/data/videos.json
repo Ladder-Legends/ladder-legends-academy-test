@@ -1119,5 +1119,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "eff5ed0f-39c9-4b56-9592-18d1012bb3b3",
+    "title": "ZvT Defending early game with gasless build",
+    "description": "early game defense strategy with no gas opener. Game becomes a treat after 6 minutes.",
+    "source": "mux",
+    "muxAssetId": "Hnw9jbMVk4HYt8HU3tBWWAl3kQTmIdVAc3j2vlDfT8s",
+    "muxPlaybackId": "GIJxlcbjttL3tzWZ37vpogMUW401WbgBSXyk009S6OANM",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/eff5ed0f-39c9-4b56-9592-18d1012bb3b3.jpg",
+    "date": "2025-11-10",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
