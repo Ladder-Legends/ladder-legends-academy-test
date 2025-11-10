@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink, Filter } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { UserMenu } from '@/components/user-menu';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -29,6 +30,7 @@ interface CoachDetailClientProps {
 }
 
 export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
+  const { data: session } = useSession();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [videoToEdit, setVideoToEdit] = useState<Video | null>(null);
 
@@ -47,6 +49,9 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
 
   // Display label for coach (always show as "Coach")
   const coachLabel = 'Coach';
+
+  // Check if user has subscriber role
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -101,9 +106,9 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
               {/* Booking Button */}
               {coach.bookingUrl && (
                 <Link
-                  href={coach.bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={hasSubscriberRole ? coach.bookingUrl : '/subscribe'}
+                  target={hasSubscriberRole ? "_blank" : undefined}
+                  rel={hasSubscriberRole ? "noopener noreferrer" : undefined}
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-semibold whitespace-nowrap"
                 >
                   Book Session
