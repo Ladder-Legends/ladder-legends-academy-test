@@ -91,18 +91,8 @@ export function FilterSidebar({
     new Set(sections.map(s => s.id))
   );
 
-  // All items with children expanded by default
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
-    const initialExpanded = new Set<string>();
-    sections.forEach(section => {
-      section.items.forEach(item => {
-        if (item.children && item.children.length > 0) {
-          initialExpanded.add(item.id);
-        }
-      });
-    });
-    return initialExpanded;
-  });
+  // Items with children collapsed by default
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set<string>());
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => {
@@ -135,44 +125,47 @@ export function FilterSidebar({
 
     return (
       <div key={item.id}>
-        <button
-          onClick={() => handleItemToggle(sectionId, item.id)}
-          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer ${
-            isSelected
-              ? 'bg-primary text-primary-foreground font-medium'
-              : 'hover:bg-muted text-muted-foreground'
-          }`}
-          style={{ paddingLeft: depth > 0 ? `${depth * 12 + 12}px` : undefined }}
-        >
-          <span className="flex items-center justify-between">
-            <span className="flex items-center gap-2 capitalize">
-              {item.label}
-              {hasChildren && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleItemExpansion(item.id);
-                  }}
-                  className="p-0.5 hover:bg-accent/50 rounded"
-                >
-                  {isExpanded ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                </button>
+        <div className="flex items-center gap-1">
+          {/* Expand/Collapse Button */}
+          {hasChildren ? (
+            <button
+              onClick={() => toggleItemExpansion(item.id)}
+              className="p-1 hover:bg-accent rounded transition-colors flex-shrink-0"
+              aria-label={isExpanded ? 'Collapse' : 'Expand'}
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              )}
+            </button>
+          ) : (
+            <div className="w-6" />
+          )}
+
+          {/* Selection Button */}
+          <button
+            onClick={() => handleItemToggle(sectionId, item.id)}
+            className={`flex-1 text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer ${
+              isSelected
+                ? 'bg-primary text-primary-foreground font-medium'
+                : 'hover:bg-muted text-muted-foreground'
+            }`}
+            style={{ paddingLeft: depth > 0 ? `${depth * 12}px` : undefined }}
+          >
+            <span className="flex items-center justify-between">
+              <span className="capitalize">{item.label}</span>
+              {item.count !== undefined && (
+                <span className={`text-xs ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                  {item.count}
+                </span>
               )}
             </span>
-            {item.count !== undefined && (
-              <span className={`text-xs ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                {item.count}
-              </span>
-            )}
-          </span>
-        </button>
+          </button>
+        </div>
 
         {hasChildren && isExpanded && (
-          <div className="mt-1 space-y-1">
+          <div className="mt-1 space-y-1 ml-1">
             {item.children!.map(child => renderItem(sectionId, child, depth + 1))}
           </div>
         )}
@@ -241,16 +234,26 @@ export function FilterSidebar({
 
         return (
           <div key={section.id}>
-            <button
-              onClick={() => toggleSection(section.id)}
-              className="flex items-center justify-between w-full mb-3 font-semibold text-sm uppercase tracking-wide text-foreground hover:text-primary transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
+            <div className="flex items-center gap-1 mb-3">
+              {/* Section Expand/Collapse Button */}
+              <button
+                onClick={() => toggleSection(section.id)}
+                className="p-1 hover:bg-accent rounded transition-colors flex-shrink-0"
+                aria-label={isSectionExpanded ? 'Collapse section' : 'Expand section'}
+              >
+                {isSectionExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </button>
+
+              {/* Section Label */}
+              <div className="flex items-center gap-2 font-semibold text-sm uppercase tracking-wide text-foreground">
                 {section.icon && <span>{section.icon}</span>}
                 {sectionLabel}
-              </span>
-              {isSectionExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-            </button>
+              </div>
+            </div>
             {isSectionExpanded && (
               <div className="space-y-1">
                 {section.items.map(item => renderItem(section.id, item))}

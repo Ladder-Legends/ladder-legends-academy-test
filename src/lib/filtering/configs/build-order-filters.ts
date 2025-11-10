@@ -127,12 +127,6 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
     ],
   },
   {
-    id: 'categories',
-    title: 'Categories',
-    type: 'checkbox',
-    options: getCategoryFilterOptions(),
-  },
-  {
     id: 'terran',
     title: 'Terran',
     type: 'checkbox',
@@ -171,6 +165,37 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
       { id: 'intermediate', label: 'Intermediate' },
       { id: 'expert', label: 'Expert' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    getOptions: (buildOrders) => {
+      // Filter to only show categories/subcategories that have content
+      const categoryCounts = new Map<string, number>();
+
+      buildOrders.forEach(buildOrder => {
+        if (buildOrder.primaryCategory) {
+          const primaryKey = buildOrder.primaryCategory;
+          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+
+          if (buildOrder.secondaryCategory) {
+            const secondaryKey = `${buildOrder.primaryCategory}.${buildOrder.secondaryCategory}`;
+            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
+          }
+        }
+      });
+
+      const allOptions = getCategoryFilterOptions();
+      return allOptions
+        .filter(primary => categoryCounts.has(primary.id))
+        .map(primary => ({
+          ...primary,
+          children: primary.children?.filter(secondary =>
+            categoryCounts.has(secondary.id)
+          ),
+        }));
+    },
   },
 ];
 

@@ -27,13 +27,6 @@ const fields: FilterFieldConfig<Video>[] = [
     predicate: createTagPredicate('tags', 'races'),
   },
 
-  // General topic filters (tag-based)
-  {
-    id: 'general',
-    urlParam: 'general',
-    predicate: createTagPredicate('tags', 'general'),
-  },
-
   // Coach filter (coachId field-based)
   {
     id: 'coaches',
@@ -97,12 +90,6 @@ const sections: FilterSectionConfig<Video>[] = [
     ],
   },
   {
-    id: 'categories',
-    title: 'Categories',
-    type: 'checkbox',
-    options: getCategoryFilterOptions(),
-  },
-  {
     id: 'races',
     title: 'Race-Specific',
     type: 'checkbox',
@@ -113,15 +100,34 @@ const sections: FilterSectionConfig<Video>[] = [
     ],
   },
   {
-    id: 'general',
-    title: 'General',
+    id: 'categories',
+    title: 'Categories',
     type: 'checkbox',
-    getOptions: (videos, filters) => {
-      const topics = ['mindset', 'fundamentals', 'meta', 'build order', 'micro', 'macro'];
-      return topics.map(topic => ({
-        id: topic,
-        label: topic.charAt(0).toUpperCase() + topic.slice(1),
-      }));
+    getOptions: (videos) => {
+      // Filter to only show categories/subcategories that have content
+      const categoryCounts = new Map<string, number>();
+
+      videos.forEach(video => {
+        if (video.primaryCategory) {
+          const primaryKey = video.primaryCategory;
+          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+
+          if (video.secondaryCategory) {
+            const secondaryKey = `${video.primaryCategory}.${video.secondaryCategory}`;
+            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
+          }
+        }
+      });
+
+      const allOptions = getCategoryFilterOptions();
+      return allOptions
+        .filter(primary => categoryCounts.has(primary.id))
+        .map(primary => ({
+          ...primary,
+          children: primary.children?.filter(secondary =>
+            categoryCounts.has(secondary.id)
+          ),
+        }));
     },
   },
   {

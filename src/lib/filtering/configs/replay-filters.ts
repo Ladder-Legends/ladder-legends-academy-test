@@ -127,12 +127,6 @@ const sections: FilterSectionConfig<Replay>[] = [
     ],
   },
   {
-    id: 'categories',
-    title: 'Categories',
-    type: 'checkbox',
-    options: getCategoryFilterOptions(),
-  },
-  {
     id: 'terran',
     title: 'Terran',
     type: 'checkbox',
@@ -172,6 +166,37 @@ const sections: FilterSectionConfig<Replay>[] = [
       { id: '20-30', label: '20-30 min' },
       { id: 'over30', label: 'Over 30 min' },
     ],
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    getOptions: (replays) => {
+      // Filter to only show categories/subcategories that have content
+      const categoryCounts = new Map<string, number>();
+
+      replays.forEach(replay => {
+        if (replay.primaryCategory) {
+          const primaryKey = replay.primaryCategory;
+          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+
+          if (replay.secondaryCategory) {
+            const secondaryKey = `${replay.primaryCategory}.${replay.secondaryCategory}`;
+            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
+          }
+        }
+      });
+
+      const allOptions = getCategoryFilterOptions();
+      return allOptions
+        .filter(primary => categoryCounts.has(primary.id))
+        .map(primary => ({
+          ...primary,
+          children: primary.children?.filter(secondary =>
+            categoryCounts.has(secondary.id)
+          ),
+        }));
+    },
   },
 ];
 

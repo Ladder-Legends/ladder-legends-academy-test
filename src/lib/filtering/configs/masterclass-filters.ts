@@ -61,12 +61,6 @@ const sections: FilterSectionConfig<Masterclass>[] = [
     ],
   },
   {
-    id: 'categories',
-    title: 'Categories',
-    type: 'checkbox',
-    options: getCategoryFilterOptions(),
-  },
-  {
     id: 'coaches',
     title: 'Coach',
     type: 'checkbox',
@@ -79,6 +73,37 @@ const sections: FilterSectionConfig<Masterclass>[] = [
         id: coach,
         label: coach,
       }));
+    },
+  },
+  {
+    id: 'categories',
+    title: 'Categories',
+    type: 'checkbox',
+    getOptions: (masterclasses) => {
+      // Filter to only show categories/subcategories that have content
+      const categoryCounts = new Map<string, number>();
+
+      masterclasses.forEach(masterclass => {
+        if (masterclass.primaryCategory) {
+          const primaryKey = masterclass.primaryCategory;
+          categoryCounts.set(primaryKey, (categoryCounts.get(primaryKey) || 0) + 1);
+
+          if (masterclass.secondaryCategory) {
+            const secondaryKey = `${masterclass.primaryCategory}.${masterclass.secondaryCategory}`;
+            categoryCounts.set(secondaryKey, (categoryCounts.get(secondaryKey) || 0) + 1);
+          }
+        }
+      });
+
+      const allOptions = getCategoryFilterOptions();
+      return allOptions
+        .filter(primary => categoryCounts.has(primary.id))
+        .map(primary => ({
+          ...primary,
+          children: primary.children?.filter(secondary =>
+            categoryCounts.has(secondary.id)
+          ),
+        }));
     },
   },
 ];
