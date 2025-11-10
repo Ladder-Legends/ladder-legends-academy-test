@@ -130,13 +130,13 @@ export function FilterSidebar({
           {hasChildren ? (
             <button
               onClick={() => toggleItemExpansion(item.id)}
-              className="p-1 hover:bg-accent rounded transition-colors flex-shrink-0"
+              className="p-1 hover:bg-primary rounded transition-colors flex-shrink-0 group"
               aria-label={isExpanded ? 'Collapse' : 'Expand'}
             >
               {isExpanded ? (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
               )}
             </button>
           ) : (
@@ -238,13 +238,13 @@ export function FilterSidebar({
               {/* Section Expand/Collapse Button */}
               <button
                 onClick={() => toggleSection(section.id)}
-                className="p-1 hover:bg-accent rounded transition-colors flex-shrink-0"
+                className="p-1 hover:bg-primary rounded transition-colors flex-shrink-0 group"
                 aria-label={isSectionExpanded ? 'Collapse section' : 'Expand section'}
               >
                 {isSectionExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
                 )}
               </button>
 
