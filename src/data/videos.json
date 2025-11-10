@@ -1103,5 +1103,21 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "02ad6079-76a0-47e6-ab1e-f3e1eea5ff0c",
+    "title": "ZvP Defending a proxy 4 gate",
+    "description": "how to defend proxy 4 gate flower and general response",
+    "source": "mux",
+    "muxAssetId": "bqj701UPTgGQJ01YrU2KYIeIFfYX7Bw6S01ttEK2ayNffw",
+    "muxPlaybackId": "0201b9XJWrXDIrTckCCvq00vmRxZnCTQ47iMI4EJOI7rTg",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/02ad6079-76a0-47e6-ab1e-f3e1eea5ff0c.jpg",
+    "date": "2025-11-10",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
