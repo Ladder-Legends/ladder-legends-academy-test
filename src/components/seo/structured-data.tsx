@@ -152,6 +152,56 @@ export function MasterclassStructuredData({ masterclass }: MasterclassStructured
   );
 }
 
+interface CoachStructuredDataProps {
+  coach: {
+    id: string;
+    name: string;
+    displayName: string;
+    race: string;
+    bio: string;
+    specialties: string[];
+    bookingUrl: string;
+  };
+}
+
+export function CoachStructuredData({ coach }: CoachStructuredDataProps) {
+  const raceLabel = coach.race === 'all' ? 'All Races' : coach.race.charAt(0).toUpperCase() + coach.race.slice(1);
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: coach.displayName,
+    description: coach.bio,
+    jobTitle: `StarCraft 2 ${raceLabel} Coach`,
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Ladder Legends Academy',
+      url: 'https://www.ladderlegendsacademy.com',
+    },
+    url: `https://www.ladderlegendsacademy.com/coaches/${coach.id}`,
+    knowsAbout: [
+      'StarCraft II',
+      `${raceLabel} gameplay`,
+      ...coach.specialties,
+    ],
+    ...(coach.bookingUrl && {
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'Coaching Booking',
+        url: coach.bookingUrl,
+      },
+    }),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      suppressHydrationWarning
+    />
+  );
+}
+
 // Organization structured data for the site
 export function OrganizationStructuredData() {
   const structuredData = {
