@@ -109,17 +109,6 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
               <CalendarDays className="w-4 h-4" />
               <span>{formatDate(video.date)}</span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {video.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className={`${getTagColor()} border-0 text-xs`}
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </PaywallLink>
