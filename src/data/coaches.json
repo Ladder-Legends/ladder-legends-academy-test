@@ -3,12 +3,12 @@
     "id": "groovy",
     "name": "groovy",
     "displayName": "Groovy",
-    "race": "zerg",
+    "race": "all",
     "bio": "Grandmaster Random player with 5400+ MMR experience across all three races. Specializes in teaching game fundamentals and multi-race strategies. Ladder Legends Admin and coach of the month 3 months in a row. Completed over 30 sessions all with success. ",
     "specialties": [
       "Ladder coaching",
       "Game fundamentals",
-      "Zerg mechanics"
+      "Multi-race strategies"
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610500/calendar/12406500",
     "socialLinks": {}
@@ -51,7 +51,7 @@
     "id": "krystianer",
     "name": "krystianer",
     "displayName": "Krystianer",
-    "race": "all",
+    "race": "protoss",
     "bio": "Top 10 Protoss worldwide with 6943 MMR peak and 270+ tournament wins. Expert in solid macro play and build order execution.",
     "specialties": [
       "Player development",
@@ -66,7 +66,7 @@
     "id": "eon",
     "name": "eon",
     "displayName": "Eon",
-    "race": "all",
+    "race": "zerg",
     "bio": "Skilled coach with expertise in micro and macro mechanics. Helps players refine their mechanical execution and game sense.Skilled coach with expertise in micro and macro mechanics. ",
     "specialties": [
       "Micro management",

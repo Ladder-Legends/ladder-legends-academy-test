@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import coachesData from '@/data/coaches.json';
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -27,8 +28,12 @@ interface NavItem {
   children?: NavItem[];
 }
 
+// Get active coaches for navigation
+const activeCoaches = coachesData.filter(coach => coach.isActive !== false);
+
 const navItems: NavItem[] = [
   {
+    href: '/library',
     label: 'Content',
     children: [
       { href: '/library', label: 'VOD Library' },
@@ -38,15 +43,19 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    href: '/coaches',
+    label: 'Coaching',
+    children: activeCoaches.map(coach => ({
+      href: `/coaches/${coach.id}`,
+      label: coach.displayName,
+    })),
+  },
+  {
+    href: '/events',
     label: 'Community',
     children: [
-      { href: '/coaches', label: 'Coaches' },
       { href: '/events', label: 'Events' },
       { href: 'https://discord.gg/uHzvKAqu3F', label: 'Discord', external: true, icon: 'discord' },
-      // Placeholder for future community features
-      // { href: '/sponsors', label: 'Sponsors' },
-      // { href: '/participants', label: 'Participants' },
-      // { href: '/tournaments', label: 'Tournaments' },
     ],
   },
   { href: '/about', label: 'About' },
@@ -54,6 +63,7 @@ const navItems: NavItem[] = [
 
 function DesktopNavItem({ item }: { item: NavItem }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -66,6 +76,23 @@ function DesktopNavItem({ item }: { item: NavItem }) {
     timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    // On click, navigate to parent href if it exists
+    if (item.href) {
+      router.push(item.href);
+    } else {
+      // On touch devices, toggle dropdown
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // On touch, toggle dropdown
+    e.preventDefault();
+    setIsOpen(!isOpen);
+  };
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -75,6 +102,7 @@ function DesktopNavItem({ item }: { item: NavItem }) {
   // If item has children, render dropdown
   if (item.children) {
     const hasActiveChild = item.children.some(child => child.href === pathname);
+    const isActive = pathname === item.href || hasActiveChild;
 
     return (
       <div
@@ -83,8 +111,10 @@ function DesktopNavItem({ item }: { item: NavItem }) {
         onMouseLeave={handleMouseLeave}
       >
         <button
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
           className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            hasActiveChild
+            isActive
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
           }`}
