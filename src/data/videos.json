@@ -1354,5 +1354,21 @@
     "categories": [
       "matchups.zvt"
     ]
+  },
+  {
+    "id": "675a5590-b485-4a5e-ad91-a0141c4d57b8",
+    "title": "The Nicosystem™ Blue-flame Hellion Timing Guide",
+    "description": "Here's a safer version of a CC-first blue-flame hellion cheese I've been working on, using a second factory to overwhelm Zerg players with a mass amount of hellions diving for their workers. ",
+    "source": "mux",
+    "muxAssetId": "UUTIgnMg000001PoT8RQBK6xTqchjA2o1zJAL008ZR00todY",
+    "muxPlaybackId": "vynaYHAZErDJKDMoOqIDvRCP8PONUZ4PRxcOauqenLc",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/675a5590-b485-4a5e-ad91-a0141c4d57b8.jpg",
+    "date": "2025-11-10",
+    "tags": [],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": true
   }
 ]
