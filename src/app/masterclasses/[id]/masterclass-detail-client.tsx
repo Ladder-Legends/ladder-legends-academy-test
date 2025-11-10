@@ -9,40 +9,27 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Masterclass } from '@/types/masterclass';
-import { Play, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
-import { PaywallLink } from '@/components/auth/paywall-link';
-import { getContentVideoUrl } from '@/lib/video-helpers';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
-import { Video, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
-import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
+import { Video } from '@/types/video';
 import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
+import { VideoPlayer } from '@/components/videos/video-player';
+import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 
 interface MasterclassDetailClientProps {
   masterclass: Masterclass;
 }
 
 export function MasterclassDetailClient({ masterclass }: MasterclassDetailClientProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // Initialize from URL query param if present
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
-    const vParam = searchParams.get('v');
-    if (vParam !== null) {
-      const index = parseInt(vParam, 10);
-      return !isNaN(index) && index >= 0 ? index : 0;
-    }
-    return 0;
-  });
 
   useTrackPageView({
     contentType: 'masterclass',
@@ -80,28 +67,13 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
     : [];
 
   const hasMultipleVideos = masterclassVideos.length > 1;
-  const currentVideo = masterclassVideos[currentVideoIndex] || null;
 
-  // Update URL when video index changes in playlists
-  const handleVideoSelect = (index: number) => {
-    setCurrentVideoIndex(index);
-
-    // Update URL with query param for playlists
-    if (hasMultipleVideos) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('v', index.toString());
-      router.push(`?${params.toString()}`, { scroll: false });
-    }
-  };
-
-  // Update document title when video changes
-  useEffect(() => {
-    const displayTitle = hasMultipleVideos && currentVideo
-      ? `${currentVideo.title} - ${masterclass.title} | Ladder Legends Academy`
-      : `${masterclass.title} | Ladder Legends Academy`;
-
-    document.title = displayTitle;
-  }, [currentVideoIndex, hasMultipleVideos, currentVideo, masterclass.title]);
+  // Use shared playlist navigation hook
+  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+    videos: masterclassVideos,
+    parentTitle: masterclass.title,
+    isPlaylist: hasMultipleVideos,
+  });
 
   // Look up replays
   const allReplays = replaysData as Replay[];
@@ -194,82 +166,12 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
             <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
               {/* Main Video Player Section */}
               <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
-                {/* Video Player - render all playlist videos but hide inactive ones to avoid reload */}
-                {hasMultipleVideos ? (
-                  <div className="relative">
-                    {masterclassVideos.map((video, index) => (
-                      <div
-                        key={video.id}
-                        className={currentVideoIndex === index ? 'block' : 'hidden'}
-                      >
-                        {isMuxVideo(video) ? (
-                          video.muxPlaybackId ? (
-                            <MuxVideoPlayer
-                              playbackId={video.muxPlaybackId}
-                              videoId={video.id}
-                              title={video.title}
-                              className="rounded-lg overflow-hidden"
-                            />
-                          ) : (
-                            <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                              <div className="text-center p-4">
-                                <p className="text-muted-foreground">
-                                  {video.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                                </p>
-                              </div>
-                            </div>
-                          )
-                        ) : (
-                          <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                            <iframe
-                              width="100%"
-                              height="100%"
-                              src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                              title={video.title}
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                            ></iframe>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  // Single video (not a playlist)
-                  currentVideo ? (
-                    isMuxVideo(currentVideo) ? (
-                      currentVideo.muxPlaybackId ? (
-                        <MuxVideoPlayer
-                          playbackId={currentVideo.muxPlaybackId}
-                          videoId={currentVideo.id}
-                          title={currentVideo.title}
-                          className="rounded-lg overflow-hidden"
-                        />
-                      ) : (
-                        <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                          <div className="text-center p-4">
-                            <p className="text-muted-foreground">
-                              {currentVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
-                          title={currentVideo.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                    )
-                  ) : null
-                )}
+                {/* Video Player */}
+                <VideoPlayer
+                  videos={masterclassVideos}
+                  currentVideoIndex={currentVideoIndex}
+                  isPlaylist={hasMultipleVideos}
+                />
 
                 {/* Masterclass Info */}
                 <div className="mt-6 space-y-4">
@@ -392,41 +294,12 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
 
               {/* Playlist Sidebar (only shown for playlists) */}
               {hasMultipleVideos && (
-                <div className="lg:col-span-1">
-                  <div className="border border-border rounded-lg bg-card overflow-hidden sticky top-24">
-                    <div className="h-[calc(100vh-7rem)] overflow-y-auto">
-                      {masterclassVideos.map((video, index) => (
-                        <div
-                          key={video.id}
-                          className={`relative group border-b-2 border-foreground/20 last:border-b-0 ${
-                            currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
-                          }`}
-                        >
-                          <button
-                            onClick={() => handleVideoSelect(index)}
-                            className="w-full p-2 hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="flex flex-col px-2">
-                              {/* Thumbnail */}
-                              <div className="aspect-video bg-muted rounded overflow-hidden mb-2 w-full">
-                                <Image
-                                  key={`${video.id}-thumb`}
-                                  src={getVideoThumbnailUrl(video, 'medium')}
-                                  alt={video.title}
-                                  width={320}
-                                  height={180}
-                                  unoptimized
-                                  className="object-cover w-full h-full"
-                                />
-                              </div>
-                              <p className="text-xs font-medium line-clamp-2 text-center pb-1 w-full">{video.title}</p>
-                            </div>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <PlaylistSidebar
+                  videos={masterclassVideos}
+                  currentVideoIndex={currentVideoIndex}
+                  onVideoSelect={handleVideoSelect}
+                  showAdminControls={false}
+                />
               )}
             </div>
           </div>

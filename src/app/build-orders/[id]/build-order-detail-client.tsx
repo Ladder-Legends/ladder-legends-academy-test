@@ -9,17 +9,19 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BuildOrder } from '@/types/build-order';
-import { Video as VideoIcon, ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
-import { getContentVideoUrl } from '@/lib/video-helpers';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
 import { Video } from '@/types/video';
+import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
+import { VideoPlayer } from '@/components/videos/video-player';
+import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 
 const allReplays = replaysData as Replay[];
 const allVideos = videosData as Video[];
@@ -31,6 +33,23 @@ interface BuildOrderDetailClientProps {
 export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Look up videos from videoIds
+  const buildOrderVideos = buildOrder.videoIds && buildOrder.videoIds.length > 0
+    ? buildOrder.videoIds.map(videoId =>
+        allVideos.find(v => v.id === videoId)
+      ).filter(Boolean) as Video[]
+    : [];
+
+  const hasVideos = buildOrderVideos.length > 0;
+  const hasMultipleVideos = buildOrderVideos.length > 1;
+
+  // Use shared playlist navigation hook
+  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+    videos: buildOrderVideos,
+    parentTitle: buildOrder.name,
+    isPlaylist: hasMultipleVideos,
+  });
+
   useTrackPageView({
     contentType: 'build-order',
     contentId: buildOrder.id,
@@ -39,6 +58,7 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
       race: buildOrder.race,
       difficulty: buildOrder.difficulty,
       is_free: buildOrder.isFree || false,
+      has_video: hasVideos,
     },
   });
 
@@ -143,11 +163,44 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
               </PermissionGate>
             </div>
 
+            {/* Video Player and Playlist Layout (if videos exist) */}
+            {hasVideos && (
+              <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
+                {/* Main Video Player Section */}
+                <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
+                  <VideoPlayer
+                    videos={buildOrderVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    isPlaylist={hasMultipleVideos}
+                  />
+                </div>
+
+                {/* Playlist Sidebar (only shown for playlists) */}
+                {hasMultipleVideos && (
+                  <PlaylistSidebar
+                    videos={buildOrderVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    onVideoSelect={handleVideoSelect}
+                    showAdminControls={false}
+                  />
+                )}
+              </div>
+            )}
+
             {/* Title Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-4xl font-bold">{buildOrder.name}</h1>
                 <SubscriberBadge isFree={buildOrder.isFree} />
+                {linkedReplay?.downloadUrl && (
+                  <a
+                    href={`/api/replay-download?replayId=${linkedReplay.id}`}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Replay
+                  </a>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -201,33 +254,6 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
               </dl>
             </div>
 
-            {/* Video & Replay Links */}
-            {(getContentVideoUrl(buildOrder, allVideos) || linkedReplay?.downloadUrl) && (
-              <div className="flex flex-wrap gap-4">
-                {getContentVideoUrl(buildOrder, allVideos) && (
-                  <PaywallLink
-                    href={getContentVideoUrl(buildOrder, allVideos)!}
-                    isFree={buildOrder.isFree}
-                    className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-                  >
-                    <VideoIcon className="h-5 w-5" />
-                    Watch Video Tutorial{buildOrder.videoIds && buildOrder.videoIds.length > 1 ? ` (${buildOrder.videoIds.length} videos)` : ''}
-                  </PaywallLink>
-                )}
-
-                {linkedReplay?.downloadUrl && (
-                  <PaywallLink
-                    href={linkedReplay.downloadUrl}
-                    isFree={buildOrder.isFree}
-                    download
-                    className="flex items-center gap-2 px-6 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium"
-                  >
-                    <Download className="h-5 w-5" />
-                    Download Replay
-                  </PaywallLink>
-                )}
-              </div>
-            )}
 
             {/* Build Order Steps */}
             <div className="border border-border rounded-lg p-6 bg-card">

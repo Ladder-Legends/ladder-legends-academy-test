@@ -16,7 +16,8 @@ import { PermissionGate } from '@/components/auth/permission-gate';
 import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 
-const allReplays = replaysData as Replay[];
+// Filter out replays without downloadUrl - they can't be downloaded yet
+const allReplays = (replaysData as Replay[]).filter(replay => replay.downloadUrl);
 
 export function ReplaysContent() {
   const { data: session } = useSession();

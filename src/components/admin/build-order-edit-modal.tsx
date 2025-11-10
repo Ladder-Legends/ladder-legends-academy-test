@@ -233,10 +233,10 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     setShowReplayDropdown(false);
   };
 
-  const saveUploadedReplayToDatabase = async () => {
+  const saveUploadedReplayToDatabase = async (): Promise<string | null> => {
     if (!uploadedReplayFile || !replayAnalysisData) {
       toast.error('No replay file to save');
-      return;
+      return null;
     }
 
     const { metadata } = replayAnalysisData;
@@ -293,7 +293,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         throw new Error('Failed to upload replay file');
       }
 
-      const { downloadUrl } = await response.json();
+      const { url: downloadUrl } = await response.json();
       newReplay.downloadUrl = downloadUrl;
 
       // Add to pending changes
@@ -317,9 +317,12 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       setUploadedReplayFile(null);
       setReplayAnalysisData(null);
       setSelectedPlayerForImport(null);
+
+      return newReplay.id;
     } catch (error) {
       console.error('Error saving replay:', error);
       toast.error('Failed to save replay to database');
+      throw error;
     }
   };
 
@@ -527,7 +530,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     toast.success(`Imported ${steps.length} build order steps from ${playerName}'s replay!`);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.id || !formData.name) {
       toast.error('Please fill in all required fields (Name)');
       return;
@@ -549,6 +552,21 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       }
     }
 
+    // Auto-save uploaded replay file if it hasn't been saved yet
+    let finalReplayId = formData.replayId;
+    if (uploadedReplayFile && replayAnalysisData && !formData.replayId) {
+      try {
+        const savedReplayId = await saveUploadedReplayToDatabase();
+        if (savedReplayId) {
+          finalReplayId = savedReplayId;
+        }
+      } catch (error) {
+        console.error('Error auto-saving replay:', error);
+        toast.error('Failed to save replay file. Please try again.');
+        return;
+      }
+    }
+
     const buildOrderData: BuildOrder = {
       id: formData.id,
       name: formData.name,
@@ -564,7 +582,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       patch: formData.patch,
       updatedAt: new Date().toISOString().split('T')[0],
       isFree: formData.isFree || false,
-      replayId: formData.replayId,
+      replayId: finalReplayId,
     };
 
     addChange({

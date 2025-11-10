@@ -3,9 +3,10 @@ import { Metadata } from 'next';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
 import { Replay } from '@/types/replay';
-import { Video, getVideoThumbnailUrl } from '@/types/video';
+import { Video } from '@/types/video';
 import { ReplayDetailClient } from './replay-detail-client';
 import { ReplayStructuredData } from '@/components/seo/structured-data';
+import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
 
 const allReplays = replaysData as Replay[];
 const allVideos = videosData as Video[];
@@ -16,9 +17,16 @@ export async function generateStaticParams() {
   }));
 }
 
+interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
 // Generate metadata for SEO and social sharing
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const replay = allReplays.find(r => r.id === params.id);
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const searchParamsResolved = await searchParams;
+  const replay = allReplays.find(r => r.id === id);
 
   if (!replay) {
     return {
@@ -27,47 +35,29 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
   }
 
-  const title = `${replay.title} | Ladder Legends Academy`;
-  const description = replay.notes ||
-    `${replay.matchup} on ${replay.map} - ${replay.player1.name} (${replay.player1.race}) vs ${replay.player2.name} (${replay.player2.race}). ${replay.coach ? `Coached by ${replay.coach}.` : ''}`.trim();
+  const baseMetadata = generatePlaylistMetadata({
+    content: replay,
+    allVideos,
+    searchParams: searchParamsResolved,
+    basePath: '/replays',
+    contentType: 'Replay',
+  });
 
-  // Try to get thumbnail from associated video
-  let thumbnailUrl = '/placeholder-thumbnail.jpg';
-  if (replay.videoIds && replay.videoIds.length > 0) {
-    const firstVideo = allVideos.find(v => v.id === replay.videoIds[0]);
-    if (firstVideo) {
-      thumbnailUrl = getVideoThumbnailUrl(firstVideo, 'high');
-    }
+  // Add replay-specific metadata fields
+  // Filter out undefined values from baseMetadata.other
+  const filteredOther: Record<string, string> = {};
+  if (baseMetadata.other) {
+    Object.entries(baseMetadata.other).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        filteredOther[key] = String(value);
+      }
+    });
   }
 
-  const absoluteThumbnailUrl = thumbnailUrl.startsWith('http')
-    ? thumbnailUrl
-    : `https://www.ladderlegendsacademy.com${thumbnailUrl}`;
-
   return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'article',
-      images: [
-        {
-          url: absoluteThumbnailUrl,
-          width: 1280,
-          height: 720,
-          alt: replay.title,
-        },
-      ],
-      siteName: 'Ladder Legends Academy',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [absoluteThumbnailUrl],
-    },
+    ...baseMetadata,
     other: {
+      ...filteredOther,
       'replay:matchup': replay.matchup,
       'replay:map': replay.map,
       'replay:duration': replay.duration,
@@ -75,8 +65,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default function ReplayDetailPage({ params }: { params: { id: string } }) {
-  const replay = allReplays.find(r => r.id === params.id);
+export default async function ReplayDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const replay = allReplays.find(r => r.id === id);
 
   if (!replay) {
     notFound();

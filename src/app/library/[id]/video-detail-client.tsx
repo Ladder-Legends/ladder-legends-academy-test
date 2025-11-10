@@ -8,35 +8,31 @@ import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Video, isPlaylist, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
+import { Video, isPlaylist } from '@/types/video';
 import videos from '@/data/videos.json';
-import { ArrowLeft, CalendarDays, Edit, Trash2, X, Pencil } from 'lucide-react';
+import buildOrdersData from '@/data/build-orders.json';
+import replaysData from '@/data/replays.json';
+import masterclassesData from '@/data/masterclasses.json';
+import { ArrowLeft, CalendarDays, Edit, Trash2, FileText, PlayCircle, GraduationCap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { toast } from 'sonner';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
+import { VideoPlayer } from '@/components/videos/video-player';
+import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
+import { BuildOrder } from '@/types/build-order';
+import { Replay } from '@/types/replay';
+import { Masterclass } from '@/types/masterclass';
 
 interface VideoDetailClientProps {
   video: Video;
 }
 
 export function VideoDetailClient({ video }: VideoDetailClientProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
-    // Initialize from URL query param if present
-    const vParam = searchParams.get('v');
-    if (vParam !== null) {
-      const index = parseInt(vParam, 10);
-      return !isNaN(index) && index >= 0 ? index : 0;
-    }
-    return 0;
-  });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPlaylistVideo, setEditingPlaylistVideo] = useState<Video | null>(null);
   const [isPlaylistVideoEditModalOpen, setIsPlaylistVideoEditModalOpen] = useState(false);
@@ -61,11 +57,33 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
         // Otherwise show all (this handles premium playlists viewed by non-subscribers - they shouldn't see this anyway)
         return true;
       })
-    : [];
+    : [video];
 
-  // Get current video to play
-  const currentVideo = videoIsPlaylist ? playlistVideos[currentVideoIndex] : video;
-  const currentYoutubeId = currentVideo?.youtubeId;
+  // Use shared playlist navigation hook
+  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+    videos: playlistVideos,
+    parentTitle: video.title,
+    isPlaylist: videoIsPlaylist,
+  });
+
+  // Find related content - build orders, replays, and masterclasses that reference this video
+  const allBuildOrders = buildOrdersData as BuildOrder[];
+  const allReplays = replaysData as Replay[];
+  const allMasterclasses = masterclassesData as Masterclass[];
+
+  const relatedBuildOrders = allBuildOrders.filter(bo =>
+    bo.videoIds && bo.videoIds.includes(video.id)
+  );
+
+  const relatedReplays = allReplays.filter(replay =>
+    replay.videoIds && replay.videoIds.includes(video.id)
+  );
+
+  const relatedMasterclasses = allMasterclasses.filter(mc =>
+    mc.videoIds && mc.videoIds.includes(video.id)
+  );
+
+  const hasRelatedContent = relatedBuildOrders.length > 0 || relatedReplays.length > 0 || relatedMasterclasses.length > 0;
 
   // Track video view
   useTrackPageView({
@@ -116,27 +134,6 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       year: 'numeric'
     });
   };
-
-  // Update URL when video index changes in playlists
-  const handleVideoSelect = (index: number) => {
-    setCurrentVideoIndex(index);
-
-    // Update URL with query param for playlists
-    if (videoIsPlaylist) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('v', index.toString());
-      router.push(`?${params.toString()}`, { scroll: false });
-    }
-  };
-
-  // Update document title when video changes
-  useEffect(() => {
-    const displayTitle = videoIsPlaylist && currentVideo
-      ? `${currentVideo.title} - ${video.title} | Ladder Legends Academy`
-      : `${video.title} | Ladder Legends Academy`;
-
-    document.title = displayTitle;
-  }, [currentVideoIndex, videoIsPlaylist, currentVideo, video.title]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -211,82 +208,12 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
             <div className={videoIsPlaylist ? 'grid lg:grid-cols-4 gap-6' : ''}>
               {/* Main Video Player Section */}
               <div className={videoIsPlaylist ? 'lg:col-span-3' : ''}>
-                {/* Video Player - render all playlist videos but hide inactive ones to avoid reload */}
-                {videoIsPlaylist ? (
-                  <div className="relative">
-                    {playlistVideos.map((plVideo, index) => (
-                      <div
-                        key={plVideo.id}
-                        className={currentVideoIndex === index ? 'block' : 'hidden'}
-                      >
-                        {isMuxVideo(plVideo) ? (
-                          plVideo.muxPlaybackId ? (
-                            <MuxVideoPlayer
-                              playbackId={plVideo.muxPlaybackId}
-                              videoId={plVideo.id}
-                              title={plVideo.title}
-                              className="rounded-lg overflow-hidden"
-                            />
-                          ) : (
-                            <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                              <div className="text-center p-4">
-                                <p className="text-muted-foreground">
-                                  {plVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                                </p>
-                              </div>
-                            </div>
-                          )
-                        ) : (
-                          <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                            <iframe
-                              width="100%"
-                              height="100%"
-                              src={`https://www.youtube.com/embed/${plVideo.youtubeId}`}
-                              title={plVideo.title}
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                            ></iframe>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  // Single video (not a playlist)
-                  <>
-                    {isMuxVideo(currentVideo) ? (
-                      currentVideo?.muxPlaybackId ? (
-                        <MuxVideoPlayer
-                          playbackId={currentVideo.muxPlaybackId}
-                          videoId={currentVideo.id}
-                          title={currentVideo.title}
-                          className="rounded-lg overflow-hidden"
-                        />
-                      ) : (
-                        <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                          <div className="text-center p-4">
-                            <p className="text-muted-foreground">
-                              {currentVideo?.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src={`https://www.youtube.com/embed/${currentYoutubeId}`}
-                          title={currentVideo?.title || video.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                    )}
-                  </>
-                )}
+                {/* Video Player */}
+                <VideoPlayer
+                  videos={playlistVideos}
+                  currentVideoIndex={currentVideoIndex}
+                  isPlaylist={videoIsPlaylist}
+                />
 
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">
@@ -340,74 +267,108 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                       <p className="text-muted-foreground leading-relaxed">{videoIsPlaylist ? currentVideo?.description || video.description : video.description}</p>
                     </div>
                   )}
+
+                  {/* Related Content */}
+                  {hasRelatedContent && (
+                    <div className="border border-border rounded-lg p-6 bg-card">
+                      <h2 className="text-xl font-semibold mb-4">Related Content</h2>
+                      <div className="space-y-6">
+                        {/* Build Orders */}
+                        {relatedBuildOrders.length > 0 && (
+                          <div>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                              <FileText className="h-4 w-4" />
+                              Build Orders ({relatedBuildOrders.length})
+                            </h3>
+                            <div className="space-y-2">
+                              {relatedBuildOrders.map(bo => (
+                                <Link
+                                  key={bo.id}
+                                  href={`/build-orders/${bo.id}`}
+                                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                                >
+                                  <div>
+                                    <p className="font-medium">{bo.name}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {bo.race} vs {bo.vsRace} • {bo.difficulty}
+                                    </p>
+                                  </div>
+                                  <ArrowLeft className="h-4 w-4 rotate-180" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Replays */}
+                        {relatedReplays.length > 0 && (
+                          <div>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                              <PlayCircle className="h-4 w-4" />
+                              Replays ({relatedReplays.length})
+                            </h3>
+                            <div className="space-y-2">
+                              {relatedReplays.map(replay => (
+                                <Link
+                                  key={replay.id}
+                                  href={`/replays/${replay.id}`}
+                                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                                >
+                                  <div>
+                                    <p className="font-medium">{replay.title}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {replay.matchup} • {replay.map} • {replay.duration}
+                                    </p>
+                                  </div>
+                                  <ArrowLeft className="h-4 w-4 rotate-180" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Masterclasses */}
+                        {relatedMasterclasses.length > 0 && (
+                          <div>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                              <GraduationCap className="h-4 w-4" />
+                              Masterclasses ({relatedMasterclasses.length})
+                            </h3>
+                            <div className="space-y-2">
+                              {relatedMasterclasses.map(mc => (
+                                <Link
+                                  key={mc.id}
+                                  href={`/masterclasses/${mc.id}`}
+                                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                                >
+                                  <div>
+                                    <p className="font-medium">{mc.title}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {mc.race !== 'all' ? mc.race : 'All Races'} • {mc.difficulty}
+                                    </p>
+                                  </div>
+                                  <ArrowLeft className="h-4 w-4 rotate-180" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Playlist Sidebar (only shown for playlists) */}
               {videoIsPlaylist && (
-                <div className="lg:col-span-1">
-                  <div className="border border-border rounded-lg bg-card overflow-hidden sticky top-24">
-                    <div className="h-[calc(100vh-7rem)] overflow-y-auto">
-                      {playlistVideos.map((plVideo, index) => (
-                        <div
-                          key={plVideo.id}
-                          className={`relative group border-b-2 border-foreground/20 last:border-b-0 ${
-                            currentVideoIndex === index ? 'bg-primary/10 border-l-4 border-l-primary' : ''
-                          }`}
-                        >
-                          <button
-                            onClick={() => handleVideoSelect(index)}
-                            className="w-full p-2 hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="flex flex-col px-2">
-                              {/* Thumbnail - uses helper to get correct URL for YouTube/Mux videos */}
-                              <div className="aspect-video bg-muted rounded overflow-hidden mb-2 w-full">
-                                <Image
-                                  key={`${plVideo.id}-thumb`}
-                                  src={getVideoThumbnailUrl(plVideo, 'medium')}
-                                  alt={plVideo.title}
-                                  width={320}
-                                  height={180}
-                                  unoptimized
-                                  className="object-cover w-full h-full"
-                                />
-                              </div>
-                              <p className="text-xs font-medium line-clamp-2 text-center pb-1 w-full">{plVideo.title}</p>
-                            </div>
-                          </button>
-
-                          {/* Edit and Remove buttons (only for coaches/owners) */}
-                          <PermissionGate require="coaches">
-                            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditPlaylistVideo(plVideo);
-                                }}
-                                className="p-1.5 bg-background/90 hover:bg-background border border-border rounded-md transition-colors"
-                                title="Edit video"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm(`Remove "${plVideo.title}" from this playlist?`)) {
-                                    handleRemoveFromPlaylist(plVideo.id);
-                                  }
-                                }}
-                                className="p-1.5 bg-background/90 hover:bg-destructive hover:text-destructive-foreground border border-border hover:border-destructive rounded-md transition-colors"
-                                title="Remove from playlist"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </PermissionGate>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <PlaylistSidebar
+                  videos={playlistVideos}
+                  currentVideoIndex={currentVideoIndex}
+                  onVideoSelect={handleVideoSelect}
+                  showAdminControls={true}
+                  onEditVideo={handleEditPlaylistVideo}
+                  onRemoveVideo={handleRemoveFromPlaylist}
+                />
               )}
             </div>
           </div>

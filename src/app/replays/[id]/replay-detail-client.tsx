@@ -9,15 +9,18 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Replay } from '@/types/replay';
-import { Download, Video, ArrowLeft, Calendar, Clock, Map, Edit, Trash2 } from 'lucide-react';
-import { PaywallLink } from '@/components/auth/paywall-link';
+import { Download, ArrowLeft, Calendar, Clock, Map, Edit, Trash2, FileText } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
-import { getContentVideoUrl } from '@/lib/video-helpers';
 import videosData from '@/data/videos.json';
+import buildOrdersData from '@/data/build-orders.json';
 import { Video as VideoType } from '@/types/video';
+import { BuildOrder } from '@/types/build-order';
+import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
+import { VideoPlayer } from '@/components/videos/video-player';
+import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 
 interface ReplayDetailClientProps {
   replay: Replay;
@@ -25,7 +28,28 @@ interface ReplayDetailClientProps {
 
 export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const allVideos = videosData as VideoType[];
+  const allBuildOrders = buildOrdersData as BuildOrder[];
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Look up videos from videoIds
+  const replayVideos = replay.videoIds && replay.videoIds.length > 0
+    ? replay.videoIds.map(videoId =>
+        allVideos.find(v => v.id === videoId)
+      ).filter(Boolean) as VideoType[]
+    : [];
+
+  // Find related build order (if this replay is linked to a build order)
+  const relatedBuildOrder = allBuildOrders.find(bo => bo.replayId === replay.id);
+
+  const hasVideos = replayVideos.length > 0;
+  const hasMultipleVideos = replayVideos.length > 1;
+
+  // Use shared playlist navigation hook
+  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+    videos: replayVideos,
+    parentTitle: replay.title,
+    isPlaylist: hasMultipleVideos,
+  });
 
   useTrackPageView({
     contentType: 'replay',
@@ -35,6 +59,7 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
       matchup: replay.matchup,
       is_free: replay.isFree || false,
       coach: replay.coach || undefined,
+      has_video: hasVideos,
     },
   });
 
@@ -123,11 +148,44 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
               </PermissionGate>
             </div>
 
+            {/* Video Player and Playlist Layout (if videos exist) */}
+            {hasVideos && (
+              <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
+                {/* Main Video Player Section */}
+                <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
+                  <VideoPlayer
+                    videos={replayVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    isPlaylist={hasMultipleVideos}
+                  />
+                </div>
+
+                {/* Playlist Sidebar (only shown for playlists) */}
+                {hasMultipleVideos && (
+                  <PlaylistSidebar
+                    videos={replayVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    onVideoSelect={handleVideoSelect}
+                    showAdminControls={false}
+                  />
+                )}
+              </div>
+            )}
+
             {/* Title Section */}
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-4xl font-bold">{replay.title}</h1>
                 <SubscriberBadge isFree={replay.isFree} />
+                {replay.downloadUrl && (
+                  <a
+                    href={`/api/replay-download?replayId=${replay.id}`}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Replay
+                  </a>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -237,6 +295,20 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                     <dd className="font-medium">{replay.coach}</dd>
                   </div>
                 )}
+                {relatedBuildOrder && (
+                  <div>
+                    <dt className="text-sm text-muted-foreground mb-1">Related Build Order</dt>
+                    <dd>
+                      <Link
+                        href={`/build-orders/${relatedBuildOrder.id}`}
+                        className="font-medium text-primary hover:underline inline-flex items-center gap-1.5"
+                      >
+                        <FileText className="h-4 w-4" />
+                        {relatedBuildOrder.name}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
               </dl>
 
               {replay.notes && (
@@ -263,29 +335,6 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-4">
-              {replay.downloadUrl && (
-                <a
-                  href={replay.downloadUrl}
-                  download
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-                >
-                  <Download className="h-5 w-5" />
-                  Download Replay
-                </a>
-              )}
-              {getContentVideoUrl(replay, allVideos) && (
-                <PaywallLink
-                  href={getContentVideoUrl(replay, allVideos)!}
-                  isFree={replay.isFree}
-                  className="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors font-medium"
-                >
-                  <Video className="h-5 w-5" />
-                  Watch Coaching VOD
-                </PaywallLink>
-              )}
-            </div>
           </div>
         </div>
       </main>

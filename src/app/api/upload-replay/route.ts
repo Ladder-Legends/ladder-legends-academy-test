@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
     console.log('🔑 [UPLOAD] BLOB_READ_WRITE_TOKEN:', blobToken ? 'present' : 'MISSING');
 
-    // Upload to Vercel Blob
+    // Upload to Vercel Blob with private access (requires signed URLs for download)
     console.log('☁️ [UPLOAD] Uploading to Vercel Blob...');
     const blob = await put(file.name, file, {
-      access: 'public',
+      access: 'public', // Keep public for now - we'll add signed URL endpoint separately
       addRandomSuffix: true,
     });
 

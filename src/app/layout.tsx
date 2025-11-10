@@ -65,6 +65,30 @@ export default function RootLayout({
                   // Ignore errors (e.g., localStorage not available)
                 }
               })();
+
+              // Utility function to clear Mux token cache (available in console)
+              window.clearMuxCache = function() {
+                let cleared = 0;
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                  const key = localStorage.key(i);
+                  if (key && key.startsWith('mux-token-')) {
+                    keys.push(key);
+                  }
+                }
+                keys.forEach(key => {
+                  try {
+                    localStorage.removeItem(key);
+                    cleared++;
+                    console.log('✓ Cleared: ' + key);
+                  } catch (err) {
+                    console.error('✗ Failed to clear: ' + key, err);
+                  }
+                });
+                console.log('🎉 Cleared ' + cleared + ' Mux token cache entries');
+                console.log('Please refresh the page to fetch fresh tokens.');
+                return cleared;
+              };
             `,
           }}
         />

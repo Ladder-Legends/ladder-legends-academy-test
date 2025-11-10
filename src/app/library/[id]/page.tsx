@@ -2,9 +2,10 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import videosData from '@/data/videos.json';
-import { Video, getVideoThumbnailUrl, isPlaylist } from '@/types/video';
+import { Video } from '@/types/video';
 import { VideoDetailClient } from './video-detail-client';
 import { VideoStructuredData } from '@/components/seo/structured-data';
+import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
 
 const allVideos = videosData as Video[];
 
@@ -37,74 +38,13 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     };
   }
 
-  // For playlists, check if a specific video is requested via ?v= query param
-  let displayVideo = video;
-  let playlistContext = '';
-
-  if (isPlaylist(video) && video.videoIds && video.videoIds.length > 0) {
-    const vParam = searchParamsResolved.v;
-    const videoIndex = typeof vParam === 'string' ? parseInt(vParam, 10) : 0;
-
-    if (!isNaN(videoIndex) && videoIndex >= 0 && videoIndex < video.videoIds.length) {
-      // Find the specific video in the playlist
-      const playlistVideo = allVideos.find(v => v.id === video.videoIds![videoIndex]);
-      if (playlistVideo) {
-        displayVideo = playlistVideo;
-        playlistContext = ` - ${video.title}`;
-      }
-    }
-  }
-
-  const title = displayVideo.title + playlistContext;
-  const description = displayVideo.description || video.description || 'Master Starcraft 2 with expert coaching from Ladder Legends Academy';
-  const thumbnailUrl = getVideoThumbnailUrl(displayVideo, 'high');
-  const absoluteThumbnailUrl = thumbnailUrl.startsWith('http')
-    ? thumbnailUrl
-    : `https://www.ladderlegendsacademy.com${thumbnailUrl}`;
-
-  // Build the canonical URL with query param if in playlist
-  let canonicalUrl = `https://www.ladderlegendsacademy.com/library/${id}`;
-  if (isPlaylist(video) && displayVideo.id !== video.id) {
-    const vParam = searchParamsResolved.v;
-    if (vParam) {
-      canonicalUrl += `?v=${vParam}`;
-    }
-  }
-
-  const contentType = isPlaylist(video) ? 'Playlist' : 'Video';
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} | Ladder Legends Academy`,
-      description,
-      url: canonicalUrl,
-      type: 'video.other',
-      images: [
-        {
-          url: absoluteThumbnailUrl,
-          width: 1280,
-          height: 720,
-          alt: displayVideo.title,
-        },
-      ],
-      siteName: 'Ladder Legends Academy',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${title} | Ladder Legends Academy`,
-      description,
-      images: [absoluteThumbnailUrl],
-    },
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    other: {
-      'video:tag': displayVideo.tags.join(', '),
-      'content:type': contentType,
-    },
-  };
+  return generatePlaylistMetadata({
+    content: video,
+    allVideos,
+    searchParams: searchParamsResolved,
+    basePath: '/library',
+    contentType: 'Video',
+  });
 }
 
 export default async function VideoDetailPage({ params }: PageProps) {

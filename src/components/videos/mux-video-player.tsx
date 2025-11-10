@@ -47,18 +47,27 @@ export function MuxVideoPlayer({
         if (cached) {
           const data: CachedToken = JSON.parse(cached);
           const now = Date.now();
+          const oneHourBuffer = 60 * 60 * 1000;
 
-          // Check if token is still valid (with 1 hour buffer)
-          if (data.expiresAt > now + (60 * 60 * 1000)) {
+          // Check if token is still valid (expires more than 1 hour from now)
+          if (data.expiresAt > now + oneHourBuffer) {
             console.log('[MUX PLAYER] Using cached token for:', playbackId);
             return data.token;
           } else {
             // Token expired or about to expire, remove from cache
+            console.log('[MUX PLAYER] Token expired or expiring soon, fetching new token for:', playbackId);
             localStorage.removeItem(cacheKey);
           }
         }
       } catch (err) {
-        console.warn('[MUX PLAYER] Error reading cached token:', err);
+        console.warn('[MUX PLAYER] Error reading cached token, clearing cache:', err);
+        // If there's any error reading the cache, clear it to be safe
+        try {
+          const cacheKey = `mux-token-${playbackId}`;
+          localStorage.removeItem(cacheKey);
+        } catch (e) {
+          // Ignore cleanup errors
+        }
       }
       return null;
     };
@@ -112,11 +121,24 @@ export function MuxVideoPlayer({
         // Support both new format (playback) and legacy format (token)
         const pbToken = data.playback || data.token;
 
+        if (!pbToken) {
+          throw new Error('No playback token received from server');
+        }
+
         // Cache the token for future use
         cacheToken(pbToken);
         setPlaybackToken(pbToken);
       } catch (err) {
-        console.error('Error fetching playback tokens:', err);
+        console.error('[MUX PLAYER] Error fetching playback tokens:', err);
+
+        // Clear cache for this playback ID on error to prevent using stale tokens
+        try {
+          const cacheKey = `mux-token-${playbackId}`;
+          localStorage.removeItem(cacheKey);
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+
         setError(err instanceof Error ? err.message : 'Failed to load video');
       } finally {
         setLoading(false);
