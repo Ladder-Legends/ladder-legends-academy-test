@@ -247,7 +247,7 @@ export function DashboardContent() {
               Ready to Climb the Ladder?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join thousands of players improving their game with Ladder Legends Academy
+              Join hundreds of players improving their game with Ladder Legends Academy
             </p>
             {!session ? (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
