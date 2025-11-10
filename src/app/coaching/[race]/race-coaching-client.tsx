@@ -81,7 +81,7 @@ export function RaceCoachingClient({
                   backgroundImage: 'url(/terran-hero-bg.png)',
                   backgroundPosition: 'center 60%',
                   backgroundSize: 'cover',
-                  filter: 'grayscale(100%) sepia(40%) hue-rotate(340deg) saturate(80%) brightness(0.9)',
+                  filter: 'grayscale(100%) sepia(60%) hue-rotate(350deg) saturate(120%) brightness(0.85)',
                 }}
               />
             </div>
