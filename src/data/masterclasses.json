@@ -23,7 +23,7 @@
     "updatedAt": "2025-11-04",
     "isFree": false,
     "primaryCategory": "matchups",
-    "secondaryCategory": "pvz"
+    "secondaryCategory": "pvt"
   },
   {
     "id": "mc-nicoract-terran-oct2025",
@@ -69,6 +69,7 @@
     "createdAt": "2025-10-09",
     "updatedAt": "2025-11-06",
     "isFree": false,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   }
 ]

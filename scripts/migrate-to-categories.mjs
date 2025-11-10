@@ -28,6 +28,7 @@ const TAG_TO_CATEGORY = {
   'allin': { primary: 'builds', secondary: 'all-in' },
   'cheese': { primary: 'builds', secondary: 'cheese' },
   'defensive': { primary: 'builds', secondary: 'defensive' },
+  'defense': { primary: 'builds', secondary: 'defensive' },
   'build order': { primary: 'builds', secondary: null },
   'build-order': { primary: 'builds', secondary: null },
 
@@ -87,7 +88,34 @@ function categorizeTags(tags) {
     return { primaryCategory: null, secondaryCategory: null };
   }
 
-  // Try to find the best category match
+  // Priority order: More specific categories first
+  const priorityOrder = [
+    // Specific build types (highest priority)
+    'cheese', 'all-in', 'allin', 'defensive', 'defense', 'timing-attack', 'timing',
+    // Matchups (high priority)
+    'tvt', 'tvz', 'tvp', 'zvt', 'zvz', 'zvp', 'pvt', 'pvz', 'pvp',
+    // Analysis types (high priority)
+    'replay', 'replay-review', 'pro-game', 'tournament', 'ladder',
+    // Specific mechanics/strategy (medium priority)
+    'micro', 'multitasking', 'army-control', 'scouting', 'transitions',
+    'early-game', 'mid-game', 'late-game', 'decision-making', 'tilt', 'learning', 'game-sense',
+    // Broad categories (lower priority)
+    'macro', 'mechanics', 'strategy', 'mindset', 'analysis',
+    // Misc (lowest priority)
+    'tipsandtricks', 'tipsntricks', 'tips-tricks', 'maps', 'team-games', 'casual', 'meta'
+  ];
+
+  // Try priority tags first
+  for (const priorityTag of priorityOrder) {
+    if (tags.some(t => t.toLowerCase().trim() === priorityTag) && TAG_TO_CATEGORY[priorityTag]) {
+      return {
+        primaryCategory: TAG_TO_CATEGORY[priorityTag].primary,
+        secondaryCategory: TAG_TO_CATEGORY[priorityTag].secondary
+      };
+    }
+  }
+
+  // Fallback: try any matching tag
   for (const tag of tags) {
     const normalized = tag.toLowerCase().trim();
     if (TAG_TO_CATEGORY[normalized]) {
@@ -131,15 +159,17 @@ function migrateContent(items, type) {
       }
     }
 
-    // Add categories based on tags
-    if (!item.primaryCategory && item.tags) {
+    // Recalculate categories based on tags (always, to fix any incorrect mappings)
+    if (item.tags && item.tags.length > 0) {
       const { primaryCategory, secondaryCategory } = categorizeTags(item.tags);
-      if (primaryCategory) {
+      // Only update if different from current value
+      if (primaryCategory && primaryCategory !== item.primaryCategory) {
         changes.primaryCategory = primaryCategory;
-        if (secondaryCategory) {
-          changes.secondaryCategory = secondaryCategory;
-        }
         changeCount++;
+      }
+      if (secondaryCategory !== item.secondaryCategory) {
+        changes.secondaryCategory = secondaryCategory;
+        if (secondaryCategory) changeCount++;
       }
     }
 

@@ -64,8 +64,8 @@
     "youtubeId": "n85AUGyZtPk",
     "thumbnail": "https://img.youtube.com/vi/n85AUGyZtPk/hqdefault.jpg",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": "tips-tricks"
+    "primaryCategory": "mechanics",
+    "secondaryCategory": "micro"
   },
   {
     "id": "f391207c-0ba7-4681-8a78-c054d5298d05",
@@ -108,8 +108,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "primaryCategory": "mechanics",
+    "secondaryCategory": "micro"
   },
   {
     "id": "2",
@@ -185,7 +185,7 @@
     "coachId": "groovy",
     "isFree": false,
     "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "secondaryCategory": "defensive"
   },
   {
     "id": "6",
@@ -282,7 +282,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "13",
@@ -322,7 +323,8 @@
     "coachId": "groovy",
     "isFree": false,
     "youtubeId": "LD4qZIo11LQ",
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "15",
@@ -343,8 +345,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "primaryCategory": "mechanics",
+    "secondaryCategory": "micro"
   },
   {
     "id": "16",
@@ -381,8 +383,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "primaryCategory": "mechanics",
+    "secondaryCategory": "micro"
   },
   {
     "id": "18",
@@ -398,7 +400,8 @@
     "coachId": "groovy",
     "isFree": true,
     "youtubeId": "2jAprwtFPIQ",
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "19",
@@ -431,8 +434,8 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "builds",
-    "secondaryCategory": "macro"
+    "primaryCategory": "strategy",
+    "secondaryCategory": "scouting"
   },
   {
     "id": "24",
@@ -473,8 +476,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": "tips-tricks"
+    "primaryCategory": "builds",
+    "secondaryCategory": "defensive"
   },
   {
     "id": "26",
@@ -493,8 +496,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": "maps"
+    "primaryCategory": "builds",
+    "secondaryCategory": "macro"
   },
   {
     "id": "27",
@@ -513,7 +516,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "29",
@@ -534,8 +538,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc",
-    "secondaryCategory": "tips-tricks"
+    "primaryCategory": "builds",
+    "secondaryCategory": "defensive"
   },
   {
     "id": "31",
@@ -555,7 +559,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "33",
@@ -574,7 +579,8 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": true,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "34",
@@ -655,7 +661,8 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": true,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "39",
@@ -687,7 +694,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "41",
@@ -706,8 +714,8 @@
     "coach": "Hino",
     "coachId": "hino",
     "isFree": false,
-    "primaryCategory": "mechanics",
-    "secondaryCategory": "micro"
+    "primaryCategory": "builds",
+    "secondaryCategory": "cheese"
   },
   {
     "id": "42",
@@ -724,7 +732,8 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false,
-    "primaryCategory": "misc"
+    "primaryCategory": "misc",
+    "secondaryCategory": null
   },
   {
     "id": "43",
@@ -961,8 +970,8 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "tvp"
+    "primaryCategory": "builds",
+    "secondaryCategory": "timing-attack"
   },
   {
     "id": "80191635-11e9-49aa-a451-9d24e9a7285f",
@@ -984,8 +993,8 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false,
-    "primaryCategory": "matchups",
-    "secondaryCategory": "tvz"
+    "primaryCategory": "builds",
+    "secondaryCategory": "timing-attack"
   },
   {
     "id": "f2eb5d73-247c-4aae-8149-c19caeb2fbc3",
