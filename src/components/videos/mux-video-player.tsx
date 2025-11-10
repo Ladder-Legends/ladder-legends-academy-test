@@ -16,6 +16,36 @@ interface CachedToken {
   expiresAt: number; // Unix timestamp
 }
 
+interface JWTPayload {
+  exp?: number; // Token expiration (Unix timestamp in seconds)
+  iat?: number; // Issued at
+  sub?: string; // Subject (playbackId)
+  aud?: string; // Audience
+  kid?: string; // Key ID
+}
+
+/**
+ * Decode JWT payload without verification
+ * We only need to check expiry, not validate signature
+ */
+function decodeJWT(token: string): JWTPayload | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.warn('[MUX PLAYER] Invalid JWT format');
+      return null;
+    }
+
+    // Decode the payload (second part)
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = JSON.parse(atob(payload));
+    return decoded;
+  } catch (err) {
+    console.error('[MUX PLAYER] Failed to decode JWT:', err);
+    return null;
+  }
+}
+
 /**
  * MuxVideoPlayer component
  *
@@ -47,15 +77,34 @@ export function MuxVideoPlayer({
         if (cached) {
           const data: CachedToken = JSON.parse(cached);
           const now = Date.now();
-          const oneHourBuffer = 60 * 60 * 1000;
+          const twoHourBuffer = 2 * 60 * 60 * 1000; // Increased from 1h to 2h
 
-          // Check if token is still valid (expires more than 1 hour from now)
-          if (data.expiresAt > now + oneHourBuffer) {
-            console.log('[MUX PLAYER] Using cached token for:', playbackId);
+          // CRITICAL: Decode and validate the JWT token itself, not just localStorage timestamp
+          const jwtPayload = decodeJWT(data.token);
+
+          if (!jwtPayload || !jwtPayload.exp) {
+            console.warn('[MUX PLAYER] Invalid JWT payload, clearing cache for:', playbackId);
+            localStorage.removeItem(cacheKey);
+            return null;
+          }
+
+          // JWT exp is in seconds, convert to milliseconds
+          const jwtExpiresAt = jwtPayload.exp * 1000;
+          const timeUntilExpiry = jwtExpiresAt - now;
+
+          // Check if JWT token is still valid (expires more than 2 hours from now)
+          if (timeUntilExpiry > twoHourBuffer) {
+            const hoursRemaining = (timeUntilExpiry / (60 * 60 * 1000)).toFixed(1);
+            console.log(`[MUX PLAYER] Using cached token for ${playbackId} (${hoursRemaining}h remaining)`);
             return data.token;
           } else {
             // Token expired or about to expire, remove from cache
-            console.log('[MUX PLAYER] Token expired or expiring soon, fetching new token for:', playbackId);
+            if (timeUntilExpiry <= 0) {
+              console.warn(`[MUX PLAYER] JWT token EXPIRED for ${playbackId}, fetching new token`);
+            } else {
+              const minutesRemaining = (timeUntilExpiry / (60 * 1000)).toFixed(0);
+              console.log(`[MUX PLAYER] JWT token expiring soon (${minutesRemaining}m), fetching new token for ${playbackId}`);
+            }
             localStorage.removeItem(cacheKey);
           }
         }
@@ -76,7 +125,7 @@ export function MuxVideoPlayer({
     const cacheToken = (token: string) => {
       try {
         const cacheKey = `mux-token-${playbackId}`;
-        const expiresAt = Date.now() + (23 * 60 * 60 * 1000); // 23 hours
+        const expiresAt = Date.now() + (12 * 60 * 60 * 1000); // 12 hours (matches server cache)
 
         const cached: CachedToken = { token, expiresAt };
         localStorage.setItem(cacheKey, JSON.stringify(cached));

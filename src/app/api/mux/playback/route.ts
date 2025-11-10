@@ -11,8 +11,43 @@ const mux = new Mux({
 });
 
 /**
+ * Decode JWT payload without verification
+ * Used to check token expiry before serving from cache
+ */
+function decodeJWT(token: string): { exp?: number } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = JSON.parse(Buffer.from(payload, 'base64').toString());
+    return decoded;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check if a JWT token is expired or expiring soon
+ * @param token JWT token to check
+ * @param bufferHours How many hours before expiry to consider "expiring soon"
+ * @returns true if token is valid and has enough time remaining
+ */
+function isTokenValid(token: string, bufferHours: number = 2): boolean {
+  const payload = decodeJWT(token);
+  if (!payload || !payload.exp) return false;
+
+  const now = Math.floor(Date.now() / 1000); // Current time in seconds
+  const timeUntilExpiry = payload.exp - now;
+  const bufferSeconds = bufferHours * 60 * 60;
+
+  return timeUntilExpiry > bufferSeconds;
+}
+
+/**
  * Cached token generation function
- * Caches tokens for 23 hours (tokens are valid for 24h)
+ * Caches tokens for 12 hours (tokens are valid for 24h)
+ * This ensures we regenerate tokens with plenty of validity remaining
  * Each playbackId gets its own cache entry
  */
 const getCachedMuxTokens = unstable_cache(
@@ -38,11 +73,12 @@ const getCachedMuxTokens = unstable_cache(
     return {
       playback: playbackToken,
       thumbnail: thumbnailToken,
+      generatedAt: Date.now(), // Track when tokens were generated
     };
   },
   ['mux-tokens'], // This will be combined with the playbackId parameter for unique cache keys
   {
-    revalidate: 82800, // 23 hours in seconds
+    revalidate: 43200, // 12 hours in seconds (half of token validity)
     tags: ['mux-playback-tokens'],
   }
 );
@@ -86,6 +122,38 @@ export async function GET(request: NextRequest) {
 
     // Get cached tokens (or generate if not in cache)
     const tokens = await getCachedMuxTokens(playbackId);
+
+    // CRITICAL: Validate cached token before returning
+    // If token is expired or expiring soon (< 2h), regenerate it
+    if (!isTokenValid(tokens.playback, 2)) {
+      console.warn('[MUX PLAYBACK] Cached token expired or expiring soon, regenerating for:', playbackId);
+
+      // Generate fresh tokens directly (bypassing cache)
+      const freshPlaybackToken = await mux.jwt.signPlaybackId(playbackId, {
+        keyId: process.env.MUX_SIGNING_KEY_ID!,
+        keySecret: process.env.MUX_SIGNING_KEY_PRIVATE_KEY!,
+        expiration: '24h',
+        type: 'video',
+      });
+
+      const freshThumbnailToken = await mux.jwt.signPlaybackId(playbackId, {
+        keyId: process.env.MUX_SIGNING_KEY_ID!,
+        keySecret: process.env.MUX_SIGNING_KEY_PRIVATE_KEY!,
+        expiration: '24h',
+        type: 'thumbnail',
+      });
+
+      console.log('[MUX PLAYBACK] Fresh tokens generated for:', playbackId);
+
+      return NextResponse.json({
+        playbackId,
+        token: freshPlaybackToken, // Keep for backward compatibility
+        playback: freshPlaybackToken,
+        thumbnail: freshThumbnailToken,
+        expiresIn: '24h',
+        regenerated: true,
+      });
+    }
 
     console.log('[MUX PLAYBACK] Served tokens for playbackId:', playbackId);
     console.log('[MUX PLAYBACK] Tokens served from cache (NEW log means cache miss)');
