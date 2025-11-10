@@ -26,9 +26,8 @@ export function EventsContent() {
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<'all' | 'past-week' | 'this-week' | 'next-week' | 'this-month' | 'next-month' | 'upcoming' | 'past' | 'custom'>('upcoming');
-  const [customStartDate, setCustomStartDate] = useState<string>('');
-  const [customEndDate, setCustomEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>(() =>
     searchParams.get('tags')?.split(',').filter(Boolean) || []
   );
@@ -40,7 +39,8 @@ export function EventsContent() {
   useUrlState({
     q: searchQuery,
     tags: selectedTags,
-    dateRange: dateRange,
+    startDate: startDate,
+    endDate: endDate,
   });
 
   // Get all unique tags
@@ -58,70 +58,8 @@ export function EventsContent() {
     );
   };
 
-  // Helper to get date range bounds
-  const getDateRangeBounds = (): { start: Date | null; end: Date | null } => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    switch (dateRange) {
-      case 'all':
-        return { start: null, end: null };
-
-      case 'past-week': {
-        const start = new Date(today);
-        start.setDate(start.getDate() - 7);
-        return { start, end: today };
-      }
-
-      case 'this-week': {
-        const start = new Date(today);
-        start.setDate(start.getDate() - start.getDay()); // Start of week (Sunday)
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6); // End of week (Saturday)
-        return { start, end };
-      }
-
-      case 'next-week': {
-        const start = new Date(today);
-        start.setDate(start.getDate() + (7 - start.getDay())); // Next Sunday
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6); // Next Saturday
-        return { start, end };
-      }
-
-      case 'this-month': {
-        const start = new Date(today.getFullYear(), today.getMonth(), 1);
-        const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        return { start, end };
-      }
-
-      case 'next-month': {
-        const start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-        return { start, end };
-      }
-
-      case 'upcoming':
-        return { start: now, end: null };
-
-      case 'past':
-        return { start: null, end: now };
-
-      case 'custom':
-        return {
-          start: customStartDate ? new Date(customStartDate) : null,
-          end: customEndDate ? new Date(customEndDate) : null,
-        };
-
-      default:
-        return { start: now, end: null }; // Default to upcoming
-    }
-  };
-
   // Filter and sort events
   const filteredEvents = useMemo(() => {
-    const { start: rangeStart, end: rangeEnd } = getDateRangeBounds();
-
     const filtered = allEvents.filter(event => {
       const status = getEventStatus(event);
       const eventDate = new Date(`${event.date}T${event.time}`);
@@ -140,8 +78,16 @@ export function EventsContent() {
       }
 
       // Date range filter
-      if (rangeStart && eventDate < rangeStart) return false;
-      if (rangeEnd && eventDate > rangeEnd) return false;
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        if (eventDate < start) return false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        if (eventDate > end) return false;
+      }
 
       // Tag filters
       if (selectedTags.length > 0) {
@@ -184,23 +130,17 @@ export function EventsContent() {
 
       return statusA === 'upcoming' ? dateA - dateB : dateB - dateA;
     });
-  }, [allEvents, selectedItems, dateRange, customStartDate, customEndDate, selectedTags, searchQuery]);
+  }, [allEvents, selectedItems, startDate, endDate, selectedTags, searchQuery]);
 
   // Filter sections
   const filterSections: FilterSection[] = [
     {
-      id: 'dateRange',
-      title: 'Date Range',
+      id: 'accessLevel',
+      title: 'Access Level',
       type: 'checkbox' as const,
       items: [
-        { id: 'upcoming', label: 'Upcoming' },
-        { id: 'past', label: 'Past' },
-        { id: 'all', label: 'All Time' },
-        { id: 'past-week', label: 'Last Week' },
-        { id: 'this-week', label: 'This Week' },
-        { id: 'next-week', label: 'Next Week' },
-        { id: 'this-month', label: 'This Month' },
-        { id: 'next-month', label: 'Next Month' },
+        { id: 'free', label: 'Free' },
+        { id: 'premium', label: 'Premium' },
       ],
     },
     {
@@ -214,24 +154,6 @@ export function EventsContent() {
         { id: 'streaming', label: 'Streaming' },
         { id: 'replay-analysis', label: 'Replay Analysis' },
         { id: 'arcade', label: 'Arcade' },
-      ],
-    },
-    {
-      id: 'status',
-      title: 'Status',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'upcoming', label: 'Upcoming' },
-        { id: 'past', label: 'Past' },
-      ],
-    },
-    {
-      id: 'accessLevel',
-      title: 'Access Level',
-      type: 'checkbox' as const,
-      items: [
-        { id: 'free', label: 'Free' },
-        { id: 'premium', label: 'Premium' },
       ],
     },
   ];
@@ -253,37 +175,62 @@ export function EventsContent() {
     }
   };
 
-  // Handle filter selection change
-  const handleSelectionChange = (newSelectedItems: Record<string, string[]>) => {
-    // Handle date range separately (only one can be selected)
-    if (newSelectedItems.dateRange && newSelectedItems.dateRange.length > 0) {
-      const selected = newSelectedItems.dateRange[0];
-      setDateRange(selected as typeof dateRange);
-      // Remove dateRange from selectedItems since we handle it separately
-      const { dateRange: _, ...rest } = newSelectedItems;
-      setSelectedItems(rest);
-    } else {
-      setSelectedItems(newSelectedItems);
-    }
-  };
-
-  // Build selectedItems including the current dateRange
-  const displaySelectedItems = {
-    ...selectedItems,
-    dateRange: [dateRange],
-  };
-
-  // Filter content
+  // Filter content with date picker
   const filterContent = (
-    <FilterSidebar
-      searchEnabled={true}
-      searchPlaceholder="Search events..."
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
-      sections={filterSections}
-      selectedItems={displaySelectedItems}
-      onSelectionChange={handleSelectionChange}
-    />
+    <div className="space-y-6">
+      {/* Date Range Picker */}
+      <div className="px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-medium mb-3">Date Range</h3>
+        <div className="space-y-3">
+          <div>
+            <label htmlFor="start-date" className="text-xs text-muted-foreground block mb-1">
+              From
+            </label>
+            <input
+              id="start-date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label htmlFor="end-date" className="text-xs text-muted-foreground block mb-1">
+              To
+            </label>
+            <input
+              id="end-date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          {(startDate || endDate) && (
+            <button
+              onClick={() => {
+                setStartDate('');
+                setEndDate('');
+              }}
+              className="text-xs text-primary hover:underline"
+            >
+              Clear dates
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Standard filters */}
+      <FilterSidebar
+        searchEnabled={true}
+        searchPlaceholder="Search events..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sections={filterSections}
+        selectedItems={selectedItems}
+        onSelectionChange={setSelectedItems}
+      />
+    </div>
   );
 
   // Table content

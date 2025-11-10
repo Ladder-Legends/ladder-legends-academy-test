@@ -1,0 +1,132 @@
+# Ladder Legends Academy - Major Feature Update Plan
+
+## Overview
+Large-scale UI/UX improvements and taxonomy system overhaul for better content organization.
+
+## Completed Quick Wins
+- ✅ Scrollbar styling updated to brand red/orange (50% opacity)
+- ✅ Added smooth scroll behavior to HTML
+- ✅ Fixed add-to-calendar dropdown cutoff (auto-flips to top when near bottom)
+- ✅ Added comprehensive date range filter to events page with presets (replaces "Show Past Events" button)
+
+## Proposed Hierarchical Category Taxonomy
+
+Replace tags system with hierarchical categories (Primary → Secondary):
+
+1. **Builds** → Macro, Timing Attack, All-in, Cheese, Defensive
+2. **Strategy** → Early Game, Mid Game, Late Game, Transitions, Scouting
+3. **Mechanics** → Macro, Micro, Multitasking, Army Control
+4. **Mindset** → Decision Making, Tilt Management, Learning, Game Sense
+5. **Matchups** → TvT, TvZ, TvP, ZvT, ZvZ, ZvP, PvT, PvZ, PvP
+6. **Analysis** → Replay Reviews, Pro Games, Ladder Games, Tournament Games
+7. **Misc.** → Tips & Tricks, Maps, Team Games, Casual, Meta Discussion
+
+Note: Not all primaries need secondaries. Empty categories should still show in sidebar but be selectable in edit modals.
+
+## Remaining Tasks (Priority Order)
+
+### 1. Navigation Menu (2-layer with dropdowns)
+- **Desktop**: Hover-based flyout menus
+- **Mobile**: Touch-to-toggle dropdowns
+- **Proposed Structure**:
+  - **Content**: VOD Library, Build Orders, Replays, Masterclasses
+  - **Community**: Events, Discord, Tournaments (new placeholder)
+  - **About**: About, Coaches, Sponsors (new placeholder), Partners (new placeholder)
+- Files to modify:
+  - `src/components/main-nav.tsx`
+
+### 2. Mux Thumbnail Control
+- Add thumbnail timestamp selection to MuxUpload component
+- Currently missing from non-VOD edit modals (build orders, replays, masterclasses)
+- Files:
+  - `src/components/admin/mux-upload.tsx`
+  - Test in modals: build-order-edit-modal, replay-edit-modal, masterclass-edit-modal
+
+### 3. Hierarchical Category System
+#### 3a. Type Definitions
+- Add `primaryCategory` and `secondaryCategory` fields to all content types
+- Remove `tags` arrays
+- Update difficulty: `'beginner' | 'intermediate' | 'advanced'` → `'basic' | 'intermediate' | 'expert'`
+- Files:
+  - `src/types/video.ts`
+  - `src/types/build-order.ts`
+  - `src/types/replay.ts`
+  - `src/types/masterclass.ts`
+  - `src/types/event.ts` (if applicable)
+
+#### 3b. Create CategorySelector Component
+- Reusable component for selecting primary/secondary categories
+- Shows secondary dropdown only when primary is selected
+- Saves consistently across all content types
+- Files:
+  - NEW: `src/components/shared/category-selector.tsx`
+
+#### 3c. Update All Edit Modals
+- Replace tag inputs with CategorySelector
+- Update difficulty dropdowns to Basic/Intermediate/Expert
+- Files:
+  - `src/components/admin/video-edit-modal.tsx`
+  - `src/components/admin/build-order-edit-modal.tsx`
+  - `src/components/admin/replay-edit-modal.tsx`
+  - `src/components/admin/masterclass-edit-modal.tsx`
+  - `src/components/admin/event-edit-modal.tsx`
+
+#### 3d. Update Filter Sidebars
+- Replace tag filters with hierarchical category filters
+- Show secondary category checkboxes when primary is selected
+- Files:
+  - `src/components/videos/video-library-content.tsx`
+  - `src/components/build-orders/build-orders-content.tsx`
+  - `src/components/replays/replays-content.tsx`
+  - `src/components/masterclasses/masterclasses-content.tsx`
+
+#### 3e. Remove "Content Type" Filter from VOD Library
+- Remove the single/playlist filter (useless distinction)
+- Files:
+  - `src/components/videos/video-library-content.tsx`
+
+#### 3f. Content Migration (ISOLATED COMMIT)
+- Update all JSON files to use new category system
+- Map existing tags to appropriate categories
+- Set all masterclasses difficulty to "expert"
+- Files:
+  - `src/data/videos.json`
+  - `src/data/build-orders.json`
+  - `src/data/replays.json`
+  - `src/data/masterclasses.json`
+  - `src/data/events.json`
+- ⚠️ IMPORTANT: Make this a separate commit for easy rollback
+
+### 4. Marketing Homepage
+- Redesign homepage to be marketing-focused (like fossa.com)
+- Showcase content, features, testimonials
+- Clear CTAs for subscription
+- Files:
+  - `src/app/page.tsx`
+  - Possibly new components in `src/components/homepage/`
+
+## Tag Migration Reference
+
+Existing tags to map:
+- Race/Matchup: terran, zerg, protoss, pvp, pvt, pvz, tvp, tvt, tvz
+- Mechanics: macro, micro, scouting
+- Strategy: cheese, defense, timing, first5minutes, meta, playstyle, mindgames
+- Mindset: mentality
+- Analysis: replay, replay analysis, replayreview, gamecast, commentary
+- Misc: advanced, build order, coaching, coaching session, competition, gameplay, krystianer, nico, ladder, maps, masterclass, patch, pro, team games, tipsandtricks, tipsntricks, casual
+
+## Testing Checklist
+- [ ] Desktop navigation hover states work
+- [ ] Mobile navigation touch toggles work
+- [ ] Mux thumbnail selection saves correctly
+- [ ] Category selection UI is intuitive
+- [ ] Filters work with new category system
+- [ ] Content displays correctly with categories
+- [ ] Build passes with no errors
+- [ ] All pages render without 404s
+
+## Notes
+- User prefers semantic, hierarchical organization over free-form tags
+- Smooth scrolling is required
+- Branding color (#e52322) should be used consistently but not overpoweringly
+- Edge compute costs are a concern - avoid force-dynamic where possible
