@@ -26,9 +26,9 @@ export function EventsContent() {
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showPastEvents, setShowPastEvents] = useState(() =>
-    searchParams.get('past') === 'true'
-  );
+  const [dateRange, setDateRange] = useState<'all' | 'past-week' | 'this-week' | 'next-week' | 'this-month' | 'next-month' | 'upcoming' | 'past' | 'custom'>('upcoming');
+  const [customStartDate, setCustomStartDate] = useState<string>('');
+  const [customEndDate, setCustomEndDate] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>(() =>
     searchParams.get('tags')?.split(',').filter(Boolean) || []
   );
@@ -40,7 +40,7 @@ export function EventsContent() {
   useUrlState({
     q: searchQuery,
     tags: selectedTags,
-    past: showPastEvents,
+    dateRange: dateRange,
   });
 
   // Get all unique tags
@@ -58,10 +58,73 @@ export function EventsContent() {
     );
   };
 
+  // Helper to get date range bounds
+  const getDateRangeBounds = (): { start: Date | null; end: Date | null } => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    switch (dateRange) {
+      case 'all':
+        return { start: null, end: null };
+
+      case 'past-week': {
+        const start = new Date(today);
+        start.setDate(start.getDate() - 7);
+        return { start, end: today };
+      }
+
+      case 'this-week': {
+        const start = new Date(today);
+        start.setDate(start.getDate() - start.getDay()); // Start of week (Sunday)
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6); // End of week (Saturday)
+        return { start, end };
+      }
+
+      case 'next-week': {
+        const start = new Date(today);
+        start.setDate(start.getDate() + (7 - start.getDay())); // Next Sunday
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6); // Next Saturday
+        return { start, end };
+      }
+
+      case 'this-month': {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return { start, end };
+      }
+
+      case 'next-month': {
+        const start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        return { start, end };
+      }
+
+      case 'upcoming':
+        return { start: now, end: null };
+
+      case 'past':
+        return { start: null, end: now };
+
+      case 'custom':
+        return {
+          start: customStartDate ? new Date(customStartDate) : null,
+          end: customEndDate ? new Date(customEndDate) : null,
+        };
+
+      default:
+        return { start: now, end: null }; // Default to upcoming
+    }
+  };
+
   // Filter and sort events
   const filteredEvents = useMemo(() => {
+    const { start: rangeStart, end: rangeEnd } = getDateRangeBounds();
+
     const filtered = allEvents.filter(event => {
       const status = getEventStatus(event);
+      const eventDate = new Date(`${event.date}T${event.time}`);
 
       // Search query
       if (searchQuery) {
@@ -76,8 +139,9 @@ export function EventsContent() {
         }
       }
 
-      // Show past events filter
-      if (!showPastEvents && status === 'past') return false;
+      // Date range filter
+      if (rangeStart && eventDate < rangeStart) return false;
+      if (rangeEnd && eventDate > rangeEnd) return false;
 
       // Tag filters
       if (selectedTags.length > 0) {
@@ -120,10 +184,25 @@ export function EventsContent() {
 
       return statusA === 'upcoming' ? dateA - dateB : dateB - dateA;
     });
-  }, [allEvents, selectedItems, showPastEvents, selectedTags, searchQuery]);
+  }, [allEvents, selectedItems, dateRange, customStartDate, customEndDate, selectedTags, searchQuery]);
 
   // Filter sections
   const filterSections: FilterSection[] = [
+    {
+      id: 'dateRange',
+      title: 'Date Range',
+      type: 'checkbox' as const,
+      items: [
+        { id: 'upcoming', label: 'Upcoming' },
+        { id: 'past', label: 'Past' },
+        { id: 'all', label: 'All Time' },
+        { id: 'past-week', label: 'Last Week' },
+        { id: 'this-week', label: 'This Week' },
+        { id: 'next-week', label: 'Next Week' },
+        { id: 'this-month', label: 'This Month' },
+        { id: 'next-month', label: 'Next Month' },
+      ],
+    },
     {
       id: 'type',
       title: 'Event Type',
@@ -174,6 +253,26 @@ export function EventsContent() {
     }
   };
 
+  // Handle filter selection change
+  const handleSelectionChange = (newSelectedItems: Record<string, string[]>) => {
+    // Handle date range separately (only one can be selected)
+    if (newSelectedItems.dateRange && newSelectedItems.dateRange.length > 0) {
+      const selected = newSelectedItems.dateRange[0];
+      setDateRange(selected as typeof dateRange);
+      // Remove dateRange from selectedItems since we handle it separately
+      const { dateRange: _, ...rest } = newSelectedItems;
+      setSelectedItems(rest);
+    } else {
+      setSelectedItems(newSelectedItems);
+    }
+  };
+
+  // Build selectedItems including the current dateRange
+  const displaySelectedItems = {
+    ...selectedItems,
+    dateRange: [dateRange],
+  };
+
   // Filter content
   const filterContent = (
     <FilterSidebar
@@ -182,8 +281,8 @@ export function EventsContent() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       sections={filterSections}
-      selectedItems={selectedItems}
-      onSelectionChange={setSelectedItems}
+      selectedItems={displaySelectedItems}
+      onSelectionChange={handleSelectionChange}
     />
   );
 
@@ -208,21 +307,12 @@ export function EventsContent() {
 
   // Header actions
   const headerActions = (
-    <div className="flex items-center gap-4">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setShowPastEvents(!showPastEvents)}
-      >
-        {showPastEvents ? 'Hide Past Events' : 'Show Past Events'}
+    <PermissionGate require="coaches">
+      <Button onClick={handleAddNew} className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Add New Event
       </Button>
-      <PermissionGate require="coaches">
-        <Button onClick={handleAddNew} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add New Event
-        </Button>
-      </PermissionGate>
-    </div>
+    </PermissionGate>
   );
 
   return (

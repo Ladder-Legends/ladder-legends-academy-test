@@ -14,7 +14,9 @@ interface AddToCalendarButtonProps {
 
 export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }: AddToCalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -26,6 +28,21 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - buttonRect.bottom;
+      const spaceAbove = buttonRect.top;
+
+      // If not enough space below (need ~100px for dropdown), flip to top
+      if (spaceBelow < 100 && spaceAbove > spaceBelow) {
+        setDropdownPosition('top');
+      } else {
+        setDropdownPosition('bottom');
+      }
     }
   }, [isOpen]);
 
@@ -44,6 +61,7 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
   return (
     <div className="relative" ref={dropdownRef}>
       <Button
+        ref={buttonRef}
         variant={variant}
         size={size}
         onClick={() => setIsOpen(!isOpen)}
@@ -55,7 +73,11 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-popover border border-border z-50">
+        <div
+          className={`absolute right-0 w-48 rounded-md shadow-lg bg-popover border border-border z-50 ${
+            dropdownPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+          }`}
+        >
           <div className="py-1">
             <button
               onClick={handleGoogleCalendar}
