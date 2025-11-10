@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Masterclass, Race } from '@/types/masterclass';
+import { Difficulty } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import masterclasses from '@/data/masterclasses.json';
@@ -106,7 +107,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         coachId: '',
         race: 'all',
         videoIds: [],
-        difficulty: 'beginner',
+        difficulty: 'basic',
         tags: [],
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
@@ -191,7 +192,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       videoIds: formData.videoIds || [],
       replayIds: formData.replayIds || [],
       buildOrderIds: formData.buildOrderIds || [],
-      difficulty: formData.difficulty || 'beginner',
+      difficulty: formData.difficulty || 'basic',
       tags: formData.tags || [],
       thumbnail: thumbnail,
       createdAt: formData.createdAt || new Date().toISOString().split('T')[0],
@@ -291,14 +292,13 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           <div>
             <label className="block text-sm font-medium mb-1">Difficulty</label>
             <select
-              value={formData.difficulty || 'beginner'}
-              onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'beginner' | 'intermediate' | 'advanced' | 'all' })}
+              value={formData.difficulty || 'basic'}
+              onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
             >
-              <option value="beginner">Beginner</option>
+              <option value="basic">Basic</option>
               <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-              <option value="all">All Levels</option>
+              <option value="expert">Expert</option>
             </select>
           </div>
         </div>

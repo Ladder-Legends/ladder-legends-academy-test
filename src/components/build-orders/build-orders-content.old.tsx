@@ -198,9 +198,9 @@ export function BuildOrdersContent() {
       title: 'Difficulty',
       type: 'checkbox' as const,
       items: [
-        { id: 'beginner', label: 'Beginner', count: getCount(bo => bo.difficulty === 'beginner', 'difficulty') },
+        { id: 'basic', label: 'Basic', count: getCount(bo => bo.difficulty === 'basic', 'difficulty') },
         { id: 'intermediate', label: 'Intermediate', count: getCount(bo => bo.difficulty === 'intermediate', 'difficulty') },
-        { id: 'advanced', label: 'Advanced', count: getCount(bo => bo.difficulty === 'advanced', 'difficulty') },
+        { id: 'expert', label: 'Expert', count: getCount(bo => bo.difficulty === 'expert', 'difficulty') },
       ],
     },
   ], [selectedTags, selectedItems, getCount, allTypes]);

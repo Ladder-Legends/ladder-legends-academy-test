@@ -1,6 +1,7 @@
 import { Video, getVideoThumbnailUrl, Difficulty } from './video';
 import type { PrimaryCategory, SecondaryCategory } from '@/lib/taxonomy';
 
+export type { Difficulty } from './video'; // Re-export for convenience
 export type Race = 'terran' | 'zerg' | 'protoss';
 export type VsRace = 'terran' | 'zerg' | 'protoss' | 'all';
 export type BuildType = 'macro' | 'all-in' | 'timing' | 'cheese' | 'defensive';

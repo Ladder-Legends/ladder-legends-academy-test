@@ -97,7 +97,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         name: '',
         race: 'terran',
         vsRace: 'terran',
-        difficulty: 'beginner',
+        difficulty: 'basic',
         coach: '',
         coachId: '',
         description: '',
@@ -572,7 +572,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       name: formData.name,
       race: formData.race || 'terran',
       vsRace: formData.vsRace || 'terran',
-      difficulty: formData.difficulty || 'beginner',
+      difficulty: formData.difficulty || 'basic',
       coach: formData.coach || '',
       coachId: formData.coachId || '',
       description: formData.description || '',
@@ -998,13 +998,13 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             <div>
               <label className="block text-sm font-medium mb-1">Difficulty *</label>
               <select
-                value={formData.difficulty || 'beginner'}
+                value={formData.difficulty || 'basic'}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
               >
-                <option value="beginner">Beginner</option>
+                <option value="basic">Basic</option>
                 <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
+                <option value="expert">Expert</option>
               </select>
             </div>
 
