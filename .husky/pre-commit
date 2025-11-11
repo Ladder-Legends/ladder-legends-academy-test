@@ -1,0 +1,10 @@
+#!/bin/sh
+echo "🧪 Running tests before commit..."
+
+# Run all tests
+npm test || {
+  echo "❌ Tests failed! Please fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ All tests passed!"
