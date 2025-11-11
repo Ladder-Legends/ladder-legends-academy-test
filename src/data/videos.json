@@ -260,10 +260,7 @@
     "race": "all",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": true,
-    "categories": [
-      "builds.macro"
-    ]
+    "isFree": true
   },
   {
     "id": "11",
