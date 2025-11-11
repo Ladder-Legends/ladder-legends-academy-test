@@ -82,6 +82,58 @@ async function fetchFiles(
 }
 
 /**
+ * Fixes references to videos in build orders, replays, and events
+ * Removes invalid video IDs and logs warnings
+ */
+function fixVideoReferences(
+  files: Record<string, FileInfo>,
+  validVideoIds: Set<string>
+): Record<string, FileInfo> {
+  const updatedFiles = { ...files };
+  const typesToFix = ['build-orders', 'replays', 'events'] as const;
+
+  for (const contentType of typesToFix) {
+    if (!updatedFiles[contentType]) continue;
+
+    const content = updatedFiles[contentType].content as Record<string, unknown>[];
+    let fixedCount = 0;
+
+    const fixedContent = content.map((item: Record<string, unknown>) => {
+      const videoIds = item.videoIds as string[] | undefined;
+      if (!videoIds || !Array.isArray(videoIds) || videoIds.length === 0) {
+        return item;
+      }
+
+      const validIds = videoIds.filter(id => validVideoIds.has(id));
+
+      if (validIds.length !== videoIds.length) {
+        const invalidIds = videoIds.filter(id => !validVideoIds.has(id));
+        console.log(
+          `[REFERENCE CLEANUP] Fixed ${contentType}/${item.id}: ` +
+          `removed ${invalidIds.length} invalid video reference(s): ${invalidIds.join(', ')}`
+        );
+        fixedCount++;
+      }
+
+      return {
+        ...item,
+        videoIds: validIds,
+      };
+    });
+
+    if (fixedCount > 0) {
+      console.log(`[REFERENCE CLEANUP] Fixed ${fixedCount} ${contentType} item(s) with invalid video references`);
+      updatedFiles[contentType] = {
+        ...updatedFiles[contentType],
+        content: fixedContent,
+      };
+    }
+  }
+
+  return updatedFiles;
+}
+
+/**
  * Applies changes to file contents (pure function - easily testable!)
  */
 function applyChanges(
@@ -346,16 +398,47 @@ async function commitWithRetry(
 
   const contentTypes = Object.keys(changesByType) as Exclude<ContentType, 'file'>[];
 
+  // Check if we need to fix video references
+  const needsReferenceFix = contentTypes.some(t => ['build-orders', 'replays', 'events'].includes(t));
+
   for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
     try {
       // 1. Fetch current JSON files (fresh on each attempt)
-      const files = contentTypes.length > 0 ? await fetchFiles(contentTypes, token) : {};
+      // Always fetch videos if we're modifying content with video references
+      const typesToFetch = needsReferenceFix && !contentTypes.includes('videos')
+        ? [...contentTypes, 'videos' as Exclude<ContentType, 'file'>]
+        : contentTypes;
+
+      const files = typesToFetch.length > 0 ? await fetchFiles(typesToFetch, token) : {};
 
       // 2. Apply changes (pure function - idempotent)
-      const updatedFiles = contentTypes.length > 0 ? applyChanges(files, changesByType) : {};
+      let updatedFiles = contentTypes.length > 0 ? applyChanges(files, changesByType) : {};
 
-      // 3. Create Git commit (atomic operation) with both JSON and file changes
-      const result = await createGitCommit(updatedFiles, fileChanges, commitMessage, token);
+      // 3. Fix video references (removes invalid IDs from build orders, replays, events)
+      if (needsReferenceFix && updatedFiles['videos']) {
+        const videoContent = updatedFiles['videos'].content as Record<string, unknown>[];
+        const validVideoIds = new Set(videoContent.map(v => v.id as string));
+        updatedFiles = fixVideoReferences(updatedFiles, validVideoIds);
+      }
+
+      // 4. Only commit files that were actually changed (don't include videos if it was just fetched for validation)
+      const filesToCommit: Record<string, FileInfo> = {};
+      for (const contentType of contentTypes) {
+        if (updatedFiles[contentType]) {
+          filesToCommit[contentType] = updatedFiles[contentType];
+        }
+      }
+      // Include fixed files even if they weren't in the original changes
+      if (needsReferenceFix) {
+        for (const type of ['build-orders', 'replays', 'events'] as const) {
+          if (updatedFiles[type] && !filesToCommit[type]) {
+            filesToCommit[type] = updatedFiles[type];
+          }
+        }
+      }
+
+      // 5. Create Git commit (atomic operation) with both JSON and file changes
+      const result = await createGitCommit(filesToCommit, fileChanges, commitMessage, token);
 
       return { ...result, attempts: attempt };
     } catch (error) {
