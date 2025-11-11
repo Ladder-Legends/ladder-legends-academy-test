@@ -18,6 +18,7 @@ import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
 import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
+import { FileUpload } from './file-upload';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -390,22 +391,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     }
   };
 
-  const handleReplayFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file extension
-    if (!file.name.endsWith('.SC2Replay')) {
-      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
-      return;
-    }
-
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size exceeds maximum allowed size of 5MB');
-      return;
-    }
-
+  const handleReplayFileSelect = async (file: File) => {
     setUploadedReplayFile(file); // Save the file for later upload
 
     // Auto-analyze the replay
@@ -413,9 +399,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       await analyzeReplayFile(file);
     } catch (error) {
       setUploadedReplayFile(null);
-    } finally {
-      // Reset the input
-      e.target.value = '';
     }
   };
 
@@ -768,27 +751,14 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
               ) : (
                 <div className="space-y-3">
                   {/* Upload replay to link AND import build order */}
-                  <div>
-                    <label className="block">
-                      <input
-                        type="file"
-                        accept=".SC2Replay"
-                        onChange={handleReplayFileSelect}
-                        disabled={isAnalyzing}
-                        className="hidden"
-                      />
-                      <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
-                        isAnalyzing
-                          ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'border-primary text-primary bg-transparent hover:bg-primary/10'
-                      }`}>
-                        {isAnalyzing ? 'Analyzing...' : 'Upload Replay File'}
-                      </span>
-                    </label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Upload a .SC2Replay file to extract build order and link it to this build order
-                    </p>
-                  </div>
+                  <FileUpload
+                    onFileSelect={handleReplayFileSelect}
+                    accept=".SC2Replay"
+                    maxSizeMB={5}
+                    label="Upload Replay File"
+                    description="Drag and drop a .SC2Replay file or click to browse to extract build order (max 5MB)"
+                    uploading={isAnalyzing}
+                  />
 
                   {/* Show player selection and import/link actions */}
                   {replayAnalysisData && (

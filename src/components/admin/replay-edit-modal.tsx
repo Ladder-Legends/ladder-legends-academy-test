@@ -15,6 +15,7 @@ import videosJson from '@/data/videos.json';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
+import { FileUpload } from './file-upload';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -203,22 +204,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     });
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file extension
-    if (!file.name.endsWith('.SC2Replay')) {
-      toast.error('Invalid file type. Only .SC2Replay files are allowed.');
-      return;
-    }
-
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size exceeds maximum allowed size of 5MB');
-      return;
-    }
-
+  const handleFileUpload = async (file: File) => {
     setIsUploading(true);
 
     try {
@@ -256,8 +242,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       toast.error(error instanceof Error ? error.message : 'Failed to upload file');
     } finally {
       setIsUploading(false);
-      // Reset the input
-      e.target.value = '';
     }
   };
 
@@ -691,27 +675,15 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                 </div>
               )}
 
-              {/* File upload button */}
-              <label className="block">
-                <input
-                  type="file"
-                  accept=".SC2Replay"
-                  onChange={handleFileUpload}
-                  disabled={isUploading}
-                  className="hidden"
-                />
-                <span className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors cursor-pointer ${
-                  isUploading
-                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'border-primary text-primary bg-transparent hover:bg-primary/10'
-                }`}>
-                  {isUploading ? 'Uploading...' : formData.downloadUrl ? 'Replace File' : 'Upload File'}
-                </span>
-              </label>
-
-              <p className="text-xs text-muted-foreground">
-                Max file size: 5MB • Allowed: .SC2Replay files
-              </p>
+              {/* File upload */}
+              <FileUpload
+                onFileSelect={handleFileUpload}
+                accept=".SC2Replay"
+                maxSizeMB={5}
+                label={formData.downloadUrl ? 'Replace Replay File' : 'Select Replay File'}
+                description="Drag and drop a .SC2Replay file or click to browse (max 5MB)"
+                uploading={isUploading}
+              />
 
               {/* Analyze Replay Button */}
               {analyzedReplayFile && (

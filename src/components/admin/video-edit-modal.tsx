@@ -15,6 +15,7 @@ import { MuxUpload } from './mux-upload';
 import { VideoSelector } from './video-selector-enhanced';
 import { extractYouTubeId } from '@/lib/youtube-parser';
 import { MultiCategorySelector } from './multi-category-selector';
+import { FileUpload } from './file-upload';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -186,22 +187,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     }
   };
 
-  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be less than 2MB');
-      return;
-    }
-
+  const handleThumbnailUpload = async (file: File) => {
     // Convert to base64
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -546,29 +532,13 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                       </button>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleThumbnailUpload}
-                        className="hidden"
-                        id="thumbnail-upload"
-                      />
-                      <label
-                        htmlFor="thumbnail-upload"
-                        className="cursor-pointer flex flex-col items-center gap-2"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                          <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Click to upload custom thumbnail</p>
-                          <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 2MB</p>
-                        </div>
-                      </label>
-                    </div>
+                    <FileUpload
+                      onFileSelect={handleThumbnailUpload}
+                      accept="image/*"
+                      maxSizeMB={2}
+                      label="Select Thumbnail"
+                      description="Drag and drop an image or click to browse (PNG, JPG up to 2MB)"
+                    />
                   )}
                   <p className="text-xs text-muted-foreground">
                     {customThumbnail
