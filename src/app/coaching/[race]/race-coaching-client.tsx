@@ -79,7 +79,7 @@ export function RaceCoachingClient({
                 race === 'zerg'
                   ? 'sepia'
                   : race === 'protoss'
-                  ? '[filter:sepia(35%)_hue-rotate(230deg)_saturate(150%)]'
+                  ? '[filter:saturate(50%)]'
                   : 'grayscale'
               }`}
               style={{
