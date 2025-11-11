@@ -25,42 +25,12 @@ function parseDuration(duration: string): number {
  * Filter field configurations
  */
 const fields: FilterFieldConfig<Replay>[] = [
-  // Terran matchups
+  // Unified matchup filter (replaces separate terran/zerg/protoss)
   {
-    id: 'terran',
-    urlParam: 'terran',
+    id: 'matchups',
+    urlParam: 'matchups',
     predicate: (replay, filters) => {
-      const selectedMatchups = filters.terran;
-      if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
-        return true;
-      }
-
-      const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
-      return matchups.includes(replay.matchup);
-    },
-  },
-
-  // Zerg matchups
-  {
-    id: 'zerg',
-    urlParam: 'zerg',
-    predicate: (replay, filters) => {
-      const selectedMatchups = filters.zerg;
-      if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
-        return true;
-      }
-
-      const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
-      return matchups.includes(replay.matchup);
-    },
-  },
-
-  // Protoss matchups
-  {
-    id: 'protoss',
-    urlParam: 'protoss',
-    predicate: (replay, filters) => {
-      const selectedMatchups = filters.protoss;
+      const selectedMatchups = filters.matchups;
       if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
         return true;
       }
@@ -159,33 +129,37 @@ const sections: FilterSectionConfig<Replay>[] = [
     ],
   },
   {
-    id: 'terran',
-    title: 'Terran',
+    id: 'matchups',
+    title: 'Races',
     type: 'checkbox',
     options: [
-      { id: 'TvT', label: 'vs Terran' },
-      { id: 'TvZ', label: 'vs Zerg' },
-      { id: 'TvP', label: 'vs Protoss' },
-    ],
-  },
-  {
-    id: 'zerg',
-    title: 'Zerg',
-    type: 'checkbox',
-    options: [
-      { id: 'ZvT', label: 'vs Terran' },
-      { id: 'ZvZ', label: 'vs Zerg' },
-      { id: 'ZvP', label: 'vs Protoss' },
-    ],
-  },
-  {
-    id: 'protoss',
-    title: 'Protoss',
-    type: 'checkbox',
-    options: [
-      { id: 'PvT', label: 'vs Terran' },
-      { id: 'PvZ', label: 'vs Zerg' },
-      { id: 'PvP', label: 'vs Protoss' },
+      {
+        id: 'terran',
+        label: 'Terran',
+        children: [
+          { id: 'TvT', label: 'vs Terran' },
+          { id: 'TvZ', label: 'vs Zerg' },
+          { id: 'TvP', label: 'vs Protoss' },
+        ],
+      },
+      {
+        id: 'zerg',
+        label: 'Zerg',
+        children: [
+          { id: 'ZvT', label: 'vs Terran' },
+          { id: 'ZvZ', label: 'vs Zerg' },
+          { id: 'ZvP', label: 'vs Protoss' },
+        ],
+      },
+      {
+        id: 'protoss',
+        label: 'Protoss',
+        children: [
+          { id: 'PvT', label: 'vs Terran' },
+          { id: 'PvZ', label: 'vs Zerg' },
+          { id: 'PvP', label: 'vs Protoss' },
+        ],
+      },
     ],
   },
   {

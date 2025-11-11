@@ -12,56 +12,12 @@ import { getCategoryFilterOptions } from '@/lib/taxonomy';
  * Filter field configurations
  */
 const fields: FilterFieldConfig<BuildOrder>[] = [
-  // Terran matchups
+  // Unified matchup filter (replaces separate terran/zerg/protoss)
   {
-    id: 'terran',
-    urlParam: 'terran',
+    id: 'matchups',
+    urlParam: 'matchups',
     predicate: (buildOrder, filters) => {
-      const selectedMatchups = filters.terran;
-      if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
-        return true;
-      }
-
-      const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
-
-      return matchups.some(matchupId => {
-        if (!matchupId.includes('-')) return false;
-        const [race, matchup] = matchupId.split('-');
-        const vsRace = matchup.substring(matchup.length - 1);
-        const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-        return buildOrder.race === race && (buildOrder.vsRace === vsRaceMap[vsRace] || buildOrder.vsRace === 'all');
-      });
-    },
-  },
-
-  // Zerg matchups
-  {
-    id: 'zerg',
-    urlParam: 'zerg',
-    predicate: (buildOrder, filters) => {
-      const selectedMatchups = filters.zerg;
-      if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
-        return true;
-      }
-
-      const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
-
-      return matchups.some(matchupId => {
-        if (!matchupId.includes('-')) return false;
-        const [race, matchup] = matchupId.split('-');
-        const vsRace = matchup.substring(matchup.length - 1);
-        const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };
-        return buildOrder.race === race && (buildOrder.vsRace === vsRaceMap[vsRace] || buildOrder.vsRace === 'all');
-      });
-    },
-  },
-
-  // Protoss matchups
-  {
-    id: 'protoss',
-    urlParam: 'protoss',
-    predicate: (buildOrder, filters) => {
-      const selectedMatchups = filters.protoss;
+      const selectedMatchups = filters.matchups;
       if (!selectedMatchups || (Array.isArray(selectedMatchups) && selectedMatchups.length === 0)) {
         return true;
       }
@@ -127,33 +83,37 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
     ],
   },
   {
-    id: 'terran',
-    title: 'Terran',
+    id: 'matchups',
+    title: 'Races',
     type: 'checkbox',
     options: [
-      { id: 'terran-tvt', label: 'vs Terran' },
-      { id: 'terran-tvz', label: 'vs Zerg' },
-      { id: 'terran-tvp', label: 'vs Protoss' },
-    ],
-  },
-  {
-    id: 'zerg',
-    title: 'Zerg',
-    type: 'checkbox',
-    options: [
-      { id: 'zerg-zvt', label: 'vs Terran' },
-      { id: 'zerg-zvz', label: 'vs Zerg' },
-      { id: 'zerg-zvp', label: 'vs Protoss' },
-    ],
-  },
-  {
-    id: 'protoss',
-    title: 'Protoss',
-    type: 'checkbox',
-    options: [
-      { id: 'protoss-pvt', label: 'vs Terran' },
-      { id: 'protoss-pvz', label: 'vs Zerg' },
-      { id: 'protoss-pvp', label: 'vs Protoss' },
+      {
+        id: 'terran',
+        label: 'Terran',
+        children: [
+          { id: 'terran-tvt', label: 'vs Terran' },
+          { id: 'terran-tvz', label: 'vs Zerg' },
+          { id: 'terran-tvp', label: 'vs Protoss' },
+        ],
+      },
+      {
+        id: 'zerg',
+        label: 'Zerg',
+        children: [
+          { id: 'zerg-zvt', label: 'vs Terran' },
+          { id: 'zerg-zvz', label: 'vs Zerg' },
+          { id: 'zerg-zvp', label: 'vs Protoss' },
+        ],
+      },
+      {
+        id: 'protoss',
+        label: 'Protoss',
+        children: [
+          { id: 'protoss-pvt', label: 'vs Terran' },
+          { id: 'protoss-pvz', label: 'vs Zerg' },
+          { id: 'protoss-pvp', label: 'vs Protoss' },
+        ],
+      },
     ],
   },
   {

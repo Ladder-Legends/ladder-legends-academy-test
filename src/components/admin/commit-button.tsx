@@ -93,7 +93,7 @@ export function CommitButton() {
   if (!hasChanges) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-40">
       <div className="bg-card border-2 border-primary rounded-lg shadow-lg shadow-primary/20 p-4 min-w-[300px]">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
