@@ -1405,5 +1405,24 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "b912495c-3501-433e-9ecf-a147c97eea70",
+    "title": "Navigating TvP with GamerRichy",
+    "description": "This video showcases how to navigate Terran Vs Protoss from the Terran side ",
+    "source": "mux",
+    "muxAssetId": "01g1c0102WvBOfFVf3NZtV00AP7ZBCaoXyxGQbzY02QcV6uM",
+    "muxPlaybackId": "uvqziI75CiIRzWS12jXn02uFkHBtRDnLiIEaIH01Bx3bg",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/b912495c-3501-433e-9ecf-a147c97eea70.jpg",
+    "date": "2025-11-11",
+    "tags": [
+      "terran",
+      "macro"
+    ],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
