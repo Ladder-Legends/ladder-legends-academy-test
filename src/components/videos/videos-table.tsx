@@ -1,8 +1,8 @@
 'use client';
 
-import { Video, isPlaylist, isMuxVideo } from '@/types/video';
+import { Video } from '@/types/video';
 import Link from 'next/link';
-import { Lock, Edit, Trash2, Play, List } from 'lucide-react';
+import { Lock, Edit, Trash2, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
@@ -39,36 +39,18 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
     );
   };
 
-  const getDifficultyBadge = (difficulty?: string) => {
-    if (!difficulty) return null;
-
-    const colors: Record<string, string> = {
-      basic: 'bg-green-500/10 text-green-500 border-green-500/20',
-      intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-      expert: 'bg-red-500/10 text-red-500 border-red-500/20',
-    };
-
-    return (
-      <Badge variant="outline" className={colors[difficulty.toLowerCase()] || 'bg-muted'}>
-        {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-      </Badge>
-    );
-  };
-
-  const getSourceBadge = (video: Video) => {
-    if (isPlaylist(video)) {
+  const getAccessBadge = (video: Video) => {
+    if (video.isFree) {
       return (
-        <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
-          <List className="w-3 h-3 mr-1" />
-          Playlist
+        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+          Free
         </Badge>
       );
     }
-
-    const source = isMuxVideo(video) ? 'Mux' : 'YouTube';
     return (
-      <Badge variant="outline" className="bg-muted">
-        {source}
+      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+        <Lock className="w-3 h-3 mr-1" />
+        Premium
       </Badge>
     );
   };
@@ -117,27 +99,11 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
       render: (video) => getRaceBadge(video.race),
     },
     {
-      id: 'difficulty',
-      label: 'Difficulty',
+      id: 'accessLevel',
+      label: 'Access',
       sortable: true,
-      sortFn: (a, b, direction) => {
-        const difficultyOrder: Record<string, number> = { basic: 1, intermediate: 2, expert: 3 };
-        const aValue = a.difficulty ? difficultyOrder[a.difficulty.toLowerCase()] || 0 : 0;
-        const bValue = b.difficulty ? difficultyOrder[b.difficulty.toLowerCase()] || 0 : 0;
-        const comparison = aValue - bValue;
-        return direction === 'asc' ? comparison : -comparison;
-      },
-      render: (video) => getDifficultyBadge(video.difficulty),
-    },
-    {
-      id: 'source',
-      label: 'Source',
-      sortable: true,
-      getValue: (video) => {
-        if (isPlaylist(video)) return 'playlist';
-        return isMuxVideo(video) ? 'mux' : 'youtube';
-      },
-      render: (video) => getSourceBadge(video),
+      getValue: (video) => video.isFree ? 'free' : 'premium',
+      render: (video) => getAccessBadge(video),
     },
     {
       id: 'date',
