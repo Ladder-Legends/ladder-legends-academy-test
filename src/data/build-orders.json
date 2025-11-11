@@ -2530,7 +2530,7 @@
     "id": "01b835ed-860c-4dc4-aec1-8f31e2894be8",
     "name": "5-1-1 2 base tank push in TvP",
     "race": "terran",
-    "vsRace": "terran",
+    "vsRace": "protoss",
     "difficulty": "basic",
     "coach": "Nico",
     "coachId": "coach-nico",
