@@ -103,9 +103,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Check for subscriber status - ALL Mux videos are premium content
-    const hasSubscription = session.user?.role === 'subscriber' ||
-                           session.user?.role === 'coach' ||
-                           session.user?.role === 'owner';
+    const hasSubscription = session.user?.hasSubscriberRole ||
+                           session.user?.roles?.includes('coaches') ||
+                           session.user?.roles?.includes('owner');
 
     if (!hasSubscription) {
       return NextResponse.json(
@@ -206,9 +206,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for subscriber status - ALL Mux videos are premium content
-    const hasSubscription = session.user?.role === 'subscriber' ||
-                           session.user?.role === 'coach' ||
-                           session.user?.role === 'owner';
+    const hasSubscription = session.user?.hasSubscriberRole ||
+                           session.user?.roles?.includes('coaches') ||
+                           session.user?.roles?.includes('owner');
 
     if (!hasSubscription) {
       return NextResponse.json(
