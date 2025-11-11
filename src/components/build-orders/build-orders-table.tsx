@@ -147,6 +147,15 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
                 <SortIcon field="coach" />
               </button>
             </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('updatedAt')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Updated
+                <SortIcon field="updatedAt" />
+              </button>
+            </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
           </tr>
         </thead>
@@ -187,6 +196,11 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
               <td className="px-6 py-4">
                 <span className="text-sm text-muted-foreground">
                   {buildOrder.coach || '—'}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <span className="text-sm text-muted-foreground">
+                  {new Date(buildOrder.updatedAt).toLocaleDateString()}
                 </span>
               </td>
               <td className="px-6 py-4">

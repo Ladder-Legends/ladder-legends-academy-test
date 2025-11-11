@@ -11,7 +11,7 @@ import { getContentVideoUrl } from '@/lib/video-helpers';
 import videosData from '@/data/videos.json';
 import { Video as VideoType } from '@/types/video';
 
-type SortField = 'title' | 'matchup' | 'map' | 'duration' | 'date';
+type SortField = 'title' | 'matchup' | 'map' | 'duration' | 'gameDate' | 'uploadDate';
 type SortDirection = 'asc' | 'desc';
 
 interface ReplaysTableProps {
@@ -23,7 +23,7 @@ interface ReplaysTableProps {
 
 export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: ReplaysTableProps) {
   const allVideos = videosData as VideoType[];
-  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortField, setSortField] = useState<SortField>('uploadDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   // Helper function to parse duration string (e.g., "12.34" or "12:34") into minutes
@@ -61,9 +61,13 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
           aValue = parseDuration(a.duration);
           bValue = parseDuration(b.duration);
           break;
-        case 'date':
-          aValue = new Date(a.uploadDate || a.gameDate).getTime();
-          bValue = new Date(b.uploadDate || b.gameDate).getTime();
+        case 'gameDate':
+          aValue = new Date(a.gameDate).getTime();
+          bValue = new Date(b.gameDate).getTime();
+          break;
+        case 'uploadDate':
+          aValue = new Date(a.uploadDate).getTime();
+          bValue = new Date(b.uploadDate).getTime();
           break;
         default:
           return 0;
@@ -153,11 +157,20 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
             </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">
               <button
-                onClick={() => handleSort('date')}
+                onClick={() => handleSort('gameDate')}
                 className="flex items-center hover:text-primary transition-colors"
               >
-                Date
-                <SortIcon field="date" />
+                Game Date
+                <SortIcon field="gameDate" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('uploadDate')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Added
+                <SortIcon field="uploadDate" />
               </button>
             </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
@@ -214,6 +227,11 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
               <td className="px-6 py-4">
                 <span className="text-sm text-muted-foreground">
                   {new Date(replay.gameDate).toLocaleDateString()}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <span className="text-sm text-muted-foreground">
+                  {new Date(replay.uploadDate).toLocaleDateString()}
                 </span>
               </td>
               <td className="px-6 py-4">
