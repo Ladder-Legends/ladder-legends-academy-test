@@ -5,6 +5,7 @@ import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useTheme } from '@/hooks/use-theme';
+import { useUserTimezone } from '@/hooks/use-user-timezone';
 import { Event, EventType } from '@/types/event';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +13,7 @@ import eventsData from '@/data/events.json';
 import { CoachSelector } from '@/components/shared/coach-selector';
 import { VideoSelector } from '@/components/admin/video-selector';
 import { MultiCategorySelector } from './multi-category-selector';
+import { TIMEZONES, getTimezoneDisplayName } from '@/lib/timezone-utils';
 import dynamic from 'next/dynamic';
 
 // Dynamically import the markdown editor (client-side only)
@@ -36,23 +38,10 @@ const eventTypes: EventType[] = [
   'other',
 ];
 
-const timezones = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'America/Phoenix',
-  'Europe/London',
-  'Europe/Paris',
-  'Europe/Berlin',
-  'Asia/Tokyo',
-  'Asia/Seoul',
-  'Australia/Sydney',
-];
-
 export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventEditModalProps) {
   const { addChange } = usePendingChanges();
   const { theme } = useTheme();
+  const { timezone: userTimezone, isLoading: timezoneLoading } = useUserTimezone();
 
   const [formData, setFormData] = useState<Partial<Event>>({
     title: '',
@@ -60,7 +49,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
     type: 'tournament',
     date: '',
     time: '18:00',
-    timezone: 'America/New_York',
+    timezone: userTimezone,
     duration: 60,
     coach: '',
     isFree: false,
@@ -78,15 +67,16 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
 
     if (event) {
       setFormData(event);
-    } else if (isNew) {
+    } else if (isNew && !timezoneLoading) {
       // Reset form data when opening in "add new" mode
+      // Default timezone to user's detected timezone
       setFormData({
         title: '',
         description: '',
         type: 'tournament',
         date: '',
         time: '18:00',
-        timezone: 'America/New_York',
+        timezone: userTimezone,
         duration: 60,
         coach: '',
         isFree: false,
@@ -97,7 +87,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         },
       });
     }
-  }, [event, isNew, isOpen]);
+  }, [event, isNew, isOpen, userTimezone, timezoneLoading]);
 
   const handleSave = () => {
     // Validation
@@ -247,9 +237,9 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
               onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
               className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
             >
-              {timezones.map((tz) => (
+              {TIMEZONES.map((tz) => (
                 <option key={tz} value={tz}>
-                  {tz.replace('_', ' ')}
+                  {getTimezoneDisplayName(tz)}
                 </option>
               ))}
             </select>
