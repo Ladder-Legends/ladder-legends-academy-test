@@ -26,7 +26,7 @@ export function ReplaysContent() {
 
   // Use the new filtering system
   const {
-    filtered: filteredReplays,
+    filtered,
     filters,
     setFilter,
     clearFilters,
@@ -37,6 +37,16 @@ export function ReplaysContent() {
     clearTags,
     sections: filterSections,
   } = useContentFiltering(allReplays, replayFilterConfig);
+
+  // Sort replays by upload date (newest first)
+  const filteredReplays = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      // Parse dates and sort newest first
+      const dateA = new Date(a.uploadDate || a.gameDate).getTime();
+      const dateB = new Date(b.uploadDate || b.gameDate).getTime();
+      return dateB - dateA; // Descending order (newest first)
+    });
+  }, [filtered]);
 
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);

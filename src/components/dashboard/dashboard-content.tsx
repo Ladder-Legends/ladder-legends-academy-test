@@ -61,6 +61,17 @@ export function DashboardContent() {
       <div className="max-w-[1920px] mx-auto">
         {/* Hero Section - Enhanced marketing style */}
         <section className="relative px-8 py-16 md:py-24 lg:py-32 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <div
+              className="absolute inset-0 bg-cover bg-no-repeat grayscale opacity-25"
+              style={{
+                backgroundImage: 'url(/homepage-hero-bg.jpg)',
+                backgroundPosition: 'center 45%', // Shift up to crop bottom bar
+                backgroundSize: 'cover',
+              }}
+            />
+          </div>
           {/* Background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />

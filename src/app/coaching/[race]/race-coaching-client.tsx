@@ -72,6 +72,17 @@ export function RaceCoachingClient({
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative px-8 py-16 md:py-24 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat grayscale opacity-30"
+              style={{
+                backgroundImage: `url(/${race}-hero-bg.jpg)`,
+                backgroundPosition: 'center center',
+                backgroundSize: 'cover',
+              }}
+            />
+          </div>
           {/* Gradient Overlay */}
           <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-10`} />
           <div className="relative max-w-7xl mx-auto">

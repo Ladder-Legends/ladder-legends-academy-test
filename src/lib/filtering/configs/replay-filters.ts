@@ -100,6 +100,38 @@ const fields: FilterFieldConfig<Replay>[] = [
     predicate: createBooleanPredicate('isFree', 'accessLevel', 'free', 'premium'),
   }),
 
+  // MMR range filter
+  {
+    id: 'mmrRange',
+    urlParam: 'mmrRange',
+    predicate: (replay, filters) => {
+      const mmrRange = filters.mmrRange;
+      if (!mmrRange || (Array.isArray(mmrRange) && mmrRange.length === 0)) {
+        return true;
+      }
+
+      const ranges = Array.isArray(mmrRange) ? mmrRange : [String(mmrRange)];
+
+      // Get the higher MMR from both players (winner typically has higher MMR)
+      const player1MMR = replay.player1.mmr || 0;
+      const player2MMR = replay.player2.mmr || 0;
+      const maxMMR = Math.max(player1MMR, player2MMR);
+
+      // If no MMR data, don't filter it out
+      if (maxMMR === 0) return true;
+
+      return ranges.some(range => {
+        if (range === 'under3000') return maxMMR < 3000;
+        if (range === '3000-3900') return maxMMR >= 3000 && maxMMR < 3900;
+        if (range === '3900-4500') return maxMMR >= 3900 && maxMMR < 4500;
+        if (range === '4500-5400') return maxMMR >= 4500 && maxMMR < 5400;
+        if (range === '5400-6000') return maxMMR >= 5400 && maxMMR < 6000;
+        if (range === 'over6000') return maxMMR >= 6000;
+        return false;
+      });
+    },
+  },
+
   // Category filter (multi-category support)
   createFilterField<Replay, 'categories'>({
     id: 'categories',
@@ -165,6 +197,19 @@ const sections: FilterSectionConfig<Replay>[] = [
       { id: '10-20', label: '10-20 min' },
       { id: '20-30', label: '20-30 min' },
       { id: 'over30', label: 'Over 30 min' },
+    ],
+  },
+  {
+    id: 'mmrRange',
+    title: 'MMR Range',
+    type: 'checkbox',
+    options: [
+      { id: 'under3000', label: '< 3000 (Bronze-Gold)' },
+      { id: '3000-3900', label: '3000-3900 (Platinum)' },
+      { id: '3900-4500', label: '3900-4500 (Diamond)' },
+      { id: '4500-5400', label: '4500-5400 (Master)' },
+      { id: '5400-6000', label: '5400-6000 (GM)' },
+      { id: 'over6000', label: '6000+ (Top GM)' },
     ],
   },
   {

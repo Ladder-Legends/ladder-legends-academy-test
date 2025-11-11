@@ -98,6 +98,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       bio: formData.bio,
       specialties: formData.specialties || [],
       bookingUrl: formData.bookingUrl,
+      pricePerHour: formData.pricePerHour,
       isActive: formData.isActive !== false, // Default to true if undefined
       socialLinks: {},
     };
@@ -221,6 +222,20 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
             placeholder="https://app.acuityscheduling.com/..."
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Price Per Hour</label>
+          <input
+            type="text"
+            value={formData.pricePerHour || ''}
+            onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background"
+            placeholder="£25/hr or $30/hr"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Display format for coaching session pricing (e.g., £25/hr, $30/hr)
+          </p>
         </div>
 
         <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-card/50">

@@ -20,6 +20,7 @@ interface Coach {
   bio: string;
   specialties: string[];
   bookingUrl: string;
+  pricePerHour?: string;
   isActive?: boolean;
   socialLinks: Record<string, string>;
 }
@@ -97,6 +98,11 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
                   <span className="text-muted-foreground text-sm">
                     {coachLabel}
                   </span>
+                  {coach.pricePerHour && (
+                    <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-md border-2 border-primary bg-primary/10 text-primary">
+                      {coach.pricePerHour}
+                    </span>
+                  )}
                 </div>
                 <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl">
                   {coach.bio}

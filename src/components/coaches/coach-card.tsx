@@ -25,6 +25,11 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
               <span className="text-sm text-muted-foreground">
                 {videoCount} video{videoCount !== 1 ? 's' : ''}
               </span>
+              {coach.pricePerHour && (
+                <span className="inline-block px-2 py-1 text-xs font-semibold rounded-md border border-primary/30 bg-primary/10 text-primary">
+                  {coach.pricePerHour}
+                </span>
+              )}
             </div>
           </div>
         </div>
