@@ -26,7 +26,7 @@ export function BuildOrdersContent() {
 
   // Use the new filtering system
   const {
-    filtered: filteredBuildOrders,
+    filtered,
     filters,
     setFilter,
     clearFilters,
@@ -37,6 +37,16 @@ export function BuildOrdersContent() {
     clearTags,
     sections: filterSections,
   } = useContentFiltering(allBuildOrders, buildOrderFilterConfig);
+
+  // Sort build orders by updated date (newest first)
+  const filteredBuildOrders = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      // Parse dates and sort newest first
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      return dateB - dateA; // Descending order (newest first)
+    });
+  }, [filtered]);
 
   const [editingBuildOrder, setEditingBuildOrder] = useState<BuildOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
