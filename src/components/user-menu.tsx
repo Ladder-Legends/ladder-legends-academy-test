@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
-import { LogOut, User, LogIn, Activity, CreditCard } from "lucide-react";
+import { LogOut, User, LogIn, Activity, CreditCard, Settings } from "lucide-react";
 import Link from "next/link";
 import { isOwner } from "@/lib/permissions";
 import {
@@ -100,6 +100,14 @@ export function UserMenu() {
           <DropdownMenuSeparator />
         </>
       )}
+
+      <Link href="/settings">
+        <DropdownMenuItem>
+          <Settings className="w-4 h-4 mr-2" />
+          Settings
+        </DropdownMenuItem>
+      </Link>
+      <DropdownMenuSeparator />
 
       <DropdownMenuItem onClick={handleSignOut} className={isSigningOut ? 'opacity-50' : ''}>
         <LogOut className="w-4 h-4 mr-2" />
