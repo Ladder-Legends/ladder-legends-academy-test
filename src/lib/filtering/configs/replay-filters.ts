@@ -87,8 +87,8 @@ const fields: FilterFieldConfig<Replay>[] = [
       const player2MMR = replay.player2.mmr || 0;
       const maxMMR = Math.max(player1MMR, player2MMR);
 
-      // If no MMR data, don't filter it out
-      if (maxMMR === 0) return true;
+      // If no MMR data, exclude from MMR filter results
+      if (maxMMR === 0) return false;
 
       return ranges.some(range => {
         if (range === 'under3000') return maxMMR < 3000;
