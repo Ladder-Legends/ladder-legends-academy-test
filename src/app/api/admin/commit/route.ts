@@ -12,7 +12,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const VERCEL_DEPLOY_HOOK = process.env.VERCEL_DEPLOY_HOOK;
 const MAX_RETRY_ATTEMPTS = 3;
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'file';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'events' | 'file';
 type Operation = 'create' | 'update' | 'delete';
 
 // Content types that are single objects (not arrays)

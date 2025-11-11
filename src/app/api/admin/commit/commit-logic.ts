@@ -3,7 +3,7 @@
  * These functions have no side effects and are easily testable
  */
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'events';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'events' | 'file';
 type Operation = 'create' | 'update' | 'delete';
 
 // Content types that are single objects (not arrays)
@@ -79,7 +79,7 @@ export function fixVideoReferences(
  */
 export function applyChanges(
   files: Record<string, FileInfo>,
-  changesByType: Record<ContentType, Change[]>
+  changesByType: Partial<Record<ContentType, Change[]>>
 ): Record<string, FileInfo> {
   const updatedFiles = { ...files };
 
