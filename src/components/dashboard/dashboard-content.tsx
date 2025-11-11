@@ -73,9 +73,7 @@ export function DashboardContent() {
             />
           </div>
           {/* Strong center wash to hide logo and create clean button area */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-background from-0% via-background/70 via-25% to-transparent to-50%" />
-          {/* Sunrise effect - elliptical gradient from center */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_130%_90%_at_center,_var(--tw-gradient-stops))] from-background/60 via-background/30 via-60% to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_center,_var(--tw-gradient-stops))] from-background from-0% via-background via-40% via-background/80 via-60% to-transparent" />
 
           <div className="relative max-w-5xl mx-auto text-center space-y-8">
             <div className="space-y-4">
