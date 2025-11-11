@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import buildOrdersData from '@/data/build-orders.json';
 import replaysData from '@/data/replays.json';
@@ -137,7 +137,7 @@ function searchCoaches(query: string, limit: number): SearchResult[] {
       url: `/coaches/${coach.id}`,
       metadata: {
         race: coach.race,
-        avatar: coach.avatar,
+        image: coach.image,
       },
       score: calculateScore(query, coach.name, coach.bio),
     }))
