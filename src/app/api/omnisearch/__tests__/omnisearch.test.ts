@@ -1,13 +1,6 @@
-import { getServerSession } from 'next-auth/next';
-
-// Mock next-auth
-jest.mock('next-auth/next', () => ({
-  getServerSession: jest.fn(),
-}));
-
 // Mock auth lib
 jest.mock('@/lib/auth', () => ({
-  authOptions: {},
+  auth: jest.fn(),
 }));
 
 // Mock NextResponse
@@ -91,6 +84,7 @@ jest.mock('@/lib/content-enrichment', () => ({
 // Import after mocks
 import { GET } from '../route';
 import { NextRequest } from 'next/server';
+import { auth } from '@/lib/auth';
 
 // Mock data files
 jest.mock('@/data/build-orders.json', () => [
@@ -248,7 +242,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should search across all content types for unauthenticated users (free content only)', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue(null);
+      (auth as jest.Mock).mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/omnisearch?q=free');
       const response = await GET(request);
@@ -266,7 +260,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should search across all content types for subscribers (including premium)', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -289,7 +283,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should rank title matches higher than description matches', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -311,7 +305,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should respect limit parameter', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -330,7 +324,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should search coach names and bios', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue(null);
+      (auth as jest.Mock).mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/omnisearch?q=groovy');
       const response = await GET(request);
@@ -342,7 +336,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should search enriched content (related content metadata)', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -358,7 +352,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should return empty results for no matches', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue(null);
+      (auth as jest.Mock).mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/omnisearch?q=nonexistentquery12345');
       const response = await GET(request);
@@ -375,7 +369,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should search case-insensitively', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -399,7 +393,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should include result metadata', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },
@@ -433,7 +427,7 @@ describe('Omnisearch API', () => {
     });
 
     it('should generate correct URLs for each content type', async () => {
-      (getServerSession as jest.Mock).mockResolvedValue({
+      (auth as jest.Mock).mockResolvedValue({
         user: {
           hasSubscriberRole: true,
         },

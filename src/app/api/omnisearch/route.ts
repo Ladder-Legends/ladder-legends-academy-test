@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import buildOrdersData from '@/data/build-orders.json';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
@@ -463,7 +462,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check authentication for subscriber content
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     const hasSubscription =
       session?.user?.hasSubscriberRole ||
       session?.user?.roles?.includes('coaches') ||

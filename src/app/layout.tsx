@@ -5,6 +5,7 @@ import { PostHogProvider } from "@/components/posthog-provider";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { Toaster } from "@/components/ui/toaster";
 import { CommitButton } from "@/components/admin/commit-button";
+import { Header } from "@/components/header";
 import "./globals.css";
 
 const lexend = Lexend({
@@ -109,6 +110,7 @@ export default function RootLayout({
         <BackgroundEffects />
         <SessionProvider>
           <PostHogProvider>
+            <Header />
             {children}
             <CommitButton />
           </PostHogProvider>

@@ -24,12 +24,14 @@ export function Header() {
               <h1 className="text-2xl font-bold hidden lg:block">Ladder Legends Academy</h1>
             </Link>
 
-            {/* Navigation */}
-            <MainNav />
+            {/* Navigation - Hidden on mobile */}
+            <div className="hidden lg:flex">
+              <MainNav />
+            </div>
           </div>
 
-          {/* Omnisearch - centered on larger screens */}
-          <div className="hidden lg:block flex-1 max-w-md mx-4">
+          {/* Omnisearch - Flex-grow on all screens, centered on desktop */}
+          <div className="flex-1 max-w-md mx-4">
             <Omnisearch placeholder="Search all content..." />
           </div>
 
@@ -37,11 +39,6 @@ export function Header() {
             <ThemeToggle />
             <UserMenu />
           </div>
-        </div>
-
-        {/* Mobile Omnisearch - Below header on mobile */}
-        <div className="lg:hidden mt-4">
-          <Omnisearch placeholder="Search all content..." />
         </div>
       </div>
     </header>
