@@ -72,6 +72,8 @@ export function DashboardContent() {
               }}
             />
           </div>
+          {/* Radial gradient to hide center logo */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-background via-background/60 to-transparent" />
           {/* Background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
