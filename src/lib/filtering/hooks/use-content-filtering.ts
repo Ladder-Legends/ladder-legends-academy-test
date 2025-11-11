@@ -98,6 +98,23 @@ export function useContentFiltering<T>(
     );
   }, [permissionFiltered, filters, config.fields, searchQuery, config.searchFields, selectedTags]);
 
+  // Helper to add counts to options recursively (handles nested children)
+  const addCountsToOptions = useCallback((options: FilterOption[], sectionId: string): FilterOption[] => {
+    return options.map(opt => {
+      const optionWithCount: FilterOption = {
+        ...opt,
+        count: getCount(opt.id, sectionId),
+      };
+
+      // Recursively add counts to children if they exist
+      if (opt.children && opt.children.length > 0) {
+        optionWithCount.children = addCountsToOptions(opt.children, sectionId);
+      }
+
+      return optionWithCount;
+    });
+  }, [getCount]);
+
   // Build sections with counts - convert to FilterSection format
   const sections = useMemo(() => {
     return config.sections.map(section => {
@@ -116,16 +133,11 @@ export function useContentFiltering<T>(
       if (section.getOptions) {
         // Get options from dynamic function
         const dynamicOptions = section.getOptions(permissionFiltered, filters);
-        // Add counts to each option
-        options = dynamicOptions.map(opt => ({
-          ...opt,
-          count: getCount(opt.id, section.id),
-        }));
+        // Add counts to each option (and their children recursively)
+        options = addCountsToOptions(dynamicOptions, section.id);
       } else if (section.options) {
-        options = section.options.map(opt => ({
-          ...opt,
-          count: getCount(opt.id, section.id),
-        }));
+        // Add counts to each option (and their children recursively)
+        options = addCountsToOptions(section.options, section.id);
       }
 
       return {
@@ -135,7 +147,7 @@ export function useContentFiltering<T>(
         items: options,
       };
     });
-  }, [config.sections, permissionFiltered, filters, getCount]);
+  }, [config.sections, permissionFiltered, filters, addCountsToOptions]);
 
   return {
     filtered,
