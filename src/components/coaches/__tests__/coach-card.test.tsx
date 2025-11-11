@@ -15,9 +15,11 @@ const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
 describe('CoachCard - Booking Paywall', () => {
   const mockCoach: Coach = {
     id: 'nico',
+    name: 'Nico',
     displayName: 'Nico',
     bio: 'Grandmaster Terran coach',
     race: 'terran',
+    specialties: ['Terran macro', 'Build orders'],
     pricePerHour: '$50/hr',
     bookingUrl: 'https://calendly.com/nico-coaching',
   }

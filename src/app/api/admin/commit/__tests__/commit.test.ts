@@ -34,11 +34,11 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result['build-orders'].content[0].videoIds).toEqual([
+      expect((result['build-orders'].content as any[])[0].videoIds).toEqual([
         'valid-video-1',
         'valid-video-2',
       ])
-      expect(result['build-orders'].content[1].videoIds).toEqual(['valid-video-1'])
+      expect((result['build-orders'].content as any[])[1].videoIds).toEqual(['valid-video-1'])
     })
 
     it('should remove invalid video IDs from replays', () => {
@@ -60,7 +60,7 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result.replays.content[0].videoIds).toEqual([])
+      expect((result.replays.content as any[])[0].videoIds).toEqual([])
     })
 
     it('should remove invalid video IDs from events', () => {
@@ -82,7 +82,7 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result.events.content[0].videoIds).toEqual(['valid-video-1'])
+      expect((result.events.content as any[])[0].videoIds).toEqual(['valid-video-1'])
     })
 
     it('should handle items with no videoIds field', () => {
@@ -104,7 +104,7 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result['build-orders'].content[0]).not.toHaveProperty('videoIds')
+      expect((result['build-orders'].content as any[])[0]).not.toHaveProperty('videoIds')
     })
 
     it('should handle items with empty videoIds array', () => {
@@ -126,7 +126,7 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result['build-orders'].content[0].videoIds).toEqual([])
+      expect((result['build-orders'].content as any[])[0].videoIds).toEqual([])
     })
 
     it('should not modify items with all valid video IDs', () => {
@@ -148,7 +148,7 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result['build-orders'].content[0].videoIds).toEqual([
+      expect((result['build-orders'].content as any[])[0].videoIds).toEqual([
         'valid-video-1',
         'valid-video-2',
       ])
@@ -195,9 +195,9 @@ describe('Video Reference Cleanup', () => {
 
       const result = fixVideoReferences(files, validVideoIds)
 
-      expect(result['build-orders'].content[0].videoIds).toEqual(['valid-video-1'])
-      expect(result.replays.content[0].videoIds).toEqual([])
-      expect(result.events.content[0].videoIds).toEqual(['valid-video-1'])
+      expect((result['build-orders'].content as any[])[0].videoIds).toEqual(['valid-video-1'])
+      expect((result.replays.content as any[])[0].videoIds).toEqual([])
+      expect((result.events.content as any[])[0].videoIds).toEqual(['valid-video-1'])
     })
   })
 })
@@ -227,10 +227,10 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       expect(result.videos.content).toHaveLength(1)
-      expect(result.videos.content[0]).toEqual({
+      expect((result.videos.content as any[])[0]).toEqual({
         id: 'video-1',
         title: 'New Video',
       })
@@ -266,10 +266,10 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       expect(result.videos.content).toHaveLength(1)
-      expect(result.videos.content[0]).toEqual({
+      expect((result.videos.content as any[])[0]).toEqual({
         id: 'video-1',
         title: 'New Title',
         description: 'New Description',
@@ -301,10 +301,10 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       expect(result.videos.content).toHaveLength(1)
-      expect(result.videos.content[0].id).toBe('video-2')
+      expect((result.videos.content as any[])[0].id).toBe('video-2')
     })
 
     it('should be idempotent for create operations', () => {
@@ -332,11 +332,11 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       // Should not create duplicate
       expect(result.videos.content).toHaveLength(1)
-      expect(result.videos.content[0].title).toBe('Existing Video')
+      expect((result.videos.content as any[])[0].title).toBe('Existing Video')
     })
 
     it('should handle single-object content types (about, privacy, terms)', () => {
@@ -365,7 +365,7 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       expect(result.about.content).toEqual({
         title: 'New About',
@@ -407,12 +407,12 @@ describe('Apply Changes', () => {
         ],
       }
 
-      const result = applyChanges(files, changesByType)
+      const result = applyChanges(files, changesByType as any)
 
       expect(result.videos.content).toHaveLength(3)
-      expect(result.videos.content.find(v => v.id === 'video-1')?.title).toBe('Updated Video 1')
-      expect(result.videos.content.find(v => v.id === 'video-2')).toBeDefined()
-      expect(result.videos.content.find(v => v.id === 'video-3')).toBeDefined()
+      expect((result.videos.content as any[]).find(v => v.id === 'video-1')?.title).toBe('Updated Video 1')
+      expect((result.videos.content as any[]).find(v => v.id === 'video-2')).toBeDefined()
+      expect((result.videos.content as any[]).find(v => v.id === 'video-3')).toBeDefined()
     })
   })
 })
@@ -451,12 +451,12 @@ describe('ID Persistence and Reference Integrity', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // ID must remain unchanged
     expect(result.videos.content).toHaveLength(1)
-    expect(result.videos.content[0].id).toBe('original-id')
-    expect(result.videos.content[0].title).toBe('Updated Title')
+    expect((result.videos.content as any[])[0].id).toBe('original-id')
+    expect((result.videos.content as any[])[0].title).toBe('Updated Title')
   })
 
   it('should preserve existing references during video updates', () => {
@@ -497,16 +497,16 @@ describe('ID Persistence and Reference Integrity', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Video ID should not change
-    expect(result.videos.content[0].id).toBe('video-1')
+    expect((result.videos.content as any[])[0].id).toBe('video-1')
 
     // Build order reference should still be valid
-    const validVideoIds = new Set(result.videos.content.map((v: any) => v.id))
+    const validVideoIds = new Set((result.videos.content as any[]).map((v: any) => v.id))
     const cleaned = fixVideoReferences(result, validVideoIds)
 
-    expect(cleaned['build-orders'].content[0].videoIds).toEqual(['video-1'])
+    expect((cleaned['build-orders'].content as any[])[0].videoIds).toEqual(['video-1'])
   })
 
   it('should preserve browser URLs when editing content', () => {
@@ -541,11 +541,11 @@ describe('ID Persistence and Reference Integrity', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // ID must remain the same so /replays/replay-abc123 still works
-    expect(result.replays.content[0].id).toBe('replay-abc123')
-    expect(result.replays.content[0].title).toBe('Updated Title')
+    expect((result.replays.content as any[])[0].id).toBe('replay-abc123')
+    expect((result.replays.content as any[])[0].title).toBe('Updated Title')
   })
 })
 
@@ -589,14 +589,14 @@ describe('Reference Unlinking vs Deletion', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Video should still exist - only the reference was removed
     expect(result.videos.content).toHaveLength(2)
-    expect(result.videos.content.find((v: any) => v.id === 'video-2')).toBeDefined()
+    expect((result.videos.content as any[]).find((v: any) => v.id === 'video-2')).toBeDefined()
 
     // Build order should have only video-1
-    expect(result['build-orders'].content[0].videoIds).toEqual(['video-1'])
+    expect((result['build-orders'].content as any[])[0].videoIds).toEqual(['video-1'])
   })
 
   it('should NOT delete video when removing it from a replay', () => {
@@ -637,14 +637,14 @@ describe('Reference Unlinking vs Deletion', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Video should still exist
     expect(result.videos.content).toHaveLength(1)
-    expect(result.videos.content[0].id).toBe('video-1')
+    expect((result.videos.content as any[])[0].id).toBe('video-1')
 
     // Replay should have no videos
-    expect(result.replays.content[0].videoIds).toEqual([])
+    expect((result.replays.content as any[])[0].videoIds).toEqual([])
   })
 
   it('should NOT delete video when removing it from an event', () => {
@@ -686,14 +686,14 @@ describe('Reference Unlinking vs Deletion', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Both videos should still exist
     expect(result.videos.content).toHaveLength(2)
-    expect(result.videos.content.find((v: any) => v.id === 'video-2')).toBeDefined()
+    expect((result.videos.content as any[]).find((v: any) => v.id === 'video-2')).toBeDefined()
 
     // Event should have only video-1
-    expect(result.events.content[0].videoIds).toEqual(['video-1'])
+    expect((result.events.content as any[])[0].videoIds).toEqual(['video-1'])
   })
 
   it('should ONLY delete video when explicitly deleting via videos contentType', () => {
@@ -731,19 +731,19 @@ describe('Reference Unlinking vs Deletion', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Video should be deleted
     expect(result.videos.content).toHaveLength(1)
-    expect(result.videos.content[0].id).toBe('video-2')
+    expect((result.videos.content as any[])[0].id).toBe('video-2')
 
     // Build order still has the reference (will be cleaned up by fixVideoReferences)
-    expect(result['build-orders'].content[0].videoIds).toEqual(['video-1'])
+    expect((result['build-orders'].content as any[])[0].videoIds).toEqual(['video-1'])
 
     // After cleanup, invalid reference should be removed
-    const validVideoIds = new Set(result.videos.content.map((v: any) => v.id))
+    const validVideoIds = new Set((result.videos.content as any[]).map((v: any) => v.id))
     const cleaned = fixVideoReferences(result, validVideoIds)
-    expect(cleaned['build-orders'].content[0].videoIds).toEqual([])
+    expect((cleaned['build-orders'].content as any[])[0].videoIds).toEqual([])
   })
 
   it('should handle masterclasses with video references', () => {
@@ -784,14 +784,14 @@ describe('Reference Unlinking vs Deletion', () => {
       ],
     }
 
-    const result = applyChanges(files, changesByType)
+    const result = applyChanges(files, changesByType as any)
 
     // Video should still exist
     expect(result.videos.content).toHaveLength(1)
-    expect(result.videos.content[0].id).toBe('video-1')
+    expect((result.videos.content as any[])[0].id).toBe('video-1')
 
     // Masterclass should have no videos
-    expect(result.masterclasses.content[0].videoIds).toEqual([])
+    expect((result.masterclasses.content as any[])[0].videoIds).toEqual([])
   })
 })
 
@@ -833,14 +833,14 @@ describe('Integration: Reference Cleanup + Apply Changes', () => {
     }
 
     // Apply the deletion
-    files = applyChanges(files, changesByType)
+    files = applyChanges(files, changesByType as any) as any
 
     // Now clean up references
     const validVideoIds = new Set(files.videos.content.map((v: any) => v.id))
     const cleaned = fixVideoReferences(files, validVideoIds)
 
     // Build order should only reference video-1 now
-    expect(cleaned['build-orders'].content[0].videoIds).toEqual(['video-1'])
+    expect((cleaned['build-orders'].content as any[])[0].videoIds).toEqual(['video-1'])
   })
 
   it('should handle video recreation with new ID (YouTube -> Mux)', () => {
@@ -885,14 +885,14 @@ describe('Integration: Reference Cleanup + Apply Changes', () => {
     }
 
     // Apply changes
-    files = applyChanges(files, changesByType)
+    files = applyChanges(files, changesByType as any) as any
 
     // Clean up references
     const validVideoIds = new Set(files.videos.content.map((v: any) => v.id))
     const cleaned = fixVideoReferences(files, validVideoIds)
 
     // Old reference should be removed
-    expect(cleaned['build-orders'].content[0].videoIds).toEqual([])
+    expect((cleaned['build-orders'].content as any[])[0].videoIds).toEqual([])
 
     // In real app, user would manually add new-mux-id
   })

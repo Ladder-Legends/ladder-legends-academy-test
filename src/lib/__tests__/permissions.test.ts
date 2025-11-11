@@ -13,7 +13,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.SUBSCRIBER],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(session)).toBe(true)
     })
@@ -23,7 +23,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.COACH],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(session)).toBe(true)
     })
@@ -33,7 +33,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.OWNER],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(session)).toBe(true)
     })
@@ -43,7 +43,7 @@ describe('Permission System', () => {
         user: {
           roles: ['some-other-role'],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(session)).toBe(false)
     })
@@ -53,7 +53,7 @@ describe('Permission System', () => {
         user: {
           roles: [],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(session)).toBe(false)
     })
@@ -63,7 +63,7 @@ describe('Permission System', () => {
     })
 
     it('should return false for undefined session', () => {
-      expect(isSubscriber(undefined)).toBe(false)
+      expect(isSubscriber(undefined as any)).toBe(false)
     })
   })
 
@@ -73,7 +73,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.COACH],
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(true)
     })
@@ -83,7 +83,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.OWNER],
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(true)
     })
@@ -93,7 +93,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.COACH, ROLE_IDS.OWNER],
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(true)
     })
@@ -103,7 +103,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.SUBSCRIBER],
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(false)
     })
@@ -113,7 +113,7 @@ describe('Permission System', () => {
         user: {
           roles: [],
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(false)
     })
@@ -129,7 +129,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.OWNER],
         },
-      } as Session
+      } as any
 
       expect(isOwner(session)).toBe(true)
     })
@@ -139,7 +139,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.COACH],
         },
-      } as Session
+      } as any
 
       expect(isOwner(session)).toBe(false)
     })
@@ -149,7 +149,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.SUBSCRIBER],
         },
-      } as Session
+      } as any
 
       expect(isOwner(session)).toBe(false)
     })
@@ -159,7 +159,7 @@ describe('Permission System', () => {
         user: {
           roles: [],
         },
-      } as Session
+      } as any
 
       expect(isOwner(session)).toBe(false)
     })
@@ -175,7 +175,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.OWNER],
         },
-      } as Session
+      } as any
 
       expect(isOwner(ownerSession)).toBe(true)
       expect(isCoach(ownerSession)).toBe(true)
@@ -187,7 +187,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.COACH],
         },
-      } as Session
+      } as any
 
       expect(isCoach(coachSession)).toBe(true)
       expect(isSubscriber(coachSession)).toBe(true)
@@ -199,7 +199,7 @@ describe('Permission System', () => {
         user: {
           roles: [ROLE_IDS.SUBSCRIBER],
         },
-      } as Session
+      } as any
 
       expect(isSubscriber(subscriberSession)).toBe(true)
       expect(isCoach(subscriberSession)).toBe(false)
@@ -221,7 +221,7 @@ describe('Permission System', () => {
         user: {
           roles: null as any,
         },
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(false)
       expect(isOwner(session)).toBe(false)
@@ -230,7 +230,7 @@ describe('Permission System', () => {
     it('should handle session with undefined roles', () => {
       const session = {
         user: {},
-      } as Session
+      } as any
 
       expect(isCoach(session)).toBe(false)
       expect(isOwner(session)).toBe(false)
