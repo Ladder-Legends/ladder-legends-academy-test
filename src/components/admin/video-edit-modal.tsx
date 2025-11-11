@@ -117,15 +117,16 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   }, [video, isNew, isOpen]);
 
   const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
-    setFormData({
-      ...formData,
+    // Use functional setState to preserve any changes made during upload
+    setFormData(prev => ({
+      ...prev,
       source: 'mux',
       muxAssetId: assetId,
       muxPlaybackId: playbackId,
       muxAssetStatus: 'ready',
       // Use static thumbnail file path (downloaded at build time)
-      thumbnail: `/thumbnails/${formData.id}.jpg`,
-    });
+      thumbnail: `/thumbnails/${prev.id}.jpg`,
+    }));
     toast.success('Mux video linked successfully');
   };
 

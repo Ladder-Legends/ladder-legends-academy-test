@@ -233,7 +233,8 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
       const { url, filename } = await response.json();
 
-      setFormData({ ...formData, downloadUrl: url });
+      // Use functional setState to preserve any changes made during upload
+      setFormData(prev => ({ ...prev, downloadUrl: url }));
       setUploadedFileName(filename);
       setAnalyzedReplayFile(file);
       toast.success('Replay file uploaded successfully!');
@@ -295,9 +296,10 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       const player1Data = metadata.players[0];
       const player2Data = metadata.players[1];
 
-      setFormData({
-        ...formData,
-        title: formData.title || `${player1Data.name} vs ${player2Data.name}`,
+      // Use functional setState to preserve any changes made during analysis
+      setFormData(prev => ({
+        ...prev,
+        title: prev.title || `${player1Data.name} vs ${player2Data.name}`,
         map: metadata.map_name,
         matchup: determineMatchup(player1Data.race, player2Data.race),
         player1: {
@@ -312,10 +314,10 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           result: player2Data.result === 'Win' ? 'win' : 'loss',
           mmr: player2Data.mmr || undefined,
         },
-        duration: metadata.game_length_seconds ? formatDuration(metadata.game_length_seconds) : formData.duration,
-        gameDate: metadata.date ? metadata.date.split('T')[0] : formData.gameDate,
-        patch: metadata.release_string || formData.patch,
-      });
+        duration: metadata.game_length_seconds ? formatDuration(metadata.game_length_seconds) : prev.duration,
+        gameDate: metadata.date ? metadata.date.split('T')[0] : prev.gameDate,
+        patch: metadata.release_string || prev.patch,
+      }));
 
       // Update search fields
       setMapSearch(metadata.map_name);

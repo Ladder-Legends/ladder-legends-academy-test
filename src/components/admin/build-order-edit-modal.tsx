@@ -306,11 +306,11 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         data: newReplay as unknown as Record<string, unknown>,
       });
 
-      // Link this replay to the build order
-      setFormData({
-        ...formData,
+      // Link this replay to the build order (use functional setState to preserve changes)
+      setFormData(prev => ({
+        ...prev,
         replayId: newReplay.id,
-      });
+      }));
       setReplaySearch(newReplay.title);
 
       toast.success(`Replay auto-saved: ${replayTitle}`);
@@ -500,15 +500,15 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     const opponentData = metadata.players.find((p: SC2ReplayPlayer) => p.name !== playerName);
     const vsRace = opponentData ? normalizeRace(opponentData.race) : formData.vsRace || 'terran';
 
-    // Auto-populate form with replay data including both races
-    setFormData({
-      ...formData,
-      name: formData.name || `${playerData.name} ${metadata.map_name} Build`,
+    // Auto-populate form with replay data including both races (use functional setState to preserve changes)
+    setFormData(prev => ({
+      ...prev,
+      name: prev.name || `${playerData.name} ${metadata.map_name} Build`,
       race: normalizeRace(playerData.race),
       vsRace: vsRace as VsRace,
       steps: steps,
-      patch: metadata.release_string || formData.patch,
-    });
+      patch: metadata.release_string || prev.patch,
+    }));
 
     setSelectedPlayerForImport(playerName);
     toast.success(`Imported ${steps.length} build order steps from ${playerName}'s replay!`);
