@@ -2535,9 +2535,7 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "description": "A smoother vs AI replay for studying timings for TvP 5-1-1",
-    "videoIds": [
-      "b45b11de-5477-4ef6-a58a-9af617c9cbcb"
-    ],
+    "videoIds": [],
     "steps": [
       {
         "supply": 13,
@@ -3097,14 +3095,9 @@
     ],
     "tags": [],
     "patch": "5.0.14.94137",
-    "updatedAt": "2025-11-04",
+    "updatedAt": "2025-11-11",
     "isFree": false,
-    "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76",
-    "categories": [
-      "builds",
-      "builds.timing-attack",
-      "matchups.tvt"
-    ]
+    "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76"
   },
   {
     "id": "c2d27dd1-e299-456d-a3be-f09784402a46",
@@ -3116,7 +3109,6 @@
     "coachId": "coach-nico",
     "description": "My basic 2-1-1 vs AI replay, without the hellbats in case you want to run an ulterior version. The opening and approach is the same, simply see the stimbat guide in the video for further details and for the hellbat variation if you wish to use it.",
     "videoIds": [
-      "79396412-d6e3-43df-9b58-5188772ada94",
       "80191635-11e9-49aa-a451-9d24e9a7285f"
     ],
     "steps": [
