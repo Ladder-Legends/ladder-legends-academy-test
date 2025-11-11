@@ -1405,21 +1405,5 @@
     "coach": "",
     "coachId": "",
     "isFree": false
-  },
-  {
-    "id": "0a0dbc4f-d549-47fd-87c2-db1aa2798136",
-    "title": "deleteme",
-    "description": "",
-    "source": "mux",
-    "muxAssetId": "USZjL3S5XaDzefMrBWKlYbXyr7PILfyV9l02u400J9LVc",
-    "muxPlaybackId": "IeE4KYCA5wpobnouxJwHtu01O3cxdwR7TfhcgAikMQfg",
-    "muxAssetStatus": "ready",
-    "thumbnail": "/thumbnails/0a0dbc4f-d549-47fd-87c2-db1aa2798136.jpg",
-    "date": "2025-11-11",
-    "tags": [],
-    "race": "terran",
-    "coach": "",
-    "coachId": "",
-    "isFree": false
   }
 ]
