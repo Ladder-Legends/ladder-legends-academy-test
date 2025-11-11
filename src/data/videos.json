@@ -1386,5 +1386,24 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "1555fba3-2e9a-4396-8a27-85f746555c47",
+    "title": "How to deal with weird openers from Zerg as Terran",
+    "description": "In this video Gamerrichy breaks down how to deal with weird zerg openers ",
+    "source": "mux",
+    "muxAssetId": "02qgcxBxnGtNAINC88D7O94AAsxCykOQJDu1QiyqA7Yk",
+    "muxPlaybackId": "BWsx3CJ902hxPoTgHsdzmevrw5vXWQZAn6kPaHkj1ktE",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/1555fba3-2e9a-4396-8a27-85f746555c47.jpg",
+    "date": "2025-11-11",
+    "tags": [
+      "terran",
+      "macro"
+    ],
+    "race": "terran",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
