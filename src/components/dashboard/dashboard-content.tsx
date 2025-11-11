@@ -19,6 +19,7 @@ import { HorizontalScrollContainer } from '@/components/ui/horizontal-scroll-con
 import { ReplayCard } from '@/components/replays/replay-card';
 import { MasterclassCard } from '@/components/masterclasses/masterclass-card';
 import { BuildOrderCard } from '@/components/build-orders/build-order-card';
+import { MarketingHero } from '@/components/ui/marketing-hero';
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -60,22 +61,11 @@ export function DashboardContent() {
     <main className="flex-1">
       <div className="max-w-[1920px] mx-auto">
         {/* Hero Section - Enhanced marketing style */}
-        <section className="relative px-8 py-16 md:py-24 lg:py-32 overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <div
-              className="absolute inset-0 bg-cover bg-no-repeat grayscale opacity-25"
-              style={{
-                backgroundImage: 'url(/homepage-hero-bg.jpg)',
-                backgroundPosition: 'center 45%', // Shift up to crop bottom bar
-                backgroundSize: 'cover',
-              }}
-            />
-          </div>
-          {/* Strong center wash to hide logo and create clean button area */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_center,_var(--tw-gradient-stops))] from-background from-0% via-background via-40% via-background/80 via-60% to-transparent" />
-
-          <div className="relative max-w-5xl mx-auto text-center space-y-8">
+        <MarketingHero
+          backgroundImage="/homepage-hero-bg.jpg"
+          backgroundPosition="center 45%"
+        >
+          <div className="max-w-5xl mx-auto text-center space-y-8">
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
                 Master StarCraft 2 with
@@ -153,7 +143,7 @@ export function DashboardContent() {
               </div>
             </div>
           </div>
-        </section>
+        </MarketingHero>
 
         {/* Content sections with consistent padding */}
         <div className="px-8 py-8 space-y-16">

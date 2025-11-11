@@ -40,7 +40,7 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
         {/* Buttons */}
         <div className="flex gap-2 mt-auto">
           <Link
-            href={`/library?coach=${coach.id}`}
+            href={`/library?coaches=${coach.id}`}
             className="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors"
           >
             View Videos

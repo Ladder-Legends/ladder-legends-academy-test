@@ -11,6 +11,7 @@ import { VideoCard } from '@/components/videos/video-card';
 import { ReplayCard } from '@/components/replays/replay-card';
 import { BuildOrderCard } from '@/components/build-orders/build-order-card';
 import { ChevronRight } from 'lucide-react';
+import { MarketingHero } from '@/components/ui/marketing-hero';
 import type { Coach } from '@/types/coach';
 import type { Video } from '@/types/video';
 import type { Replay } from '@/types/replay';
@@ -39,6 +40,13 @@ export function RaceCoachingClient({
   replays,
   buildOrders,
 }: RaceCoachingClientProps) {
+  // Determine image filter based on race
+  const imageFilter = race === 'zerg'
+    ? 'sepia'
+    : race === 'protoss'
+    ? '[filter:saturate(50%)]'
+    : 'grayscale';
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -71,27 +79,13 @@ export function RaceCoachingClient({
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative px-8 py-16 md:py-24 overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <div
-              className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 ${
-                race === 'zerg'
-                  ? 'sepia'
-                  : race === 'protoss'
-                  ? '[filter:saturate(50%)]'
-                  : 'grayscale'
-              }`}
-              style={{
-                backgroundImage: `url(/${race}-hero-bg.jpg)`,
-                backgroundPosition: 'center center',
-                backgroundSize: 'cover',
-              }}
-            />
-          </div>
-          {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-10`} />
-          <div className="relative max-w-7xl mx-auto">
+        <MarketingHero
+          backgroundImage={`/${race}-hero-bg.jpg`}
+          backgroundPosition="center center"
+          imageFilter={imageFilter}
+          imageOpacity={0.3}
+        >
+          <div className="max-w-7xl mx-auto">
             <div className="text-center space-y-6 mb-12">
               <h1 className="text-4xl md:text-6xl font-bold">
                 StarCraft 2 {config.title} Coaching
@@ -135,7 +129,7 @@ export function RaceCoachingClient({
               </div>
             </div>
           </div>
-        </section>
+        </MarketingHero>
 
         {/* Coaches Section */}
         {coaches.length > 0 && (
