@@ -1,18 +1,13 @@
 'use client';
 
-import { UserMenu } from '@/components/user-menu';
-import { MainNav } from '@/components/main-nav';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import masterclassesData from '@/data/masterclasses.json';
 import { Masterclass } from '@/types/masterclass';
-import { Play, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
-import { PaywallLink } from '@/components/auth/paywall-link';
-import { getContentVideoUrl } from '@/lib/video-helpers';
 import { Video, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import videosData from '@/data/videos.json';
@@ -110,34 +105,6 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
-                <Image
-                  src="/LL_LOGO.png"
-                  alt="Ladder Legends"
-                  width={48}
-                  height={48}
-                  unoptimized
-                  className="object-contain"
-                  priority
-                />
-                <h1 className="text-2xl font-bold hidden lg:block">Ladder Legends Academy</h1>
-              </Link>
-
-              <MainNav />
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <UserMenu />
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex-1 px-4 lg:px-8 py-8">
         <div className="max-w-7xl mx-auto">

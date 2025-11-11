@@ -69,7 +69,7 @@ export function DashboardContent() {
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
                 Master StarCraft 2 with
-                <span className="block text-primary mt-2">Expert Coaching</span>
+                <span className="block text-primary mt-2">Ladder Legends</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
                 Learn from professional coaches through video tutorials, build orders, masterclasses, and personalized guidance
