@@ -74,9 +74,8 @@ export function DashboardContent() {
           </div>
           {/* Radial gradient to hide center logo - tighter/more centered */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-background via-background/40 via-30% to-transparent" />
-          {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+          {/* Sunrise effect - elliptical gradient from center */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_center,_var(--tw-gradient-stops))] from-background/80 via-background/40 via-60% to-transparent" />
 
           <div className="relative max-w-5xl mx-auto text-center space-y-8">
             <div className="space-y-4">
