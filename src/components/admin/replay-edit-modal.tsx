@@ -751,62 +751,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           onChange={(categories) => setFormData({ ...formData, categories })}
         />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Tags (legacy - use categories instead)</label>
-          <div className="space-y-2">
-            {/* Selected tags */}
-            {formData.tags && formData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="hover:text-primary/70"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Tag input with autocomplete */}
-            <div className="relative">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                onFocus={() => setShowTagDropdown(true)}
-                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to add tags (press Enter)"
-              />
-
-              {/* Autocomplete dropdown */}
-              {showTagDropdown && filteredTags.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => addTag(tag)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
         <div className="flex gap-2 pt-4">
           <Button onClick={handleSave} className="flex-1">
             Save to Local Storage

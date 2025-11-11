@@ -30,10 +30,8 @@ interface BuildOrderEditModalProps {
 export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false }: BuildOrderEditModalProps) {
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<BuildOrder>>({});
-  const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [replayAnalysisData, setReplayAnalysisData] = useState<SC2AnalysisResponse | null>(null);
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
@@ -44,22 +42,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
   // Merge static videos with pending changes for validation
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
-
-  // Get all unique tags from existing build orders for autocomplete
-  const allExistingTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    buildOrders.forEach(bo => bo.tags.forEach(tag => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
-  }, []);
-
-  // Filter tags based on input
-  const filteredTags = useMemo(() => {
-    if (!tagInput.trim()) return [];
-    const input = tagInput.toLowerCase();
-    return allExistingTags
-      .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
-      .slice(0, 5);
-  }, [tagInput, allExistingTags, formData.tags]);
 
   // Filter coaches based on search input (only active coaches)
   const filteredCoaches = useMemo(() => {
@@ -90,7 +72,21 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     if (!isOpen) return; // Only reset when opening the modal
 
     if (buildOrder) {
-      setFormData(buildOrder);
+      // Auto-cleanup invalid video IDs
+      const validVideoIds = (buildOrder.videoIds || []).filter(
+        id => allVideos.find(v => v.id === id)
+      );
+
+      // If some video IDs were invalid, show a warning
+      if (buildOrder.videoIds && validVideoIds.length !== buildOrder.videoIds.length) {
+        const invalidCount = buildOrder.videoIds.length - validVideoIds.length;
+        toast.warning(`Removed ${invalidCount} invalid video reference(s) from this build order`);
+      }
+
+      setFormData({
+        ...buildOrder,
+        videoIds: validVideoIds,
+      });
       setCoachSearch(buildOrder.coach || '');
     } else if (isNew) {
       // Always generate a fresh UUID when opening in "add new" mode
@@ -112,32 +108,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       });
       setCoachSearch('');
     }
-    setTagInput('');
-  }, [buildOrder, isNew, isOpen]);
-
-  const addTag = (tag: string) => {
-    const trimmedTag = tag.trim().toLowerCase();
-    if (trimmedTag && !formData.tags?.includes(trimmedTag)) {
-      setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
-    }
-    setTagInput('');
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter(tag => tag !== tagToRemove) || []
-    });
-  };
-
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        addTag(tagInput);
-      }
-    }
-  };
+  }, [buildOrder, isNew, isOpen, allVideos]);
 
   const selectCoach = (coachId: string) => {
     const coach = coaches.find(c => c.id === coachId);
@@ -1006,62 +977,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             onChange={(categories) => setFormData({ ...formData, categories })}
             className="mt-4"
           />
-
-          <div className="mt-4">
-            <label className="block text-sm font-medium mb-1">Tags (legacy - use categories instead)</label>
-            <div className="space-y-2">
-              {/* Selected tags */}
-              {formData.tags && formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="hover:text-primary/70"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Tag input with autocomplete */}
-              <div className="relative">
-                <input
-                  type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagInputKeyDown}
-                  onFocus={() => setShowTagDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                  placeholder="Type to add tags (press Enter)"
-                />
-
-                {/* Autocomplete dropdown */}
-                {showTagDropdown && filteredTags.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                    {filteredTags.map((tag) => (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => addTag(tag)}
-                        className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
 
           <div className="mt-4">
             <label className="flex items-center gap-2">

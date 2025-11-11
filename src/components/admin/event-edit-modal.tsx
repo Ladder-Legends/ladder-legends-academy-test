@@ -458,46 +458,6 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
           onChange={(categories) => setFormData({ ...formData, categories })}
         />
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Tags (legacy - use categories instead)</label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddTag();
-                }
-              }}
-              className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="Add a tag..."
-            />
-            <Button type="button" onClick={handleAddTag} size="sm">
-              Add Tag
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.tags?.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-destructive"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4 border-t border-border">
           <Button onClick={handleSave} className="flex-1">
