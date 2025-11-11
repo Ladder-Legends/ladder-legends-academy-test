@@ -75,7 +75,13 @@ export function RaceCoachingClient({
           {/* Background Image */}
           <div className="absolute inset-0">
             <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat grayscale opacity-30"
+              className={`absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 ${
+                race === 'zerg'
+                  ? 'sepia'
+                  : race === 'protoss'
+                  ? '[filter:sepia(35%)_hue-rotate(230deg)_saturate(150%)]'
+                  : 'grayscale'
+              }`}
               style={{
                 backgroundImage: `url(/${race}-hero-bg.jpg)`,
                 backgroundPosition: 'center center',
