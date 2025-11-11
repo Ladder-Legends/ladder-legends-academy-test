@@ -188,7 +188,20 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
 
       const data = await response.json();
       setReplayAnalysisData(data);
-      toast.success('Replay analyzed! You can now import build steps and metadata.');
+
+      // Automatically import build order from the first player (or prompt if multiple players)
+      const playerNames = Object.keys(data.build_orders);
+      if (playerNames.length > 0) {
+        // If there's only one player, auto-import immediately
+        if (playerNames.length === 1) {
+          importBuildOrderFromPlayer(playerNames[0]);
+        } else {
+          // If multiple players, let the user choose via the existing UI
+          toast.success('Replay analyzed! Select a player to import build steps.');
+        }
+      } else {
+        toast.success('Replay analyzed but no build order data found.');
+      }
     } catch (error) {
       console.error('Error analyzing replay:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to analyze replay');

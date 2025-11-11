@@ -103,7 +103,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               {buildOrder.name}
             </CardTitle>
-            <CardDescription className="line-clamp-2">
+            <CardDescription className="line-clamp-3">
               {buildOrder.description}
             </CardDescription>
           </CardHeader>

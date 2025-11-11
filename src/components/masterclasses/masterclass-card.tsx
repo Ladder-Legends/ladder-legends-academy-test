@@ -90,7 +90,7 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               {masterclass.title}
             </CardTitle>
-            <CardDescription className="line-clamp-2">
+            <CardDescription className="line-clamp-3">
               {masterclass.description}
             </CardDescription>
           </CardHeader>

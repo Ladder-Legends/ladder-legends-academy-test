@@ -256,7 +256,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         isFree: formData.isFree || false,
       };
     } else if (isMuxVideo) {
-      // Mux video
+      // Mux video - ALWAYS premium content
       videoData = {
         id: formData.id,
         title: formData.title,
@@ -271,7 +271,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         race: formData.race || 'terran',
         coach: formData.coach || '',
         coachId: formData.coachId || '',
-        isFree: formData.isFree || false,
+        isFree: false, // ALWAYS false for Mux videos - enforced by API
       };
     } else {
       // Single YouTube video
@@ -620,13 +620,20 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="checkbox"
               checked={formData.isFree || false}
               onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
-              className="w-4 h-4 rounded border-border"
+              disabled={!!formData.muxPlaybackId}
+              className="w-4 h-4 rounded border-border disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <span className="text-sm font-medium">Free Content (accessible to all users)</span>
           </label>
-          <p className="text-xs text-muted-foreground mt-1">
-            Leave unchecked for premium content (subscribers only). Defaults to premium.
-          </p>
+          {formData.muxPlaybackId ? (
+            <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1 font-medium">
+              ⚠️ Mux videos are ALWAYS premium content. This cannot be changed.
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-1">
+              Leave unchecked for premium content (subscribers only). Defaults to premium.
+            </p>
+          )}
 
           {/* Warning for free playlists with non-free videos */}
           {freePlaylistWarning && (

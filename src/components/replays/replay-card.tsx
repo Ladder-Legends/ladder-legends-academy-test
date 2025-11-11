@@ -93,6 +93,11 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               {replay.title}
             </CardTitle>
+            {replay.description && (
+              <CardDescription className="line-clamp-3">
+                {replay.description}
+              </CardDescription>
+            )}
             <CardDescription className="flex items-center gap-2">
               <span className={getRaceColor(replay.player1.race)}>
                 {replay.player1.name}

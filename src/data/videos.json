@@ -400,7 +400,7 @@
     "race": "terran",
     "coach": "Groovy",
     "coachId": "groovy",
-    "isFree": true,
+    "isFree": false,
     "categories": [
       "matchups.tvt"
     ]
@@ -1371,7 +1371,7 @@
     "race": "terran",
     "coach": "Nico",
     "coachId": "coach-nico",
-    "isFree": true
+    "isFree": false
   },
   {
     "id": "c12a0000-55a9-4110-b340-f9f79b08e91f",

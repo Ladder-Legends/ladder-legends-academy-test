@@ -13,6 +13,7 @@ export interface ReplayPlayer {
 export interface Replay {
   id: string;
   title: string;
+  description?: string; // Optional description shown on replay cards
   map: string;
   matchup: Matchup;
   player1: ReplayPlayer;

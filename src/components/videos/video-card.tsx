@@ -109,7 +109,7 @@ export function VideoCard({ video, onEdit, onDelete, allVideos }: VideoCardProps
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               {video.title}
             </CardTitle>
-            <CardDescription className="line-clamp-2">
+            <CardDescription className="line-clamp-3">
               {video.description}
             </CardDescription>
           </CardHeader>

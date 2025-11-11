@@ -102,6 +102,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check for subscriber status - ALL Mux videos are premium content
+    const hasSubscription = session.user?.role === 'subscriber' ||
+                           session.user?.role === 'coach' ||
+                           session.user?.role === 'owner';
+
+    if (!hasSubscription) {
+      return NextResponse.json(
+        { error: 'Premium subscription required. All videos require an active subscription.' },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const playbackId = searchParams.get('playbackId');
 
@@ -190,6 +202,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Check for subscriber status - ALL Mux videos are premium content
+    const hasSubscription = session.user?.role === 'subscriber' ||
+                           session.user?.role === 'coach' ||
+                           session.user?.role === 'owner';
+
+    if (!hasSubscription) {
+      return NextResponse.json(
+        { error: 'Premium subscription required. All videos require an active subscription.' },
+        { status: 403 }
       );
     }
 
