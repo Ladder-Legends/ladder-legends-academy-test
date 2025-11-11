@@ -7,6 +7,7 @@ import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Replay, Race, Matchup, ReplayPlayer } from '@/types/replay';
 import { Video } from '@/types/video';
+import { BuildOrder, BuildOrderStep } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
@@ -338,7 +339,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     }
   };
 
-  const checkAndUpdateLinkedBuildOrders = async (replayId: string, analysisData: any) => {
+  const checkAndUpdateLinkedBuildOrders = async (replayId: string, analysisData: SC2AnalysisResponse) => {
     try {
       // Import build orders data to check for links
       const response = await fetch('/api/admin/commit', {
@@ -352,10 +353,10 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       // This is a hack - we should have a proper GET endpoint for build orders
       // For now, we'll just import the build orders client-side
       const buildOrdersModule = await import('@/data/build-orders.json');
-      const buildOrders = buildOrdersModule.default;
+      const buildOrders = buildOrdersModule.default as BuildOrder[];
 
       // Find build orders that reference this replay
-      const linkedBuildOrders = buildOrders.filter((bo: any) => bo.replayId === replayId);
+      const linkedBuildOrders = buildOrders.filter(bo => bo.replayId === replayId);
 
       if (linkedBuildOrders.length === 0) {
         return; // No linked build orders
@@ -369,7 +370,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
       // Show confirmation with player selection
       const message = `Found ${linkedBuildOrders.length} build order(s) linked to this replay:\n\n` +
-        linkedBuildOrders.map((bo: any) => `• ${bo.name}`).join('\n') +
+        linkedBuildOrders.map(bo => `• ${bo.name}`).join('\n') +
         `\n\nWould you like to update them with the new replay analysis?`;
 
       if (confirm(message)) {
@@ -392,7 +393,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         const newSteps = convertToBuildOrderSteps(buildOrderEvents);
 
         // Update each linked build order
-        const updatePromises = linkedBuildOrders.map(async (bo: any) => {
+        const updatePromises = linkedBuildOrders.map(async bo => {
           return {
             id: bo.id,
             contentType: 'build-orders' as const,

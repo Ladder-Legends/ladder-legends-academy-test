@@ -301,8 +301,8 @@ describe('transformLocalToDiscord', () => {
 
     const discordPayload = transformLocalToDiscord(localEvent);
 
-    expect(discordPayload.recurrence_rule?.end).toBeTruthy();
-    expect(discordPayload.recurrence_rule?.by_weekday).toEqual([5]);
+    expect((discordPayload.recurrence_rule as {end?: unknown})?.end).toBeTruthy();
+    expect((discordPayload.recurrence_rule as {by_weekday?: unknown})?.by_weekday).toEqual([5]);
   });
 });
 
