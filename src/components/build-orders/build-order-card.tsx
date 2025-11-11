@@ -26,23 +26,13 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
   const thumbnailUrl = getBuildOrderThumbnailUrl(buildOrder, videos);
 
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'beginner': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'intermediate': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'advanced': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      default: return 'bg-muted';
-    }
+    // Using theme colors instead of difficulty-specific colors
+    return 'bg-muted text-foreground border-border';
   };
 
   const getTypeColor = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'aggressive': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'defensive': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'economic': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'timing': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-      case 'all-in': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
-      default: return 'bg-muted';
-    }
+    // Using theme colors instead of type-specific colors
+    return 'bg-muted text-foreground border-border';
   };
 
   return (

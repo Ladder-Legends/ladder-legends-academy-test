@@ -26,12 +26,8 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
   const thumbnailUrl = getMasterclassThumbnailUrl(masterclass, videos);
 
   const getRaceBadgeColor = (race: string) => {
-    switch (race.toLowerCase()) {
-      case 'terran': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'zerg': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-      case 'protoss': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      default: return 'bg-muted';
-    }
+    // Using theme colors instead of race-specific colors
+    return 'bg-muted text-foreground border-border';
   };
 
   return (

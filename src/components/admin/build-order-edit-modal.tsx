@@ -652,7 +652,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
             <div className="border border-border rounded-lg p-4 bg-muted/50">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-green-600">Replay linked successfully</p>
+                  <p className="text-sm font-medium text-foreground">Replay linked successfully</p>
                   <p className="text-xs text-muted-foreground">
                     {replaySearch || `Replay ID: ${formData.replayId}`}
                   </p>

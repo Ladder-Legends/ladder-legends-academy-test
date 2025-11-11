@@ -26,14 +26,9 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
   const getRaceBadge = (race?: string) => {
     if (!race || race === 'all') return null;
 
-    const colors: Record<string, string> = {
-      terran: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-      zerg: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-      protoss: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    };
-
+    // Using theme colors instead of race-specific colors
     return (
-      <Badge variant="outline" className={colors[race.toLowerCase()] || 'bg-muted'}>
+      <Badge variant="outline" className="bg-muted text-foreground border-border">
         {race.charAt(0).toUpperCase() + race.slice(1)}
       </Badge>
     );
@@ -42,7 +37,7 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
   const getAccessBadge = (video: Video) => {
     if (video.isFree) {
       return (
-        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+        <Badge variant="outline" className="bg-muted text-foreground border-border">
           Free
         </Badge>
       );

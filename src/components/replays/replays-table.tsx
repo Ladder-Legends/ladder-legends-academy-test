@@ -35,12 +35,8 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
 
   // Helper to get race color
   const getRaceColor = (race: string) => {
-    switch (race) {
-      case 'T': return 'text-blue-500';
-      case 'Z': return 'text-purple-500';
-      case 'P': return 'text-yellow-500';
-      default: return 'text-muted-foreground';
-    }
+    // Using theme foreground color instead of race-specific colors
+    return 'text-foreground';
   };
 
   const columns: ColumnConfig<Replay>[] = [

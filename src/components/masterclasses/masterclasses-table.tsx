@@ -16,22 +16,13 @@ interface MasterclassesTableProps {
 
 export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, onDelete }: MasterclassesTableProps) {
   const getRaceColor = (race: string) => {
-    switch (race.toLowerCase()) {
-      case 'terran': return 'text-blue-400';
-      case 'zerg': return 'text-purple-400';
-      case 'protoss': return 'text-yellow-400';
-      default: return 'text-muted-foreground';
-    }
+    // Using theme foreground color instead of race-specific colors
+    return 'text-foreground';
   };
 
   const getDifficultyColor = (difficulty?: string) => {
-    if (!difficulty) return 'bg-muted';
-    switch (difficulty.toLowerCase()) {
-      case 'beginner': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'intermediate': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'advanced': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      default: return 'bg-muted';
-    }
+    // Using theme colors instead of difficulty-specific colors
+    return 'bg-muted text-foreground border-border';
   };
 
   return (

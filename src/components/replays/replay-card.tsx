@@ -34,12 +34,8 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
   };
 
   const getRaceColor = (race: string) => {
-    switch (race.toLowerCase()) {
-      case 'terran': return 'text-orange-500';
-      case 'zerg': return 'text-purple-500';
-      case 'protoss': return 'text-cyan-500';
-      default: return 'text-muted-foreground';
-    }
+    // Using theme foreground color instead of race-specific colors
+    return 'text-foreground';
   };
 
   return (

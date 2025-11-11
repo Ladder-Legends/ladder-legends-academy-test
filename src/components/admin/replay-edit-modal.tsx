@@ -801,7 +801,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                   className={`w-full px-4 py-2 text-sm font-medium rounded-md border-2 transition-colors ${
                     isAnalyzing
                       ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'border-green-600 text-green-600 bg-transparent hover:bg-green-600/10'
+                      : 'border-border text-foreground bg-transparent hover:bg-muted'
                   }`}
                 >
                   {isAnalyzing ? 'Analyzing...' : analysisData ? 'Re-analyze Replay' : 'Analyze Replay & Auto-Fill'}
