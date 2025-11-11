@@ -28,9 +28,10 @@ interface Coach {
 interface CoachDetailClientProps {
   coach: Coach;
   videos: Video[];
+  allVideos?: Video[]; // Optional: used to resolve playlist thumbnails
 }
 
-export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
+export function CoachDetailClient({ coach, videos, allVideos }: CoachDetailClientProps) {
   const { data: session } = useSession();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [videoToEdit, setVideoToEdit] = useState<Video | null>(null);
@@ -155,6 +156,7 @@ export function CoachDetailClient({ coach, videos }: CoachDetailClientProps) {
                     video={video}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    allVideos={allVideos}
                   />
                 ))}
               </div>

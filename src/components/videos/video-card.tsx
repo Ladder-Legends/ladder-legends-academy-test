@@ -15,9 +15,10 @@ interface VideoCardProps {
   video: Video;
   onEdit?: (video: Video) => void;
   onDelete?: (video: Video) => void;
+  allVideos?: Video[]; // Optional: used to resolve playlist thumbnails
 }
 
-export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
+export function VideoCard({ video, onEdit, onDelete, allVideos }: VideoCardProps) {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
@@ -40,6 +41,14 @@ export function VideoCard({ video, onEdit, onDelete }: VideoCardProps) {
   const thumbnailUrl = (() => {
     // Playlist videos: use their pre-set thumbnail field
     if (videoIsPlaylist) {
+      // If thumbnail is placeholder and we have access to all videos, try to use first video's thumbnail
+      if (video.thumbnail === '/placeholder-thumbnail.jpg' && allVideos && video.videoIds && video.videoIds.length > 0) {
+        const firstVideoId = video.videoIds[0];
+        const firstVideo = allVideos.find(v => v.id === firstVideoId);
+        if (firstVideo) {
+          return getVideoThumbnailUrl(firstVideo, 'high');
+        }
+      }
       return video.thumbnail;
     }
     // Single videos (YouTube or Mux): use helper to get correct thumbnail

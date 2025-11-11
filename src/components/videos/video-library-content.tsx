@@ -127,6 +127,7 @@ export function VideoLibraryContent() {
       videos={filteredVideos}
       onEdit={handleEdit}
       onDelete={handleDelete}
+      allVideos={videos}
     />
   );
 

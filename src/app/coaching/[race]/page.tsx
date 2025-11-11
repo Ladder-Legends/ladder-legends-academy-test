@@ -5,6 +5,7 @@ import videosData from '@/data/videos.json';
 import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
 import { RaceCoachingClient } from './race-coaching-client';
+import { Video } from '@/types/video';
 
 type Race = 'terran' | 'zerg' | 'protoss' | 'random';
 
@@ -137,6 +138,8 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     return buildOrder.race === race || buildOrder.race === race.charAt(0).toUpperCase() + race.slice(1);
   });
 
+  const allVideos = videosData as Video[];
+
   return (
     <RaceCoachingClient
       race={race}
@@ -145,6 +148,7 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
       videos={raceVideos.slice(0, 12)}
       replays={raceReplays.slice(0, 12)}
       buildOrders={raceBuildOrders.slice(0, 12)}
+      allVideos={allVideos}
     />
   );
 }

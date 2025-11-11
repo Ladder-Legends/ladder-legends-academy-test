@@ -4,6 +4,7 @@ import coachesData from '@/data/coaches.json';
 import videosData from '@/data/videos.json';
 import { CoachDetailClient } from './coach-detail-client';
 import { CoachStructuredData } from '@/components/seo/structured-data';
+import { Video } from '@/types/video';
 
 export async function generateStaticParams() {
   return coachesData.map((coach) => ({
@@ -82,10 +83,12 @@ export default function CoachDetailPage({ params }: { params: { id: string } }) 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any; // Cast to any to handle the type mismatch from JSON
 
+  const allVideos = videosData as Video[];
+
   return (
     <>
       <CoachStructuredData coach={coach} />
-      <CoachDetailClient coach={coach} videos={coachVideos} />
+      <CoachDetailClient coach={coach} videos={coachVideos} allVideos={allVideos} />
     </>
   );
 }

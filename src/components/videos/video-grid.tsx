@@ -5,9 +5,10 @@ interface VideoGridProps {
   videos: Video[];
   onEdit?: (video: Video) => void;
   onDelete?: (video: Video) => void;
+  allVideos?: Video[]; // Pass through to resolve playlist thumbnails
 }
 
-export function VideoGrid({ videos, onEdit, onDelete }: VideoGridProps) {
+export function VideoGrid({ videos, onEdit, onDelete, allVideos }: VideoGridProps) {
   if (videos.length === 0) {
     return (
       <div className="text-center py-12">
@@ -26,6 +27,7 @@ export function VideoGrid({ videos, onEdit, onDelete }: VideoGridProps) {
           video={video}
           onEdit={onEdit}
           onDelete={onDelete}
+          allVideos={allVideos}
         />
       ))}
     </div>

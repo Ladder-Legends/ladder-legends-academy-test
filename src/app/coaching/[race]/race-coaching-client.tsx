@@ -30,6 +30,7 @@ interface RaceCoachingClientProps {
   videos: Video[];
   replays: Replay[];
   buildOrders: BuildOrder[];
+  allVideos?: Video[]; // Optional: used to resolve playlist thumbnails
 }
 
 export function RaceCoachingClient({
@@ -39,6 +40,7 @@ export function RaceCoachingClient({
   videos,
   replays,
   buildOrders,
+  allVideos,
 }: RaceCoachingClientProps) {
   // Determine image filter based on race
   const imageFilter = race === 'zerg'
@@ -192,7 +194,7 @@ export function RaceCoachingClient({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {videos.map((video) => (
-                  <VideoCard key={video.id} video={video} />
+                  <VideoCard key={video.id} video={video} allVideos={allVideos} />
                 ))}
               </div>
             </div>

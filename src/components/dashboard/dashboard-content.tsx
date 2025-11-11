@@ -154,6 +154,7 @@ export function DashboardContent() {
           videos={featuredVideos}
           viewAllHref="/library"
           viewAllLabel="View Full Library"
+          allVideos={allVideos}
         />
 
         {/* Masterclasses */}

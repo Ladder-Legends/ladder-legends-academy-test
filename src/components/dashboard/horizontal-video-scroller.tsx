@@ -11,13 +11,15 @@ interface HorizontalVideoScrollerProps {
   videos: Video[];
   viewAllHref: string;
   viewAllLabel?: string;
+  allVideos?: Video[]; // Optional: used to resolve playlist thumbnails
 }
 
 export function HorizontalVideoScroller({
   title,
   videos,
   viewAllHref,
-  viewAllLabel = "View All"
+  viewAllLabel = "View All",
+  allVideos
 }: HorizontalVideoScrollerProps) {
   return (
     <section className="space-y-4">
@@ -38,7 +40,7 @@ export function HorizontalVideoScroller({
         <div className="flex gap-4 min-w-max items-stretch">
           {videos.map((video) => (
             <div key={video.id} className="w-80 flex-shrink-0">
-              <VideoCard video={video} />
+              <VideoCard video={video} allVideos={allVideos} />
             </div>
           ))}
         </div>
