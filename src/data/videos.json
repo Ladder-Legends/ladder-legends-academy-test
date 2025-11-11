@@ -33,6 +33,9 @@
     "id": "31f4310c-2d87-4c18-866e-01ae1b2b26aa",
     "title": "Sc2 Tools for Improvement #2: Big Brain Game",
     "description": "Learn how to play the 'Big Brain Game' - thinking multiple steps ahead and making strategic decisions in StarCraft 2.",
+    "source": "youtube",
+    "youtubeId": "-gHDUWDA-5g",
+    "thumbnail": "https://img.youtube.com/vi/-gHDUWDA-5g/hqdefault.jpg",
     "date": "2025-10-23",
     "tags": [
       "zerg",
@@ -41,13 +44,7 @@
     "race": "zerg",
     "coach": "Groovy",
     "coachId": "groovy",
-    "source": "youtube",
-    "youtubeId": "-gHDUWDA-5g",
-    "thumbnail": "https://img.youtube.com/vi/-gHDUWDA-5g/hqdefault.jpg",
-    "isFree": false,
-    "categories": [
-      "builds.macro"
-    ]
+    "isFree": true
   },
   {
     "id": "91333018-95d1-4315-a88b-96b6f6e7994d",
