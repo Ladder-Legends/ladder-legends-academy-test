@@ -36,6 +36,7 @@ export function MuxUpload({
   const [uploadedAssetId, setUploadedAssetId] = useState<string | null>(null);
   const [uploadedPlaybackId, setUploadedPlaybackId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
 
   const processFile = async (file: File) => {
     // Validate file type - check both MIME type and extension
@@ -145,13 +146,20 @@ export function MuxUpload({
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setDragCounter(prev => prev + 1);
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(false);
+    setDragCounter(prev => {
+      const newCount = prev - 1;
+      if (newCount === 0) {
+        setIsDragging(false);
+      }
+      return newCount;
+    });
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -162,6 +170,7 @@ export function MuxUpload({
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setDragCounter(0);
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
