@@ -1271,14 +1271,15 @@
     "youtubeId": "T3AWsoX90-Y",
     "thumbnail": "https://img.youtube.com/vi/T3AWsoX90-Y/hqdefault.jpg",
     "date": "2025-11-08",
-    "tags": [],
+    "tags": [
+      "eon",
+      "zerg",
+      "micro"
+    ],
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false,
-    "categories": [
-      "mechanics.micro"
-    ]
+    "isFree": true
   },
   {
     "id": "7a48669b-1055-4048-8a7e-a362701b16ed",
