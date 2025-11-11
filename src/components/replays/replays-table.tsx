@@ -12,7 +12,7 @@ import videosData from '@/data/videos.json';
 import { Video as VideoType } from '@/types/video';
 
 type SortField = 'title' | 'matchup' | 'map' | 'duration' | 'gameDate' | 'uploadDate';
-type SortDirection = 'asc' | 'desc';
+type SortDirection = 'asc' | 'desc' | null;
 
 interface ReplaysTableProps {
   replays: Replay[];
@@ -23,8 +23,8 @@ interface ReplaysTableProps {
 
 export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: ReplaysTableProps) {
   const allVideos = videosData as VideoType[];
-  const [sortField, setSortField] = useState<SortField>('uploadDate');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   // Helper function to parse duration string (e.g., "12.34" or "12:34") into minutes
   const parseDuration = (duration: string): number => {
@@ -40,6 +40,9 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
 
   // Sort the replays based on current sort field and direction
   const sortedReplays = useMemo(() => {
+    // No sort if sortField or sortDirection is null
+    if (!sortField || !sortDirection) return replays;
+
     return [...replays].sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
@@ -81,10 +84,17 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      // Toggle direction if clicking the same field
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      // Cycle through: asc → desc → null → asc
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      } else {
+        setSortDirection('asc');
+      }
     } else {
-      // Default to ascending when clicking a new field
+      // New column: start with ascending
       setSortField(field);
       setSortDirection('asc');
     }
@@ -94,9 +104,13 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
     if (sortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
     }
-    return sortDirection === 'asc'
-      ? <ArrowUp className="h-4 w-4 ml-1" />
-      : <ArrowDown className="h-4 w-4 ml-1" />;
+    if (sortDirection === 'asc') {
+      return <ArrowUp className="h-4 w-4 ml-1" />;
+    }
+    if (sortDirection === 'desc') {
+      return <ArrowDown className="h-4 w-4 ml-1" />;
+    }
+    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
   };
 
   // Helper to get race color

@@ -3,7 +3,7 @@
 import { useState, useMemo, ReactNode } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-export type SortDirection = 'asc' | 'desc';
+export type SortDirection = 'asc' | 'desc' | null;
 
 export interface ColumnConfig<T> {
   /** Unique identifier for this column */
@@ -16,7 +16,7 @@ export interface ColumnConfig<T> {
   sortable?: boolean;
 
   /** Optional custom sort function - if not provided, uses getValue for comparison */
-  sortFn?: (a: T, b: T, direction: SortDirection) => number;
+  sortFn?: (a: T, b: T, direction: 'asc' | 'desc') => number;
 
   /** Function to extract sortable value from item (used if sortFn not provided) */
   getValue?: (item: T) => string | number | Date;
@@ -38,10 +38,10 @@ interface SortableTableProps<T> {
   /** Column configurations */
   columns: ColumnConfig<T>[];
 
-  /** Default sort field */
-  defaultSortField?: string;
+  /** Default sort field (null for no initial sort) */
+  defaultSortField?: string | null;
 
-  /** Default sort direction */
+  /** Default sort direction (null for no initial sort) */
   defaultSortDirection?: SortDirection;
 
   /** Optional function to get a unique key for each row */
@@ -62,7 +62,7 @@ export function SortableTable<T>({
   items,
   columns,
   defaultSortField,
-  defaultSortDirection = 'desc',
+  defaultSortDirection = null,
   getRowKey,
   className = '',
   minWidth = '800px',
@@ -72,7 +72,8 @@ export function SortableTable<T>({
 
   // Sort the items based on current sort field and direction
   const sortedItems = useMemo(() => {
-    if (!sortField) return items;
+    // No sort if sortField or sortDirection is null
+    if (!sortField || !sortDirection) return items;
 
     const column = columns.find(col => col.id === sortField);
     if (!column || !column.sortable) return items;
@@ -114,10 +115,17 @@ export function SortableTable<T>({
     if (!column || !column.sortable) return;
 
     if (sortField === columnId) {
-      // Toggle direction if clicking the same field
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      // Cycle through: asc → desc → null → asc
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      } else {
+        setSortDirection('asc');
+      }
     } else {
-      // Default to ascending when clicking a new field
+      // New column: start with ascending
       setSortField(columnId);
       setSortDirection('asc');
     }
@@ -127,9 +135,13 @@ export function SortableTable<T>({
     if (sortField !== columnId) {
       return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
     }
-    return sortDirection === 'asc'
-      ? <ArrowUp className="h-4 w-4 ml-1" />
-      : <ArrowDown className="h-4 w-4 ml-1" />;
+    if (sortDirection === 'asc') {
+      return <ArrowUp className="h-4 w-4 ml-1" />;
+    }
+    if (sortDirection === 'desc') {
+      return <ArrowDown className="h-4 w-4 ml-1" />;
+    }
+    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
   };
 
   return (

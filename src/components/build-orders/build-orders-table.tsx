@@ -15,7 +15,7 @@ import videosData from '@/data/videos.json';
 const allVideos = videosData as VideoType[];
 
 type SortField = 'name' | 'matchup' | 'difficulty' | 'coach' | 'updatedAt';
-type SortDirection = 'asc' | 'desc';
+type SortDirection = 'asc' | 'desc' | null;
 
 interface BuildOrdersTableProps {
   buildOrders: BuildOrder[];
@@ -25,11 +25,14 @@ interface BuildOrdersTableProps {
 }
 
 export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDelete }: BuildOrdersTableProps) {
-  const [sortField, setSortField] = useState<SortField>('updatedAt');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   // Sort the build orders based on current sort field and direction
   const sortedBuildOrders = useMemo(() => {
+    // No sort if sortField or sortDirection is null
+    if (!sortField || !sortDirection) return buildOrders;
+
     return [...buildOrders].sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
@@ -69,10 +72,17 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      // Toggle direction if clicking the same field
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      // Cycle through: asc → desc → null → asc
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      } else {
+        setSortDirection('asc');
+      }
     } else {
-      // Default to ascending when clicking a new field
+      // New column: start with ascending
       setSortField(field);
       setSortDirection('asc');
     }
@@ -82,9 +92,13 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
     if (sortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
     }
-    return sortDirection === 'asc'
-      ? <ArrowUp className="h-4 w-4 ml-1" />
-      : <ArrowDown className="h-4 w-4 ml-1" />;
+    if (sortDirection === 'asc') {
+      return <ArrowUp className="h-4 w-4 ml-1" />;
+    }
+    if (sortDirection === 'desc') {
+      return <ArrowDown className="h-4 w-4 ml-1" />;
+    }
+    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
   };
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
