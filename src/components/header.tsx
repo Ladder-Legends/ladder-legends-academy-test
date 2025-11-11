@@ -28,20 +28,19 @@ export function Header() {
             <MainNav />
           </div>
 
-          {/* Search & Actions */}
-          <div className="flex items-center gap-3">
-            {/* Omnisearch - Hidden on mobile */}
-            <div className="hidden md:block w-64">
-              <Omnisearch placeholder="Search all content..." />
-            </div>
+          {/* Omnisearch - centered on larger screens */}
+          <div className="hidden lg:block flex-1 max-w-md mx-4">
+            <Omnisearch placeholder="Search all content..." />
+          </div>
 
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <UserMenu />
           </div>
         </div>
 
         {/* Mobile Omnisearch - Below header on mobile */}
-        <div className="md:hidden mt-3">
+        <div className="lg:hidden mt-4">
           <Omnisearch placeholder="Search all content..." />
         </div>
       </div>

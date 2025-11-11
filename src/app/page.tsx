@@ -3,6 +3,7 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content';
 import { MainNav } from '@/components/main-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Footer } from '@/components/footer';
+import { Omnisearch } from '@/components/search/omnisearch';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -30,10 +31,21 @@ export default function Home() {
               {/* Navigation */}
               <MainNav />
             </div>
+
+            {/* Omnisearch - centered on larger screens */}
+            <div className="hidden lg:block flex-1 max-w-md mx-4">
+              <Omnisearch placeholder="Search all content..." />
+            </div>
+
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <UserMenu />
             </div>
+          </div>
+
+          {/* Mobile Omnisearch - Below header on mobile */}
+          <div className="lg:hidden mt-4">
+            <Omnisearch placeholder="Search all content..." />
           </div>
         </div>
       </header>
