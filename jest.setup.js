@@ -1,5 +1,50 @@
 import '@testing-library/jest-dom'
 
+// Mock Next.js web APIs for API routes
+if (typeof Request === 'undefined') {
+  global.Request = class Request {
+    constructor(input, init) {
+      this._url = typeof input === 'string' ? input : input.url;
+      this._init = init;
+    }
+
+    get url() {
+      return this._url;
+    }
+
+    get method() {
+      return this._init?.method || 'GET';
+    }
+
+    get headers() {
+      return new Headers(this._init?.headers || {});
+    }
+  };
+}
+
+if (typeof Response === 'undefined') {
+  global.Response = class Response {
+    constructor(body, init) {
+      this.body = body;
+      this.init = init;
+    }
+  };
+}
+
+if (typeof Headers === 'undefined') {
+  global.Headers = class Headers {
+    constructor() {
+      this.headers = {};
+    }
+    get(name) {
+      return this.headers[name];
+    }
+    set(name, value) {
+      this.headers[name] = value;
+    }
+  };
+}
+
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({

@@ -11,6 +11,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "checkup": "tsx scripts/checkup.ts",
+    "health-report": "tsx scripts/dev-health-report.ts",
     "json-to-csv": "tsx scripts/json-to-csv.ts",
     "csv-to-json": "tsx scripts/csv-to-json.ts",
     "prepare": "husky"

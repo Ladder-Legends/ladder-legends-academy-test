@@ -1,0 +1,538 @@
+#!/usr/bin/env tsx
+
+/**
+ * Enhanced Checkup CLI script
+ *
+ * Uses the discord-sync service for bi-directional event sync.
+ * Provides interactive conflict resolution.
+ */
+
+import { config } from 'dotenv';
+import * as readline from 'readline';
+
+// Load .env.local
+config({ path: '.env.local' });
+
+// Import service functions
+import {
+  fetchDiscordEvents,
+  detectConflicts,
+  readLocalEvents,
+  writeLocalEvents,
+  transformDiscordToLocal,
+  createDiscordEvent,
+  updateDiscordEvent,
+  type LocalEvent,
+  type DiscordEvent,
+  type EventConflict,
+} from '../src/services/discord-sync.service';
+
+const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || '1386735340517195959';
+
+// CLI-specific display functions
+  const startTime = new Date(event.scheduled_start_time);
+  const endTime = event.scheduled_end_time ? new Date(event.scheduled_end_time) : null;
+  const duration = endTime ? Math.round((endTime.getTime() - startTime.getTime()) / 60000) : 120;
+
+  const text = (event.name + ' ' + (event.description || '')).toLowerCase();
+
+  // Detect event type
+  let type: 'tournament' | 'coaching' | 'arcade' | 'other' = 'other';
+  if (text.includes('tournament')) type = 'tournament';
+  else if (text.includes('coaching') || text.includes('workshop') || text.includes('lesson') || text.includes('replay analysis') || text.includes('micro monday')) type = 'coaching';
+  else if (text.includes('team game') || text.includes('arcade') || text.includes('casual') || text.includes('inhouse')) type = 'arcade';
+
+  // Extract tags
+  const tags = new Set<string>();
+  if (text.includes('replay analysis')) tags.add('replay analysis');
+  if (text.includes('coaching')) tags.add('coaching');
+  if (text.includes('ladder')) tags.add('ladder');
+  if (text.includes('gameplay')) tags.add('gameplay');
+  if (text.includes('commentary')) tags.add('commentary');
+  if (text.includes('team games') || text.includes('team game')) tags.add('team games');
+  if (text.includes('casual')) tags.add('casual');
+  if (text.includes('micro')) tags.add('micro');
+  if (text.includes('competition')) tags.add('competition');
+
+  // Detect coach
+  let coach: string | undefined;
+  const coaches = ['hino', 'nico', 'groovy', 'gamerrichy', 'krystianer', 'eon'];
+  for (const c of coaches) {
+    if (text.includes(c)) {
+      coach = c;
+      break;
+    }
+  }
+
+  // Convert Discord recurrence_rule to our format
+  let recurring: LocalEvent['recurring'] | undefined;
+  if (event.recurrence_rule) {
+    const freq = event.recurrence_rule.frequency === 2 ? 'weekly' : 'monthly';
+    const dayOfWeek = event.recurrence_rule.by_weekday?.[0];
+    recurring = {
+      enabled: true,
+      frequency: freq as 'weekly' | 'monthly',
+      ...(dayOfWeek !== undefined && { dayOfWeek }),
+      ...(event.recurrence_rule.end && { endDate: event.recurrence_rule.end }),
+    };
+  }
+
+  // Auto-generate description if missing
+  let description = event.description || '';
+  if (!description && text.includes('replay analysis')) {
+    description = 'Join Groovy for live analysis of subscriber replays. Submit your games for professional feedback!';
+  } else if (!description && text.includes('ladder grind')) {
+    description = 'Watch high-level ladder gameplay and learn advanced strategies.';
+  } else if (!description && text.includes('team game')) {
+    description = 'Join us for casual team games and inhouse matches! All skill levels welcome.';
+  } else if (!description && text.includes('ladder commentary')) {
+    description = `Watch ${coach || 'our coach'} climb the ladder with live commentary and analysis.`;
+  }
+
+  // Auto-categorize
+  const categories: string[] = ['misc'];
+  if (text.includes('micro')) categories[0] = 'mechanics.micro';
+  else if (text.includes('ladder')) categories[0] = 'analysis.ladder-games';
+  else if (text.includes('casual')) categories[0] = 'misc.casual';
+
+  return {
+    id: event.id,
+    title: event.name,
+    description,
+    type,
+    date: startTime.toISOString().split('T')[0],
+    time: startTime.toTimeString().split(' ')[0].slice(0, 5),
+    timezone: 'America/New_York',
+    duration,
+    ...(coach && { coach }),
+    videoIds: [],
+    isFree: false,
+    tags: Array.from(tags),
+    ...(recurring && { recurring }),
+    categories,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Converts local event format to Discord API format
+ */
+function transformLocalToDiscord(event: LocalEvent): Record<string, unknown> {
+  // Parse date and time
+  const dateTime = new Date(`${event.date}T${event.time}`);
+
+  // Calculate end time based on duration
+  const endTime = new Date(dateTime.getTime() + event.duration * 60000);
+
+  // Build recurrence rule if recurring
+  let recurrence_rule = null;
+  if (event.recurring?.enabled) {
+    recurrence_rule = {
+      start: dateTime.toISOString(),
+      end: event.recurring.endDate ? new Date(event.recurring.endDate).toISOString() : null,
+      frequency: event.recurring.frequency === 'weekly' ? 2 : 3,
+      interval: 1,
+      by_weekday: event.recurring.dayOfWeek !== undefined ? [event.recurring.dayOfWeek] : null,
+      by_month_day: null,
+      count: null,
+    };
+  }
+
+  return {
+    name: event.title,
+    description: event.description || '',
+    scheduled_start_time: dateTime.toISOString(),
+    scheduled_end_time: endTime.toISOString(),
+    entity_type: 2, // EXTERNAL - most common for voice channel events
+    privacy_level: 2, // GUILD_ONLY
+    recurrence_rule,
+  };
+}
+
+/**
+ * Creates a new Discord scheduled event via API
+ */
+async function createDiscordEvent(botToken: string, event: LocalEvent): Promise<DiscordEvent> {
+  const payload = transformLocalToDiscord(event);
+
+  const response = await fetch(
+    `${DISCORD_API_BASE}/guilds/${DISCORD_GUILD_ID}/scheduled-events`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to create Discord event: ${response.status} - ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Updates an existing Discord scheduled event via API
+ */
+async function updateDiscordEvent(botToken: string, eventId: string, event: LocalEvent): Promise<DiscordEvent> {
+  const payload = transformLocalToDiscord(event);
+
+  const response = await fetch(
+    `${DISCORD_API_BASE}/guilds/${DISCORD_GUILD_ID}/scheduled-events/${eventId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update Discord event: ${response.status} - ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Deletes a Discord scheduled event via API
+ */
+async function deleteDiscordEvent(botToken: string, eventId: string): Promise<void> {
+  const response = await fetch(
+    `${DISCORD_API_BASE}/guilds/${DISCORD_GUILD_ID}/scheduled-events/${eventId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete Discord event: ${response.status} - ${errorText}`);
+  }
+}
+
+function detectConflicts(localEvents: LocalEvent[], discordEvents: DiscordEvent[]): EventConflict[] {
+  const conflicts: EventConflict[] = [];
+  const localById = new Map(localEvents.map(e => [e.id, e]));
+  const discordById = new Map(discordEvents.map(e => [e.id, e]));
+
+  // Find events in Discord but not in local
+  for (const discordEvent of discordEvents) {
+    if (!localById.has(discordEvent.id)) {
+      conflicts.push({
+        type: 'missing_local',
+        discordEvent,
+      });
+    }
+  }
+
+  // Find events in local but not in Discord
+  for (const localEvent of localEvents) {
+    if (!discordById.has(localEvent.id)) {
+      conflicts.push({
+        type: 'missing_discord',
+        localEvent,
+      });
+    }
+  }
+
+  // Find mismatches (same ID but different data)
+  for (const [id, localEvent] of localById) {
+    const discordEvent = discordById.get(id);
+    if (!discordEvent) continue;
+
+    const differences: string[] = [];
+
+    // Check title
+    if (localEvent.title !== discordEvent.name) {
+      differences.push(`Title: "${localEvent.title}" vs "${discordEvent.name}"`);
+    }
+
+    // Check description
+    const discordDesc = discordEvent.description || '';
+    if (localEvent.description !== discordDesc) {
+      differences.push(`Description differs`);
+    }
+
+    // Check date/time
+    const discordDate = new Date(discordEvent.scheduled_start_time);
+    const localDateTime = `${localEvent.date}T${localEvent.time}`;
+    const discordDateTime = discordDate.toISOString().slice(0, 16).replace('T', ' at ');
+    if (localDateTime !== discordDate.toISOString().slice(0, 16)) {
+      differences.push(`Date/Time: ${localDateTime} vs ${discordDateTime}`);
+    }
+
+    // Check recurring pattern
+    const hasLocalRecurring = localEvent.recurring?.enabled;
+    const hasDiscordRecurring = !!discordEvent.recurrence_rule;
+    if (hasLocalRecurring !== hasDiscordRecurring) {
+      differences.push(`Recurring: ${hasLocalRecurring ? 'yes' : 'no'} vs ${hasDiscordRecurring ? 'yes' : 'no'}`);
+    } else if (hasLocalRecurring && hasDiscordRecurring && discordEvent.recurrence_rule) {
+      // Check dayOfWeek if both are weekly
+      const localDay = localEvent.recurring?.dayOfWeek;
+      const discordDay = discordEvent.recurrence_rule.by_weekday?.[0];
+      if (localDay !== discordDay) {
+        differences.push(`Day of week: ${localDay} vs ${discordDay}`);
+      }
+    }
+
+    if (differences.length > 0) {
+      conflicts.push({
+        type: 'mismatch',
+        localEvent,
+        discordEvent,
+        differences,
+      });
+    }
+  }
+
+  return conflicts;
+}
+
+async function displayConflicts(conflicts: EventConflict[]): Promise<void> {
+  if (conflicts.length === 0) {
+    console.log('\n✅ No conflicts found! Local and Discord events are in sync.');
+    return;
+  }
+
+  console.log('\n⚠️  Event Sync Conflicts Found');
+  console.log('━'.repeat(60));
+
+  for (const conflict of conflicts) {
+    console.log();
+    if (conflict.type === 'missing_local') {
+      console.log(`📥 Event in Discord but NOT in local system:`);
+      console.log(`   ID: ${conflict.discordEvent!.id}`);
+      console.log(`   Title: ${conflict.discordEvent!.name}`);
+      console.log(`   Date: ${new Date(conflict.discordEvent!.scheduled_start_time).toISOString().slice(0, 16)}`);
+    } else if (conflict.type === 'missing_discord') {
+      console.log(`📤 Event in local system but NOT in Discord:`);
+      console.log(`   ID: ${conflict.localEvent!.id}`);
+      console.log(`   Title: ${conflict.localEvent!.title}`);
+      console.log(`   Date: ${conflict.localEvent!.date} ${conflict.localEvent!.time}`);
+    } else {
+      console.log(`⚠️  Event exists in both but has differences:`);
+      console.log(`   ID: ${conflict.localEvent!.id}`);
+      console.log(`   Differences:`);
+      for (const diff of conflict.differences!) {
+        console.log(`      - ${diff}`);
+      }
+    }
+  }
+
+  console.log('━'.repeat(60));
+}
+
+async function promptConflictResolution(conflicts: EventConflict[]): Promise<Map<string, 'keep_discord' | 'keep_local' | 'skip'>> {
+  const resolutions = new Map<string, 'keep_discord' | 'keep_local' | 'skip'>();
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  for (const conflict of conflicts) {
+    const id = conflict.localEvent?.id || conflict.discordEvent?.id || '';
+
+    console.log('\n━'.repeat(60));
+    if (conflict.type === 'missing_local') {
+      console.log(`\n📥 Event "${conflict.discordEvent!.name}" exists in Discord but not locally.`);
+      console.log(`\nOptions:`);
+      console.log(`  [d] Import from Discord`);
+      console.log(`  [s] Skip`);
+
+      const answer = await new Promise<string>((resolve) => {
+        rl.question('Your choice (d/s): ', resolve);
+      });
+
+      if (answer.toLowerCase() === 'd') {
+        resolutions.set(id, 'keep_discord');
+      } else {
+        resolutions.set(id, 'skip');
+      }
+    } else if (conflict.type === 'missing_discord') {
+      console.log(`\n📤 Event "${conflict.localEvent!.title}" exists locally but not in Discord.`);
+      console.log(`\nOptions:`);
+      console.log(`  [l] Create in Discord`);
+      console.log(`  [s] Skip`);
+
+      const answer = await new Promise<string>((resolve) => {
+        rl.question('Your choice (l/s): ', resolve);
+      });
+
+      if (answer.toLowerCase() === 'l') {
+        resolutions.set(id, 'keep_local');
+      } else {
+        resolutions.set(id, 'skip');
+      }
+    } else {
+      console.log(`\n⚠️  Event "${conflict.localEvent!.title}" has differences.`);
+      console.log(`\nDifferences:`);
+      for (const diff of conflict.differences!) {
+        console.log(`  - ${diff}`);
+      }
+      console.log(`\nOptions:`);
+      console.log(`  [d] Use Discord version`);
+      console.log(`  [l] Use local version (update Discord)`);
+      console.log(`  [s] Skip`);
+
+      const answer = await new Promise<string>((resolve) => {
+        rl.question('Your choice (d/l/s): ', resolve);
+      });
+
+      if (answer.toLowerCase() === 'd') {
+        resolutions.set(id, 'keep_discord');
+      } else if (answer.toLowerCase() === 'l') {
+        resolutions.set(id, 'keep_local');
+      } else {
+        resolutions.set(id, 'skip');
+      }
+    }
+  }
+
+  rl.close();
+  return resolutions;
+}
+
+async function applySyncResolutions(
+  conflicts: EventConflict[],
+  resolutions: Map<string, 'keep_discord' | 'keep_local' | 'skip'>,
+  botToken: string
+): Promise<void> {
+  console.log('\n🔄 Applying sync resolutions...');
+
+  const localEvents = [...eventsData] as LocalEvent[];
+  const localById = new Map(localEvents.map(e => [e.id, e]));
+
+  for (const conflict of conflicts) {
+    const id = conflict.localEvent?.id || conflict.discordEvent?.id || '';
+    const resolution = resolutions.get(id);
+
+    if (resolution === 'skip') {
+      console.log(`   ⏭️  Skipped: ${id}`);
+      continue;
+    }
+
+    if (resolution === 'keep_discord' && conflict.discordEvent) {
+      // Import from Discord to local
+      const transformedEvent = transformDiscordToLocal(conflict.discordEvent);
+
+      if (localById.has(id)) {
+        // Update existing
+        const index = localEvents.findIndex(e => e.id === id);
+        localEvents[index] = transformedEvent;
+        console.log(`   ✅ Updated local event: ${transformedEvent.title}`);
+      } else {
+        // Add new
+        localEvents.push(transformedEvent);
+        console.log(`   ✅ Added local event: ${transformedEvent.title}`);
+      }
+    } else if (resolution === 'keep_local' && conflict.localEvent) {
+      // Sync to Discord (create/update)
+      console.log(`   🚀 Syncing to Discord: ${conflict.localEvent.title}`);
+
+      try {
+        if (conflict.type === 'missing_discord') {
+          // Create new event in Discord
+          const createdEvent = await createDiscordEvent(botToken, conflict.localEvent);
+          console.log(`   ✅ Created Discord event: ${createdEvent.name} (ID: ${createdEvent.id})`);
+
+          // Update local event with Discord ID if it was different
+          if (createdEvent.id !== conflict.localEvent.id) {
+            const index = localEvents.findIndex(e => e.id === conflict.localEvent!.id);
+            if (index !== -1) {
+              localEvents[index] = {
+                ...conflict.localEvent,
+                id: createdEvent.id, // Use Discord's ID
+                updatedAt: new Date().toISOString(),
+              };
+              console.log(`   ℹ️  Updated local event ID to match Discord: ${createdEvent.id}`);
+            }
+          }
+        } else if (conflict.type === 'mismatch') {
+          // Update existing Discord event
+          const updatedEvent = await updateDiscordEvent(botToken, id, conflict.localEvent);
+          console.log(`   ✅ Updated Discord event: ${updatedEvent.name}`);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`   ❌ Failed to sync to Discord: ${message}`);
+      }
+    }
+  }
+
+  // Write updated events to file
+  const eventsPath = join(process.cwd(), 'src', 'data', 'events.json');
+  writeFileSync(eventsPath, JSON.stringify(localEvents, null, 2) + '\n');
+  console.log(`\n✅ Updated events.json`);
+}
+
+async function syncDiscordEventsEnhanced(): Promise<void> {
+  console.log('\n📅 Syncing Discord scheduled events (Enhanced)...');
+
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) {
+    console.log('   ⚠️  DISCORD_BOT_TOKEN not found in .env.local - skipping sync');
+    return;
+  }
+
+  try {
+    const discordEvents = await fetchDiscordEvents(botToken);
+    console.log(`   ✅ Found ${discordEvents.length} Discord event(s)`);
+
+    const localEvents = eventsData as LocalEvent[];
+    console.log(`   ✅ Found ${localEvents.length} local event(s)`);
+
+    const conflicts = detectConflicts(localEvents, discordEvents);
+
+    await displayConflicts(conflicts);
+
+    if (conflicts.length > 0) {
+      const resolutions = await promptConflictResolution(conflicts);
+      await applySyncResolutions(conflicts, resolutions, botToken);
+    }
+
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`   ❌ Error syncing events:`, message);
+  }
+}
+
+// Export for testing
+export {
+  transformDiscordToLocal,
+  transformLocalToDiscord,
+  createDiscordEvent,
+  updateDiscordEvent,
+  deleteDiscordEvent,
+  detectConflicts,
+  type LocalEvent,
+  type DiscordEvent,
+  type EventConflict,
+};
+
+// Run enhanced sync
+async function main() {
+  console.log('🔍 Running enhanced Discord event sync...');
+  console.log('━'.repeat(60));
+
+  await syncDiscordEventsEnhanced();
+
+  console.log('\n✨ Sync complete!');
+}
+
+if (require.main === module) {
+  main().catch(console.error);
+}
