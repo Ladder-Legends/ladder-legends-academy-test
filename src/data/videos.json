@@ -1215,14 +1215,16 @@
     "muxAssetStatus": "ready",
     "thumbnail": "/thumbnails/2dfe7d61-e390-433f-b8c3-3a40871e4518.jpg",
     "date": "2025-11-07",
-    "tags": [],
+    "tags": [
+      "eon",
+      "zerg",
+      "micro",
+      "macro"
+    ],
     "race": "zerg",
     "coach": "Eon",
     "coachId": "eon",
-    "isFree": false,
-    "categories": [
-      "matchups.zvt"
-    ]
+    "isFree": false
   },
   {
     "id": "9400d216-d6b9-4855-836a-71c455317a87",
