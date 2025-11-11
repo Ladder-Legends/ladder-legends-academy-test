@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { VideoGrid } from '@/components/videos/video-grid';
+import { VideosTable } from '@/components/videos/videos-table';
 import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { VideoEditModal } from '@/components/admin/video-edit-modal';
@@ -15,12 +16,15 @@ import { Video } from '@/types/video';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 // Cast imported JSON to Video[] to ensure proper typing
 const videos = videosData as Video[];
 
 export function VideoLibraryContent() {
   const { addChange } = usePendingChanges();
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Use the new filtering system - replaces ~300 lines of code!
   const {
@@ -131,6 +135,16 @@ export function VideoLibraryContent() {
     />
   );
 
+  // Table content
+  const tableContent = (
+    <VideosTable
+      videos={filteredVideos}
+      hasSubscriberRole={hasSubscriberRole}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  );
+
   // Header actions
   const headerActions = (
     <PermissionGate require="coaches">
@@ -147,10 +161,10 @@ export function VideoLibraryContent() {
         title="Video Library"
         description="Browse our collection of coaching videos and playlists"
         filterContent={filterContent}
-        tableContent={<div />}
+        tableContent={tableContent}
         gridContent={gridContent}
         defaultView="grid"
-        showViewToggle={false}
+        showViewToggle={true}
         headerActions={headerActions}
         filters={filters}
         searchQuery={searchQuery}
