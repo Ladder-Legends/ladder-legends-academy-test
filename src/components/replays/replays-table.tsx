@@ -1,14 +1,18 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
-import { Download, Video, Edit, Trash2, Lock } from 'lucide-react';
+import { Download, Video, Edit, Trash2, Lock, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { getContentVideoUrl } from '@/lib/video-helpers';
 import videosData from '@/data/videos.json';
 import { Video as VideoType } from '@/types/video';
+
+type SortField = 'title' | 'matchup' | 'map' | 'duration' | 'date';
+type SortDirection = 'asc' | 'desc';
 
 interface ReplaysTableProps {
   replays: Replay[];
@@ -19,6 +23,77 @@ interface ReplaysTableProps {
 
 export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: ReplaysTableProps) {
   const allVideos = videosData as VideoType[];
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  // Helper function to parse duration string (e.g., "12.34" or "12:34") into minutes
+  const parseDuration = (duration: string): number => {
+    const separator = duration.includes('.') ? '.' : ':';
+    const parts = duration.split(separator).map(p => parseInt(p, 10));
+    if (parts.length === 2) {
+      return parts[0];
+    } else if (parts.length === 3) {
+      return parts[0] * 60 + parts[1];
+    }
+    return 0;
+  };
+
+  // Sort the replays based on current sort field and direction
+  const sortedReplays = useMemo(() => {
+    return [...replays].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case 'title':
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case 'matchup':
+          aValue = a.matchup.toLowerCase();
+          bValue = b.matchup.toLowerCase();
+          break;
+        case 'map':
+          aValue = a.map.toLowerCase();
+          bValue = b.map.toLowerCase();
+          break;
+        case 'duration':
+          aValue = parseDuration(a.duration);
+          bValue = parseDuration(b.duration);
+          break;
+        case 'date':
+          aValue = new Date(a.uploadDate || a.gameDate).getTime();
+          bValue = new Date(b.uploadDate || b.gameDate).getTime();
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [replays, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to ascending when clicking a new field
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp className="h-4 w-4 ml-1" />
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
 
   // Helper to get race color
   const getRaceColor = (race: string) => {
@@ -39,17 +114,57 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       <table className="w-full min-w-[800px]">
         <thead className="bg-muted/50">
           <tr>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('title')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Title
+                <SortIcon field="title" />
+              </button>
+            </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Players</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Matchup</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Map</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Duration</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Date</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('matchup')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Matchup
+                <SortIcon field="matchup" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('map')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Map
+                <SortIcon field="map" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('duration')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Duration
+                <SortIcon field="duration" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('date')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Date
+                <SortIcon field="date" />
+              </button>
+            </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {replays.map((replay, index) => (
+          {sortedReplays.map((replay, index) => (
             <tr
               key={replay.id}
               className={`border-t border-border hover:bg-muted/30 transition-colors ${

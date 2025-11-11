@@ -1,9 +1,10 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { BuildOrder } from '@/types/build-order';
 import { Video as VideoType } from '@/types/video';
 import Link from 'next/link';
-import { FileText, Video, Lock, Edit, Trash2 } from 'lucide-react';
+import { FileText, Video, Lock, Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import videosData from '@/data/videos.json';
 
 const allVideos = videosData as VideoType[];
 
+type SortField = 'name' | 'matchup' | 'difficulty' | 'coach' | 'updatedAt';
+type SortDirection = 'asc' | 'desc';
+
 interface BuildOrdersTableProps {
   buildOrders: BuildOrder[];
   hasSubscriberRole: boolean;
@@ -21,6 +25,67 @@ interface BuildOrdersTableProps {
 }
 
 export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDelete }: BuildOrdersTableProps) {
+  const [sortField, setSortField] = useState<SortField>('updatedAt');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  // Sort the build orders based on current sort field and direction
+  const sortedBuildOrders = useMemo(() => {
+    return [...buildOrders].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'matchup':
+          aValue = `${a.race}${a.vsRace}`.toLowerCase();
+          bValue = `${b.race}${b.vsRace}`.toLowerCase();
+          break;
+        case 'difficulty':
+          // Sort by difficulty order: basic < intermediate < expert
+          const difficultyOrder: Record<string, number> = { basic: 1, intermediate: 2, expert: 3 };
+          aValue = difficultyOrder[a.difficulty.toLowerCase()] || 0;
+          bValue = difficultyOrder[b.difficulty.toLowerCase()] || 0;
+          break;
+        case 'coach':
+          aValue = (a.coach || '').toLowerCase();
+          bValue = (b.coach || '').toLowerCase();
+          break;
+        case 'updatedAt':
+          aValue = new Date(a.updatedAt).getTime();
+          bValue = new Date(b.updatedAt).getTime();
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [buildOrders, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to ascending when clicking a new field
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp className="h-4 w-4 ml-1" />
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'beginner': return 'bg-green-500/10 text-green-500 border-green-500/20';
@@ -46,15 +111,47 @@ export function BuildOrdersTable({ buildOrders, hasSubscriberRole, onEdit, onDel
       <table className="w-full min-w-[800px]">
         <thead className="bg-muted/50">
           <tr>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Build Name</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Matchup</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('name')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Build Name
+                <SortIcon field="name" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('matchup')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Matchup
+                <SortIcon field="matchup" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('difficulty')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Difficulty
+                <SortIcon field="difficulty" />
+              </button>
+            </th>
+            <th className="text-left px-6 py-4 text-sm font-semibold">
+              <button
+                onClick={() => handleSort('coach')}
+                className="flex items-center hover:text-primary transition-colors"
+              >
+                Coach
+                <SortIcon field="coach" />
+              </button>
+            </th>
             <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {buildOrders.map((buildOrder, index) => (
+          {sortedBuildOrders.map((buildOrder, index) => (
             <tr
               key={buildOrder.id}
               className={`border-t border-border hover:bg-muted/30 transition-colors ${
