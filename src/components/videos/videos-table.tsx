@@ -55,6 +55,19 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
     );
   };
 
+  const getPrimaryCategory = (video: Video): string => {
+    if (!video.categories || video.categories.length === 0) {
+      return '—';
+    }
+    // Get the first category and extract the primary part (before the dot)
+    const firstCategory = video.categories[0];
+    const primary = firstCategory.includes('.')
+      ? firstCategory.split('.')[0]
+      : firstCategory;
+    // Capitalize first letter
+    return primary.charAt(0).toUpperCase() + primary.slice(1);
+  };
+
   const columns: ColumnConfig<Video>[] = [
     {
       id: 'title',
@@ -97,6 +110,17 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
       sortable: true,
       getValue: (video) => video.race || 'zzz', // Put 'all' at the end
       render: (video) => getRaceBadge(video.race),
+    },
+    {
+      id: 'category',
+      label: 'Category',
+      sortable: true,
+      getValue: (video) => getPrimaryCategory(video).toLowerCase(),
+      render: (video) => (
+        <span className="text-sm text-muted-foreground">
+          {getPrimaryCategory(video)}
+        </span>
+      ),
     },
     {
       id: 'accessLevel',
