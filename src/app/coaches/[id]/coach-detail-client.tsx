@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Filter } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Footer } from '@/components/footer';
 import { VideoCard } from '@/components/videos/video-card';
@@ -59,44 +59,33 @@ export function CoachDetailClient({ coach, videos, allVideos }: CoachDetailClien
         <div className="max-w-7xl mx-auto">
           {/* Coach Header */}
           <div className="mb-8">
-            <div className="flex items-start justify-between gap-6 mb-6">
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-2">{coach.displayName}</h1>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-md border border-border bg-secondary capitalize">
-                    {coach.race === 'all' ? 'All Races' : coach.race}
+            <div className="mb-6">
+              <h1 className="text-4xl font-bold mb-2">{coach.displayName}</h1>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-md border border-border bg-secondary capitalize">
+                  {coach.race === 'all' ? 'All Races' : coach.race}
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  {coachLabel}
+                </span>
+                {coach.pricePerHour && (
+                  <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-md border-2 border-primary bg-primary/10 text-primary">
+                    {coach.pricePerHour}
                   </span>
-                  <span className="text-muted-foreground text-sm">
-                    {coachLabel}
-                  </span>
-                  {coach.pricePerHour && (
-                    <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-md border-2 border-primary bg-primary/10 text-primary">
-                      {coach.pricePerHour}
-                    </span>
-                  )}
-                </div>
-                <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl">
-                  {coach.bio}
-                </p>
+                )}
               </div>
-
-              {/* Booking Button */}
-              {coach.bookingUrl && (
-                <Link
-                  href={hasSubscriberRole ? coach.bookingUrl : '/subscribe'}
-                  target={hasSubscriberRole ? "_blank" : undefined}
-                  rel={hasSubscriberRole ? "noopener noreferrer" : undefined}
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-semibold whitespace-nowrap"
-                >
-                  Book Session
-                  <ExternalLink className="h-4 w-4" />
-                </Link>
-              )}
+              <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl">
+                {coach.bio}
+              </p>
             </div>
           </div>
 
-          {/* Did You Know Section */}
-          <DidYouKnow className="mb-8" />
+          {/* Did You Know Section with Booking CTA */}
+          <DidYouKnow
+            className="mb-8"
+            bookingUrl={coach.bookingUrl}
+            hasSubscriberRole={hasSubscriberRole}
+          />
 
           {/* Videos Section */}
           <div className="border-t border-border pt-8">

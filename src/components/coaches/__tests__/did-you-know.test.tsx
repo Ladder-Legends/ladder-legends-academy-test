@@ -42,4 +42,27 @@ describe('DidYouKnow', () => {
     const heading = screen.getByRole('heading', { level: 3 });
     expect(heading).toHaveTextContent('Did You Know?');
   });
+
+  it('should render booking button when bookingUrl is provided', () => {
+    render(<DidYouKnow bookingUrl="https://example.com/book" />);
+
+    const bookButton = screen.getByRole('link', { name: /Book Session/i });
+    expect(bookButton).toBeInTheDocument();
+    expect(bookButton).toHaveAttribute('href', '/subscribe');
+  });
+
+  it('should link to booking URL for subscribers', () => {
+    render(<DidYouKnow bookingUrl="https://example.com/book" hasSubscriberRole={true} />);
+
+    const bookButton = screen.getByRole('link', { name: /Book Session/i });
+    expect(bookButton).toHaveAttribute('href', 'https://example.com/book');
+    expect(bookButton).toHaveAttribute('target', '_blank');
+  });
+
+  it('should not render booking button when bookingUrl is not provided', () => {
+    render(<DidYouKnow />);
+
+    const bookButton = screen.queryByRole('link', { name: /Book Session/i });
+    expect(bookButton).not.toBeInTheDocument();
+  });
 });
