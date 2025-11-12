@@ -18,8 +18,8 @@ export function Header() {
               <Image
                 src="/logos/logo-light.png"
                 alt="Ladder Legends"
-                width={120}
-                height={32}
+                width={1134}
+                height={710}
                 unoptimized
                 className="logo-desktop-light"
                 priority
@@ -28,8 +28,8 @@ export function Header() {
               <Image
                 src="/logos/logo-dark.png"
                 alt="Ladder Legends"
-                width={120}
-                height={32}
+                width={1134}
+                height={710}
                 unoptimized
                 className="logo-desktop-dark"
                 priority
