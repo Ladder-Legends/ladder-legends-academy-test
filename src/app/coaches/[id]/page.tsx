@@ -101,7 +101,8 @@ export default function CoachDetailPage({ params }: { params: { id: string } }) 
 
   return (
     <>
-      <CoachStructuredData coach={coach} />
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <CoachStructuredData coach={coach as any} />
       <CoachDetailClient
         coach={coach}
         videos={coachVideos}

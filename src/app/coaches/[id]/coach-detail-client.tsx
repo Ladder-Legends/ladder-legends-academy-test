@@ -263,7 +263,8 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
       <CoachEditModal
         isOpen={isCoachEditModalOpen}
         onClose={() => setIsCoachEditModalOpen(false)}
-        coach={coach}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        coach={coach as any}
       />
     </div>
   );
