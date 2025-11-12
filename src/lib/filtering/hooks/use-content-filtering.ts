@@ -101,17 +101,24 @@ export function useContentFiltering<T>(
   // Helper to add counts to options recursively (handles nested children)
   const addCountsToOptions = useCallback((options: FilterOption[], sectionId: string): FilterOption[] => {
     return options.map(opt => {
-      const optionWithCount: FilterOption = {
-        ...opt,
-        count: getCount(opt.id, sectionId),
-      };
+      let count: number;
+      let children: FilterOption[] | undefined;
 
       // Recursively add counts to children if they exist
       if (opt.children && opt.children.length > 0) {
-        optionWithCount.children = addCountsToOptions(opt.children, sectionId);
+        children = addCountsToOptions(opt.children, sectionId);
+        // For parent items with children, sum up the children's counts
+        count = children.reduce((sum, child) => sum + (child.count || 0), 0);
+      } else {
+        // For leaf items, calculate the count normally
+        count = getCount(opt.id, sectionId);
       }
 
-      return optionWithCount;
+      return {
+        ...opt,
+        count,
+        children,
+      };
     });
   }, [getCount]);
 
