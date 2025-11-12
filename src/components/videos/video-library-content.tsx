@@ -50,9 +50,9 @@ export function VideoLibraryContent() {
         return bIsFree ? 1 : -1; // Free items come first
       }
 
-      // Then sort by upload date (newest first)
-      const dateA = new Date(a.uploadDate || a.createdAt || 0).getTime();
-      const dateB = new Date(b.uploadDate || b.createdAt || 0).getTime();
+      // Then sort by date (newest first)
+      const dateA = new Date(a.date || 0).getTime();
+      const dateB = new Date(b.date || 0).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
   }, [filtered]);

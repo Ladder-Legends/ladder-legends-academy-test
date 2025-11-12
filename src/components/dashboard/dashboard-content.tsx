@@ -57,8 +57,8 @@ export function DashboardContent() {
 
   console.log('[DASHBOARD] hasSubscriberRole:', hasSubscriberRole);
 
-  // Sort content: newest first, then free before paid
-  const sortContent = <T extends { uploadDate?: string; createdAt?: string; gameDate?: string; isFree?: boolean }>(items: T[]) => {
+  // Sort content: free first, then newest first
+  const sortContent = <T extends { date?: string; uploadDate?: string; createdAt?: string; updatedAt?: string; gameDate?: string; isFree?: boolean }>(items: T[]) => {
     return [...items].sort((a, b) => {
       // First, prioritize free content
       const aIsFree = a.isFree ?? false;
@@ -67,9 +67,9 @@ export function DashboardContent() {
         return bIsFree ? 1 : -1; // Free items come first
       }
 
-      // Then sort by date (newest first)
-      const aDate = new Date(a.uploadDate || a.createdAt || a.gameDate || 0).getTime();
-      const bDate = new Date(b.uploadDate || b.createdAt || b.gameDate || 0).getTime();
+      // Then sort by date (newest first) - try various date fields
+      const aDate = new Date(a.date || a.uploadDate || a.updatedAt || a.createdAt || a.gameDate || 0).getTime();
+      const bDate = new Date(b.date || b.uploadDate || b.updatedAt || b.createdAt || b.gameDate || 0).getTime();
       return bDate - aDate; // Descending (newest first)
     });
   };
