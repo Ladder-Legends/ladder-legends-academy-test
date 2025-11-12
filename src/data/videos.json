@@ -547,7 +547,7 @@
     "isFree": false,
     "categories": [
       "builds.macro",
-      "misc.maps",
+      "analysis.maps",
       "misc.tips-tricks"
     ]
   },
