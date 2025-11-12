@@ -675,5 +675,34 @@
     "patch": "5.0.15.95299",
     "isFree": false,
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20Viking%20Tank%20push%20no%20ravens-Fxbpc1it8ZYIi78A5XL7thUIdd4ltc.SC2Replay"
+  },
+  {
+    "id": "0c318abf-fa57-405a-a24e-27d7d4eec185",
+    "title": "Insane PvP on Persephone against SpeCial",
+    "description": "This game starts with countering his 1 base all in by opening DT's",
+    "map": "Persephone LE",
+    "matchup": "PvP",
+    "player1": {
+      "name": "Groovy",
+      "race": "protoss",
+      "result": "win",
+      "mmr": 4920
+    },
+    "player2": {
+      "name": "SpeCial",
+      "race": "protoss",
+      "result": "loss",
+      "mmr": 5680
+    },
+    "duration": "19:49",
+    "gameDate": "2025-11-12",
+    "uploadDate": "2025-11-12",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/win%20against%20special-EzcqeJn71UJs6vLD5MJQPh9v5Npalj.SC2Replay",
+    "videoIds": [],
+    "coach": "groovy",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "This was a win against a 5.7k Protoss in PvP where I counter his 1 base all in by opening DT",
+    "isFree": false
   }
 ]
