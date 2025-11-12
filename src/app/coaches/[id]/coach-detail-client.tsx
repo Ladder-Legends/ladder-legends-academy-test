@@ -19,19 +19,7 @@ import type { Replay } from '@/types/replay';
 import type { BuildOrder } from '@/types/build-order';
 import type { Masterclass } from '@/types/masterclass';
 import type { Event } from '@/types/event';
-
-interface Coach {
-  id: string;
-  name: string;
-  displayName: string;
-  race: string;
-  bio: string;
-  specialties: string[];
-  bookingUrl: string;
-  pricePerHour?: string;
-  isActive?: boolean;
-  socialLinks: Record<string, string>;
-}
+import type { Coach } from '@/types/coach';
 
 interface CoachDetailClientProps {
   coach: Coach;
