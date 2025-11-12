@@ -1418,5 +1418,21 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "f41bd6e5-58d9-4846-9db7-0ff6bead8317",
+    "title": "Zerg Map Tutorial-A guide to Ruby Rock LE ",
+    "description": "This video goes over the overlord positions on Ruby Rock LE one of the new ladder maps",
+    "source": "mux",
+    "muxAssetId": "unPVyLH42H3Ek8oD02E7hTAS011vEFG2oBxgRh3jna01dw",
+    "muxPlaybackId": "SvlMRJ13MwBT7kQOLpkCDWCHy01X3Bji0101D6qGFXaEag",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/f41bd6e5-58d9-4846-9db7-0ff6bead8317.jpg",
+    "date": "2025-11-12",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
