@@ -3,72 +3,74 @@
  * Inspired by subtlepatterns.com
  */
 
-/* Hexagonal pattern - StarCraft themed */
-.pattern-hexagons {
-  background-image:
-    radial-gradient(circle at 25px 25px, hsl(var(--muted-foreground) / 0.03) 2%, transparent 0%),
-    radial-gradient(circle at 75px 75px, hsl(var(--muted-foreground) / 0.03) 2%, transparent 0%);
-  background-size: 100px 100px;
-  background-position: 0 0, 50px 50px;
-}
+@layer utilities {
+  /* Hexagonal pattern - StarCraft themed */
+  .pattern-hexagons {
+    background-image:
+      radial-gradient(circle at 25px 25px, hsl(var(--muted-foreground) / 0.03) 2%, transparent 0%),
+      radial-gradient(circle at 75px 75px, hsl(var(--muted-foreground) / 0.03) 2%, transparent 0%);
+    background-size: 100px 100px;
+    background-position: 0 0, 50px 50px;
+  }
 
-/* Diagonal stripes - very subtle */
-.pattern-diagonal-stripes {
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    hsl(var(--muted-foreground) / 0.02) 10px,
-    hsl(var(--muted-foreground) / 0.02) 20px
-  );
-}
+  /* Diagonal stripes - very subtle */
+  .pattern-diagonal-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      hsl(var(--muted-foreground) / 0.02) 10px,
+      hsl(var(--muted-foreground) / 0.02) 20px
+    );
+  }
 
-/* Grid pattern - minimal and clean */
-.pattern-grid {
-  background-image:
-    linear-gradient(hsl(var(--muted-foreground) / 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--muted-foreground) / 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
+  /* Grid pattern - minimal and clean */
+  .pattern-grid {
+    background-image:
+      linear-gradient(hsl(var(--muted-foreground) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--muted-foreground) / 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
 
-/* Dots pattern - subtle and modern */
-.pattern-dots {
-  background-image: radial-gradient(
-    circle,
-    hsl(var(--muted-foreground) / 0.04) 1px,
-    transparent 1px
-  );
-  background-size: 20px 20px;
-}
+  /* Dots pattern - subtle and modern */
+  .pattern-dots {
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--muted-foreground) / 0.04) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
 
-/* Cross-hatch pattern - technical feel */
-.pattern-crosshatch {
-  background-image:
-    linear-gradient(45deg, hsl(var(--muted-foreground) / 0.02) 25%, transparent 25%),
-    linear-gradient(-45deg, hsl(var(--muted-foreground) / 0.02) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, hsl(var(--muted-foreground) / 0.02) 75%),
-    linear-gradient(-45deg, transparent 75%, hsl(var(--muted-foreground) / 0.02) 75%);
-  background-size: 30px 30px;
-  background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
-}
+  /* Cross-hatch pattern - technical feel */
+  .pattern-crosshatch {
+    background-image:
+      linear-gradient(45deg, hsl(var(--muted-foreground) / 0.02) 25%, transparent 25%),
+      linear-gradient(-45deg, hsl(var(--muted-foreground) / 0.02) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, hsl(var(--muted-foreground) / 0.02) 75%),
+      linear-gradient(-45deg, transparent 75%, hsl(var(--muted-foreground) / 0.02) 75%);
+    background-size: 30px 30px;
+    background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
+  }
 
-/* Circuit board pattern - tech/gaming themed */
-.pattern-circuit {
-  background-image:
-    linear-gradient(90deg, hsl(var(--muted-foreground) / 0.015) 1px, transparent 1px),
-    linear-gradient(hsl(var(--muted-foreground) / 0.015) 1px, transparent 1px),
-    radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.02) 0.5px, transparent 0.5px);
-  background-size: 50px 50px, 50px 50px, 25px 25px;
-  background-position: -1px -1px, -1px -1px, 0 0;
-}
+  /* Circuit board pattern - tech/gaming themed */
+  .pattern-circuit {
+    background-image:
+      linear-gradient(90deg, hsl(var(--muted-foreground) / 0.015) 1px, transparent 1px),
+      linear-gradient(hsl(var(--muted-foreground) / 0.015) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.02) 0.5px, transparent 0.5px);
+    background-size: 50px 50px, 50px 50px, 25px 25px;
+    background-position: -1px -1px, -1px -1px, 0 0;
+  }
 
-/* Weave pattern - subtle texture */
-.pattern-weave {
-  background-image:
-    linear-gradient(135deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
-    linear-gradient(225deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
-    linear-gradient(315deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
-    linear-gradient(45deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px);
-  background-size: 32px 32px;
-  background-position: 0 0, 0 0, 16px 16px, 16px 16px;
+  /* Weave pattern - subtle texture */
+  .pattern-weave {
+    background-image:
+      linear-gradient(135deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
+      linear-gradient(225deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
+      linear-gradient(315deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px),
+      linear-gradient(45deg, hsl(var(--muted-foreground) / 0.02) 22px, transparent 22px);
+    background-size: 32px 32px;
+    background-position: 0 0, 0 0, 16px 16px, 16px 16px;
+  }
 }
