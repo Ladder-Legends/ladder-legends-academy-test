@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Video, isPlaylist, getThumbnailYoutubeId, isMuxVideo, getVideoThumbnailUrl } from "@/types/video";
-import { CalendarDays, PlayCircle, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
+import { CalendarDays, Play, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
 import { PermissionGate } from "@/components/auth/permission-gate";
@@ -75,16 +75,31 @@ export function VideoCard({ video, onEdit, onDelete, allVideos }: VideoCardProps
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                <PlayCircle className="w-16 h-16 text-muted-foreground/50" />
+                <Play className="w-16 h-16 text-muted-foreground/50" />
               </div>
             )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
               {!video.isFree && !hasSubscriberRole ? (
-                <Lock className="w-16 h-16 text-white" />
+                <button
+                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  aria-label="Premium content"
+                >
+                  <Lock className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
+                </button>
               ) : videoIsPlaylist ? (
-                <ListVideo className="w-16 h-16 text-white" />
+                <button
+                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  aria-label="Watch playlist"
+                >
+                  <ListVideo className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
+                </button>
               ) : (
-                <PlayCircle className="w-16 h-16 text-white" />
+                <button
+                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  aria-label="Watch video"
+                >
+                  <Play className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
+                </button>
               )}
             </div>
             {videoIsPlaylist && (
