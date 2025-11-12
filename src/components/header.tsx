@@ -62,7 +62,14 @@ export function Header() {
 
           {/* Omnisearch - Flex-grow on all screens, centered on desktop */}
           <div className="flex-1 max-w-md mx-4">
-            <OmnisearchClient placeholder="Search all content..." />
+            {/* Mobile: shorter placeholder */}
+            <div className="sm:hidden">
+              <OmnisearchClient placeholder="Search..." />
+            </div>
+            {/* Desktop: full placeholder */}
+            <div className="hidden sm:block">
+              <OmnisearchClient placeholder="Search all content..." />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
