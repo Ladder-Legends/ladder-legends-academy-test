@@ -107,7 +107,7 @@ const TYPE_PAGES: Record<SearchResult['type'], string> = {
   event: '/events',
   buildOrder: '/build-orders',
   replay: '/replays',
-  video: '/videos',
+  video: '/library',
 };
 
 /**

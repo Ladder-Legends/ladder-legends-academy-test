@@ -27,6 +27,21 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 31536000, // Cache for 1 year (365 days) - images rarely change
   },
 
+  async redirects() {
+    return [
+      {
+        source: '/videos',
+        destination: '/library',
+        permanent: true,
+      },
+      {
+        source: '/videos/:path*',
+        destination: '/library/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {
