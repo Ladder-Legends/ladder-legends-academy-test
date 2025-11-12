@@ -20,17 +20,9 @@ interface EventsTableProps {
 
 export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelete }: EventsTableProps) {
   const getEventTypeBadge = (type: string) => {
-    const colors: Record<string, string> = {
-      tournament: 'bg-red-500/10 text-red-500 border-red-500/20',
-      coaching: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-      casting: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-      streaming: 'bg-green-500/10 text-green-500 border-green-500/20',
-      'replay-analysis': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-      arcade: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
-    };
-
+    // Using theme colors instead of type-specific colors
     return (
-      <Badge variant="outline" className={colors[type] || 'bg-muted'}>
+      <Badge variant="outline" className="bg-muted text-foreground border-border">
         {type}
       </Badge>
     );
@@ -39,7 +31,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
   const getStatusBadge = (event: Event) => {
     const status = getEventStatus(event);
     return (
-      <Badge variant={status === 'upcoming' ? 'default' : 'secondary'}>
+      <Badge variant="outline" className="bg-muted text-foreground border-border">
         {status === 'upcoming' ? 'Upcoming' : 'Past'}
       </Badge>
     );
