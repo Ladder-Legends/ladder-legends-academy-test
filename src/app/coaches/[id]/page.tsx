@@ -2,9 +2,17 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import coachesData from '@/data/coaches.json';
 import videosData from '@/data/videos.json';
+import replaysData from '@/data/replays.json';
+import buildOrdersData from '@/data/build-orders.json';
+import masterclassesData from '@/data/masterclasses.json';
+import eventsData from '@/data/events.json';
 import { CoachDetailClient } from './coach-detail-client';
 import { CoachStructuredData } from '@/components/seo/structured-data';
 import { Video } from '@/types/video';
+import { Replay, normalizeReplays } from '@/types/replay';
+import { BuildOrder } from '@/types/build-order';
+import { Masterclass } from '@/types/masterclass';
+import { Event } from '@/types/event';
 
 export async function generateStaticParams() {
   return coachesData.map((coach) => ({
@@ -64,31 +72,44 @@ export default function CoachDetailPage({ params }: { params: { id: string } }) 
     notFound();
   }
 
-  // Find all videos by this coach
-  // Match by coachId first, then fall back to coach name comparison
-  const coachVideos = videosData.filter((video) => {
+  // Helper function to match content by coach
+  const matchesCoach = (item: { coach?: string; coachId?: string }) => {
     // Match by coachId (preferred)
-    if (video.coachId && video.coachId === coach.id) {
+    if (item.coachId && item.coachId === coach.id) {
       return true;
     }
     // Fall back to name matching (case-insensitive)
-    if (video.coach?.toLowerCase() === coach.name.toLowerCase()) {
+    if (item.coach?.toLowerCase() === coach.name.toLowerCase()) {
       return true;
     }
-    // Also match if video.coach matches the displayName
-    if (video.coach?.toLowerCase() === coach.displayName.toLowerCase()) {
+    // Also match if item.coach matches the displayName
+    if (item.coach?.toLowerCase() === coach.displayName.toLowerCase()) {
       return true;
     }
     return false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }) as any; // Cast to any to handle the type mismatch from JSON
+  };
+
+  // Find all content by this coach
+  const coachVideos = videosData.filter(matchesCoach) as Video[];
+  const coachReplays = normalizeReplays(replaysData as Replay[]).filter(matchesCoach);
+  const coachBuildOrders = (buildOrdersData as BuildOrder[]).filter(matchesCoach);
+  const coachMasterclasses = (masterclassesData as Masterclass[]).filter(matchesCoach);
+  const coachEvents = (eventsData as Event[]).filter(matchesCoach);
 
   const allVideos = videosData as Video[];
 
   return (
     <>
       <CoachStructuredData coach={coach} />
-      <CoachDetailClient coach={coach} videos={coachVideos} allVideos={allVideos} />
+      <CoachDetailClient
+        coach={coach}
+        videos={coachVideos}
+        replays={coachReplays}
+        buildOrders={coachBuildOrders}
+        masterclasses={coachMasterclasses}
+        events={coachEvents}
+        allVideos={allVideos}
+      />
     </>
   );
 }

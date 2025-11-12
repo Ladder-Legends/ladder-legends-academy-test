@@ -82,7 +82,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 z-10">
               <button
                 onClick={handleDocumentClick}
-                className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
+                className="bg-black/60 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-transform duration-200 group/icon"
                 aria-label="View build order"
               >
                 <FileText className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
@@ -90,7 +90,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
               {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
                 <button
                   onClick={handleVideoClick}
-                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
+                  className="bg-black/60 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-transform duration-200 group/icon"
                   aria-label="Watch videos"
                 >
                   <VideoIcon className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />

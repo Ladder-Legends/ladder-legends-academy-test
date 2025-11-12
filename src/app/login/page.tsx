@@ -12,9 +12,9 @@ export default async function LoginPage({
 }) {
   const session = await auth();
 
-  // If already authenticated and has role, redirect to home
-  if (session?.user?.hasSubscriberRole) {
-    redirect(searchParams.callbackUrl || "/");
+  // If already authenticated and has role, redirect to callback URL (but not if they came directly to /login)
+  if (session?.user?.hasSubscriberRole && searchParams.callbackUrl) {
+    redirect(searchParams.callbackUrl);
   }
 
   const errorMessage = searchParams.error === "no_role"

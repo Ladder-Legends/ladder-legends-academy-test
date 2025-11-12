@@ -117,20 +117,22 @@ export function EventsContent() {
       return true;
     });
 
-    // Sort: upcoming first (by date), then past (by date desc)
+    // Sort: upcoming events first (by date ascending), then past events (by date descending)
     return filtered.sort((a, b) => {
-      // Sort by status (upcoming first)
       const statusA = getEventStatus(a);
       const statusB = getEventStatus(b);
 
+      // Upcoming events come before past events
       if (statusA !== statusB) {
         return statusA === 'upcoming' ? -1 : 1;
       }
 
-      // Then by date
+      // Within each status group, sort by date
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
 
+      // Upcoming: closest date first (ascending)
+      // Past: most recent first (descending)
       return statusA === 'upcoming' ? dateA - dateB : dateB - dateA;
     });
   }, [allEvents, selectedItems, startDate, endDate, selectedTags, searchQuery]);

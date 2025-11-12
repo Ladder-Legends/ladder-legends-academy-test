@@ -89,7 +89,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
               {replay.downloadUrl && (
                 <button
                   onClick={handleDownload}
-                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
+                  className="bg-black/60 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-transform duration-200 group/icon"
                   aria-label="Download replay"
                 >
                   <Download className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
@@ -98,7 +98,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
               {replay.videoIds && replay.videoIds.length > 0 && (
                 <button
                   onClick={handleVideoClick}
-                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
+                  className="bg-black/60 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-transform duration-200 group/icon"
                   aria-label="Watch video"
                 >
                   <VideoIcon className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
