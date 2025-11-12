@@ -1402,5 +1402,21 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "886e4f1f-38f6-4c6e-8928-e51622eac2af",
+    "title": "Zerg Map Tutorial- Guide to 10000 Feet ",
+    "description": "This video goes over where to put your overlords and talks about the different matchups and the deadspace on the maps ",
+    "source": "mux",
+    "muxAssetId": "sLqt6yCh1g2NoYtUq402k01xRG5HxquK2onI8HnkhINeY",
+    "muxPlaybackId": "vpVMnf9aYBI2xueRTONEewoX01qONxvaiEpub4QzgHck",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/886e4f1f-38f6-4c6e-8928-e51622eac2af.jpg",
+    "date": "2025-11-12",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
