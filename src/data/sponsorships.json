@@ -16,14 +16,6 @@
       "url": "https://liquipedia.net/starcraft2/SC2's_Safe_House",
       "logoUrl": "/sponsorships/safehouse-logo.png",
       "displayOrder": 2
-    },
-    {
-      "id": "sc2pulse",
-      "name": "SC2 Pulse",
-      "description": "Ranked ladder tracker for StarCraft 2",
-      "url": "https://sc2pulse.nephest.com/sc2/",
-      "logoUrl": "/sponsorships/sc2pulse-logo.svg",
-      "displayOrder": 3
     }
   ]
 }
