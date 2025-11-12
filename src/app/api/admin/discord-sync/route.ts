@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { isOwner } from '@/lib/permissions';
 import {
   fetchDiscordEvents,
   detectConflicts,
@@ -170,19 +171,18 @@ async function handleApplyResolutions(
 }
 
 export async function POST(request: NextRequest) {
-  // Check authentication
+  // Check authentication and owner permission
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     return NextResponse.json(
       { success: false, message: 'Not authenticated' },
       { status: 401 }
     );
   }
 
-  // Check if user is owner (hardcoded owner IDs)
-  const ownerIds = ['363533762576908290']; // Draknas
-  if (!ownerIds.includes(session.user.id)) {
+  // Check if user is owner using centralized permission helper
+  if (!isOwner(session)) {
     return NextResponse.json(
       { success: false, message: 'Forbidden: Owner access required' },
       { status: 403 }
