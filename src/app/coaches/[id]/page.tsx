@@ -8,6 +8,7 @@ import masterclassesData from '@/data/masterclasses.json';
 import eventsData from '@/data/events.json';
 import { CoachDetailClient } from './coach-detail-client';
 import { CoachStructuredData } from '@/components/seo/structured-data';
+import { Coach } from '@/types/coach';
 import { Video } from '@/types/video';
 import { Replay, normalizeReplays } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
