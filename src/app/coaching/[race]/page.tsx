@@ -123,14 +123,20 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     return video.race === race || video.race === 'all' || video.race === race.charAt(0).toUpperCase() + race.slice(1);
   });
 
-  // Filter replays - only show where target race is first in matchup (e.g., TvZ for Terran)
+  // Filter replays - only show where the winner's race matches the target race
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raceReplays = (replaysData as any[]).filter((replay) => {
     if (race === 'random') return true;
-    const matchup = replay.matchup?.toUpperCase() || '';
-    const raceInitial = race.charAt(0).toUpperCase();
-    // Check if race is first in matchup (e.g., "TvZ" for Terran, "ZvP" for Zerg)
-    return matchup.startsWith(raceInitial + 'v');
+
+    // Find the winner
+    const winner = replay.player1?.result === 'win' ? replay.player1 :
+                   replay.player2?.result === 'win' ? replay.player2 : null;
+
+    if (!winner) return false;
+
+    // Check if winner's race matches the target race
+    const winnerRace = winner.race?.toLowerCase() || '';
+    return winnerRace === race;
   });
 
   // Filter build orders - only show where the build order's race matches the target race
