@@ -54,7 +54,7 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
               />
             ) : (
               <div className="text-6xl font-bold text-muted-foreground/20">
-                {buildOrder.race.charAt(0)}v{buildOrder.vsRace.charAt(0)}
+                {buildOrder.race.charAt(0).toUpperCase()}v{buildOrder.vsRace.charAt(0).toUpperCase()}
               </div>
             )}
 
