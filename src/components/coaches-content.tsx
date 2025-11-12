@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CoachCard } from '@/components/coaches/coach-card';
+import { DidYouKnow } from '@/components/coaches/did-you-know';
 import type { Coach } from '@/types/coach';
 import coachesData from '@/data/coaches.json';
 import videos from '@/data/videos.json';
@@ -117,6 +118,9 @@ export function CoachesContent() {
             ))}
           </div>
         </div>
+
+        {/* Did You Know Section */}
+        <DidYouKnow />
 
         {/* Active Coaches Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

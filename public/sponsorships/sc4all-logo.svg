@@ -1,0 +1,16 @@
+<svg width="300" height="50" viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .gray-text { fill: #52524E; }
+      .yellow-text { fill: #D4AF37; }
+    </style>
+  </defs>
+
+  <g transform="skewX(-15) translate(0, 0)">
+    <!-- SC in dark gray -->
+    <text x="5" y="40" style="font-family: Arial Black, Impact, sans-serif; font-weight: 900; font-size: 48px;" class="gray-text">SC</text>
+
+    <!-- 4ALL in gold -->
+    <text x="100" y="40" style="font-family: Arial Black, Impact, sans-serif; font-weight: 900; font-size: 48px;" class="yellow-text">4ALL</text>
+  </g>
+</svg>

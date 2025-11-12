@@ -11,8 +11,16 @@ interface CoachCardProps {
 
 export function CoachCard({ coach, videoCount }: CoachCardProps) {
   const { data: session } = useSession();
+
+  const handleCardClick = () => {
+    window.location.href = `/coaches/${coach.id}`;
+  };
+
   return (
-    <div className="rounded-lg border-2 border-border bg-card/50 p-6 transition-all hover:shadow-lg hover:border-primary/50 flex flex-col h-full">
+    <div
+      onClick={handleCardClick}
+      className="rounded-lg border-2 border-border bg-card/50 p-6 transition-all hover:shadow-lg hover:border-primary/50 flex flex-col h-full cursor-pointer"
+    >
       <div className="flex flex-col h-full space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -41,6 +49,7 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
         <div className="flex gap-2 mt-auto">
           <Link
             href={`/library?coaches=${coach.id}`}
+            onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors"
           >
             View Videos
@@ -50,6 +59,7 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
               href={session?.user?.hasSubscriberRole ? coach.bookingUrl : '/subscribe'}
               target={session?.user?.hasSubscriberRole ? "_blank" : undefined}
               rel={session?.user?.hasSubscriberRole ? "noopener noreferrer" : undefined}
+              onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium border-2 border-primary text-primary bg-transparent rounded-md hover:bg-primary/10 transition-colors"
             >
               Book Session

@@ -2,6 +2,7 @@
 
 import { Video, isMuxVideo } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
+import { useEffect } from 'react';
 
 interface VideoPlayerProps {
   videos: Video[];
@@ -15,7 +16,7 @@ interface VideoPlayerProps {
  *
  * Features:
  * - Supports Mux and YouTube videos
- * - Playlist mode hides inactive videos instead of unmounting (prevents reload)
+ * - Playlist mode unmounts inactive videos to stop playback
  * - Shows processing/error states for Mux videos
  *
  * @example
@@ -34,47 +35,42 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
     return null;
   }
 
-  // Playlist mode: render all videos but hide inactive ones to avoid reload
+  // Playlist mode: only render the current video to ensure others stop playing
   if (isPlaylist) {
     return (
       <div className={`relative ${className}`}>
-        {videos.map((video, index) => (
-          <div
-            key={video.id}
-            className={currentVideoIndex === index ? 'block' : 'hidden'}
-          >
-            {isMuxVideo(video) ? (
-              video.muxPlaybackId ? (
-                <MuxVideoPlayer
-                  playbackId={video.muxPlaybackId}
-                  videoId={video.id}
-                  title={video.title}
-                  className="rounded-lg overflow-hidden"
-                />
-              ) : (
-                <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                  <div className="text-center p-4">
-                    <p className="text-muted-foreground">
-                      {video.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
-                    </p>
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                  title={video.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
+        {isMuxVideo(currentVideo) ? (
+          currentVideo.muxPlaybackId ? (
+            <MuxVideoPlayer
+              key={currentVideo.id} // Force remount when video changes
+              playbackId={currentVideo.muxPlaybackId}
+              videoId={currentVideo.id}
+              title={currentVideo.title}
+              className="rounded-lg overflow-hidden"
+            />
+          ) : (
+            <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
+              <div className="text-center p-4">
+                <p className="text-muted-foreground">
+                  {currentVideo.muxAssetStatus === 'preparing' ? 'Video is processing...' : 'Video not available'}
+                </p>
               </div>
-            )}
+            </div>
+          )
+        ) : (
+          <div className="aspect-video bg-black rounded-lg overflow-hidden">
+            <iframe
+              key={currentVideo.id} // Force remount when video changes
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
+              title={currentVideo.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
           </div>
-        ))}
+        )}
       </div>
     );
   }

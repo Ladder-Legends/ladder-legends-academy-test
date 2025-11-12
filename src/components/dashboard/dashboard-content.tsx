@@ -20,6 +20,16 @@ import { ReplayCard } from '@/components/replays/replay-card';
 import { MasterclassCard } from '@/components/masterclasses/masterclass-card';
 import { BuildOrderCard } from '@/components/build-orders/build-order-card';
 import { MarketingHero } from '@/components/ui/marketing-hero';
+import { SponsorshipSection } from '@/components/sponsorships/sponsorship-section';
+import { SponsorshipEditModal } from '@/components/admin/sponsorship-edit-modal';
+import { PermissionGate } from '@/components/auth/permission-gate';
+import { Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import sponsorshipData from '@/data/sponsorships.json';
+import { SponsorshipData } from '@/types/sponsorship';
+
+const sponsorships = sponsorshipData as SponsorshipData;
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -43,6 +53,7 @@ const allBuildOrders = buildOrdersData as BuildOrder[];
 export function DashboardContent() {
   const { data: session } = useSession();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+  const [isSponsorshipModalOpen, setIsSponsorshipModalOpen] = useState(false);
 
   console.log('[DASHBOARD] hasSubscriberRole:', hasSubscriberRole);
 
@@ -144,6 +155,30 @@ export function DashboardContent() {
             </div>
           </div>
         </MarketingHero>
+
+        {/* Sponsorship Section */}
+        <div className="relative border-t border-b border-border bg-muted/30">
+          <SponsorshipSection
+            sponsors={sponsorships.sponsors}
+            communityFunding={sponsorships.communityFunding}
+            className=""
+          />
+
+          {/* Owner-only Edit Button */}
+          <PermissionGate require="owners">
+            <div className="absolute top-4 right-4">
+              <Button
+                onClick={() => setIsSponsorshipModalOpen(true)}
+                variant="secondary"
+                size="sm"
+                className="shadow-lg"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Edit Sponsorships
+              </Button>
+            </div>
+          </PermissionGate>
+        </div>
 
         {/* Content sections with consistent padding */}
         <div className="px-8 py-8 space-y-16">
@@ -278,6 +313,13 @@ export function DashboardContent() {
 
         <div className="mb-12" />
       </div>
+
+      {/* Sponsorship Edit Modal */}
+      <SponsorshipEditModal
+        isOpen={isSponsorshipModalOpen}
+        onClose={() => setIsSponsorshipModalOpen(false)}
+        currentData={sponsorships}
+      />
     </main>
   );
 }

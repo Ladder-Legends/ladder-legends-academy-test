@@ -6,6 +6,7 @@ import { ExternalLink, Filter } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Footer } from '@/components/footer';
 import { VideoCard } from '@/components/videos/video-card';
+import { DidYouKnow } from '@/components/coaches/did-you-know';
 import type { Video } from '@/types/video';
 
 interface Coach {
@@ -93,6 +94,9 @@ export function CoachDetailClient({ coach, videos, allVideos }: CoachDetailClien
               )}
             </div>
           </div>
+
+          {/* Did You Know Section */}
+          <DidYouKnow className="mb-8" />
 
           {/* Videos Section */}
           <div className="border-t border-border pt-8">

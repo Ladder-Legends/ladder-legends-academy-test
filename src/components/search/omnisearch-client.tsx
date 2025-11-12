@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Search, X, ExternalLink, ChevronRight } from 'lucide-react';
+import { Search, X, ExternalLink, ChevronRight, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -53,6 +53,7 @@ interface SearchResult {
   url: string;
   metadata?: Record<string, unknown>;
   score: number;
+  isPremium?: boolean;
 }
 
 interface SearchResults {
@@ -63,6 +64,14 @@ interface SearchResults {
   replays: SearchResult[];
   videos: SearchResult[];
   totalResults: number;
+  totalCounts: {
+    coaches: number;
+    masterclasses: number;
+    events: number;
+    buildOrders: number;
+    replays: number;
+    videos: number;
+  };
 }
 
 const TYPE_LABELS: Record<SearchResult['type'], string> = {
@@ -173,7 +182,7 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
     const lowerQuery = searchQuery.toLowerCase();
 
     // Search coaches
-    const coachResults: SearchResult[] = coaches
+    const allCoachResults = coaches
       .filter(coach => {
         const searchText = [coach.name, coach.bio, coach.race, coach.specialties?.join(' ')]
           .filter(Boolean)
@@ -190,13 +199,13 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
         metadata: { race: coach.race },
         score: calculateScore(searchQuery, coach.name, coach.bio),
       }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a, b) => b.score - a.score);
+    const totalCoaches = allCoachResults.length;
+    const coachResults = allCoachResults.slice(0, limit);
 
     // Search masterclasses
-    const masterclassResults: SearchResult[] = masterclasses
+    const allMasterclassResults = masterclasses
       .filter(mc => {
-        if (!mc.isFree && !hasSubscription) return false;
         const enriched = enrichMasterclass(mc, collections);
         const searchText = [
           mc.title,
@@ -223,15 +232,16 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
           url: `/masterclasses/${mc.id}`,
           metadata: { coach: mc.coach, race: mc.race, difficulty: mc.difficulty },
           score: calculateScore(searchQuery, mc.title, mc.description, createSearchableText(enriched)),
+          isPremium: !mc.isFree,
         };
       })
-      .sort((a: SearchResult, b: SearchResult) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a: SearchResult, b: SearchResult) => b.score - a.score);
+    const totalMasterclasses = allMasterclassResults.length;
+    const masterclassResults = allMasterclassResults.slice(0, limit);
 
     // Search events
-    const eventResults: SearchResult[] = events
+    const allEventResults = events
       .filter(event => {
-        if (!event.isFree && !hasSubscription) return false;
         const enriched = enrichEvent(event, collections);
         const searchText = [
           event.title,
@@ -259,13 +269,13 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
           score: calculateScore(searchQuery, event.title, event.description, createSearchableText(enriched)),
         };
       })
-      .sort((a: SearchResult, b: SearchResult) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a: SearchResult, b: SearchResult) => b.score - a.score);
+    const totalEvents = allEventResults.length;
+    const eventResults = allEventResults.slice(0, limit);
 
     // Search build orders
-    const buildOrderResults: SearchResult[] = buildOrders
+    const allBuildOrderResults = buildOrders
       .filter(bo => {
-        if (!bo.isFree && !hasSubscription) return false;
         const enriched = enrichBuildOrder(bo, collections);
         const searchText = [
           bo.name,
@@ -294,15 +304,16 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
           url: `/build-orders/${bo.id}`,
           metadata: { race: bo.race, vsRace: bo.vsRace, difficulty: bo.difficulty, coach: bo.coach },
           score: calculateScore(searchQuery, bo.name, bo.description, createSearchableText(enriched)),
+          isPremium: !bo.isFree,
         };
       })
-      .sort((a: SearchResult, b: SearchResult) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a: SearchResult, b: SearchResult) => b.score - a.score);
+    const totalBuildOrders = allBuildOrderResults.length;
+    const buildOrderResults = allBuildOrderResults.slice(0, limit);
 
     // Search replays
-    const replayResults: SearchResult[] = replays
+    const allReplayResults = replays
       .filter(replay => {
-        if (!replay.isFree && !hasSubscription) return false;
         const enriched = enrichReplay(replay, collections);
         const searchText = [
           replay.title,
@@ -337,15 +348,16 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
             coach: replay.coach,
           },
           score: calculateScore(searchQuery, replay.title, replay.description, createSearchableText(enriched)),
+          isPremium: !replay.isFree,
         };
       })
-      .sort((a: SearchResult, b: SearchResult) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a: SearchResult, b: SearchResult) => b.score - a.score);
+    const totalReplays = allReplayResults.length;
+    const replayResults = allReplayResults.slice(0, limit);
 
     // Search videos
-    const videoResults: SearchResult[] = videos
+    const allVideoResults = videos
       .filter(video => {
-        if (!video.isFree && !hasSubscription) return false;
         const enriched = enrichVideo(video, collections);
         const searchText = [
           video.title,
@@ -375,18 +387,14 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
             source: video.muxPlaybackId ? 'mux' : video.youtubeId ? 'youtube' : 'playlist',
           },
           score: calculateScore(searchQuery, video.title, video.description, createSearchableText(enriched)),
+          isPremium: !video.isFree,
         };
       })
-      .sort((a: SearchResult, b: SearchResult) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a: SearchResult, b: SearchResult) => b.score - a.score);
+    const totalVideos = allVideoResults.length;
+    const videoResults = allVideoResults.slice(0, limit);
 
-    const totalResults =
-      coachResults.length +
-      masterclassResults.length +
-      eventResults.length +
-      buildOrderResults.length +
-      replayResults.length +
-      videoResults.length;
+    const totalResults = totalCoaches + totalMasterclasses + totalEvents + totalBuildOrders + totalReplays + totalVideos;
 
     setResults({
       coaches: coachResults,
@@ -396,6 +404,14 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
       replays: replayResults,
       videos: videoResults,
       totalResults,
+      totalCounts: {
+        coaches: totalCoaches,
+        masterclasses: totalMasterclasses,
+        events: totalEvents,
+        buildOrders: totalBuildOrders,
+        replays: totalReplays,
+        videos: totalVideos,
+      },
     });
     setIsOpen(true);
   }, [hasSubscription]);
@@ -450,7 +466,7 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
 
   const handleViewMore = useCallback((type: SearchResult['type']) => {
     const basePath = TYPE_PAGES[type];
-    router.push(`${basePath}?search=${encodeURIComponent(query)}`);
+    router.push(`${basePath}?q=${encodeURIComponent(query)}`);
     setIsOpen(false);
     setQuery('');
     onClose?.();
@@ -473,21 +489,19 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
 
     return (
       <div key={type} className="border-b border-border last:border-b-0">
-        <div className="flex items-center justify-between px-4 py-2 bg-muted/50">
+        <div className="flex items-center gap-3 px-4 py-2 bg-muted/50">
           <h3 className={cn('text-sm font-semibold', TYPE_COLORS[type])}>
-            {TYPE_LABELS[type]} ({totalInCategory})
+            {TYPE_LABELS[type]} ({items.length} of {totalInCategory})
           </h3>
-          {totalInCategory > items.length && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 text-xs"
-              onClick={() => handleViewMore(type)}
-            >
-              View {totalInCategory - items.length} more
-              <ChevronRight className="w-3 h-3 ml-1" />
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs"
+            onClick={() => handleViewMore(type)}
+          >
+            View all results
+            <ChevronRight className="w-3 h-3 ml-1" />
+          </Button>
         </div>
         <div className="divide-y divide-border">
           {items.map((result) => (
@@ -498,6 +512,9 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
+                  {result.isPremium && !hasSubscription && (
+                    <Lock className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
+                  )}
                   <span className="font-medium text-sm group-hover:text-primary transition-colors truncate">
                     {result.title}
                   </span>
@@ -582,10 +599,11 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
                                   type === 'event' ? 'events' :
                                   type === 'buildOrder' ? 'buildOrders' :
                                   type === 'replay' ? 'replays' :
-                                  'videos') as keyof typeof results;
+                                  'videos') as keyof Omit<SearchResults, 'totalResults' | 'totalCounts'>;
                 const items = results[resultKey] as SearchResult[];
+                const totalCount = results.totalCounts[resultKey];
                 if (!items || items.length === 0) return null;
-                return renderResultGroup(type, items, items.length);
+                return renderResultGroup(type, items, totalCount);
               })}
             </>
           )}

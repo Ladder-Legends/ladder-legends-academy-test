@@ -168,5 +168,5 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
 export const buildOrderFilterConfig: FilterConfig<BuildOrder> = {
   fields,
   sections,
-  searchFields: ['name', 'description', 'coach', 'tags'],
+  searchFields: ['name', 'description', 'coach', 'tags', 'race', 'vsRace', 'type'],
 };

@@ -228,5 +228,5 @@ const sections: FilterSectionConfig<Replay>[] = [
 export const replayFilterConfig: FilterConfig<Replay> = {
   fields,
   sections,
-  searchFields: ['title', 'player1', 'player2', 'map', 'coach'],
+  searchFields: ['title', 'description', 'player1', 'player2', 'map', 'coach', 'matchup', 'tags'],
 };

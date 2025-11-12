@@ -1,0 +1,29 @@
+{
+  "communityFunding": "$3,500",
+  "sponsors": [
+    {
+      "id": "sc4all",
+      "name": "SC4ALL",
+      "description": "North American StarCraft LAN event",
+      "url": "https://liquipedia.net/starcraft2/SC4ALL:_StarCraft_II",
+      "logoUrl": "/sponsorships/sc4all-logo.svg",
+      "displayOrder": 1
+    },
+    {
+      "id": "sc2-safe-house",
+      "name": "SC2's Safe House",
+      "description": "ZombieGrub's StarCraft 2 tournament series",
+      "url": "https://liquipedia.net/starcraft2/SC2's_Safe_House",
+      "logoUrl": "/sponsorships/safehouse-logo.png",
+      "displayOrder": 2
+    },
+    {
+      "id": "sc2pulse",
+      "name": "SC2 Pulse",
+      "description": "Ranked ladder tracker for StarCraft 2",
+      "url": "https://sc2pulse.nephest.com/sc2/",
+      "logoUrl": "/sponsorships/sc2pulse-logo.svg",
+      "displayOrder": 3
+    }
+  ]
+}

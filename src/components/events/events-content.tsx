@@ -71,6 +71,7 @@ export function EventsContent() {
           !event.title.toLowerCase().includes(query) &&
           !event.description.toLowerCase().includes(query) &&
           !event.type.toLowerCase().includes(query) &&
+          !(event.coach && event.coach.toLowerCase().includes(query)) &&
           !event.tags?.some(tag => tag.toLowerCase().includes(query))
         ) {
           return false;

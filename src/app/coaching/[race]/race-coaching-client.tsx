@@ -8,10 +8,15 @@ import { ReplayCard } from '@/components/replays/replay-card';
 import { BuildOrderCard } from '@/components/build-orders/build-order-card';
 import { ChevronRight } from 'lucide-react';
 import { MarketingHero } from '@/components/ui/marketing-hero';
+import { SponsorshipSection } from '@/components/sponsorships/sponsorship-section';
+import sponsorshipData from '@/data/sponsorships.json';
+import { SponsorshipData } from '@/types/sponsorship';
 import type { Coach } from '@/types/coach';
 import type { Video } from '@/types/video';
 import type { Replay } from '@/types/replay';
 import type { BuildOrder } from '@/types/build-order';
+
+const sponsorships = sponsorshipData as SponsorshipData;
 
 interface RaceConfig {
   title: string;
@@ -101,6 +106,13 @@ export function RaceCoachingClient({
             </div>
           </div>
         </MarketingHero>
+
+        {/* Sponsorship Section */}
+        <SponsorshipSection
+          sponsors={sponsorships.sponsors}
+          communityFunding={sponsorships.communityFunding}
+          className="border-t border-b border-border bg-muted/30"
+        />
 
         {/* Coaches Section */}
         {coaches.length > 0 && (
