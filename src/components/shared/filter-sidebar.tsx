@@ -277,7 +277,7 @@ export function MobileFilterButton({ onClick, label = 'Filters' }: MobileFilterB
   return (
     <button
       onClick={onClick}
-      className="lg:hidden w-full px-4 py-2.5 bg-card border border-border rounded-md hover:bg-muted transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm"
+      className="lg:hidden w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm"
       aria-label="Open filters"
     >
       <SlidersHorizontal className="w-4 h-4" />

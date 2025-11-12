@@ -75,28 +75,32 @@ export function FilterableContentLayout({
 
       <main className="flex-1 px-4 lg:px-8 py-12 overflow-y-auto pattern-circuit-content">
         <div className="space-y-6">
-          {/* Mobile Filter Button */}
-          <MobileFilterButton
-            onClick={() => setIsMobileFilterOpen(true)}
-            label="Filters & Search"
-          />
-
           {/* Header */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold">{title}</h2>
-              {description && (
-                <p className="text-muted-foreground">{description}</p>
-              )}
-            </div>
+          <div className="space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              <div className="space-y-2 flex-1">
+                <h2 className="text-3xl font-bold">{title}</h2>
+                {description && (
+                  <p className="text-muted-foreground">{description}</p>
+                )}
+              </div>
 
-            {/* Header Actions and View Toggle */}
-            <div className="flex items-center gap-3">
-              {headerActions}
-              {showViewToggle && (
-                <ViewToggle view={view} onViewChange={setView} />
-              )}
+              {/* Header Actions and View Toggle */}
+              <div className="flex items-center justify-between lg:justify-end gap-3">
+                {headerActions}
+                {showViewToggle && (
+                  <ViewToggle view={view} onViewChange={setView} />
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Mobile Filter Button */}
+          <div className="lg:hidden">
+            <MobileFilterButton
+              onClick={() => setIsMobileFilterOpen(true)}
+              label="Filters & Search"
+            />
           </div>
 
           {/* Active Filters */}
