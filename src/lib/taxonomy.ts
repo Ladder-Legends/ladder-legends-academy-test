@@ -135,6 +135,7 @@ export const TAXONOMY: CategoryDefinition[] = [
       { id: 'pro-games', label: 'Pro Games' },
       { id: 'ladder-games', label: 'Ladder Games' },
       { id: 'tournament-games', label: 'Tournament Games' },
+      { id: 'maps', label: 'Maps' },
     ],
   },
   {
