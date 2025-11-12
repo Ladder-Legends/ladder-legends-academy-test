@@ -35,6 +35,12 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
     return 'bg-muted text-foreground border-border';
   };
 
+  const handleDocumentClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `/build-orders/${buildOrder.id}`;
+  };
+
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -74,13 +80,13 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 z-10">
-              <Link
-                href={`/build-orders/${buildOrder.id}`}
+              <button
+                onClick={handleDocumentClick}
                 className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
                 aria-label="View build order"
               >
                 <FileText className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
-              </Link>
+              </button>
               {buildOrder.videoIds && buildOrder.videoIds.length > 0 && (
                 <button
                   onClick={handleVideoClick}
