@@ -14,6 +14,7 @@ import { Replay, normalizeReplays } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import { Masterclass } from '@/types/masterclass';
 import { Event } from '@/types/event';
+import { getReplaysByCoach } from '@/lib/replay-coach-mapping';
 
 export async function generateStaticParams() {
   return coachesData.map((coach) => ({
@@ -92,7 +93,7 @@ export default function CoachDetailPage({ params }: { params: { id: string } }) 
 
   // Find all content by this coach
   const coachVideos = videosData.filter(matchesCoach) as Video[];
-  const coachReplays = normalizeReplays(replaysData as Replay[]).filter(matchesCoach);
+  const coachReplays = getReplaysByCoach(normalizeReplays(replaysData as Replay[]), coach.id);
   const coachBuildOrders = (buildOrdersData as BuildOrder[]).filter(matchesCoach);
   const coachMasterclasses = (masterclassesData as Masterclass[]).filter(matchesCoach);
   const coachEvents = (eventsData as Event[]).filter(matchesCoach);
