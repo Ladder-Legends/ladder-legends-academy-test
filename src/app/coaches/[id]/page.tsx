@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default function CoachDetailPage({ params }: { params: { id: string } }) {
-  const coach = coachesData.find((c) => c.id === params.id);
+  const coach = coachesData.find((c) => c.id === params.id) as Coach | undefined;
 
   if (!coach) {
     notFound();
