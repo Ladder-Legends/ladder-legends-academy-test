@@ -28,7 +28,7 @@ export function VideoLibraryContent() {
 
   // Use the new filtering system - replaces ~300 lines of code!
   const {
-    filtered: filteredVideos,
+    filtered,
     filters,
     setFilter,
     clearFilters,
@@ -39,6 +39,23 @@ export function VideoLibraryContent() {
     clearTags,
     sections: filterSections,
   } = useContentFiltering(videos, videoFilterConfig);
+
+  // Sort videos: free first, then newest first
+  const filteredVideos = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      // First, prioritize free content
+      const aIsFree = a.isFree ?? false;
+      const bIsFree = b.isFree ?? false;
+      if (aIsFree !== bIsFree) {
+        return bIsFree ? 1 : -1; // Free items come first
+      }
+
+      // Then sort by upload date (newest first)
+      const dateA = new Date(a.uploadDate || a.createdAt || 0).getTime();
+      const dateB = new Date(b.uploadDate || b.createdAt || 0).getTime();
+      return dateB - dateA; // Descending order (newest first)
+    });
+  }, [filtered]);
 
   // Modal state for editing
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);

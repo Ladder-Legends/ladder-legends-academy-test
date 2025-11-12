@@ -38,10 +38,17 @@ export function BuildOrdersContent() {
     sections: filterSections,
   } = useContentFiltering(allBuildOrders, buildOrderFilterConfig);
 
-  // Sort build orders by updated date (newest first)
+  // Sort build orders: free first, then newest first
   const filteredBuildOrders = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // Parse dates and sort newest first
+      // First, prioritize free content
+      const aIsFree = a.isFree ?? false;
+      const bIsFree = b.isFree ?? false;
+      if (aIsFree !== bIsFree) {
+        return bIsFree ? 1 : -1; // Free items come first
+      }
+
+      // Then sort by date (newest first)
       const dateA = new Date(a.updatedAt).getTime();
       const dateB = new Date(b.updatedAt).getTime();
       return dateB - dateA; // Descending order (newest first)

@@ -26,7 +26,7 @@ export function MasterclassesContent() {
 
   // Use the new filtering system
   const {
-    filtered: filteredMasterclasses,
+    filtered,
     filters,
     setFilter,
     clearFilters,
@@ -37,6 +37,23 @@ export function MasterclassesContent() {
     clearTags,
     sections: filterSections,
   } = useContentFiltering(allMasterclasses, masterclassFilterConfig);
+
+  // Sort masterclasses: free first, then newest first
+  const filteredMasterclasses = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      // First, prioritize free content
+      const aIsFree = a.isFree ?? false;
+      const bIsFree = b.isFree ?? false;
+      if (aIsFree !== bIsFree) {
+        return bIsFree ? 1 : -1; // Free items come first
+      }
+
+      // Then sort by created date (newest first)
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA; // Descending order (newest first)
+    });
+  }, [filtered]);
 
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

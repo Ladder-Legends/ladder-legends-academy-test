@@ -38,10 +38,17 @@ export function ReplaysContent() {
     sections: filterSections,
   } = useContentFiltering(allReplays, replayFilterConfig);
 
-  // Sort replays by upload date (newest first)
+  // Sort replays: free first, then newest first
   const filteredReplays = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // Parse dates and sort newest first
+      // First, prioritize free content
+      const aIsFree = a.isFree ?? false;
+      const bIsFree = b.isFree ?? false;
+      if (aIsFree !== bIsFree) {
+        return bIsFree ? 1 : -1; // Free items come first
+      }
+
+      // Then sort by date (newest first)
       const dateA = new Date(a.uploadDate || a.gameDate).getTime();
       const dateB = new Date(b.uploadDate || b.gameDate).getTime();
       return dateB - dateA; // Descending order (newest first)
