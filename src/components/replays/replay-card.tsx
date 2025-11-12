@@ -38,6 +38,20 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
     return 'text-foreground';
   };
 
+  const handleDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (replay.downloadUrl) {
+      window.location.href = replay.downloadUrl;
+    }
+  };
+
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `/replays/${replay.id}?scrollTo=videos`;
+  };
+
   return (
     <div className="relative group h-full">
       <PaywallLink
@@ -71,16 +85,24 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
             )}
 
             {/* Hover overlay with action icons */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 z-10">
               {replay.downloadUrl && (
-                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                  <Download className="w-6 h-6 text-white" />
-                </div>
+                <button
+                  onClick={handleDownload}
+                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  aria-label="Download replay"
+                >
+                  <Download className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
+                </button>
               )}
               {replay.videoIds && replay.videoIds.length > 0 && (
-                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                  <VideoIcon className="w-6 h-6 text-white" />
-                </div>
+                <button
+                  onClick={handleVideoClick}
+                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  aria-label="Watch video"
+                >
+                  <VideoIcon className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
+                </button>
               )}
             </div>
           </div>
