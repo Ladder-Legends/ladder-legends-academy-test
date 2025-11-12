@@ -101,7 +101,7 @@ export function RaceCoachingClient({
               </div>
               <div className="text-center p-6 bg-card rounded-lg border border-border">
                 <div className="text-3xl font-bold text-primary">{replays.length}+</div>
-                <div className="text-sm text-muted-foreground mt-1">Pro Replays</div>
+                <div className="text-sm text-muted-foreground mt-1">High-Level Replays</div>
               </div>
             </div>
           </div>
@@ -219,7 +219,7 @@ export function RaceCoachingClient({
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-3xl font-bold mb-2">
-                    {config.title} Pro Replays
+                    {config.title} Replays
                   </h2>
                   <p className="text-muted-foreground">
                     Learn from high-level gameplay

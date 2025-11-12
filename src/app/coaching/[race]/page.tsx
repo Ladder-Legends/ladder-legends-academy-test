@@ -123,19 +123,22 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     return video.race === race || video.race === 'all' || video.race === race.charAt(0).toUpperCase() + race.slice(1);
   });
 
-  // Filter replays by race (check matchup contains race)
+  // Filter replays - only show where target race is first in matchup (e.g., TvZ for Terran)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raceReplays = (replaysData as any[]).filter((replay) => {
     if (race === 'random') return true;
-    const matchup = replay.matchup?.toLowerCase() || '';
-    return matchup.includes(race.charAt(0)); // TvZ, ZvP, etc
+    const matchup = replay.matchup?.toUpperCase() || '';
+    const raceInitial = race.charAt(0).toUpperCase();
+    // Check if race is first in matchup (e.g., "TvZ" for Terran, "ZvP" for Zerg)
+    return matchup.startsWith(raceInitial + 'v');
   });
 
-  // Filter build orders by race
+  // Filter build orders - only show where the build order's race matches the target race
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raceBuildOrders = (buildOrdersData as any[]).filter((buildOrder) => {
     if (race === 'random') return true;
-    return buildOrder.race === race || buildOrder.race === race.charAt(0).toUpperCase() + race.slice(1);
+    const buildOrderRace = buildOrder.race?.toLowerCase() || '';
+    return buildOrderRace === race;
   });
 
   const allVideos = videosData as Video[];
