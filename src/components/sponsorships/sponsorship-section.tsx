@@ -14,18 +14,7 @@ export function SponsorshipSection({ sponsors, communityFunding, className = '' 
   if (sponsors.length === 0) return null;
 
   return (
-    <div className={`relative py-12 ${className}`}>
-      {/* Subtle grid pattern background */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, currentColor 1px, transparent 1px),
-            linear-gradient(to bottom, currentColor 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }}
-      />
+    <div className={`relative py-12 pattern-circuit ${className}`}>
       <div className="relative max-w-7xl mx-auto px-4">
         {/* Community Funding Metric */}
         <div className="text-center mb-12">
