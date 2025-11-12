@@ -199,7 +199,9 @@ export function FilterSidebar({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Search Input */}
+        {/* Content wrapper with top padding on mobile to avoid overlap with close button */}
+        <div className="lg:pt-0 pt-8">
+          {/* Search Input */}
       {searchEnabled && (
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -262,6 +264,7 @@ export function FilterSidebar({
           </div>
         );
       })}
+        </div>
       </aside>
     </>
   );
