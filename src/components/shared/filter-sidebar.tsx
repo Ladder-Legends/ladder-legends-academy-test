@@ -190,20 +190,22 @@ export function FilterSidebar({
         fixed top-0 left-0 bottom-0 z-50 transition-transform duration-200
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Mobile Close Button */}
-        <button
-          onClick={() => handleMobileOpenChange(false)}
-          className="lg:hidden absolute top-2 right-2 p-2 hover:bg-muted rounded-md transition-colors z-10"
-          aria-label="Close filters"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Content wrapper - no special padding needed */}
+        <div>
+          {/* Mobile Close Button - floated right inside content */}
+          <div className="lg:hidden flex justify-end mb-2">
+            <button
+              onClick={() => handleMobileOpenChange(false)}
+              className="p-2 hover:bg-muted rounded-md transition-colors"
+              aria-label="Close filters"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Content wrapper with top padding on mobile to avoid overlap with close button */}
-        <div className="lg:pt-0 pt-8">
           {/* Search Input */}
       {searchEnabled && (
-        <div className="relative">
+        <div className="relative mb-4 pb-4 border-b border-border">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
