@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Image from 'next/image';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
@@ -47,6 +48,38 @@ export function AboutContent() {
     });
   };
 
+  // Custom components for ReactMarkdown
+  const components = {
+    img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+      // Check if this is the logo image
+      const srcStr = typeof src === 'string' ? src : '';
+      if (srcStr.includes('lOGO') || srcStr.includes('logo')) {
+        return (
+          <div className="my-8">
+            <Image
+              src="/logos/logo-light.png"
+              alt={alt || 'Ladder Legends'}
+              width={1134}
+              height={710}
+              className="logo-about-light mx-auto"
+              priority
+            />
+            <Image
+              src="/logos/logo-dark.png"
+              alt={alt || 'Ladder Legends'}
+              width={1134}
+              height={710}
+              className="logo-about-dark mx-auto"
+              priority
+            />
+          </div>
+        );
+      }
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={srcStr} alt={alt} {...props} />;
+    },
+  };
+
   return (
     <main className="flex-1 px-8 py-12 pattern-circuit-content">
       <div className="max-w-4xl mx-auto">
@@ -56,7 +89,7 @@ export function AboutContent() {
             <div className="flex-1">
               {!isEditing && (
                 <div className="prose prose-lg dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
                     {editedContent}
                   </ReactMarkdown>
                 </div>
@@ -103,7 +136,7 @@ export function AboutContent() {
               <div className="border border-border rounded-lg p-6 bg-card/50">
                 <h3 className="text-lg font-semibold mb-4">Preview</h3>
                 <div className="prose prose-lg dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
                     {editedContent}
                   </ReactMarkdown>
                 </div>

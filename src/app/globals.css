@@ -659,3 +659,24 @@
     display: none;
   }
 }
+
+/* About page logo visibility */
+.logo-about-light {
+  display: block;
+  max-width: 400px;
+  height: auto;
+}
+
+.logo-about-dark {
+  display: none;
+  max-width: 400px;
+  height: auto;
+}
+
+.dark .logo-about-light {
+  display: none;
+}
+
+.dark .logo-about-dark {
+  display: block;
+}
