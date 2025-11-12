@@ -16,23 +16,9 @@ export function EventCard({ event }: EventCardProps) {
   const nextOccurrence = getNextOccurrence(event);
   const coach = event.coach ? coachesData.find(c => c.id === event.coach) : null;
 
-  const getTypeColor = (type: string): string => {
-    switch (type) {
-      case 'tournament':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'coaching':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'casting':
-        return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-      case 'streaming':
-        return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
-      case 'replay-analysis':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'arcade':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
+  const getTypeColor = (): string => {
+    // Using theme colors instead of type-specific colors
+    return 'bg-muted text-foreground border-border';
   };
 
   return (
@@ -53,23 +39,23 @@ export function EventCard({ event }: EventCardProps) {
           <div className="flex flex-wrap gap-2">
             <Badge
               variant="outline"
-              className={`${getTypeColor(event.type)} border`}
+              className={getTypeColor()}
             >
               {event.type.replace('-', ' ')}
             </Badge>
 
             {status === 'upcoming' ? (
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 border">
+              <Badge variant="outline" className="bg-muted text-foreground border-border">
                 Upcoming
               </Badge>
             ) : (
-              <Badge variant="outline" className="bg-muted text-muted-foreground border">
+              <Badge variant="outline" className="bg-muted text-foreground border-border">
                 Past
               </Badge>
             )}
 
             {event.recurring?.enabled && (
-              <Badge variant="outline" className="bg-cyan-500/10 text-cyan-500 border-cyan-500/20 border">
+              <Badge variant="outline" className="bg-muted text-foreground border-border">
                 <Repeat className="h-3 w-3 mr-1" />
                 Recurring
               </Badge>
