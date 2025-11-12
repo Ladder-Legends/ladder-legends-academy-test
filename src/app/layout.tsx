@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy. Learn from Grandmaster coaches, watch professional replays, and improve your gameplay.",
     images: [
       {
-        url: 'https://www.ladderlegendsacademy.com/LL_LOGO.png',
+        url: 'https://www.ladderlegendsacademy.com/logos/icon-red.png',
         width: 512,
         height: 512,
         alt: 'Ladder Legends Academy Logo',
@@ -42,7 +42,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Ladder Legends Academy | Starcraft 2 Coaching",
     description: "Master Starcraft 2 with expert coaching from Ladder Legends Academy. Learn from Grandmaster coaches, watch professional replays, and improve your gameplay.",
-    images: ['https://www.ladderlegendsacademy.com/LL_LOGO.png'],
+    images: ['https://www.ladderlegendsacademy.com/logos/icon-red.png'],
+  },
+  icons: {
+    icon: '/logos/icon.png',
+    apple: '/logos/icon.png',
   },
 };
 

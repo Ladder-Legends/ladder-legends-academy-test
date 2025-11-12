@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: 'ChironHeiHK';
+  src: url('/fonts/ChironHeiHK-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ChironHeiHK';
+  src: url('/fonts/ChironHeiHK-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   /* Light mode colors */
   --color-background: #f5f5f5;
@@ -31,7 +47,7 @@
   --color-chart-5: #e84855;
 
   /* Fonts */
-  --font-sans: var(--font-lexend);
+  --font-sans: 'ChironHeiHK', var(--font-lexend), sans-serif;
   --font-secondary: Arial, sans-serif;
 
   /* Radius */
@@ -552,4 +568,76 @@
     linear-gradient(225deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px),
     linear-gradient(315deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px),
     linear-gradient(45deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px);
+}
+
+/* Logo visibility classes */
+.logo-desktop-light {
+  display: none;
+}
+
+.logo-desktop-dark {
+  display: none;
+}
+
+.logo-mobile-light {
+  display: block;
+}
+
+.logo-mobile-dark {
+  display: none;
+}
+
+/* Desktop (sm and up): Show desktop logos */
+@media (min-width: 640px) {
+  .logo-desktop-light {
+    display: block;
+  }
+
+  .logo-desktop-dark {
+    display: none;
+  }
+
+  .logo-mobile-light {
+    display: none;
+  }
+
+  .logo-mobile-dark {
+    display: none;
+  }
+}
+
+/* Dark mode mobile: Only mobile dark logo */
+.dark .logo-desktop-light {
+  display: none;
+}
+
+.dark .logo-desktop-dark {
+  display: none;
+}
+
+.dark .logo-mobile-light {
+  display: none;
+}
+
+.dark .logo-mobile-dark {
+  display: block;
+}
+
+/* Dark mode desktop: Only desktop dark logo */
+@media (min-width: 640px) {
+  .dark .logo-desktop-light {
+    display: none;
+  }
+
+  .dark .logo-desktop-dark {
+    display: block;
+  }
+
+  .dark .logo-mobile-light {
+    display: none;
+  }
+
+  .dark .logo-mobile-dark {
+    display: none;
+  }
 }

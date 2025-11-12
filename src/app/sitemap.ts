@@ -100,6 +100,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    },
   ];
 
   // Video/library pages
@@ -152,6 +164,52 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  // Free preview pages
+  const freeVideoPages = allVideos
+    .filter((video) => video.isFree)
+    .map((video) => ({
+      url: `${baseUrl}/free/library/${video.id}`,
+      lastModified: new Date(video.date),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+
+  const freeReplayPages = allReplays
+    .filter((replay) => replay.isFree)
+    .map((replay) => ({
+      url: `${baseUrl}/free/replays/${replay.id}`,
+      lastModified: new Date(replay.uploadDate),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    }));
+
+  const freeBuildOrderPages = allBuildOrders
+    .filter((buildOrder) => buildOrder.isFree)
+    .map((buildOrder) => ({
+      url: `${baseUrl}/free/build-orders/${buildOrder.id}`,
+      lastModified: new Date(buildOrder.updatedAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+
+  const freeMasterclassPages = allMasterclasses
+    .filter((masterclass) => masterclass.isFree)
+    .map((masterclass) => ({
+      url: `${baseUrl}/free/masterclasses/${masterclass.id}`,
+      lastModified: new Date(masterclass.updatedAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+
+  const freeEventPages = allEvents
+    .filter((event: { isFree?: boolean }) => event.isFree)
+    .map((event: { id: string; updatedAt?: string; createdAt?: string }) => ({
+      url: `${baseUrl}/free/events/${event.id}`,
+      lastModified: new Date(event.updatedAt || event.createdAt || Date.now()),
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    }));
+
   return [
     ...staticPages,
     ...videoPages,
@@ -160,5 +218,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...masterclassPages,
     ...coachPages,
     ...eventPages,
+    ...freeVideoPages,
+    ...freeReplayPages,
+    ...freeBuildOrderPages,
+    ...freeMasterclassPages,
+    ...freeEventPages,
   ];
 }
