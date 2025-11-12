@@ -186,7 +186,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
           className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors ${
             hasActiveChild
               ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              : 'text-foreground hover:text-white hover:bg-primary'
           }`}
         >
           <span>{item.label}</span>
@@ -206,7 +206,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                   className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
                     isActive
                       ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      : 'text-foreground hover:text-white hover:bg-primary'
                   }`}
                   {...linkProps}
                 >
@@ -232,7 +232,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
       className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
         isActive
           ? 'bg-primary text-primary-foreground'
-          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+          : 'text-foreground hover:text-white hover:bg-primary'
       }`}
       {...linkProps}
     >
@@ -303,7 +303,7 @@ export function MainNav() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(true)}
-        className="lg:hidden p-2 hover:bg-accent rounded-md transition-colors"
+        className="lg:hidden p-2 hover:bg-primary hover:text-white rounded-md transition-colors"
         aria-label="Open menu"
       >
         <Menu className="w-5 h-5" />

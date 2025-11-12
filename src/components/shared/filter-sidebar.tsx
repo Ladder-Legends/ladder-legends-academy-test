@@ -190,13 +190,14 @@ export function FilterSidebar({
         fixed top-0 left-0 bottom-0 z-50 transition-transform duration-200
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Content wrapper - no special padding needed */}
+        {/* Content wrapper */}
         <div>
-          {/* Mobile Close Button - floated right inside content */}
-          <div className="lg:hidden flex justify-end mb-2">
+          {/* Header with Close Button - only on mobile */}
+          <div className="lg:hidden flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-lg">Filters</h2>
             <button
               onClick={() => handleMobileOpenChange(false)}
-              className="p-2 hover:bg-muted rounded-md transition-colors"
+              className="p-1.5 hover:bg-muted rounded-md transition-colors"
               aria-label="Close filters"
             >
               <X className="w-5 h-5" />
@@ -206,22 +207,24 @@ export function FilterSidebar({
           {/* Search Input */}
       {searchEnabled && (
         <div className="relative mb-4 pb-4 border-b border-border">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="w-full pl-10 pr-10 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange?.('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full pl-10 pr-10 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange?.('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       )}
 
