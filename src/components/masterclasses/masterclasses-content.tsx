@@ -38,14 +38,16 @@ export function MasterclassesContent() {
     sections: filterSections,
   } = useContentFiltering(allMasterclasses, masterclassFilterConfig);
 
-  // Sort masterclasses: free first, then newest first
+  // Sort masterclasses: for free users, free content first then newest; for premium users, just newest
   const filteredMasterclasses = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
+      // For non-subscribers, prioritize free content first
+      if (!hasSubscriberRole) {
+        const aIsFree = a.isFree ?? false;
+        const bIsFree = b.isFree ?? false;
+        if (aIsFree !== bIsFree) {
+          return bIsFree ? 1 : -1; // Free items come first
+        }
       }
 
       // Then sort by created date (newest first)
@@ -53,7 +55,7 @@ export function MasterclassesContent() {
       const dateB = new Date(b.createdAt || 0).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
-  }, [filtered]);
+  }, [filtered, hasSubscriberRole]);
 
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

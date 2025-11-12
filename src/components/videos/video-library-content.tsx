@@ -40,14 +40,16 @@ export function VideoLibraryContent() {
     sections: filterSections,
   } = useContentFiltering(videos, videoFilterConfig);
 
-  // Sort videos: free first, then newest first
+  // Sort videos: for free users, free content first then newest; for premium users, just newest
   const filteredVideos = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
+      // For non-subscribers, prioritize free content first
+      if (!hasSubscriberRole) {
+        const aIsFree = a.isFree ?? false;
+        const bIsFree = b.isFree ?? false;
+        if (aIsFree !== bIsFree) {
+          return bIsFree ? 1 : -1; // Free items come first
+        }
       }
 
       // Then sort by date (newest first)
@@ -55,7 +57,7 @@ export function VideoLibraryContent() {
       const dateB = new Date(b.date || 0).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
-  }, [filtered]);
+  }, [filtered, hasSubscriberRole]);
 
   // Modal state for editing
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);

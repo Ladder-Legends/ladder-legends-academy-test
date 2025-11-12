@@ -38,14 +38,16 @@ export function ReplaysContent() {
     sections: filterSections,
   } = useContentFiltering(allReplays, replayFilterConfig);
 
-  // Sort replays: free first, then newest first
+  // Sort replays: for free users, free content first then newest; for premium users, just newest
   const filteredReplays = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
+      // For non-subscribers, prioritize free content first
+      if (!hasSubscriberRole) {
+        const aIsFree = a.isFree ?? false;
+        const bIsFree = b.isFree ?? false;
+        if (aIsFree !== bIsFree) {
+          return bIsFree ? 1 : -1; // Free items come first
+        }
       }
 
       // Then sort by date (newest first)
@@ -53,7 +55,7 @@ export function ReplaysContent() {
       const dateB = new Date(b.uploadDate || b.gameDate).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
-  }, [filtered]);
+  }, [filtered, hasSubscriberRole]);
 
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);

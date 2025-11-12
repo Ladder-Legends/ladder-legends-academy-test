@@ -38,14 +38,16 @@ export function BuildOrdersContent() {
     sections: filterSections,
   } = useContentFiltering(allBuildOrders, buildOrderFilterConfig);
 
-  // Sort build orders: free first, then newest first
+  // Sort build orders: for free users, free content first then newest; for premium users, just newest
   const filteredBuildOrders = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
+      // For non-subscribers, prioritize free content first
+      if (!hasSubscriberRole) {
+        const aIsFree = a.isFree ?? false;
+        const bIsFree = b.isFree ?? false;
+        if (aIsFree !== bIsFree) {
+          return bIsFree ? 1 : -1; // Free items come first
+        }
       }
 
       // Then sort by date (newest first)
@@ -53,7 +55,7 @@ export function BuildOrdersContent() {
       const dateB = new Date(b.updatedAt).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
-  }, [filtered]);
+  }, [filtered, hasSubscriberRole]);
 
   const [editingBuildOrder, setEditingBuildOrder] = useState<BuildOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

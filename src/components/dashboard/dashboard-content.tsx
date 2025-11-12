@@ -57,14 +57,16 @@ export function DashboardContent() {
 
   console.log('[DASHBOARD] hasSubscriberRole:', hasSubscriberRole);
 
-  // Sort content: free first, then newest first
+  // Sort content: for free users, free content first then newest; for premium users, just newest
   const sortContent = <T extends { date?: string; uploadDate?: string; createdAt?: string; updatedAt?: string; gameDate?: string; isFree?: boolean }>(items: T[]) => {
     return [...items].sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
+      // For non-subscribers, prioritize free content first
+      if (!hasSubscriberRole) {
+        const aIsFree = a.isFree ?? false;
+        const bIsFree = b.isFree ?? false;
+        if (aIsFree !== bIsFree) {
+          return bIsFree ? 1 : -1; // Free items come first
+        }
       }
 
       // Then sort by date (newest first) - try various date fields

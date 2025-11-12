@@ -117,16 +117,9 @@ export function EventsContent() {
       return true;
     });
 
-    // Sort: free first, then upcoming first (by date), then past (by date desc)
+    // Sort: upcoming first (by date), then past (by date desc)
     return filtered.sort((a, b) => {
-      // First, prioritize free content
-      const aIsFree = a.isFree ?? false;
-      const bIsFree = b.isFree ?? false;
-      if (aIsFree !== bIsFree) {
-        return bIsFree ? 1 : -1; // Free items come first
-      }
-
-      // Then sort by status (upcoming first)
+      // Sort by status (upcoming first)
       const statusA = getEventStatus(a);
       const statusB = getEventStatus(b);
 
