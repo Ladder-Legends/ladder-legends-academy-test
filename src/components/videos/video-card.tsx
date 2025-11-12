@@ -81,21 +81,21 @@ export function VideoCard({ video, onEdit, onDelete, allVideos }: VideoCardProps
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
               {!video.isFree && !hasSubscriberRole ? (
                 <button
-                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
                   aria-label="Premium content"
                 >
                   <Lock className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
                 </button>
               ) : videoIsPlaylist ? (
                 <button
-                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
                   aria-label="Watch playlist"
                 >
                   <ListVideo className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
                 </button>
               ) : (
                 <button
-                  className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all duration-200 group/icon"
+                  className="bg-black/40 backdrop-blur-sm p-3 rounded-full hover:scale-110 hover:bg-black/40 transition-all duration-200 group/icon"
                   aria-label="Watch video"
                 >
                   <Play className="w-6 h-6 text-white group-hover/icon:text-primary transition-colors" />
