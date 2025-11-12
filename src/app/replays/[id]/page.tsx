@@ -3,13 +3,13 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
-import { Replay } from '@/types/replay';
+import { Replay, normalizeReplays } from '@/types/replay';
 import { Video } from '@/types/video';
 import { ReplayDetailClient } from './replay-detail-client';
 import { ReplayStructuredData } from '@/components/seo/structured-data';
 import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
 
-const allReplays = replaysData as Replay[];
+const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
 const allVideos = videosData as Video[];
 
 export async function generateStaticParams() {

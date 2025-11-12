@@ -14,13 +14,13 @@ import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
-import { Replay } from '@/types/replay';
+import { Replay, normalizeReplays } from '@/types/replay';
 import { Video } from '@/types/video';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 
-const allReplays = replaysData as Replay[];
+const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
 const allVideos = videosData as Video[];
 
 interface BuildOrderDetailClientProps {

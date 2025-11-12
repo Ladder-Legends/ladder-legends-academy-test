@@ -14,7 +14,7 @@ import masterclassesData from '@/data/masterclasses.json';
 import eventsData from '@/data/events.json';
 import coachesData from '@/data/coaches.json';
 import { BuildOrder } from '@/types/build-order';
-import { Replay } from '@/types/replay';
+import { Replay, normalizeReplays } from '@/types/replay';
 import { Video } from '@/types/video';
 import { Masterclass } from '@/types/masterclass';
 import { Event } from '@/types/event';
@@ -30,7 +30,7 @@ import {
 } from '@/lib/content-enrichment';
 
 const buildOrders = buildOrdersData as BuildOrder[];
-const replays = replaysData as Replay[];
+const replays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
 const videos = videosData as Video[];
 const masterclasses = masterclassesData as Masterclass[];
 const events = eventsData as Event[];

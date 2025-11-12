@@ -10,7 +10,7 @@ import buildOrdersData from '@/data/build-orders.json';
 import { Video } from '@/types/video';
 import { Coach } from '@/types/coach';
 import { Masterclass } from '@/types/masterclass';
-import { Replay } from '@/types/replay';
+import { Replay, normalizeReplays } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -47,7 +47,7 @@ function DiscordIcon({ className }: { className?: string }) {
 const allVideos = videos as Video[];
 const allCoaches = coaches as Coach[];
 const allMasterclasses = masterclassesData as Masterclass[];
-const allReplays = replaysData as Replay[];
+const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
 const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function DashboardContent() {

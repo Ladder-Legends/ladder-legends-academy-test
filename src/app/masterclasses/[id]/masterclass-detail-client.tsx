@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { Video } from '@/types/video';
 import videosData from '@/data/videos.json';
-import { Replay } from '@/types/replay';
+import { Replay, normalizeReplays } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
@@ -72,8 +72,8 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
     isPlaylist: hasMultipleVideos,
   });
 
-  // Look up replays
-  const allReplays = replaysData as Replay[];
+  // Look up replays and normalize so winner is always player1
+  const allReplays = normalizeReplays(replaysData as Replay[]);
   const masterclassReplays = masterclass.replayIds && masterclass.replayIds.length > 0
     ? masterclass.replayIds.map(replayId =>
         allReplays.find(r => r.id === replayId)

@@ -6,6 +6,7 @@ import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
 import { RaceCoachingClient } from './race-coaching-client';
 import { Video } from '@/types/video';
+import { Replay, normalizeReplays } from '@/types/replay';
 
 type Race = 'terran' | 'zerg' | 'protoss' | 'random';
 
@@ -123,19 +124,13 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     return video.race === race || video.race === 'all' || video.race === race.charAt(0).toUpperCase() + race.slice(1);
   });
 
-  // Filter replays - only show where the winner's race matches the target race
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raceReplays = (replaysData as any[]).filter((replay) => {
+  // Normalize replays so winner is always player1, then filter by race
+  // After normalization, player1 is always the winner, so we just check player1.race
+  const normalizedReplays = normalizeReplays(replaysData as Replay[]);
+  const raceReplays = normalizedReplays.filter((replay) => {
     if (race === 'random') return true;
-
-    // Find the winner
-    const winner = replay.player1?.result === 'win' ? replay.player1 :
-                   replay.player2?.result === 'win' ? replay.player2 : null;
-
-    if (!winner) return false;
-
-    // Check if winner's race matches the target race
-    const winnerRace = winner.race?.toLowerCase() || '';
+    // Player1 is always the winner after normalization
+    const winnerRace = replay.player1.race?.toLowerCase() || '';
     return winnerRace === race;
   });
 

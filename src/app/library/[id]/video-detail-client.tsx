@@ -10,6 +10,7 @@ import videos from '@/data/videos.json';
 import buildOrdersData from '@/data/build-orders.json';
 import replaysData from '@/data/replays.json';
 import masterclassesData from '@/data/masterclasses.json';
+import { normalizeReplays } from '@/types/replay';
 import { ArrowLeft, CalendarDays, Edit, Trash2, FileText, PlayCircle, GraduationCap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,7 +66,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
 
   // Find related content - build orders, replays, and masterclasses that reference this video
   const allBuildOrders = buildOrdersData as BuildOrder[];
-  const allReplays = replaysData as Replay[];
+  const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
   const allMasterclasses = masterclassesData as Masterclass[];
 
   const relatedBuildOrders = allBuildOrders.filter(bo =>
