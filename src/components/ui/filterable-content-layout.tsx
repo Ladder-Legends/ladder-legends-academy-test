@@ -73,7 +73,7 @@ export function FilterableContentLayout({
       {/* Filter Sidebar - uses the passed filterContent which should be a FilterSidebar component */}
       {enhancedFilterContent}
 
-      <main className="flex-1 px-4 lg:px-8 py-8 overflow-y-auto">
+      <main className="flex-1 px-4 lg:px-8 py-12 overflow-y-auto pattern-circuit-content">
         <div className="space-y-6">
           {/* Mobile Filter Button */}
           <MobileFilterButton

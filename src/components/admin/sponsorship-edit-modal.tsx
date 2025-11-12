@@ -5,6 +5,8 @@ import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Sponsorship, SponsorshipData } from '@/types/sponsorship';
 import { Plus, Trash2, Save, X, GripVertical } from 'lucide-react';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { toast } from 'sonner';
 
 interface SponsorshipEditModalProps {
   isOpen: boolean;
@@ -13,10 +15,9 @@ interface SponsorshipEditModalProps {
 }
 
 export function SponsorshipEditModal({ isOpen, onClose, currentData }: SponsorshipEditModalProps) {
+  const { addChange } = usePendingChanges();
   const [sponsorships, setSponshorships] = useState<Sponsorship[]>(currentData.sponsors);
   const [communityFunding, setCommunityFunding] = useState(currentData.communityFunding);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     setSponshorships(currentData.sponsors);
@@ -73,34 +74,19 @@ export function SponsorshipEditModal({ isOpen, onClose, currentData }: Sponsorsh
     setSponshorships(newSponshorships);
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    setSaveMessage(null);
+  const handleSave = () => {
+    addChange({
+      id: 'sponsorships',
+      contentType: 'sponsorships',
+      operation: 'update',
+      data: {
+        communityFunding,
+        sponsors: sponsorships,
+      },
+    });
 
-    try {
-      const response = await fetch('/api/admin/sponsorships', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          communityFunding,
-          sponsors: sponsorships,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save sponsorships');
-      }
-
-      setSaveMessage({ type: 'success', text: 'Sponsorships saved successfully!' });
-      setTimeout(() => {
-        window.location.reload(); // Reload to reflect changes
-      }, 1500);
-    } catch (error) {
-      console.error('Error saving sponsorships:', error);
-      setSaveMessage({ type: 'error', text: 'Failed to save sponsorships. Please try again.' });
-    } finally {
-      setIsSaving(false);
-    }
+    toast.success('Sponsorships updated (pending commit)');
+    onClose();
   };
 
   return (
@@ -232,28 +218,15 @@ export function SponsorshipEditModal({ isOpen, onClose, currentData }: Sponsorsh
             )}
           </div>
 
-          {/* Save Message */}
-          {saveMessage && (
-            <div
-              className={`p-3 rounded-md ${
-                saveMessage.type === 'success'
-                  ? 'bg-green-500/10 text-green-600 border border-green-500/20'
-                  : 'bg-destructive/10 text-destructive border border-destructive/20'
-              }`}
-            >
-              {saveMessage.text}
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t border-border">
-            <Button variant="outline" onClick={onClose} disabled={isSaving}>
+            <Button variant="outline" onClick={onClose}>
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave}>
               <Save className="w-4 h-4 mr-2" />
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              Save Changes
             </Button>
           </div>
         </div>

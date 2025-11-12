@@ -48,7 +48,7 @@ export function AboutContent() {
   };
 
   return (
-    <main className="flex-1 px-8 py-12">
+    <main className="flex-1 px-8 py-12 pattern-circuit-content">
       <div className="max-w-4xl mx-auto">
         <div className="space-y-6">
           {/* Header with Edit Button */}

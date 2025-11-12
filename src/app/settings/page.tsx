@@ -11,7 +11,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pattern-circuit-content">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-2">Settings</h1>

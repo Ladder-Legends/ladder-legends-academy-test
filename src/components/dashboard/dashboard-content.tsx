@@ -199,105 +199,110 @@ export function DashboardContent() {
           </PermissionGate>
         </div>
 
-        {/* Content sections with consistent padding */}
-        <div className="px-8 py-8 space-y-16">
-
         {/* Latest VODs */}
-        <HorizontalVideoScroller
-          title="Latest VODs"
-          videos={featuredVideos}
-          viewAllHref="/library"
-          viewAllLabel="View Full Library"
-          allVideos={allVideos}
-        />
+        <section className="px-8 py-12 pattern-circuit-content border-b border-border">
+          <HorizontalVideoScroller
+            title="Latest VODs"
+            videos={featuredVideos}
+            viewAllHref="/library"
+            viewAllLabel="View Full Library"
+            allVideos={allVideos}
+          />
+        </section>
 
         {/* Masterclasses */}
         {featuredMasterclasses.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Masterclasses</h2>
-              <Link
-                href="/masterclasses"
-                className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-              >
-                View All Masterclasses
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <HorizontalScrollContainer showFadeIndicator>
-              <div className="flex gap-4 min-w-max items-stretch">
-                {featuredMasterclasses.map((masterclass) => (
-                  <div key={masterclass.id} className="w-80 flex-shrink-0">
-                    <MasterclassCard masterclass={masterclass} />
-                  </div>
-                ))}
+          <section className="px-8 py-12 pattern-circuit-content border-b border-border">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Masterclasses</h2>
+                <Link
+                  href="/masterclasses"
+                  className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                >
+                  View All Masterclasses
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
-            </HorizontalScrollContainer>
+              <HorizontalScrollContainer showFadeIndicator>
+                <div className="flex gap-4 min-w-max items-stretch">
+                  {featuredMasterclasses.map((masterclass) => (
+                    <div key={masterclass.id} className="w-80 flex-shrink-0">
+                      <MasterclassCard masterclass={masterclass} />
+                    </div>
+                  ))}
+                </div>
+              </HorizontalScrollContainer>
+            </div>
           </section>
         )}
 
         {/* Replays */}
         {featuredReplays.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Replays</h2>
-              <Link
-                href="/replays"
-                className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-              >
-                View All Replays
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <HorizontalScrollContainer showFadeIndicator>
-              <div className="flex gap-4 min-w-max items-stretch">
-                {featuredReplays.map((replay) => (
-                  <div key={replay.id} className="w-80 flex-shrink-0">
-                    <ReplayCard replay={replay} />
-                  </div>
-                ))}
+          <section className="px-8 py-12 pattern-circuit-content border-b border-border">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Replays</h2>
+                <Link
+                  href="/replays"
+                  className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                >
+                  View All Replays
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
-            </HorizontalScrollContainer>
+              <HorizontalScrollContainer showFadeIndicator>
+                <div className="flex gap-4 min-w-max items-stretch">
+                  {featuredReplays.map((replay) => (
+                    <div key={replay.id} className="w-80 flex-shrink-0">
+                      <ReplayCard replay={replay} />
+                    </div>
+                  ))}
+                </div>
+              </HorizontalScrollContainer>
+            </div>
           </section>
         )}
 
         {/* Build Orders */}
         {featuredBuildOrders.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Build Orders</h2>
-              <Link
-                href="/build-orders"
-                className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-              >
-                View All Build Orders
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <HorizontalScrollContainer showFadeIndicator>
-              <div className="flex gap-4 min-w-max items-stretch">
-                {featuredBuildOrders.map((buildOrder) => (
-                  <div key={buildOrder.id} className="w-80 flex-shrink-0">
-                    <BuildOrderCard buildOrder={buildOrder} />
-                  </div>
-                ))}
+          <section className="px-8 py-12 pattern-circuit-content border-b border-border">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Build Orders</h2>
+                <Link
+                  href="/build-orders"
+                  className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                >
+                  View All Build Orders
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
-            </HorizontalScrollContainer>
+              <HorizontalScrollContainer showFadeIndicator>
+                <div className="flex gap-4 min-w-max items-stretch">
+                  {featuredBuildOrders.map((buildOrder) => (
+                    <div key={buildOrder.id} className="w-80 flex-shrink-0">
+                      <BuildOrderCard buildOrder={buildOrder} />
+                    </div>
+                  ))}
+                </div>
+              </HorizontalScrollContainer>
+            </div>
           </section>
         )}
 
-          {/* Meet Our Coaches */}
+        {/* Meet Our Coaches */}
+        <section className="px-8 py-12 pattern-circuit-content border-b border-border">
           <HorizontalCoachScroller
             title="Meet Our Coaches"
             coaches={allCoaches}
             viewAllHref="/coaches"
           />
-        </div>
+        </section>
 
         {/* Final CTA Section */}
-        <section className="relative px-8 py-16 md:py-24 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-background" />
-          <div className="relative max-w-4xl mx-auto text-center space-y-6">
+        <section className="px-8 py-16 md:py-24 bg-muted/30 pattern-circuit-splash border-b border-border">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold">
               Ready to Climb the Ladder?
             </h2>

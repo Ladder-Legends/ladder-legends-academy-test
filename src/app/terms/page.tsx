@@ -10,7 +10,7 @@ export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 px-8 py-12">
+      <main className="flex-1 px-8 py-12 pattern-circuit-content">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8">
             <div>

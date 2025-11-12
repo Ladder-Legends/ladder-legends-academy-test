@@ -4,7 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export default function SubscribePage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 pattern-circuit-splash">
       <div className="max-w-2xl w-full">
         <div className="border border-border/40 rounded-lg p-8 md:p-12 bg-background/95 backdrop-blur-sm">
           {/* Header */}
@@ -23,10 +23,7 @@ export default function SubscribePage() {
               1-on-1 Coaching Bookings with Top Players
             </FeatureItem>
             <FeatureItem>
-              Coach Diaries & Strategy Insights
-            </FeatureItem>
-            <FeatureItem>
-              Replay Reviews & Personalized Feedback
+              Personalized Coaching Plans and Replay Analysis
             </FeatureItem>
             <FeatureItem>
               Exclusive VOD Library with Premium Content
@@ -41,7 +38,7 @@ export default function SubscribePage() {
               Tournament Entry & Role-Based Shoutouts
             </FeatureItem>
             <FeatureItem>
-              Build Order Database with Video Tutorials
+              Build orders matched to your playstyle
             </FeatureItem>
             <FeatureItem>
               Professional Replay Analysis & Masterclasses

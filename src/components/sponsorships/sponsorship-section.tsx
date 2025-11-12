@@ -14,7 +14,7 @@ export function SponsorshipSection({ sponsors, communityFunding, className = '' 
   if (sponsors.length === 0) return null;
 
   return (
-    <div className={`relative py-12 pattern-circuit ${className}`}>
+    <div className={`relative py-12 pattern-circuit-splash ${className}`}>
       <div className="relative max-w-7xl mx-auto px-4">
         {/* Community Funding Metric */}
         <div className="text-center mb-12">

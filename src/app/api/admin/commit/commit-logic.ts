@@ -3,11 +3,11 @@
  * These functions have no side effects and are easily testable
  */
 
-type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'events' | 'file';
+type ContentType = 'build-orders' | 'replays' | 'masterclasses' | 'videos' | 'coaches' | 'about' | 'privacy' | 'terms' | 'events' | 'file' | 'sponsorships';
 type Operation = 'create' | 'update' | 'delete';
 
 // Content types that are single objects (not arrays)
-const SINGLE_OBJECT_TYPES: ContentType[] = ['about', 'privacy', 'terms'];
+const SINGLE_OBJECT_TYPES: ContentType[] = ['about', 'privacy', 'terms', 'sponsorships'];
 
 export interface Change {
   id: string;

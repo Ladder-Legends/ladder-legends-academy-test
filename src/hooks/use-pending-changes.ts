@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { posthog } from '@/lib/posthog';
 
-export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'events' | 'file' | 'about' | 'privacy' | 'terms';
+export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'events' | 'file' | 'about' | 'privacy' | 'terms' | 'sponsorships';
 
 export interface PendingChange {
   id: string;

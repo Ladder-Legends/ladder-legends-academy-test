@@ -116,7 +116,7 @@ export function RaceCoachingClient({
 
         {/* Coaches Section */}
         {coaches.length > 0 && (
-          <section className="px-8 py-12 bg-muted/30 pattern-hexagons">
+          <section className="px-8 py-12 bg-muted/30 pattern-circuit-content border-b border-border">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -154,7 +154,7 @@ export function RaceCoachingClient({
 
         {/* Videos Section */}
         {videos.length > 0 && (
-          <section className="px-8 py-12 pattern-dots">
+          <section className="px-8 py-12 pattern-circuit-content border-b border-border">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -184,7 +184,7 @@ export function RaceCoachingClient({
 
         {/* Build Orders Section */}
         {buildOrders.length > 0 && (
-          <section className="px-8 py-12 bg-muted/30 pattern-weave">
+          <section className="px-8 py-12 bg-muted/30 pattern-circuit-content border-b border-border">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -214,7 +214,7 @@ export function RaceCoachingClient({
 
         {/* Replays Section */}
         {replays.length > 0 && (
-          <section className="px-8 py-12 pattern-diagonal-stripes">
+          <section className="px-8 py-12 pattern-circuit-content border-b border-border">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -243,7 +243,7 @@ export function RaceCoachingClient({
         )}
 
         {/* Final CTA */}
-        <section className="px-8 py-16 bg-muted/30 pattern-crosshatch">
+        <section className="px-8 py-16 bg-muted/30 pattern-circuit-splash border-b border-border">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h2 className="text-4xl font-bold">
               Ready to Master {config.title}?

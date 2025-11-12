@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "../styles/patterns.css";
 
 @theme {
   /* Light mode colors */
@@ -55,9 +54,6 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    background-image:
-      radial-gradient(at 0% 0%, hsl(4 85% 95% / 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsl(30 90% 95% / 0.3) 0px, transparent 50%);
   }
 
   /* Dark mode colors - override the theme */
@@ -128,12 +124,6 @@
   ::-moz-selection {
     background-color: #e52322;
     color: white;
-  }
-
-  .dark body {
-    background-image:
-      radial-gradient(at 0% 0%, hsl(4 65% 8% / 0.3) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsl(30 70% 8% / 0.2) 0px, transparent 50%);
   }
 
   /* Subtle accent effects */
@@ -351,4 +341,215 @@
   .dark .prose :where(pre):not(:where([class~="not-prose"] *)) {
     background-color: var(--color-secondary);
   }
+}
+
+/**
+ * Subtle background patterns for the site
+ * Inspired by subtlepatterns.com
+ */
+
+@layer components {
+  /* Hexagonal pattern - StarCraft themed */
+  .pattern-hexagons {
+    background-image:
+      radial-gradient(circle at 25px 25px, rgba(89, 89, 89, 0.03) 2%, transparent 0%),
+      radial-gradient(circle at 75px 75px, rgba(89, 89, 89, 0.03) 2%, transparent 0%);
+    background-size: 100px 100px;
+    background-position: 0 0, 50px 50px;
+  }
+
+  /* Diagonal stripes - very subtle */
+  .pattern-diagonal-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(89, 89, 89, 0.02) 10px,
+      rgba(89, 89, 89, 0.02) 20px
+    );
+  }
+
+  /* Grid pattern - minimal and clean */
+  .pattern-grid {
+    background-image:
+      linear-gradient(rgba(89, 89, 89, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(89, 89, 89, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Dots pattern - subtle and modern */
+  .pattern-dots {
+    background-image: radial-gradient(
+      circle,
+      rgba(89, 89, 89, 0.04) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
+
+  /* Cross-hatch pattern - technical feel */
+  .pattern-crosshatch {
+    background-image:
+      linear-gradient(45deg, rgba(89, 89, 89, 0.02) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(89, 89, 89, 0.02) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(89, 89, 89, 0.02) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(89, 89, 89, 0.02) 75%);
+    background-size: 30px 30px;
+    background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
+  }
+
+  /* Circuit board pattern - tech/gaming themed */
+  .pattern-circuit {
+    background-image:
+      linear-gradient(90deg, rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+      linear-gradient(rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+    background-size: 50px 50px, 50px 50px, 25px 25px;
+    background-position: -1px -1px, -1px -1px, 0 0;
+  }
+
+  /* Weave pattern - subtle texture */
+  .pattern-weave {
+    background-image:
+      linear-gradient(135deg, rgba(89, 89, 89, 0.02) 22px, transparent 22px),
+      linear-gradient(225deg, rgba(89, 89, 89, 0.02) 22px, transparent 22px),
+      linear-gradient(315deg, rgba(89, 89, 89, 0.02) 22px, transparent 22px),
+      linear-gradient(45deg, rgba(89, 89, 89, 0.02) 22px, transparent 22px);
+    background-size: 32px 32px;
+    background-position: 0 0, 0 0, 16px 16px, 16px 16px;
+  }
+}
+
+/* Gradient splash effect - reusable */
+.gradient-splash {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, hsl(4 80% 90% / 0.6) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsl(10 70% 88% / 0.5) 0px, transparent 50%);
+}
+
+.dark .gradient-splash {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, hsl(4 65% 8% / 0.5) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsl(30 70% 8% / 0.4) 0px, transparent 50%);
+}
+
+/* Flipped gradient splash - opposite diagonal */
+.gradient-splash-flip {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 100% 0%, hsl(4 80% 90% / 0.6) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(10 70% 88% / 0.5) 0px, transparent 50%);
+}
+
+.dark .gradient-splash-flip {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 100% 0%, hsl(4 65% 8% / 0.5) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(30 70% 8% / 0.4) 0px, transparent 50%);
+}
+
+/* Combined pattern + gradient splash for sponsorship section */
+.pattern-circuit-splash {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, hsl(4 80% 90% / 0.6) 0px, transparent 35%),
+    radial-gradient(at 100% 100%, hsl(10 70% 88% / 0.5) 0px, transparent 50%),
+    linear-gradient(90deg, rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 50px 50px, 25px 25px;
+  background-position: 0 0, 0 0, 0 0, -1px -1px, -1px -1px, 0 0;
+}
+
+.dark .pattern-circuit-splash {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, hsl(4 65% 8% / 0.5) 0px, transparent 35%),
+    radial-gradient(at 100% 100%, hsl(30 70% 8% / 0.4) 0px, transparent 50%),
+    linear-gradient(90deg, rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 50px 50px, 25px 25px;
+  background-position: 0 0, 0 0, 0 0, -1px -1px, -1px -1px, 0 0;
+}
+
+/* Content sections version - with top-left vignette for readability */
+.pattern-circuit-content {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, var(--color-background) 0px, transparent 35%),
+    radial-gradient(at 100% 100%, hsl(10 70% 88% / 0.5) 0px, transparent 60%),
+    linear-gradient(90deg, rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(89, 89, 89, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 50px 50px, 25px 25px;
+  background-position: 0 0, 0 0, 0 0, -1px -1px, -1px -1px, 0 0;
+}
+
+.dark .pattern-circuit-content {
+  background-image:
+    radial-gradient(ellipse 60% 70% at center 55%, color-mix(in srgb, var(--color-background) 92%, transparent) 0%, color-mix(in srgb, var(--color-background) 80%, transparent) 30%, color-mix(in srgb, var(--color-background) 40%, transparent) 50%, transparent 70%),
+    radial-gradient(at 0% 0%, var(--color-background) 0px, transparent 35%),
+    radial-gradient(at 100% 100%, hsl(30 70% 8% / 0.4) 0px, transparent 60%),
+    linear-gradient(90deg, rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 50px 50px, 50px 50px, 25px 25px;
+  background-position: 0 0, 0 0, 0 0, -1px -1px, -1px -1px, 0 0;
+}
+
+/* Dark mode pattern adjustments - flip to lighter colors */
+.dark .pattern-hexagons {
+  background-image:
+    radial-gradient(circle at 25px 25px, rgba(218, 218, 218, 0.03) 2%, transparent 0%),
+    radial-gradient(circle at 75px 75px, rgba(218, 218, 218, 0.03) 2%, transparent 0%);
+}
+
+.dark .pattern-diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(218, 218, 218, 0.02) 10px,
+    rgba(218, 218, 218, 0.02) 20px
+  );
+}
+
+.dark .pattern-grid {
+  background-image:
+    linear-gradient(rgba(218, 218, 218, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(218, 218, 218, 0.03) 1px, transparent 1px);
+}
+
+.dark .pattern-dots {
+  background-image: radial-gradient(
+    circle,
+    rgba(218, 218, 218, 0.04) 1px,
+    transparent 1px
+  );
+}
+
+.dark .pattern-crosshatch {
+  background-image:
+    linear-gradient(45deg, rgba(218, 218, 218, 0.02) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(218, 218, 218, 0.02) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(218, 218, 218, 0.02) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(218, 218, 218, 0.02) 75%);
+}
+
+.dark .pattern-circuit {
+  background-image:
+    linear-gradient(90deg, rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(218, 218, 218, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(229, 35, 34, 0.12) 0.5px, transparent 0.5px);
+}
+
+.dark .pattern-weave {
+  background-image:
+    linear-gradient(135deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px),
+    linear-gradient(225deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px),
+    linear-gradient(315deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px),
+    linear-gradient(45deg, rgba(218, 218, 218, 0.02) 22px, transparent 22px);
 }

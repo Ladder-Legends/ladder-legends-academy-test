@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { isOwner } from '@/lib/permissions';
 import { writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     // Check for owner permission
-    if (!session?.user?.roles?.includes('owner')) {
+    if (!isOwner(session)) {
       return NextResponse.json(
         { error: 'Unauthorized - owner access required' },
         { status: 403 }
@@ -62,7 +63,7 @@ export async function GET() {
     const session = await auth();
 
     // Check for owner permission
-    if (!session?.user?.roles?.includes('owner')) {
+    if (!isOwner(session)) {
       return NextResponse.json(
         { error: 'Unauthorized - owner access required' },
         { status: 403 }

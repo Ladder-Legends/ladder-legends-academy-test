@@ -81,7 +81,7 @@ export function CoachesContent() {
     : [];
 
   return (
-    <main className="flex-1 px-8 py-8">
+    <main className="flex-1 px-8 py-12 pattern-circuit-content">
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-start justify-between gap-4">

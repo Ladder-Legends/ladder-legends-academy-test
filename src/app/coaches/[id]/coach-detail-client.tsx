@@ -55,7 +55,7 @@ export function CoachDetailClient({ coach, videos, allVideos }: CoachDetailClien
   return (
     <div className="min-h-screen flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 px-6 py-8">
+      <main className="flex-1 px-6 py-12 pattern-circuit-content">
         <div className="max-w-7xl mx-auto">
           {/* Coach Header */}
           <div className="mb-8">
