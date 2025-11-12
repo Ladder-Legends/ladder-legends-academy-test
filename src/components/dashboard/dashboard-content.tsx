@@ -57,10 +57,27 @@ export function DashboardContent() {
 
   console.log('[DASHBOARD] hasSubscriberRole:', hasSubscriberRole);
 
-  const featuredVideos = allVideos.slice(0, 8);
-  const featuredMasterclasses = allMasterclasses.slice(0, 6);
-  const featuredReplays = allReplays.slice(0, 6);
-  const featuredBuildOrders = allBuildOrders.slice(0, 6);
+  // Sort content: newest first, then free before paid
+  const sortContent = <T extends { uploadDate?: string; createdAt?: string; gameDate?: string; isFree?: boolean }>(items: T[]) => {
+    return [...items].sort((a, b) => {
+      // First, prioritize free content
+      const aIsFree = a.isFree ?? false;
+      const bIsFree = b.isFree ?? false;
+      if (aIsFree !== bIsFree) {
+        return bIsFree ? 1 : -1; // Free items come first
+      }
+
+      // Then sort by date (newest first)
+      const aDate = new Date(a.uploadDate || a.createdAt || a.gameDate || 0).getTime();
+      const bDate = new Date(b.uploadDate || b.createdAt || b.gameDate || 0).getTime();
+      return bDate - aDate; // Descending (newest first)
+    });
+  };
+
+  const featuredVideos = sortContent(allVideos).slice(0, 8);
+  const featuredMasterclasses = sortContent(allMasterclasses).slice(0, 6);
+  const featuredReplays = sortContent(allReplays).slice(0, 6);
+  const featuredBuildOrders = sortContent(allBuildOrders).slice(0, 6);
 
   // Calculate stats for marketing
   const totalVideos = allVideos.length;
