@@ -1434,5 +1434,21 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "52691b43-4e80-412c-9514-052c65a5cedb",
+    "title": "Zerg Map Tutorial- A guide to overlord positioning for Taito Citadel",
+    "description": "This video goes over all of the potential overlord spots as well as scouting strategy for the Taito Citadel map!",
+    "source": "mux",
+    "muxAssetId": "301QVhRxsR5Od531yOtv00Hy7lFZ1qrYgtAXllwdgWAoA",
+    "muxPlaybackId": "tV00ppNYZAv6bL01Ej8CW4178F4dOptBOdW9OUCMh5eW00",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/52691b43-4e80-412c-9514-052c65a5cedb.jpg",
+    "date": "2025-11-13",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
