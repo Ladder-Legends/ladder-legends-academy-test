@@ -16,6 +16,7 @@ import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
+import { useSession } from 'next-auth/react';
 
 const allMasterclasses = masterclassesData as Masterclass[];
 
@@ -27,7 +28,13 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const masterclass = allMasterclasses.find(mc => mc.id === id);
+
+  // Extract user data for Mux Data analytics
+  const viewerUserId = session?.user?.discordId ?? undefined;
+  const viewerUserName = session?.user?.name ?? undefined;
+  const viewerIsSubscriber = session?.user?.hasSubscriberRole ?? false;
 
   // Initialize from URL query param if present
   const [currentVideoIndex, setCurrentVideoIndex] = useState(() => {
@@ -137,6 +144,9 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
                               videoId={video.id}
                               title={video.title}
                               className="rounded-lg overflow-hidden"
+                              viewerUserId={viewerUserId}
+                              viewerUserName={viewerUserName}
+                              viewerIsSubscriber={viewerIsSubscriber}
                             />
                           ) : (
                             <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
@@ -173,6 +183,9 @@ export default function FreeMasterclassDetailPage({ params }: PageProps) {
                           videoId={currentVideo.id}
                           title={currentVideo.title}
                           className="rounded-lg overflow-hidden"
+                          viewerUserId={viewerUserId}
+                          viewerUserName={viewerUserName}
+                          viewerIsSubscriber={viewerIsSubscriber}
                         />
                       ) : (
                         <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">

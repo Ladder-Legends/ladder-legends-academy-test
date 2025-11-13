@@ -3,6 +3,7 @@
 import { Video, isMuxVideo } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface VideoPlayerProps {
   videos: Video[];
@@ -28,7 +29,13 @@ interface VideoPlayerProps {
  * <VideoPlayer videos={playlistVideos} currentVideoIndex={2} isPlaylist={true} />
  */
 export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className = '' }: VideoPlayerProps) {
+  const { data: session } = useSession();
   const currentVideo = videos[currentVideoIndex];
+
+  // Extract user data for Mux Data analytics
+  const viewerUserId = session?.user?.discordId ?? undefined;
+  const viewerUserName = session?.user?.name ?? undefined;
+  const viewerIsSubscriber = session?.user?.hasSubscriberRole ?? false;
 
   // No video available
   if (!currentVideo) {
@@ -47,6 +54,9 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
               videoId={currentVideo.id}
               title={currentVideo.title}
               className="rounded-lg overflow-hidden"
+              viewerUserId={viewerUserId}
+              viewerUserName={viewerUserName}
+              viewerIsSubscriber={viewerIsSubscriber}
             />
           ) : (
             <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
@@ -85,6 +95,9 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
             videoId={currentVideo.id}
             title={currentVideo.title}
             className="rounded-lg overflow-hidden"
+            viewerUserId={viewerUserId}
+            viewerUserName={viewerUserName}
+            viewerIsSubscriber={viewerIsSubscriber}
           />
         ) : (
           <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">

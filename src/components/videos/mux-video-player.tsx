@@ -9,6 +9,10 @@ interface MuxVideoPlayerProps {
   title?: string;
   className?: string;
   autoPlay?: boolean;
+  // User data for Mux Data analytics
+  viewerUserId?: string; // Discord ID or user identifier
+  viewerUserName?: string; // Discord username
+  viewerIsSubscriber?: boolean; // Subscriber status
 }
 
 interface CachedToken {
@@ -59,6 +63,9 @@ export function MuxVideoPlayer({
   title,
   className = '',
   autoPlay = false,
+  viewerUserId,
+  viewerUserName,
+  viewerIsSubscriber,
 }: MuxVideoPlayerProps) {
   const [playbackToken, setPlaybackToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -236,7 +243,12 @@ export function MuxVideoPlayer({
         }}
         poster={posterUrl}
         metadata={{
+          video_id: videoId,
           video_title: title,
+          viewer_user_id: viewerUserId,
+          viewer_user_name: viewerUserName,
+          // Custom metadata for subscriber status (used for analytics segmentation)
+          subscriber_status: viewerIsSubscriber ? 'premium' : 'free',
         }}
         streamType="on-demand"
         autoPlay={autoPlay}
