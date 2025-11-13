@@ -3,6 +3,7 @@
 import type { Coach } from '@/types/coach';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { posthog } from '@/lib/posthog';
 
 interface CoachCardProps {
   coach: Coach;
@@ -59,7 +60,23 @@ export function CoachCard({ coach, videoCount }: CoachCardProps) {
               href={session?.user?.hasSubscriberRole ? coach.bookingUrl : '/subscribe'}
               target={session?.user?.hasSubscriberRole ? "_blank" : undefined}
               rel={session?.user?.hasSubscriberRole ? "noopener noreferrer" : undefined}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+
+                // Track booking click
+                if (session?.user?.hasSubscriberRole) {
+                  posthog.capture('booking_link_clicked', {
+                    coach_id: coach.id,
+                    coach_name: coach.displayName,
+                    booking_url: coach.bookingUrl,
+                  });
+                } else {
+                  posthog.capture('booking_paywall_hit', {
+                    coach_id: coach.id,
+                    coach_name: coach.displayName,
+                  });
+                }
+              }}
               className="inline-flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium border-2 border-primary text-primary bg-transparent rounded-md hover:bg-primary/10 transition-colors"
             >
               Book Session

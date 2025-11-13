@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ReactNode, MouseEvent } from 'react';
+import { posthog } from '@/lib/posthog';
 
 interface PaywallLinkProps {
   href: string;
@@ -47,7 +48,22 @@ export function PaywallLink({ href, children, className, external = false, isFre
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!hasAccess) {
       e.preventDefault();
+
+      // Track paywall hit in PostHog
+      posthog.capture('paywall_hit', {
+        intended_destination: href,
+        link_type: external ? 'external' : 'internal',
+        is_download: download,
+      });
+
       router.push('/subscribe');
+    } else {
+      // Track successful access to premium content
+      posthog.capture('premium_content_accessed', {
+        destination: href,
+        link_type: external ? 'external' : 'internal',
+        is_download: download,
+      });
     }
   };
 

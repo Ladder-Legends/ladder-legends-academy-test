@@ -1,11 +1,12 @@
 'use client';
 
-import { ReactNode, cloneElement, isValidElement, useState } from 'react';
+import { ReactNode, cloneElement, isValidElement, useState, useEffect } from 'react';
 import { ViewToggle } from './view-toggle';
 import { HorizontalScrollContainer } from './horizontal-scroll-container';
 import { MobileFilterButton } from '../shared/filter-sidebar';
 import { ActiveFilters } from '../shared/active-filters';
 import { useViewPreference } from '@/hooks/use-view-preference';
+import { posthog } from '@/lib/posthog';
 import type { FilterState } from '@/lib/filtering/types';
 
 interface FilterableContentLayoutProps {
@@ -71,6 +72,37 @@ export function FilterableContentLayout({
 
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  // Track filter changes in PostHog
+  useEffect(() => {
+    if (!filters || Object.keys(filters).length === 0) return;
+
+    // Count active filters
+    const activeFilterCount = Object.entries(filters).filter(([_, value]) => {
+      if (Array.isArray(value)) return value.length > 0;
+      if (typeof value === 'boolean') return value;
+      return value !== undefined && value !== '';
+    }).length;
+
+    if (activeFilterCount > 0) {
+      posthog.capture('filters_applied', {
+        page: pageKey || title,
+        filter_count: activeFilterCount,
+        filters: filters,
+        has_search: Boolean(searchQuery && searchQuery.length > 0),
+        has_tags: Boolean(selectedTags && selectedTags.length > 0),
+      });
+    }
+  }, [filters, searchQuery, selectedTags, pageKey, title]);
+
+  // Track view toggle changes
+  const handleViewChange = (newView: 'grid' | 'table') => {
+    posthog.capture('view_toggled', {
+      page: pageKey || title,
+      view: newView,
+    });
+    setView(newView);
+  };
+
   // Clone filterContent and inject mobile props if it's a valid React element
   const enhancedFilterContent = isValidElement(filterContent)
     ? cloneElement(filterContent as React.ReactElement<{ isMobileOpen?: boolean; onMobileOpenChange?: (isOpen: boolean) => void }>, {
@@ -100,7 +132,7 @@ export function FilterableContentLayout({
               <div className="flex items-center justify-between lg:justify-end gap-3">
                 {headerActions}
                 {showViewToggle && (
-                  <ViewToggle view={view} onViewChange={setView} />
+                  <ViewToggle view={view} onViewChange={handleViewChange} />
                 )}
               </div>
             </div>
