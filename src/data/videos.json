@@ -1450,5 +1450,19 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "795915af-c5c1-4d99-9396-a6674a667334",
+    "title": "Sc2 Tools For Improvement #3: Micro Tournament Mini Games ",
+    "description": "This video describes all of the mini games in the micro tournament arcade game, what they are effective at training and how you should use them. if you enjoy this video please consider subscribing and check out Ladder Legends for More Curated Coaching Content",
+    "source": "youtube",
+    "youtubeId": "XmZECqpm3YM",
+    "thumbnail": "https://img.youtube.com/vi/XmZECqpm3YM/hqdefault.jpg",
+    "date": "2025-11-13",
+    "tags": [],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": true
   }
 ]
