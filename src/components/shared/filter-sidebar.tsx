@@ -232,7 +232,7 @@ export function FilterSidebar({
       {customSectionAfterSearch && customSectionAfterSearch}
 
       {/* Sections */}
-      {sections.map(section => {
+      {sections.map((section, sectionIndex) => {
         // Skip search section - it's handled separately above
         if (section.type === 'search') return null;
 
@@ -241,31 +241,34 @@ export function FilterSidebar({
 
         return (
           <div key={section.id}>
-            <div className="flex items-center gap-1 mb-3">
-              {/* Section Expand/Collapse Button */}
-              <button
-                onClick={() => toggleSection(section.id)}
-                className="p-1 hover:bg-primary rounded transition-colors flex-shrink-0 group"
-                aria-label={isSectionExpanded ? 'Collapse section' : 'Expand section'}
-              >
-                {isSectionExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
-                )}
-              </button>
+            {/* Section Container with spacing and separator */}
+            <div className={sectionIndex > 0 ? 'pt-6 mt-6 border-t border-border/50' : ''}>
+              <div className="flex items-center gap-1 mb-3">
+                {/* Section Expand/Collapse Button */}
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  className="p-1 hover:bg-primary rounded transition-colors flex-shrink-0 group"
+                  aria-label={isSectionExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  {isSectionExpanded ? (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
+                  )}
+                </button>
 
-              {/* Section Label */}
-              <div className="flex items-center gap-2 font-semibold text-sm uppercase tracking-wide text-foreground">
-                {section.icon && <span>{section.icon}</span>}
-                {sectionLabel}
+                {/* Section Label */}
+                <div className="flex items-center gap-2 font-semibold text-sm uppercase tracking-wide text-foreground">
+                  {section.icon && <span>{section.icon}</span>}
+                  {sectionLabel}
+                </div>
               </div>
+              {isSectionExpanded && (
+                <div className="space-y-1">
+                  {section.items.map(item => renderItem(section.id, item))}
+                </div>
+              )}
             </div>
-            {isSectionExpanded && (
-              <div className="space-y-1">
-                {section.items.map(item => renderItem(section.id, item))}
-              </div>
-            )}
           </div>
         );
       })}
