@@ -280,6 +280,7 @@ export function EventsContent() {
       <FilterableContentLayout
         title="Events"
         description="Join our community events: tournaments, coaching sessions, team games, and more"
+        pageKey="events"
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}

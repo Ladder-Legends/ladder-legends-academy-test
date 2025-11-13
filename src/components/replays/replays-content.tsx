@@ -169,6 +169,7 @@ export function ReplaysContent() {
       <FilterableContentLayout
         title="Replays"
         description="Download and study replays from our coaches and top-level games. Filter by race, matchup, and MMR bracket."
+        pageKey="replays"
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}
@@ -180,7 +181,13 @@ export function ReplaysContent() {
         selectedTags={selectedTags}
         onClearFilters={clearFilters}
         onRemoveFilter={(key) => setFilter(key, [])}
-        onClearSearch={() => setSearchQuery('')}
+onRemoveFilterValue={(key, value) => {
+          const currentValues = filters[key];
+          if (Array.isArray(currentValues)) {
+            setFilter(key, currentValues.filter(v => v !== value));
+          }
+        }}
+                onClearSearch={() => setSearchQuery('')}
         onRemoveTag={toggleTag}
         filterLabels={{}}
       />

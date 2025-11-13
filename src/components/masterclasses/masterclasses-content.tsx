@@ -178,6 +178,7 @@ export function MasterclassesContent() {
       <FilterableContentLayout
         title="Masterclasses"
         description="Deep dive tutorials and advanced strategies from our expert coaches"
+        pageKey="masterclasses"
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}
@@ -189,7 +190,13 @@ export function MasterclassesContent() {
         selectedTags={selectedTags}
         onClearFilters={clearFilters}
         onRemoveFilter={(key) => setFilter(key, [])}
-        onClearSearch={() => setSearchQuery('')}
+onRemoveFilterValue={(key, value) => {
+          const currentValues = filters[key];
+          if (Array.isArray(currentValues)) {
+            setFilter(key, currentValues.filter(v => v !== value));
+          }
+        }}
+                onClearSearch={() => setSearchQuery('')}
         onRemoveTag={toggleTag}
         filterLabels={{}}
       />

@@ -178,6 +178,7 @@ export function BuildOrdersContent() {
       <FilterableContentLayout
         title="Build Orders"
         description="Master proven build orders from our expert coaches. Each build includes detailed timings, supply counts, and linked video demonstrations."
+        pageKey="build-orders"
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}
@@ -189,7 +190,13 @@ export function BuildOrdersContent() {
         selectedTags={selectedTags}
         onClearFilters={clearFilters}
         onRemoveFilter={(key) => setFilter(key, [])}
-        onClearSearch={() => setSearchQuery('')}
+onRemoveFilterValue={(key, value) => {
+          const currentValues = filters[key];
+          if (Array.isArray(currentValues)) {
+            setFilter(key, currentValues.filter(v => v !== value));
+          }
+        }}
+                onClearSearch={() => setSearchQuery('')}
         onRemoveTag={toggleTag}
         filterLabels={{
           races: 'Race',

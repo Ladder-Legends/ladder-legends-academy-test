@@ -179,6 +179,7 @@ export function VideoLibraryContent() {
       <FilterableContentLayout
         title="Video Library"
         description="Browse our collection of coaching videos and playlists"
+        pageKey="videos"
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}
@@ -190,6 +191,12 @@ export function VideoLibraryContent() {
         selectedTags={selectedTags}
         onClearFilters={clearFilters}
         onRemoveFilter={(key) => setFilter(key, [])}
+        onRemoveFilterValue={(key, value) => {
+          const currentValues = filters[key];
+          if (Array.isArray(currentValues)) {
+            setFilter(key, currentValues.filter(v => v !== value));
+          }
+        }}
         onClearSearch={() => setSearchQuery('')}
         onRemoveTag={toggleTag}
         filterLabels={{

@@ -1,10 +1,11 @@
 'use client';
 
-import { ReactNode, useState, cloneElement, isValidElement } from 'react';
+import { ReactNode, cloneElement, isValidElement, useState } from 'react';
 import { ViewToggle } from './view-toggle';
 import { HorizontalScrollContainer } from './horizontal-scroll-container';
 import { MobileFilterButton } from '../shared/filter-sidebar';
 import { ActiveFilters } from '../shared/active-filters';
+import { useViewPreference } from '@/hooks/use-view-preference';
 import type { FilterState } from '@/lib/filtering/types';
 
 interface FilterableContentLayoutProps {
@@ -20,6 +21,7 @@ interface FilterableContentLayoutProps {
   gridContent: ReactNode;
 
   // View settings
+  pageKey?: string; // Unique key for localStorage (e.g., 'videos', 'replays')
   defaultView?: 'grid' | 'table';
   showViewToggle?: boolean;
 
@@ -32,6 +34,7 @@ interface FilterableContentLayoutProps {
   selectedTags?: string[];
   onClearFilters?: () => void;
   onRemoveFilter?: (key: string) => void;
+  onRemoveFilterValue?: (key: string, value: string) => void;
   onClearSearch?: () => void;
   onRemoveTag?: (tag: string) => void;
   filterLabels?: Record<string, string>;
@@ -44,6 +47,7 @@ export function FilterableContentLayout({
   filterContent,
   tableContent,
   gridContent,
+  pageKey,
   defaultView = 'table',
   showViewToggle = true,
   headerActions,
@@ -52,12 +56,19 @@ export function FilterableContentLayout({
   selectedTags,
   onClearFilters,
   onRemoveFilter,
+  onRemoveFilterValue,
   onClearSearch,
   onRemoveTag,
   filterLabels,
   optionLabels,
 }: FilterableContentLayoutProps) {
-  const [view, setView] = useState<'grid' | 'table'>(defaultView);
+  // Use persisted view preference if pageKey is provided, otherwise use local state
+  const [persistedView, setPersistedView] = useViewPreference(pageKey || 'default', defaultView);
+  const [localView, setLocalView] = useState<'grid' | 'table'>(defaultView);
+
+  const view = pageKey ? persistedView : localView;
+  const setView = pageKey ? setPersistedView : setLocalView;
+
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Clone filterContent and inject mobile props if it's a valid React element
@@ -110,6 +121,7 @@ export function FilterableContentLayout({
             selectedTags={selectedTags}
             onClearFilters={onClearFilters}
             onRemoveFilter={onRemoveFilter}
+            onRemoveFilterValue={onRemoveFilterValue}
             onClearSearch={onClearSearch}
             onRemoveTag={onRemoveTag}
             filterLabels={filterLabels}

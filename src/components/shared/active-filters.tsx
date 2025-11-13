@@ -9,6 +9,7 @@ interface ActiveFiltersProps {
   selectedTags?: string[];
   onClearFilters?: () => void;
   onRemoveFilter?: (key: string) => void;
+  onRemoveFilterValue?: (key: string, value: string) => void; // New: Remove individual value from multi-select
   onClearSearch?: () => void;
   onRemoveTag?: (tag: string) => void;
   filterLabels?: Record<string, string>; // Map filter IDs to human-readable labels
@@ -21,6 +22,7 @@ export function ActiveFilters({
   selectedTags,
   onClearFilters,
   onRemoveFilter,
+  onRemoveFilterValue,
   onClearSearch,
   onRemoveTag,
   filterLabels = {},
@@ -70,15 +72,15 @@ export function ActiveFilters({
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-3">
           <h3 className="text-sm font-semibold">Active Filters:</h3>
-          {/* Clear all button as red chip */}
+          {/* Clear all button with muted colors and X on right */}
           {onClearFilters && (
             <button
               onClick={onClearFilters}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-muted text-muted-foreground hover:bg-muted/80 rounded-md text-xs font-medium transition-colors"
               aria-label="Clear all filters"
             >
-              <X className="h-3 w-3" />
               Clear All
+              <X className="h-3 w-3" />
             </button>
           )}
         </div>
@@ -100,31 +102,50 @@ export function ActiveFilters({
             </div>
           )}
 
-          {/* Filter groups */}
-          {filterGroups.map((group, idx) => (
-            <div key={group.key} className="inline-flex items-center gap-2">
-              {idx > 0 && hasSearch && <span className="text-muted-foreground text-sm">AND</span>}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted border border-border rounded-md text-sm">
-                <span className="font-medium">{group.label}:</span>
-                {group.items.length > 1 ? (
-                  <span className="text-muted-foreground">
-                    ({group.items.join(' OR ')})
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">{group.items[0]}</span>
-                )}
-                {onRemoveFilter && (
-                  <button
-                    onClick={() => onRemoveFilter(group.key)}
-                    className="ml-1 hover:text-foreground transition-colors"
-                    aria-label={`Remove ${group.label} filter`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
+          {/* Filter groups - show individual pills for OR values */}
+          {filterGroups.map((group, groupIdx) => {
+            const filterValue = filters[group.key];
+            const rawValues = Array.isArray(filterValue) ? filterValue : [String(filterValue)];
+
+            return (
+              <div key={group.key} className="inline-flex items-center gap-2 flex-wrap">
+                {groupIdx > 0 && hasSearch && <span className="text-muted-foreground text-sm">AND</span>}
+
+                {/* Label for the filter type */}
+                <span className="text-sm font-medium text-foreground">{group.label}:</span>
+
+                {/* Individual pills for each value (OR) */}
+                {group.items.map((item, itemIdx) => {
+                  const rawValue = rawValues[itemIdx];
+                  return (
+                    <div key={`${group.key}-${rawValue}`} className="inline-flex items-center gap-2">
+                      {itemIdx > 0 && <span className="text-muted-foreground text-xs">OR</span>}
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-destructive/10 border border-destructive/30 text-destructive rounded-md text-sm">
+                        <span>{item}</span>
+                        {onRemoveFilterValue && rawValues.length > 1 ? (
+                          <button
+                            onClick={() => onRemoveFilterValue(group.key, rawValue)}
+                            className="hover:text-destructive/80 transition-colors"
+                            aria-label={`Remove ${item}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        ) : onRemoveFilter ? (
+                          <button
+                            onClick={() => onRemoveFilter(group.key)}
+                            className="hover:text-destructive/80 transition-colors"
+                            aria-label={`Remove ${group.label} filter`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Tags */}
           {hasTags && selectedTags!.map((tag, idx) => (
