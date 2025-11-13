@@ -1464,5 +1464,21 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true
+  },
+  {
+    "id": "55876414-627c-48b6-a17c-25ef1e9ec17d",
+    "title": "Zerg Map Tutorial- Winter madness overlord positionings and how to scout on ith ",
+    "description": "This video goes over the map Winter Madness and how it applies to zerg! ",
+    "source": "mux",
+    "muxAssetId": "nxpxPZV9702Z00aGEuW3BJxZlwBxp8xDcy93rcWV5nzBA",
+    "muxPlaybackId": "sMWRz41b6RXGKFfkPYRzFmGqUXbw9Sof00rMlTpg1jWg",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/55876414-627c-48b6-a17c-25ef1e9ec17d.jpg",
+    "date": "2025-11-13",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
