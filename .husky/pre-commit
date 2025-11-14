@@ -1,4 +1,11 @@
 #!/bin/sh
+
+# Skip hooks in Termux environment (native binaries not compatible)
+if [ -n "$TERMUX_VERSION" ] || [ -d "/data/data/com.termux" ]; then
+  echo "⏭️  Skipping pre-commit tests (Termux environment detected)"
+  exit 0
+fi
+
 echo "🧪 Running tests before commit..."
 
 # Run all tests

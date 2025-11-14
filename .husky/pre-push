@@ -1,3 +1,11 @@
+#!/bin/sh
+
+# Detect Termux environment
+IS_TERMUX=""
+if [ -n "$TERMUX_VERSION" ] || [ -d "/data/data/com.termux" ]; then
+  IS_TERMUX="true"
+fi
+
 echo "🔍 Running pre-push checks..."
 
 # Run TypeScript type checking
@@ -8,11 +16,16 @@ npx tsc --noEmit || exit 1
 echo "🔧 Linting..."
 npm run lint || exit 1
 
-# Run build to ensure it compiles (using separate build directory)
-echo "🏗️  Building (using .next-pre-push cache)..."
-NEXT_BUILD_DIR=.next-pre-push npm run build || exit 1
+# Skip build in Termux (native binaries not compatible)
+if [ -n "$IS_TERMUX" ]; then
+  echo "⏭️  Skipping build step (Termux environment - will build on Vercel)"
+else
+  # Run build to ensure it compiles (using separate build directory)
+  echo "🏗️  Building (using .next-pre-push cache)..."
+  NEXT_BUILD_DIR=.next-pre-push npm run build || exit 1
 
-# Clean up the pre-push build directory to save space
-rm -rf .next-pre-push
+  # Clean up the pre-push build directory to save space
+  rm -rf .next-pre-push
+fi
 
 echo "✅ All checks passed! Pushing..."
