@@ -1703,13 +1703,9 @@
     ],
     "tags": [],
     "patch": "5.0.15.95248",
-    "updatedAt": "2025-11-04",
+    "updatedAt": "2025-11-14",
     "isFree": false,
-    "replayId": "replay-nico-ladder-tvz-default",
-    "categories": [
-      "builds",
-      "matchups.tvt"
-    ]
+    "replayId": "replay-nico-ladder-tvz-default"
   },
   {
     "id": "e5aea996-7e9e-4bc5-9dce-1a31d40e7173",
