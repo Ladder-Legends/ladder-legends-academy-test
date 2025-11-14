@@ -127,7 +127,7 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       render: (replay) => (
         <div className="flex items-center gap-2">
           {replay.downloadUrl && (
-            <a href={replay.downloadUrl} download>
+            <a href={`/api/replay-download?replayId=${replay.id}`}>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <Download className="h-4 w-4" />
               </Button>

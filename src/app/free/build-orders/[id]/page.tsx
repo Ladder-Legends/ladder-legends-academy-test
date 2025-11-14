@@ -154,15 +154,13 @@ export default async function FreeBuildOrderDetailPage({ params }: PageProps) {
                 )}
 
                 {linkedReplay?.downloadUrl && (
-                  <PaywallLink
-                    href={linkedReplay.downloadUrl}
-                    isFree={buildOrder.isFree}
-                    download
+                  <a
+                    href={`/api/replay-download?replayId=${linkedReplay.id}`}
                     className="flex items-center gap-2 px-6 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium"
                   >
                     <Download className="h-5 w-5" />
                     Download Replay
-                  </PaywallLink>
+                  </a>
                 )}
               </div>
             )}

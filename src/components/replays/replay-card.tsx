@@ -42,7 +42,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
     e.preventDefault();
     e.stopPropagation();
     if (replay.downloadUrl) {
-      window.location.href = replay.downloadUrl;
+      window.location.href = `/api/replay-download?replayId=${replay.id}`;
     }
   };
 

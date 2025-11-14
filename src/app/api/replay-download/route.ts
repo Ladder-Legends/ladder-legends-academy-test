@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import replaysData from '@/data/replays.json';
+import { getDownloadUrl } from '@vercel/blob';
 
 /**
  * Secure replay download endpoint
- * Validates authentication before redirecting to replay download
+ * - For FREE content: redirects to public blob URL
+ * - For PREMIUM content: validates auth and generates signed URL
  *
  * GET /api/replay-download?replayId=<id>
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
     const searchParams = request.nextUrl.searchParams;
     const replayId = searchParams.get('replayId');
 
@@ -38,22 +39,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if user has access
     const isFree = replay.isFree || false;
-    const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
-    const hasAccess = isFree || hasSubscriberRole;
 
-    if (!hasAccess) {
+    // For free content, just redirect to public URL (no auth check needed)
+    if (isFree) {
+      return NextResponse.redirect(replay.downloadUrl);
+    }
+
+    // For premium content, check authentication
+    const session = await auth();
+    const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+    if (!hasSubscriberRole) {
       return NextResponse.json(
         { error: 'Unauthorized. This replay requires a subscription.' },
         { status: 403 }
       );
     }
 
-    // Redirect to the download URL
-    // Note: Using public blob URLs for now. For private URLs, we would need to
-    // implement signed URL generation with @vercel/blob's private access mode.
-    return NextResponse.redirect(replay.downloadUrl);
+    // Generate signed URL for premium content (expires in 5 minutes)
+    const signedUrl = await getDownloadUrl(replay.downloadUrl, {
+      expiresIn: 300, // 5 minutes
+    });
+
+    return NextResponse.redirect(signedUrl);
   } catch (error) {
     console.error('Error in replay download:', error);
     return NextResponse.json(
