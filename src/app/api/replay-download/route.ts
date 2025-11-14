@@ -2,52 +2,77 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import replaysData from '@/data/replays.json';
 import { getDownloadUrl } from '@vercel/blob';
+import { generateDownloadToken, verifyDownloadToken } from '@/lib/signed-urls';
+import { checkRateLimit } from '@/lib/rate-limiter';
 
 /**
- * Secure replay download endpoint
- * - For FREE content: redirects to public blob URL with download parameter
- * - For PREMIUM content: validates auth and redirects with download parameter
+ * Secure replay download endpoint with signed URLs and rate limiting
  *
- * GET /api/replay-download?replayId=<id>
+ * Two-step flow:
+ * 1. GET /api/replay-download?replayId=<id> → generates signed token, redirects to step 2
+ * 2. GET /api/replay-download?token=<token> → validates token, checks rate limit, redirects to blob
+ *
+ * Rate limits (per IP):
+ * - Free content: 20 downloads per hour
+ * - Premium content: 50 downloads per hour
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const token = searchParams.get('token');
     const replayId = searchParams.get('replayId');
 
-    if (!replayId) {
-      return NextResponse.json(
-        { error: 'Missing replayId parameter' },
-        { status: 400 }
-      );
+    // Step 2: Token validation and download
+    if (token) {
+      return handleTokenDownload(token, request);
     }
 
-    // Find the replay
-    const replay = replaysData.find(r => r.id === replayId);
-
-    if (!replay) {
-      return NextResponse.json(
-        { error: 'Replay not found' },
-        { status: 404 }
-      );
+    // Step 1: Generate signed token
+    if (replayId) {
+      return handleGenerateToken(replayId, request);
     }
 
-    if (!replay.downloadUrl) {
-      return NextResponse.json(
-        { error: 'Replay has no download URL' },
-        { status: 404 }
-      );
-    }
+    return NextResponse.json(
+      { error: 'Missing replayId or token parameter' },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error('Error in replay download:', error);
+    return NextResponse.json(
+      { error: 'Failed to process download request' },
+      { status: 500 }
+    );
+  }
+}
 
-    const isFree = replay.isFree || false;
+/**
+ * Step 1: Generate signed token and redirect
+ */
+async function handleGenerateToken(
+  replayId: string,
+  request: NextRequest
+): Promise<NextResponse> {
+  // Find the replay
+  const replay = replaysData.find(r => r.id === replayId);
 
-    // For free content, just redirect to download URL (no auth check needed)
-    if (isFree) {
-      const downloadUrl = getDownloadUrl(replay.downloadUrl);
-      return NextResponse.redirect(downloadUrl);
-    }
+  if (!replay) {
+    return NextResponse.json(
+      { error: 'Replay not found' },
+      { status: 404 }
+    );
+  }
 
-    // For premium content, check authentication
+  if (!replay.downloadUrl) {
+    return NextResponse.json(
+      { error: 'Replay has no download URL' },
+      { status: 404 }
+    );
+  }
+
+  const isFree = replay.isFree || false;
+
+  // For premium content, check authentication first
+  if (!isFree) {
     const session = await auth();
     const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
@@ -57,17 +82,93 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       );
     }
+  }
 
-    // Redirect to download URL for premium content
-    // Note: Using public blob URLs with auth check at API level
-    // For true signed URLs, would need custom implementation or different storage provider
-    const downloadUrl = getDownloadUrl(replay.downloadUrl);
-    return NextResponse.redirect(downloadUrl);
-  } catch (error) {
-    console.error('Error in replay download:', error);
+  // Generate signed token (expires in 5 minutes)
+  const token = generateDownloadToken(replayId, 300);
+
+  // Redirect to token download endpoint
+  const tokenUrl = new URL(request.url);
+  tokenUrl.searchParams.delete('replayId');
+  tokenUrl.searchParams.set('token', token);
+
+  return NextResponse.redirect(tokenUrl);
+}
+
+/**
+ * Step 2: Validate token, check rate limit, and redirect to blob
+ */
+async function handleTokenDownload(
+  token: string,
+  request: NextRequest
+): Promise<NextResponse> {
+  // Verify token
+  const payload = verifyDownloadToken(token);
+
+  if (!payload) {
     return NextResponse.json(
-      { error: 'Failed to process download request' },
-      { status: 500 }
+      { error: 'Invalid or expired download token' },
+      { status: 401 }
     );
   }
+
+  // Find the replay
+  const replay = replaysData.find(r => r.id === payload.replayId);
+
+  if (!replay || !replay.downloadUrl) {
+    return NextResponse.json(
+      { error: 'Replay not found' },
+      { status: 404 }
+    );
+  }
+
+  // Get client IP for rate limiting
+  const clientIp =
+    request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+
+  const isFree = replay.isFree || false;
+
+  // Apply rate limiting
+  const rateLimit = checkRateLimit(
+    `download:${clientIp}:${isFree ? 'free' : 'premium'}`,
+    {
+      maxRequests: isFree ? 20 : 50, // Free: 20/hr, Premium: 50/hr
+      windowSeconds: 3600, // 1 hour
+      blockDurationSeconds: 300, // Block for 5 minutes if exceeded
+    }
+  );
+
+  if (!rateLimit.allowed) {
+    const retryAfter = Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000);
+
+    return NextResponse.json(
+      {
+        error: 'Rate limit exceeded',
+        retryAfter,
+        resetAt: rateLimit.resetAt.toISOString(),
+      },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': retryAfter.toString(),
+          'X-RateLimit-Limit': (isFree ? 20 : 50).toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimit.resetAt.toISOString(),
+        },
+      }
+    );
+  }
+
+  // Add rate limit headers
+  const downloadUrl = getDownloadUrl(replay.downloadUrl);
+
+  return NextResponse.redirect(downloadUrl, {
+    headers: {
+      'X-RateLimit-Limit': (isFree ? 20 : 50).toString(),
+      'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+      'X-RateLimit-Reset': rateLimit.resetAt.toISOString(),
+    },
+  });
 }
