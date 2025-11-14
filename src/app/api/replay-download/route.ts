@@ -5,8 +5,8 @@ import { getDownloadUrl } from '@vercel/blob';
 
 /**
  * Secure replay download endpoint
- * - For FREE content: redirects to public blob URL
- * - For PREMIUM content: validates auth and generates signed URL
+ * - For FREE content: redirects to public blob URL with download parameter
+ * - For PREMIUM content: validates auth and redirects with download parameter
  *
  * GET /api/replay-download?replayId=<id>
  */
@@ -41,9 +41,10 @@ export async function GET(request: NextRequest) {
 
     const isFree = replay.isFree || false;
 
-    // For free content, just redirect to public URL (no auth check needed)
+    // For free content, just redirect to download URL (no auth check needed)
     if (isFree) {
-      return NextResponse.redirect(replay.downloadUrl);
+      const downloadUrl = getDownloadUrl(replay.downloadUrl);
+      return NextResponse.redirect(downloadUrl);
     }
 
     // For premium content, check authentication
@@ -57,12 +58,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Generate signed URL for premium content (expires in 5 minutes)
-    const signedUrl = await getDownloadUrl(replay.downloadUrl, {
-      expiresIn: 300, // 5 minutes
-    });
-
-    return NextResponse.redirect(signedUrl);
+    // Redirect to download URL for premium content
+    // Note: Using public blob URLs with auth check at API level
+    // For true signed URLs, would need custom implementation or different storage provider
+    const downloadUrl = getDownloadUrl(replay.downloadUrl);
+    return NextResponse.redirect(downloadUrl);
   } catch (error) {
     console.error('Error in replay download:', error);
     return NextResponse.json(
