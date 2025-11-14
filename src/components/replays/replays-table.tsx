@@ -127,11 +127,25 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       render: (replay) => (
         <div className="flex items-center gap-2">
           {replay.downloadUrl && (
-            <a href={`/api/replay-download?replayId=${replay.id}`}>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <Download className="h-4 w-4" />
-              </Button>
-            </a>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // For premium content, check if user has access
+                if (!replay.isFree && !hasSubscriberRole) {
+                  window.location.href = '/subscribe';
+                  return;
+                }
+
+                window.location.href = `/api/replay-download?replayId=${replay.id}`;
+              }}
+            >
+              <Download className="h-4 w-4" />
+            </Button>
           )}
           {getContentVideoUrl(replay, allVideos) && (
             <PaywallLink

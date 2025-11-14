@@ -41,6 +41,13 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
   const handleDownload = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // For premium content, check if user has access
+    if (!replay.isFree && !hasSubscriberRole) {
+      window.location.href = '/subscribe';
+      return;
+    }
+
     if (replay.downloadUrl) {
       window.location.href = `/api/replay-download?replayId=${replay.id}`;
     }
