@@ -704,5 +704,34 @@
     "patch": "5.0.15.95299",
     "notes": "This was a win against a 5.7k Protoss in PvP where I counter his 1 base all in by opening DT",
     "isFree": false
+  },
+  {
+    "id": "b4b06eaa-0f17-499c-825e-5a94e1743001",
+    "title": "Proxy Reaper into 1 base cyclone all in +scv pull against 5.2k Toss",
+    "description": "This game showcases a terran 1 base all in for use against protoss",
+    "map": "Tourmaline LE",
+    "matchup": "TvP",
+    "player1": {
+      "name": "Groovy",
+      "race": "terran",
+      "result": "win",
+      "mmr": 4944
+    },
+    "player2": {
+      "name": "Caesura",
+      "race": "terran",
+      "result": "loss",
+      "mmr": 5223
+    },
+    "duration": "5:51",
+    "gameDate": "2025-11-15",
+    "uploadDate": "2025-11-15",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Tourmaline%20LE-6xhWdMGn3WhdNRDwHX4H4MA7u4xXlV.SC2Replay",
+    "videoIds": [],
+    "coach": "groovy",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
