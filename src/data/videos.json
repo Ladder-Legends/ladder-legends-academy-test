@@ -1518,5 +1518,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "d65e1d78-f855-4749-b2e2-63a0ec4ee625",
+    "title": "ZvZ Recovering from a bad spot and Map usage",
+    "description": "ZvZ of strange opening, trying to play safe, and falling behind and finding a way to recover.",
+    "source": "mux",
+    "muxAssetId": "obAceKbynC5Q00FjGWrANQLpP02SXBvj5nr42lTrjJlw8",
+    "muxPlaybackId": "f1KF13uiMG5oIBHSXO8Uo2tGBkwDsqJjIkmjHDbTXsw",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/d65e1d78-f855-4749-b2e2-63a0ec4ee625.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
