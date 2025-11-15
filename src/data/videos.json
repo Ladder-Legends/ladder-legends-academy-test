@@ -1566,5 +1566,21 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false
+  },
+  {
+    "id": "aad8c272-e4c3-4e06-857d-11cfb4cf8d8d",
+    "title": "TvZ Stimbat Guide with GamerRichy",
+    "description": "This video showcases the stimbat build from GamerRichy",
+    "source": "mux",
+    "muxAssetId": "R6F6edsgRSmEzC7BYAw6QfaPmjE6hu1TSsqF02XUarhA",
+    "muxPlaybackId": "1WHAhcsn51MN00rHJBoj5Iwpok2N2MudufC7BYEpx017A",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/aad8c272-e4c3-4e06-857d-11cfb4cf8d8d.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "terran",
+    "coach": "GamerRichy",
+    "coachId": "gamerrichy",
+    "isFree": false
   }
 ]
