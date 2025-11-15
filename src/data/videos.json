@@ -1595,6 +1595,6 @@
     "race": "protoss",
     "coach": "",
     "coachId": "",
-    "isFree": false
+    "isFree": true
   }
 ]
