@@ -1480,5 +1480,21 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "2b8311ec-cd15-4e87-b190-d18561fcba90",
+    "title": "ZvP How to worker pull",
+    "description": "Quick video showcasing a 12 pool worker pull and how to execute it. Some micro tricks in the end.",
+    "source": "mux",
+    "muxAssetId": "VmRY01zh8ERlXtvbRKZwGgWenIIMQ02W02Tkk01vG4wH4uE",
+    "muxPlaybackId": "TeqjmYv7UcGxsHkPzIQqjqyyuAKBLkDH3gMDBY4rDoY",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/2b8311ec-cd15-4e87-b190-d18561fcba90.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
