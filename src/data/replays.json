@@ -733,5 +733,34 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "b4c88e7f-7e7c-462c-b97a-8547edd85e24",
+    "title": "Banshee Speed opener Into Insane 0 scv Comeback against 5.5. Protoss ",
+    "description": "This game goes completely sideways and pulling the boys is the only option ",
+    "map": "White Rabbit LE",
+    "matchup": "TvP",
+    "player1": {
+      "name": "Groovy",
+      "race": "terran",
+      "result": "win",
+      "mmr": 5038
+    },
+    "player2": {
+      "name": "Hardwell",
+      "race": "protoss",
+      "result": "loss",
+      "mmr": 5472
+    },
+    "duration": "",
+    "gameDate": "2025-11-15",
+    "uploadDate": "2025-11-15",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/White%20Rabbit%20LE-l0DTsTkWI6IcDj7VEsFy8rERw5sHfZ.SC2Replay",
+    "videoIds": [],
+    "coach": "groovy",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": true
   }
 ]
