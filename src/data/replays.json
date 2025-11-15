@@ -762,5 +762,34 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": true
+  },
+  {
+    "id": "a8d6e55d-b775-41fe-b85c-639f920382d7",
+    "title": "TvZ on Old Republic Stimbat Push ",
+    "description": "Stimbat 2/1/1 Build ",
+    "map": "Old Republic LE",
+    "matchup": "TvZ",
+    "player1": {
+      "name": "GamerRichy",
+      "race": "terran",
+      "result": "win",
+      "mmr": 5400
+    },
+    "player2": {
+      "name": "Ryu",
+      "race": "zerg",
+      "result": "loss",
+      "mmr": 5780
+    },
+    "duration": "",
+    "gameDate": "2025-11-15",
+    "uploadDate": "2025-11-15",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Old%20Republic%20LE-4pJVCgGckJD2kZBflJ8nRksKolXOhG.SC2Replay",
+    "videoIds": [],
+    "coach": "gamerrichy",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
