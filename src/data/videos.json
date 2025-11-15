@@ -1550,5 +1550,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "49201b30-e801-421e-bed3-6c41a1f43f50",
+    "title": "Mech and Wreck TvT",
+    "description": "This is a great video for Terran players wanting to learn how to play mech in TvT",
+    "source": "mux",
+    "muxAssetId": "BVDtAOlXsZcvuNnKvG8juNnDbnD7naB1UU42xAMsJ5M",
+    "muxPlaybackId": "Kc1RUi9YI8hk5bReKw9auTYK15UyyQpaw8My1W8RZ9E",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/49201b30-e801-421e-bed3-6c41a1f43f50.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "terran",
+    "coach": "GamerRichy",
+    "coachId": "gamerrichy",
+    "isFree": false
   }
 ]
