@@ -1596,5 +1596,21 @@
     "coach": "",
     "coachId": "",
     "isFree": true
+  },
+  {
+    "id": "188586b4-c360-4802-83f6-150ba4372d41",
+    "title": "Gateway Tutorial for Protoss ",
+    "description": "This video goes over how protoss economy works and why the gateway counts for each base worth of economy matter so much",
+    "source": "mux",
+    "muxAssetId": "sf47ofVWg9NvEN9RYNOPN00zVC678EaN00h1AduJfbymM",
+    "muxPlaybackId": "r7YQbCL00thzdymLbNog59Y98oTHFCcrfDfb02NaKCVF8",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/188586b4-c360-4802-83f6-150ba4372d41.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "protoss",
+    "coach": "",
+    "coachId": "",
+    "isFree": false
   }
 ]
