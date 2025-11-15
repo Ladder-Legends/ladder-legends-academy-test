@@ -1534,5 +1534,21 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "1932f913-dafa-4b62-97e1-a274e725167d",
+    "title": "ZvZ 14 hatch speedling allin execution",
+    "description": "How to perform a 14 hatch speedling allin, some scout timings of this build and what to look for as a defender and attacker.",
+    "source": "mux",
+    "muxAssetId": "U8l5qkGnbo501bCo4LqqxE45fdAHGsZNGx26reW3hFjQ",
+    "muxPlaybackId": "TlpDnoOkefEzd4TFqolZQXXQ7TltCN02Z02uowizcuo02o",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/1932f913-dafa-4b62-97e1-a274e725167d.jpg",
+    "date": "2025-11-15",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
