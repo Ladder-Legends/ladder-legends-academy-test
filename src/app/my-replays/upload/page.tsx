@@ -212,10 +212,9 @@ export default function UploadReplayPage() {
               disabled={isUploading || isLoadingBuilds}
             >
               <SelectTrigger id="target-build">
-                <SelectValue placeholder="Select a build to compare against" />
+                <SelectValue placeholder="No comparison (auto-detect only)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No comparison</SelectItem>
                 {builds.map((build) => (
                   <SelectItem key={build.id} value={build.id}>
                     {build.name} ({build.matchup})
