@@ -7,41 +7,57 @@ export interface ReplayFingerprint {
   matchup: string;
   race: string;
   metadata: {
-    map_name: string;
-    game_length_seconds: number;
-    date: string | null;
+    map: string;
+    duration: number | null;
     result: string; // "Win" | "Loss"
     opponent_race: string;
   };
   timings: Record<string, number | null>;
   sequences: {
-    tech_sequence: string[];
-    build_sequence: string[];
+    tech_sequence: Array<{ name: string; type: string }>;
+    build_sequence: Array<{ name: string; type: string }>;
     upgrade_sequence: string[];
   };
   army_composition: Record<string, Record<string, number>>;
   economy: {
-    worker_counts: Record<string, number>;
+    workers_3min: number | null;
+    workers_5min: number | null;
+    workers_7min: number | null;
+    expansion_count: number;
+    avg_expansion_timing: number | null;
+    'avg_mineral_float_5min+'?: number;
+    'avg_gas_float_5min+'?: number;
+    supply_block_count?: number;
+    total_supply_block_time?: number;
   };
   tactical: {
-    moveouts: Array<{ time: number; unit_count: number }>;
-    harass: Array<{ time: number; unit_count: number }>;
-    engagements: Array<{ time: number; deaths: number }>;
+    moveout_times: number[];
+    first_moveout: number | null;
+    harass_count: number;
+    engagement_count: number;
+    first_engagement: number | null;
   };
   micro: {
-    selections_per_minute: number;
-    control_groups: Record<string, number>;
-    camera_movements_per_minute: number;
+    selection_count: number;
+    avg_selections_per_min: number;
+    control_groups_used: number;
+    most_used_control_group: string | null;
+    camera_movement_count: number;
+    avg_camera_moves_per_min: number;
   };
   positioning: {
-    average_building_distance: number;
-    proxy_buildings: string[];
+    proxy_buildings: number;
+    avg_building_distance_from_main: number | null;
   };
   ratios: {
     gas_count: number;
     production_count: number;
     tech_count: number;
+    reactor_count: number;
+    techlab_count: number;
     expansions: number;
+    gas_per_base: number;
+    production_per_base: number;
   };
 }
 
