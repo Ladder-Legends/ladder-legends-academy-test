@@ -206,10 +206,11 @@ export default function MyReplaysPage() {
                         <Calendar className="h-3 w-3" />
                         {new Date(replay.uploaded_at).toLocaleDateString()}
                       </div>
-                      <div>{replay.fingerprint.metadata.map_name}</div>
+                      <div>{replay.fingerprint.metadata.map}</div>
                       <div>
-                        {Math.floor(replay.fingerprint.metadata.game_length_seconds / 60)}:
-                        {String(Math.floor(replay.fingerprint.metadata.game_length_seconds % 60)).padStart(2, '0')}
+                        {replay.fingerprint.metadata.duration
+                          ? `${Math.floor(replay.fingerprint.metadata.duration / 60)}:${String(Math.floor(replay.fingerprint.metadata.duration % 60)).padStart(2, '0')}`
+                          : 'N/A'}
                       </div>
                     </div>
                   </div>

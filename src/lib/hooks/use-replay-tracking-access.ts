@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import { posthog } from '@/lib/posthog';
 
 // Discord IDs with replay tracking access (coaches and beta testers)
-const REPLAY_TRACKING_WHITELIST = [
+const REPLAY_TRACKING_WHITELIST: string[] = [
   // Add Discord IDs here
   // Example: '123456789012345678',
 ];
