@@ -3,8 +3,7 @@
  * Handles replay upload, analysis, and storage for logged-in users
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
 import {
   saveReplay,
@@ -24,13 +23,13 @@ const sc2readerClient = new SC2ReplayAPIClient();
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user?.discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const replays = await getUserReplays(session.user.id);
+    const replays = await getUserReplays(session.user.discordId);
 
     return NextResponse.json({ replays });
   } catch (error) {
@@ -52,9 +51,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user?.discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -96,7 +95,7 @@ export async function POST(request: NextRequest) {
     // Create replay data object
     const replayData: UserReplayData = {
       id: nanoid(),
-      discord_user_id: session.user.id,
+      discord_user_id: session.user.discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
       target_build_id: targetBuildId || undefined,
@@ -139,9 +138,9 @@ export async function POST(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user?.discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -181,9 +180,9 @@ export async function PATCH(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user?.discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -197,7 +196,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await deleteReplay(session.user.id, replayId);
+    await deleteReplay(session.user.discordId, replayId);
 
     return NextResponse.json({
       success: true,
