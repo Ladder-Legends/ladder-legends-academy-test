@@ -575,7 +575,7 @@
     "id": "3c0873f0-4ee9-4505-b53c-56343f1ea580",
     "name": "Nicoract's TvP Speed Build",
     "race": "terran",
-    "vsRace": "terran",
+    "vsRace": "protoss",
     "difficulty": "basic",
     "coach": "",
     "coachId": "",
@@ -1135,15 +1135,19 @@
     ],
     "tags": [],
     "patch": "5.0.15.95248",
-    "updatedAt": "2025-11-14",
+    "updatedAt": "2025-11-04",
     "isFree": false,
-    "replayId": "replay-nico-ladder-tvp-speed"
+    "replayId": "replay-nico-ladder-tvp-speed",
+    "categories": [
+      "builds",
+      "matchups.tvp"
+    ]
   },
   {
     "id": "a2f85072-8348-4743-8db9-511088e1148a",
     "name": "Nicoract's TvZ Default Build",
     "race": "terran",
-    "vsRace": "terran",
+    "vsRace": "zerg",
     "difficulty": "basic",
     "coach": "",
     "coachId": "",
@@ -1703,9 +1707,13 @@
     ],
     "tags": [],
     "patch": "5.0.15.95248",
-    "updatedAt": "2025-11-14",
+    "updatedAt": "2025-11-04",
     "isFree": false,
-    "replayId": "replay-nico-ladder-tvz-default"
+    "replayId": "replay-nico-ladder-tvz-default",
+    "categories": [
+      "builds",
+      "matchups.tvz"
+    ]
   },
   {
     "id": "e5aea996-7e9e-4bc5-9dce-1a31d40e7173",
@@ -2516,7 +2524,8 @@
     "categories": [
       "builds",
       "matchups.tvt"
-    ]
+    ],
+    "replayId": "replay-a5e86f0f-a7f2-4095-a181-936d06113d46"
   },
   {
     "id": "01b835ed-860c-4dc4-aec1-8f31e2894be8",
@@ -2527,9 +2536,7 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "description": "A smoother vs AI replay for studying timings for TvP 5-1-1",
-    "videoIds": [
-      "fce29407-cde6-42d1-8ca1-8011712bbe4e"
-    ],
+    "videoIds": [],
     "steps": [
       {
         "supply": 13,
@@ -3089,7 +3096,7 @@
     ],
     "tags": [],
     "patch": "5.0.14.94137",
-    "updatedAt": "2025-11-13",
+    "updatedAt": "2025-11-11",
     "isFree": false,
     "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76"
   },
