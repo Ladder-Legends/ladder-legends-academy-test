@@ -363,12 +363,50 @@ export default function ReplayDetailPage() {
             </Card>
           )}
 
-          {/* Army Composition Comparison */}
+          {/* Production Timeline Comparison (Cumulative) */}
+          {comparison && comparison.production_comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Production Timeline (Cumulative)</CardTitle>
+                <CardDescription>Total units produced minute-by-minute vs benchmark</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(comparison.production_comparison).map(([minute, units]) => (
+                    <div key={minute}>
+                      <h4 className="font-semibold mb-2">Minute {minute}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {Object.entries(units).map(([unit, comp]) => (
+                          <div key={unit} className="flex items-center justify-between p-2 border rounded">
+                            <span className="text-sm font-medium">{unit}</span>
+                            <div className="text-sm">
+                              <span className="font-medium">{comp.actual}</span>
+                              <span className="text-muted-foreground"> / {comp.target}</span>
+                              {comp.difference !== 0 && (
+                                <span
+                                  className={`ml-1 text-xs ${comp.difference > 0 ? 'text-green-600' : 'text-red-600'}`}
+                                >
+                                  ({comp.difference > 0 ? '+' : ''}
+                                  {comp.difference})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Army Composition Comparison (Snapshot) */}
           {comparison && comparison.composition_comparison && (
             <Card>
               <CardHeader>
-                <CardTitle>Army Composition</CardTitle>
-                <CardDescription>Unit counts at key timings</CardDescription>
+                <CardTitle>Army Composition (Alive)</CardTitle>
+                <CardDescription>Units alive at key timings (snapshot)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

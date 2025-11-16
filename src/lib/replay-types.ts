@@ -19,6 +19,7 @@ export interface ReplayFingerprint {
     upgrade_sequence: string[];
   };
   army_composition: Record<string, Record<string, number>>;
+  production_timeline: Record<number, Record<string, number>>;
   economy: {
     workers_3min: number | null;
     workers_5min: number | null;
@@ -91,6 +92,7 @@ export interface ComparisonResult {
   tier: "S" | "A" | "B" | "C" | "D";
   timing_comparison: Record<string, TimingComparison>;
   composition_comparison: Record<string, Record<string, CompositionComparison>>;
+  production_comparison: Record<string, Record<string, CompositionComparison>>;
   replay_fingerprint: ReplayFingerprint;
 }
 
