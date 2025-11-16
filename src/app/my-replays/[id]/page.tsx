@@ -145,8 +145,9 @@ export default function ReplayDetailPage() {
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
-            {Math.floor(fingerprint.metadata.game_length_seconds / 60)}:
-            {String(Math.floor(fingerprint.metadata.game_length_seconds % 60)).padStart(2, '0')}
+            {fingerprint.metadata.duration
+              ? `${Math.floor(fingerprint.metadata.duration / 60)}:${String(Math.floor(fingerprint.metadata.duration % 60)).padStart(2, '0')}`
+              : 'N/A'}
           </div>
           <div className="flex items-center gap-1">
             <Swords className="h-4 w-4" />
