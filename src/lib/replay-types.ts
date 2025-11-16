@@ -60,6 +60,9 @@ export interface ReplayFingerprint {
     gas_per_base: number;
     production_per_base: number;
   };
+  // Timeline data for graphing (sampled every 10 seconds)
+  supply_timeline?: Record<number, { current: number; max: number }>;
+  resource_timeline?: Record<number, { minerals: number; gas: number }>;
 }
 
 export interface BuildDetection {
