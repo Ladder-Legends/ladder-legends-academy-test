@@ -30,6 +30,7 @@ export interface ReplayFingerprint {
     'avg_gas_float_5min+'?: number;
     supply_block_count?: number;
     total_supply_block_time?: number;
+    supply_block_periods?: Array<{ start: number; end: number; duration: number }>;
   };
   tactical: {
     moveout_times: number[];
