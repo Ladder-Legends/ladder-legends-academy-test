@@ -1,9 +1,16 @@
 /**
  * SC2 Replay Analyzer API Client
  *
- * TypeScript client for interacting with the Flask API that analyzes SC2 replay files.
- * Returns build orders and metadata extracted from replay files.
+ * TypeScript client for interacting with the FastAPI that analyzes SC2 replay files.
+ * Returns build orders, metadata, fingerprints, build detection, and comparisons.
  */
+
+import type {
+  ReplayFingerprint,
+  BuildDetection,
+  ComparisonResult,
+  LearnedBuild,
+} from './replay-types';
 
 // API Response Types
 export interface SC2ReplayMetadata {
@@ -140,6 +147,172 @@ export class SC2ReplayAPIClient {
       return data.status === 'healthy';
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Extract comprehensive fingerprint from a replay
+   * @param file - The .SC2Replay file
+   * @param playerName - Optional player name to analyze
+   * @returns Promise with replay fingerprint
+   */
+  async extractFingerprint(file: File, playerName?: string): Promise<ReplayFingerprint> {
+    if (!file.name.endsWith('.SC2Replay')) {
+      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (playerName) {
+      formData.append('player_name', playerName);
+    }
+
+    try {
+      const response = await fetch(`${this.config.apiUrl}/fingerprint`, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': this.config.apiKey,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw await this.handleError(response);
+      }
+
+      const data = await response.json();
+      return data.fingerprint;
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error('Failed to extract fingerprint. Please try again.');
+    }
+  }
+
+  /**
+   * Detect build order from a replay
+   * @param file - The .SC2Replay file
+   * @param playerName - Optional player name to analyze
+   * @returns Promise with build detection result
+   */
+  async detectBuild(file: File, playerName?: string): Promise<BuildDetection | null> {
+    if (!file.name.endsWith('.SC2Replay')) {
+      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (playerName) {
+      formData.append('player_name', playerName);
+    }
+
+    try {
+      const response = await fetch(`${this.config.apiUrl}/detect-build`, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': this.config.apiKey,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw await this.handleError(response);
+      }
+
+      const data = await response.json();
+      return data.detection;
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error('Failed to detect build. Please try again.');
+    }
+  }
+
+  /**
+   * Compare replay execution to a learned build
+   * @param file - The .SC2Replay file
+   * @param buildId - ID of learned build to compare against
+   * @param playerName - Optional player name to analyze
+   * @returns Promise with comparison result
+   */
+  async compareReplay(
+    file: File,
+    buildId: string,
+    playerName?: string
+  ): Promise<ComparisonResult> {
+    if (!file.name.endsWith('.SC2Replay')) {
+      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (playerName) {
+      formData.append('player_name', playerName);
+    }
+
+    try {
+      const response = await fetch(
+        `${this.config.apiUrl}/compare?build_id=${encodeURIComponent(buildId)}`,
+        {
+          method: 'POST',
+          headers: {
+            'X-API-Key': this.config.apiKey,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw await this.handleError(response);
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error('Failed to compare replay. Please try again.');
+    }
+  }
+
+  /**
+   * List all available learned builds
+   * @returns Promise with list of learned builds
+   */
+  async listBuilds(): Promise<LearnedBuild[]> {
+    try {
+      const response = await fetch(`${this.config.apiUrl}/builds`, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': this.config.apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        throw await this.handleError(response);
+      }
+
+      const data = await response.json();
+      return data.builds;
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error('Failed to fetch builds. Please try again.');
+    }
+  }
+
+  /**
+   * Handle API errors consistently
+   */
+  private async handleError(response: Response): Promise<Error> {
+    const errorData = await response.json().catch(() => ({}));
+    const error = errorData as SC2ReplayAPIError;
+
+    if (response.status === 401) {
+      return new Error('Authentication failed. Invalid API key.');
+    } else if (response.status === 422) {
+      return new Error(`Failed to parse replay file: ${error.detail || 'The replay may be corrupted'}`);
+    } else if (response.status === 400) {
+      return new Error(error.error || error.detail || 'Invalid request');
+    } else if (response.status === 404) {
+      return new Error(error.detail || 'Resource not found');
+    } else {
+      return new Error(error.error || error.detail || 'An error occurred');
     }
   }
 }
