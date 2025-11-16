@@ -2,6 +2,7 @@
  * API Route: /api/my-replays
  * Handles replay upload, analysis, and storage for logged-in users
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
@@ -9,6 +10,7 @@ import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
 // Use mock KV in development if real KV is not configured
 const USE_MOCK_KV = !process.env.KV_REST_API_URL;
 
+// Import the appropriate KV module - using require for dynamic conditional import
 const kvModule = USE_MOCK_KV
   ? require('@/lib/replay-kv-mock')
   : require('@/lib/replay-kv');
@@ -16,7 +18,6 @@ const kvModule = USE_MOCK_KV
 const {
   saveReplay,
   getUserReplays,
-  updateReplay,
   deleteReplay,
 } = kvModule;
 

@@ -25,7 +25,13 @@ const fields: FilterFieldConfig<BuildOrder>[] = [
       const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
 
       return matchups.some(matchupId => {
-        if (!matchupId.includes('-')) return false;
+        // Handle parent race selection (e.g., "terran" without opponent)
+        if (!matchupId.includes('-')) {
+          // Match all build orders for this race
+          return buildOrder.race === matchupId;
+        }
+
+        // Handle specific matchup selection (e.g., "terran-tvz")
         const [race, matchup] = matchupId.split('-');
         const vsRace = matchup.substring(matchup.length - 1);
         const vsRaceMap: Record<string, string> = { t: 'terran', z: 'zerg', p: 'protoss' };

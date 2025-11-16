@@ -9,6 +9,7 @@ import type {
 } from './replay-types';
 
 // In-memory storage
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const storage = new Map<string, any>();
 
 // Key prefix constants
