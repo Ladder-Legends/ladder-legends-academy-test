@@ -15,7 +15,6 @@ interface AddToCalendarButtonProps {
 
 export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }: AddToCalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -46,14 +45,12 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
 
       // If not enough space below (need ~100px for dropdown), flip to top
       if (spaceBelow < 100 && spaceAbove > spaceBelow) {
-        setDropdownPosition('top');
         setDropdownStyle({
           position: 'fixed',
           top: `${buttonRect.top - 100}px`,
           right: `${window.innerWidth - buttonRect.right}px`,
         });
       } else {
-        setDropdownPosition('bottom');
         setDropdownStyle({
           position: 'fixed',
           top: `${buttonRect.bottom + 8}px`,
