@@ -350,13 +350,17 @@ export default function ReplayDetailPage() {
                 <div className="flex justify-between">
                   <span>Selections per minute</span>
                   <span className="font-medium">
-                    {Math.round(fingerprint.micro.selections_per_minute)}
+                    {isNaN(fingerprint.micro.selections_per_minute)
+                      ? 'N/A'
+                      : Math.round(fingerprint.micro.selections_per_minute)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Camera movements per minute</span>
                   <span className="font-medium">
-                    {Math.round(fingerprint.micro.camera_movements_per_minute)}
+                    {isNaN(fingerprint.micro.camera_movements_per_minute)
+                      ? 'N/A'
+                      : Math.round(fingerprint.micro.camera_movements_per_minute)}
                   </span>
                 </div>
                 <div className="flex justify-between">
