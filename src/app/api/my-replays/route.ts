@@ -5,14 +5,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
-import {
+
+// Use mock KV in development if real KV is not configured
+const USE_MOCK_KV = !process.env.KV_REST_API_URL;
+
+const kvModule = USE_MOCK_KV
+  ? require('@/lib/replay-kv-mock')
+  : require('@/lib/replay-kv');
+
+const {
   saveReplay,
   getUserReplays,
   updateReplay,
   deleteReplay,
-} from '@/lib/replay-kv';
+} = kvModule;
+
 import type { UserReplayData } from '@/lib/replay-types';
 import { nanoid } from 'nanoid';
+
+// Log which KV implementation is being used
+if (USE_MOCK_KV) {
+  console.log('🔧 [DEV] Using mock in-memory KV storage');
+} else {
+  console.log('✅ [PROD] Using Vercel KV storage');
+}
 
 // Initialize sc2reader client
 const sc2readerClient = new SC2ReplayAPIClient();
