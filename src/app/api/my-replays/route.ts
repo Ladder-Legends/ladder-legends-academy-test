@@ -101,11 +101,13 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Detecting build...');
     const detection = await sc2readerClient.detectBuild(file, playerName || undefined);
 
-    // Compare to target build if specified
+    // Compare to target build (use detected build if no target specified)
     let comparison = null;
-    if (targetBuildId) {
-      console.log(`📈 Comparing to build: ${targetBuildId}...`);
-      comparison = await sc2readerClient.compareReplay(file, targetBuildId, playerName || undefined);
+    const buildToCompare = targetBuildId || detection?.build_id;
+
+    if (buildToCompare) {
+      console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
+      comparison = await sc2readerClient.compareReplay(file, buildToCompare, playerName || undefined);
     }
 
     // Create replay data object
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
       discord_user_id: session.user.discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
-      target_build_id: targetBuildId || undefined,
+      target_build_id: targetBuildId || detection?.build_id,
       detection,
       comparison,
       fingerprint,
