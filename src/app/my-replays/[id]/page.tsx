@@ -220,6 +220,157 @@ export default function ReplayDetailPage() {
             </Card>
           )}
 
+          {/* Accuracy Score Dashboard */}
+          {comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+                <CardDescription>Detailed breakdown of execution quality</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Timing Accuracy */}
+                {(() => {
+                  const deviations = Object.values(comparison.timing_comparison).map(t => Math.abs(t.deviation));
+                  const avgDeviation = deviations.length > 0
+                    ? deviations.reduce((a, b) => a + b, 0) / deviations.length
+                    : 0;
+                  const grade = avgDeviation <= 5 ? 'A' : avgDeviation <= 10 ? 'B' : avgDeviation <= 20 ? 'C' : 'D';
+                  const gradeColor = grade === 'A' ? 'text-green-600 dark:text-green-400' :
+                                    grade === 'B' ? 'text-yellow-600 dark:text-yellow-400' :
+                                    grade === 'C' ? 'text-orange-600 dark:text-orange-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Timing Accuracy</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          Grade {grade}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        ±{Math.round(avgDeviation)}s average deviation
+                      </div>
+                      <Progress
+                        value={Math.max(0, 100 - (avgDeviation * 4))}
+                        className="h-2"
+                      />
+                    </div>
+                  );
+                })()}
+
+                {/* Macro Score */}
+                {(() => {
+                  let macroScore = 100;
+                  const penalties: string[] = [];
+
+                  // Worker benchmark penalties
+                  const economy = fingerprint.economy;
+                  if (economy.workers_3min !== null && economy.workers_3min < 10) {
+                    const penalty = (10 - economy.workers_3min) * 2;
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 3min (-${penalty})`);
+                  }
+                  if (economy.workers_5min !== null && economy.workers_5min < 23) {
+                    const penalty = (23 - economy.workers_5min) * 1.5;
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 5min (-${Math.round(penalty)})`);
+                  }
+                  if (economy.workers_7min !== null && economy.workers_7min < 44) {
+                    const penalty = (44 - economy.workers_7min);
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 7min (-${Math.round(penalty)})`);
+                  }
+
+                  // Supply block penalties
+                  if (economy.supply_block_count !== undefined) {
+                    const penalty = economy.supply_block_count * 5;
+                    macroScore -= penalty;
+                    if (penalty > 0) penalties.push(`Supply blocks (-${penalty})`);
+                  }
+                  if (economy.total_supply_block_time !== undefined) {
+                    const penalty = Math.floor(economy.total_supply_block_time / 10);
+                    macroScore -= penalty;
+                    if (penalty > 0) penalties.push(`Supply block time (-${penalty})`);
+                  }
+
+                  // Resource float penalties (high float = bad)
+                  const avgFloat = (economy['avg_mineral_float_5min+'] || 0) + (economy['avg_gas_float_5min+'] || 0);
+                  if (avgFloat > 2000) {
+                    const penalty = Math.floor((avgFloat - 2000) / 100);
+                    macroScore -= penalty;
+                    penalties.push(`High resource float (-${penalty})`);
+                  }
+
+                  macroScore = Math.max(0, Math.min(100, macroScore));
+                  const grade = macroScore >= 90 ? 'A+' : macroScore >= 85 ? 'A' :
+                               macroScore >= 80 ? 'B+' : macroScore >= 75 ? 'B' :
+                               macroScore >= 70 ? 'C+' : macroScore >= 65 ? 'C' : 'D';
+                  const gradeColor = macroScore >= 85 ? 'text-green-600 dark:text-green-400' :
+                                    macroScore >= 75 ? 'text-yellow-600 dark:text-yellow-400' :
+                                    macroScore >= 65 ? 'text-orange-600 dark:text-orange-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2 pt-3 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Macro Score</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          {grade} ({Math.round(macroScore)}/100)
+                        </Badge>
+                      </div>
+                      {penalties.length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {penalties.slice(0, 2).join(', ')}
+                          {penalties.length > 2 && ` +${penalties.length - 2} more`}
+                        </div>
+                      )}
+                      <Progress value={macroScore} className="h-2" />
+                    </div>
+                  );
+                })()}
+
+                {/* Production Efficiency */}
+                {comparison.production_comparison && (() => {
+                  let totalUnits = 0;
+                  let onTargetUnits = 0;
+
+                  Object.values(comparison.production_comparison).forEach(minute => {
+                    Object.values(minute).forEach(comp => {
+                      totalUnits++;
+                      // Consider "on target" if within 2 units
+                      if (Math.abs(comp.difference) <= 2) {
+                        onTargetUnits++;
+                      }
+                    });
+                  });
+
+                  const efficiency = totalUnits > 0 ? (onTargetUnits / totalUnits) * 100 : 0;
+                  const grade = efficiency >= 90 ? 'A' : efficiency >= 80 ? 'B' :
+                               efficiency >= 70 ? 'C' : 'D';
+                  const gradeColor = efficiency >= 80 ? 'text-green-600 dark:text-green-400' :
+                                    efficiency >= 70 ? 'text-yellow-600 dark:text-yellow-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2 pt-3 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Production Efficiency</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          {Math.round(efficiency)}%
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {onTargetUnits} of {totalUnits} unit benchmarks hit
+                      </div>
+                      <Progress value={efficiency} className="h-2" />
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Economy */}
           {fingerprint.economy && (
             <Card>
