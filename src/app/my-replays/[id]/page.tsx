@@ -316,43 +316,50 @@ export default function ReplayDetailPage() {
               <CardContent>
                 <div className="space-y-3">
                   {Object.entries(comparison.timing_comparison).map(([key, timing]) => {
-                    const Icon =
-                      timing.status === 'on_time'
-                        ? CheckCircle2
-                        : timing.status === 'early'
-                          ? AlertCircle
-                          : XCircle;
+                    // Format time as M:SS
+                    const formatTime = (seconds: number) => {
+                      const mins = Math.floor(seconds / 60);
+                      const secs = Math.floor(seconds % 60);
+                      return `${mins}:${secs.toString().padStart(2, '0')}`;
+                    };
 
-                    const variant =
-                      timing.status === 'on_time'
-                        ? 'default'
-                        : timing.status === 'early'
-                          ? 'secondary'
-                          : 'destructive';
+                    // Determine status color based on deviation
+                    const deviation = timing.deviation;
+                    const absDeviation = Math.abs(deviation);
+
+                    // Green (on time): within ±5s
+                    // Yellow (acceptable): within ±10s
+                    // Red (off): > 10s
+                    const badgeColor =
+                      absDeviation <= 5 ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20' :
+                      absDeviation <= 10 ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20' :
+                      'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20';
+
+                    const Icon =
+                      absDeviation <= 5 ? CheckCircle2 :
+                      absDeviation <= 10 ? AlertCircle :
+                      XCircle;
 
                     return (
                       <div
                         key={key}
-                        className="flex items-center justify-between p-3 border rounded-lg"
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
                       >
                         <div className="flex items-center gap-2">
-                          <Icon className="h-4 w-4" />
+                          <Icon className={`h-4 w-4 ${absDeviation <= 5 ? 'text-green-500' : absDeviation <= 10 ? 'text-yellow-500' : 'text-red-500'}`} />
                           <span className="font-medium capitalize">
                             {key.replace(/_/g, ' ')}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right text-sm">
-                            <div className="font-medium">
-                              {Math.floor(timing.actual)}s
-                            </div>
-                            <div className="text-muted-foreground">
-                              Target: {Math.floor(timing.target)}s
-                            </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right text-sm font-mono">
+                            <span className="font-semibold">{formatTime(timing.actual)}</span>
+                            <span className="text-muted-foreground mx-1">/</span>
+                            <span className="text-muted-foreground">{formatTime(timing.target)}</span>
                           </div>
-                          <Badge variant={variant} className="min-w-[80px] justify-center">
-                            {timing.deviation > 0 ? '+' : ''}
-                            {Math.floor(timing.deviation)}s
+                          <Badge variant="outline" className={`min-w-[60px] justify-center font-mono ${badgeColor}`}>
+                            {deviation > 0 ? '+' : ''}
+                            {Math.floor(deviation)}
                           </Badge>
                         </div>
                       </div>
