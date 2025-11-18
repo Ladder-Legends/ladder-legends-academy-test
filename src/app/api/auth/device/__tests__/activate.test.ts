@@ -3,14 +3,18 @@ import { POST } from '../activate/route';
 import { deviceCodeStore } from '@/lib/device-code-store';
 import { auth } from '@/lib/auth';
 import { NextRequest } from 'next/server';
-import type { MockedFunction, MockedObject } from 'vitest';
 
 // Mock dependencies
-vi.mock('@/lib/device-code-store');
-vi.mock('@/lib/auth');
+vi.mock('@/lib/device-code-store', () => ({
+  deviceCodeStore: {
+    get: vi.fn(),
+    set: vi.fn().mockResolvedValue(undefined),
+  },
+}));
 
-const mockAuth = auth as MockedFunction<typeof auth>;
-const mockDeviceCodeStore = deviceCodeStore as MockedObject<typeof deviceCodeStore>;
+vi.mock('@/lib/auth', () => ({
+  auth: vi.fn(),
+}));
 
 describe('POST /api/auth/device/activate', () => {
   const mockSession = {
@@ -32,12 +36,11 @@ describe('POST /api/auth/device/activate', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAuth.mockResolvedValue(mockSession as any);
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
   });
 
   it('should successfully activate a valid device code', async () => {
-    mockDeviceCodeStore.get.mockResolvedValue(mockDeviceCode as any);
-    mockDeviceCodeStore.set.mockResolvedValue(undefined);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(mockDeviceCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -54,7 +57,7 @@ describe('POST /api/auth/device/activate', () => {
     });
 
     // Verify the code was updated with user info
-    expect(mockDeviceCodeStore.set).toHaveBeenCalledWith(
+    expect(deviceCodeStore.set).toHaveBeenCalledWith(
       mockDeviceCode.device_code,
       expect.objectContaining({
         status: 'authorized',
@@ -69,7 +72,7 @@ describe('POST /api/auth/device/activate', () => {
   });
 
   it('should return 401 if user is not logged in', async () => {
-    mockAuth.mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -97,7 +100,7 @@ describe('POST /api/auth/device/activate', () => {
   });
 
   it('should return 400 if code is not found', async () => {
-    mockDeviceCodeStore.get.mockResolvedValue(undefined);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(undefined);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -116,7 +119,7 @@ describe('POST /api/auth/device/activate', () => {
       ...mockDeviceCode,
       expires_at: new Date(Date.now() - 1000), // Expired 1 second ago
     };
-    mockDeviceCodeStore.get.mockResolvedValue(expiredCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(expiredCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -135,7 +138,7 @@ describe('POST /api/auth/device/activate', () => {
       ...mockDeviceCode,
       status: 'authorized' as const,
     };
-    mockDeviceCodeStore.get.mockResolvedValue(usedCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(usedCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -150,8 +153,7 @@ describe('POST /api/auth/device/activate', () => {
   });
 
   it('should handle case-insensitive user codes', async () => {
-    mockDeviceCodeStore.get.mockResolvedValue(mockDeviceCode as any);
-    mockDeviceCodeStore.set.mockResolvedValue(undefined);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(mockDeviceCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',
@@ -161,6 +163,6 @@ describe('POST /api/auth/device/activate', () => {
     const response = await POST(mockRequest);
 
     expect(response.status).toBe(200);
-    expect(mockDeviceCodeStore.get).toHaveBeenCalledWith('ABCD-1234'); // Should be uppercased
+    expect(deviceCodeStore.get).toHaveBeenCalledWith('ABCD-1234'); // Should be uppercased
   });
 });

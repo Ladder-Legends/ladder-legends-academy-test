@@ -2,15 +2,18 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GET } from '../poll/route';
 import { deviceCodeStore } from '@/lib/device-code-store';
 import { NextRequest } from 'next/server';
-import type { MockedObject } from 'vitest';
 
 // Mock dependencies
-vi.mock('@/lib/device-code-store');
+vi.mock('@/lib/device-code-store', () => ({
+  deviceCodeStore: {
+    get: vi.fn(),
+    delete: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 vi.mock('jsonwebtoken', () => ({
   sign: vi.fn((payload, secret, options) => `mock-jwt-token-${payload.type}`),
 }));
-
-const mockDeviceCodeStore = deviceCodeStore as MockedObject<typeof deviceCodeStore>;
 
 describe('GET /api/auth/device/poll', () => {
   const mockDeviceCode = {
@@ -36,7 +39,7 @@ describe('GET /api/auth/device/poll', () => {
   });
 
   it('should return 404 if device code is not found', async () => {
-    mockDeviceCodeStore.get.mockResolvedValue(undefined);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(undefined);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=invalid');
 
@@ -52,7 +55,7 @@ describe('GET /api/auth/device/poll', () => {
       ...mockDeviceCode,
       expires_at: new Date(Date.now() - 1000),
     };
-    mockDeviceCodeStore.get.mockResolvedValue(expiredCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(expiredCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 
@@ -64,7 +67,7 @@ describe('GET /api/auth/device/poll', () => {
   });
 
   it('should return 428 if authorization is pending', async () => {
-    mockDeviceCodeStore.get.mockResolvedValue(mockDeviceCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(mockDeviceCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 
@@ -80,7 +83,7 @@ describe('GET /api/auth/device/poll', () => {
       ...mockDeviceCode,
       status: 'denied' as const,
     };
-    mockDeviceCodeStore.get.mockResolvedValue(deniedCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(deniedCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 
@@ -102,8 +105,7 @@ describe('GET /api/auth/device/poll', () => {
         avatar_url: 'https://example.com/avatar.png',
       },
     };
-    mockDeviceCodeStore.get.mockResolvedValue(authorizedCode as any);
-    mockDeviceCodeStore.delete.mockResolvedValue(undefined);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(authorizedCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 
@@ -119,7 +121,7 @@ describe('GET /api/auth/device/poll', () => {
     expect(data.user).toEqual(authorizedCode.user_data);
 
     // Verify device code was deleted after successful poll
-    expect(mockDeviceCodeStore.delete).toHaveBeenCalledWith(
+    expect(deviceCodeStore.delete).toHaveBeenCalledWith(
       authorizedCode.device_code,
       authorizedCode.user_code
     );
@@ -136,7 +138,7 @@ describe('GET /api/auth/device/poll', () => {
       },
       // Missing user_id
     };
-    mockDeviceCodeStore.get.mockResolvedValue(invalidAuthorizedCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(invalidAuthorizedCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 
@@ -154,7 +156,7 @@ describe('GET /api/auth/device/poll', () => {
       user_id: '123456789',
       // Missing user_data
     };
-    mockDeviceCodeStore.get.mockResolvedValue(invalidAuthorizedCode as any);
+    vi.mocked(deviceCodeStore.get).mockResolvedValue(invalidAuthorizedCode as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/poll?device_code=test-device-code-123');
 

@@ -1,17 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { deviceCodeStore, DeviceCode } from '../device-code-store';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
+import { kv } from '@vercel/kv';
 
-// Mock Vercel KV
-vi.mock('@vercel/kv', () => ({
-  kv: {
-    get: vi.fn(),
-    set: vi.fn(),
-    del: vi.fn(),
-  },
-}));
+// Mock is already set up in vitest.setup.ts
 
 describe('DeviceCodeStore', () => {
   const mockCode: DeviceCode = {
@@ -34,203 +25,188 @@ describe('DeviceCodeStore', () => {
     },
   };
 
-  describe('File-based storage (no KV)', () => {
-    let storePath: string;
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    beforeEach(() => {
-      // Clear environment to force file-based storage
-      delete process.env.KV_REST_API_URL;
-      const tmpDir = os.tmpdir();
-      storePath = path.join(tmpDir, 'ladder-legends-device-codes.json');
+  describe('get()', () => {
+    it('should retrieve code by device_code', async () => {
+      vi.mocked(kv.get).mockResolvedValueOnce(mockCode);
 
-      // Clean up any existing test file
-      if (fs.existsSync(storePath)) {
-        fs.unlinkSync(storePath);
-      }
+      const result = await deviceCodeStore.get(mockCode.device_code);
+
+      expect(kv.get).toHaveBeenCalledWith(`device:${mockCode.device_code}`);
+      expect(result).toBeDefined();
+      expect(result?.device_code).toBe(mockCode.device_code);
+      expect(result?.user_code).toBe(mockCode.user_code);
+      expect(result?.status).toBe('pending');
     });
 
-    afterEach(() => {
-      // Clean up
-      if (fs.existsSync(storePath)) {
-        fs.unlinkSync(storePath);
-      }
-    });
+    it('should retrieve code by user_code', async () => {
+      vi.mocked(kv.get).mockResolvedValueOnce(null).mockResolvedValueOnce(mockCode);
 
-    it('should save and retrieve a device code', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-      const retrieved = await deviceCodeStore.get(mockCode.device_code);
+      const result = await deviceCodeStore.get(mockCode.user_code);
 
-      expect(retrieved).toBeDefined();
-      expect(retrieved?.device_code).toBe(mockCode.device_code);
-      expect(retrieved?.user_code).toBe(mockCode.user_code);
-      expect(retrieved?.status).toBe('pending');
-    });
-
-    it('should save code by both device_code and user_code', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-
-      const byDeviceCode = await deviceCodeStore.get(mockCode.device_code);
-      const byUserCode = await deviceCodeStore.get(mockCode.user_code);
-
-      expect(byDeviceCode).toBeDefined();
-      expect(byUserCode).toBeDefined();
-      expect(byDeviceCode?.device_code).toBe(byUserCode?.device_code);
+      expect(kv.get).toHaveBeenCalledWith(`device:${mockCode.user_code}`);
+      expect(kv.get).toHaveBeenCalledWith(`user:${mockCode.user_code}`);
+      expect(result).toBeDefined();
+      expect(result?.device_code).toBe(mockCode.device_code);
     });
 
     it('should return undefined for non-existent code', async () => {
+      vi.mocked(kv.get).mockResolvedValue(null);
+
       const result = await deviceCodeStore.get('non-existent');
+
       expect(result).toBeUndefined();
     });
 
-    it('should delete expired codes', async () => {
-      const expiredCode = {
+    it('should parse date strings back to Date objects', async () => {
+      const codeWithStringDates = {
         ...mockCode,
-        expires_at: new Date('2020-01-01T00:00:00Z'), // Past date
+        created_at: '2025-01-01T00:00:00Z' as unknown as Date,
+        expires_at: '2025-01-01T00:15:00Z' as unknown as Date,
       };
 
-      await deviceCodeStore.set(expiredCode.device_code, expiredCode);
-      const result = await deviceCodeStore.get(expiredCode.device_code);
-
-      expect(result).toBeUndefined();
-    });
-
-    it('should update code status', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-      await deviceCodeStore.set(authorizedCode.device_code, authorizedCode);
-
-      const updated = await deviceCodeStore.get(authorizedCode.device_code);
-      expect(updated?.status).toBe('authorized');
-      expect(updated?.user_id).toBe('user-123');
-      expect(updated?.user_data?.username).toBe('TestUser');
-    });
-
-    it('should delete code by device_code', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-      await deviceCodeStore.delete(mockCode.device_code);
+      vi.mocked(kv.get).mockResolvedValueOnce(codeWithStringDates);
 
       const result = await deviceCodeStore.get(mockCode.device_code);
-      expect(result).toBeUndefined();
-    });
 
-    it('should delete code by both device_code and user_code', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-      await deviceCodeStore.delete(mockCode.device_code, mockCode.user_code);
-
-      const byDeviceCode = await deviceCodeStore.get(mockCode.device_code);
-      const byUserCode = await deviceCodeStore.get(mockCode.user_code);
-
-      expect(byDeviceCode).toBeUndefined();
-      expect(byUserCode).toBeUndefined();
-    });
-
-    it('should check if code exists', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-
-      const exists = await deviceCodeStore.has(mockCode.device_code);
-      const notExists = await deviceCodeStore.has('non-existent');
-
-      expect(exists).toBe(true);
-      expect(notExists).toBe(false);
-    });
-
-    it('should preserve Date objects when storing and retrieving', async () => {
-      await deviceCodeStore.set(mockCode.device_code, mockCode);
-      const retrieved = await deviceCodeStore.get(mockCode.device_code);
-
-      expect(retrieved?.created_at).toBeInstanceOf(Date);
-      expect(retrieved?.expires_at).toBeInstanceOf(Date);
-      expect(retrieved?.created_at.toISOString()).toBe(mockCode.created_at.toISOString());
-      expect(retrieved?.expires_at.toISOString()).toBe(mockCode.expires_at.toISOString());
+      expect(result?.created_at).toBeInstanceOf(Date);
+      expect(result?.expires_at).toBeInstanceOf(Date);
+      expect(result?.created_at.toISOString()).toBe('2025-01-01T00:00:00.000Z');
+      expect(result?.expires_at.toISOString()).toBe('2025-01-01T00:15:00.000Z');
     });
 
     it('should handle authorized_at date correctly', async () => {
-      await deviceCodeStore.set(authorizedCode.device_code, authorizedCode);
-      const retrieved = await deviceCodeStore.get(authorizedCode.device_code);
+      const codeWithStringDate = {
+        ...authorizedCode,
+        created_at: '2025-01-01T00:00:00Z' as unknown as Date,
+        expires_at: '2025-01-01T00:15:00Z' as unknown as Date,
+        authorized_at: '2025-01-01T00:05:00Z' as unknown as Date,
+      };
 
-      expect(retrieved?.authorized_at).toBeInstanceOf(Date);
-      expect(retrieved?.authorized_at?.toISOString()).toBe(authorizedCode.authorized_at?.toISOString());
+      vi.mocked(kv.get).mockResolvedValueOnce(codeWithStringDate);
+
+      const result = await deviceCodeStore.get(authorizedCode.device_code);
+
+      expect(result?.authorized_at).toBeInstanceOf(Date);
+      expect(result?.authorized_at?.toISOString()).toBe('2025-01-01T00:05:00.000Z');
     });
 
-    it('should handle multiple codes in the same file', async () => {
-      const code1 = { ...mockCode, device_code: 'code-1', user_code: 'CODE-1' };
-      const code2 = { ...mockCode, device_code: 'code-2', user_code: 'CODE-2' };
+    it('should handle KV errors gracefully', async () => {
+      vi.mocked(kv.get).mockRejectedValue(new Error('KV connection failed'));
 
-      await deviceCodeStore.set(code1.device_code, code1);
-      await deviceCodeStore.set(code2.device_code, code2);
-
-      const retrieved1 = await deviceCodeStore.get(code1.device_code);
-      const retrieved2 = await deviceCodeStore.get(code2.device_code);
-
-      expect(retrieved1?.user_code).toBe('CODE-1');
-      expect(retrieved2?.user_code).toBe('CODE-2');
-    });
-
-    it('should handle file system errors gracefully', async () => {
-      // Try to get from a non-existent store
       const result = await deviceCodeStore.get('any-code');
 
-      // Should not throw, just return undefined
       expect(result).toBeUndefined();
     });
   });
 
-  describe('Date parsing', () => {
-    it('should convert string dates to Date objects', async () => {
-      // Simulate what KV would return (dates as strings)
-      const codeWithStringDates = {
-        ...mockCode,
-        created_at: '2025-01-01T00:00:00Z' as any,
-        expires_at: '2025-01-01T00:15:00Z' as any,
-      };
+  describe('set()', () => {
+    it('should save code by both device_code and user_code keys', async () => {
+      vi.mocked(kv.set).mockResolvedValue('OK');
 
-      await deviceCodeStore.set(mockCode.device_code, codeWithStringDates);
-      const retrieved = await deviceCodeStore.get(mockCode.device_code);
+      await deviceCodeStore.set(mockCode.device_code, mockCode);
 
-      // Should be converted back to Date objects
-      expect(retrieved?.created_at).toBeInstanceOf(Date);
-      expect(retrieved?.expires_at).toBeInstanceOf(Date);
+      expect(kv.set).toHaveBeenCalledTimes(2);
+      expect(kv.set).toHaveBeenCalledWith(
+        `device:${mockCode.device_code}`,
+        mockCode,
+        expect.objectContaining({ ex: expect.any(Number) })
+      );
+      expect(kv.set).toHaveBeenCalledWith(
+        `user:${mockCode.user_code}`,
+        mockCode,
+        expect.objectContaining({ ex: expect.any(Number) })
+      );
     });
 
-    it('should handle authorized_at as string', async () => {
-      const codeWithStringDate = {
-        ...authorizedCode,
-        authorized_at: '2025-01-01T00:05:00Z' as any,
-      };
-
-      await deviceCodeStore.set(authorizedCode.device_code, codeWithStringDate);
-      const retrieved = await deviceCodeStore.get(authorizedCode.device_code);
-
-      expect(retrieved?.authorized_at).toBeInstanceOf(Date);
-    });
-  });
-
-  describe('TTL calculation', () => {
-    it('should calculate correct TTL for future expiration', async () => {
-      const futureDate = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    it('should calculate correct TTL', async () => {
+      const futureDate = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
       const code = {
         ...mockCode,
         expires_at: futureDate,
       };
 
-      // This should not throw
+      vi.mocked(kv.set).mockResolvedValue('OK');
+
       await deviceCodeStore.set(code.device_code, code);
 
-      const retrieved = await deviceCodeStore.get(code.device_code);
-      expect(retrieved).toBeDefined();
+      const setCall = vi.mocked(kv.set).mock.calls[0];
+      const ttl = (setCall[2] as { ex: number }).ex;
+
+      // TTL should be approximately 900 seconds (15 minutes)
+      expect(ttl).toBeGreaterThan(890);
+      expect(ttl).toBeLessThanOrEqual(900);
     });
 
-    it('should handle expired codes', async () => {
-      const pastDate = new Date(Date.now() - 15 * 60 * 1000); // 15 minutes ago
-      const expiredCode = {
-        ...mockCode,
-        expires_at: pastDate,
-      };
+    it('should update code status', async () => {
+      vi.mocked(kv.set).mockResolvedValue('OK');
 
-      await deviceCodeStore.set(expiredCode.device_code, expiredCode);
-      const retrieved = await deviceCodeStore.get(expiredCode.device_code);
+      await deviceCodeStore.set(authorizedCode.device_code, authorizedCode);
 
-      // Expired codes should be deleted
-      expect(retrieved).toBeUndefined();
+      expect(kv.set).toHaveBeenCalledWith(
+        `device:${authorizedCode.device_code}`,
+        authorizedCode,
+        expect.any(Object)
+      );
+      expect(kv.set).toHaveBeenCalledWith(
+        `user:${authorizedCode.user_code}`,
+        authorizedCode,
+        expect.any(Object)
+      );
+    });
+
+    it('should handle KV errors gracefully', async () => {
+      vi.mocked(kv.set).mockRejectedValue(new Error('KV connection failed'));
+
+      // Should not throw
+      await expect(deviceCodeStore.set(mockCode.device_code, mockCode)).resolves.not.toThrow();
+    });
+  });
+
+  describe('delete()', () => {
+    it('should delete code by device_code only', async () => {
+      vi.mocked(kv.del).mockResolvedValue(1);
+
+      await deviceCodeStore.delete(mockCode.device_code);
+
+      expect(kv.del).toHaveBeenCalledWith(`device:${mockCode.device_code}`);
+      expect(kv.del).toHaveBeenCalledTimes(1);
+    });
+
+    it('should delete code by both device_code and user_code', async () => {
+      vi.mocked(kv.del).mockResolvedValue(2);
+
+      await deviceCodeStore.delete(mockCode.device_code, mockCode.user_code);
+
+      expect(kv.del).toHaveBeenCalledWith(`device:${mockCode.device_code}`, `user:${mockCode.user_code}`);
+    });
+
+    it('should handle KV errors gracefully', async () => {
+      vi.mocked(kv.del).mockRejectedValue(new Error('KV connection failed'));
+
+      // Should not throw
+      await expect(deviceCodeStore.delete(mockCode.device_code)).resolves.not.toThrow();
+    });
+  });
+
+  describe('has()', () => {
+    it('should return true when code exists', async () => {
+      vi.mocked(kv.get).mockResolvedValueOnce(mockCode);
+
+      const exists = await deviceCodeStore.has(mockCode.device_code);
+
+      expect(exists).toBe(true);
+    });
+
+    it('should return false when code does not exist', async () => {
+      vi.mocked(kv.get).mockResolvedValue(null);
+
+      const exists = await deviceCodeStore.has('non-existent');
+
+      expect(exists).toBe(false);
     });
   });
 
@@ -239,23 +215,12 @@ describe('DeviceCodeStore', () => {
       const statuses: Array<DeviceCode['status']> = ['pending', 'authorized', 'denied', 'expired'];
 
       for (const status of statuses) {
-        const code = { ...mockCode, device_code: `code-${status}`, status };
-        await deviceCodeStore.set(code.device_code, code);
-        const retrieved = await deviceCodeStore.get(code.device_code);
+        const code = { ...mockCode, status };
+        vi.mocked(kv.get).mockResolvedValueOnce(code);
+
+        const retrieved = await deviceCodeStore.get(`code-${status}`);
         expect(retrieved?.status).toBe(status);
       }
-    });
-  });
-
-  describe('Error handling', () => {
-    it('should not throw on delete of non-existent code', async () => {
-      // Should not throw
-      await expect(deviceCodeStore.delete('non-existent')).resolves.not.toThrow();
-    });
-
-    it('should not throw on has() for non-existent code', async () => {
-      const result = await deviceCodeStore.has('non-existent');
-      expect(result).toBe(false);
     });
   });
 });
