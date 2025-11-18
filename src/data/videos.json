@@ -1247,6 +1247,13 @@
     "muxAssetStatus": "ready",
     "thumbnail": "/thumbnails/09fc41db-bc7a-48f4-a312-dbf7026c0f15.jpg",
     "date": "2025-11-08",
+    "categories": [
+      "builds.macro",
+      "mechanics.macro-mechanics",
+      "matchups.zvp",
+      "matchups.zvt",
+      "matchups.zvz"
+    ],
     "tags": [],
     "race": "zerg",
     "coach": "Eon",
