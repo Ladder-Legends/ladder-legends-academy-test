@@ -811,7 +811,9 @@
     "gameDate": "2025-09-22",
     "uploadDate": "2025-11-18",
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Ultralove%20%289%29-3LzWnuVI3xuRqcctRKoFTIjV8R1Fn3.SC2Replay",
-    "videoIds": [],
+    "videoIds": [
+      "15"
+    ],
     "coach": "groovy",
     "tags": [],
     "patch": "5.0.14.94137",
