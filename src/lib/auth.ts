@@ -13,6 +13,26 @@ const ALLOWED_ROLE_IDS = process.env.ALLOWED_ROLE_IDS?.split(',') || [
   "1387076312878813337", // Subscriber
 ];
 
+// Role ID to name mapping
+const ROLE_ID_TO_NAME: Record<string, string> = {
+  "1386739785283928124": "Owner",
+  "1386739850731851817": "Moderator",
+  "1387372036665643188": "Coach",
+  "1387076312878813337": "Subscriber",
+};
+
+// Get the highest priority role name from role IDs
+function getHighestPriorityRole(roleIds: string[]): string | undefined {
+  const priority = ["Owner", "Moderator", "Coach", "Subscriber"];
+  for (const roleName of priority) {
+    const roleId = Object.keys(ROLE_ID_TO_NAME).find(id => ROLE_ID_TO_NAME[id] === roleName);
+    if (roleId && roleIds.includes(roleId)) {
+      return roleName;
+    }
+  }
+  return undefined;
+}
+
 const { handlers, signIn, signOut, auth: uncachedAuth } = NextAuth({
   providers: [
     Discord({
@@ -33,6 +53,10 @@ const { handlers, signIn, signOut, auth: uncachedAuth } = NextAuth({
       }
       if (profile) {
         token.discordId = profile.id;
+        // Discord avatar URL format: https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png
+        if (profile.image_url || profile.avatar) {
+          token.picture = profile.image_url || `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
+        }
       }
 
       // Fetch roles only on initial sign-in or when explicitly triggered
@@ -78,6 +102,9 @@ const { handlers, signIn, signOut, auth: uncachedAuth } = NextAuth({
       // Use cached roles from JWT token (no Discord API call!)
       session.user.roles = (token.userRoles as string[]) || [];
       session.user.hasSubscriberRole = (token.hasSubscriberRole as boolean) || false;
+
+      // Compute highest priority role name for easier access control
+      session.user.role = getHighestPriorityRole(session.user.roles);
 
       return session;
     },

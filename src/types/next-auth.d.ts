@@ -7,6 +7,7 @@ declare module "next-auth" {
       discordId?: string;
       hasSubscriberRole?: boolean;
       roles?: string[]; // Discord role IDs
+      role?: string; // Highest priority role name (Owner, Moderator, Coach, Subscriber)
     } & DefaultSession["user"];
   }
 

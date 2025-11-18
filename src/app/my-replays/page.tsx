@@ -242,16 +242,18 @@ export default function MyReplaysPage() {
     );
   }
 
+  // Check authentication
   if (!session) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertDescription>
-            Please sign in to view your replays.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+    router.push('/login?callbackUrl=/my-replays');
+    return null;
+  }
+
+  // Check if user is Coach or Owner only (my-replays restricted to coaches)
+  const isCoachOrOwner = session.user?.role === 'Coach' || session.user?.role === 'Owner';
+
+  if (!isCoachOrOwner) {
+    router.push('/subscribe?feature=my-replays');
+    return null;
   }
 
   return (

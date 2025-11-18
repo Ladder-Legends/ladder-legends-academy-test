@@ -21,11 +21,15 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       const userId = session.user.discordId || session.user.email || 'unknown';
 
       posthog.identify(userId, {
+        // Core user properties (email, username, avatar)
         email: session.user.email,
         name: session.user.name,
+        username: session.user.name, // Also send as 'username' for clarity
+        avatar: session.user.image, // Discord avatar URL
         // Discord-specific properties
         discord_id: session.user.discordId,
         discord_name: session.user.name,
+        discord_avatar: session.user.image,
         // Subscription and role properties
         has_subscriber_role: session.user.hasSubscriberRole ?? false,
         subscriber_status: session.user.hasSubscriberRole ? 'premium' : 'free',
