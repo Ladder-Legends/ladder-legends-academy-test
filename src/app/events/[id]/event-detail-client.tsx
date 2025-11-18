@@ -3,6 +3,7 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
+import { ShareButtons } from '@/components/social/share-buttons';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -122,7 +123,14 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
                   <h1 className="text-4xl font-bold">{event.title}</h1>
                   <SubscriberBadge isFree={event.isFree} />
                 </div>
-                <AddToCalendarButton event={event} variant="default" size="default" />
+                <div className="flex items-center gap-2">
+                  <ShareButtons
+                    url={`/events/${event.id}`}
+                    title={event.title}
+                    description={event.description.slice(0, 160)}
+                  />
+                  <AddToCalendarButton event={event} variant="default" size="default" />
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2">

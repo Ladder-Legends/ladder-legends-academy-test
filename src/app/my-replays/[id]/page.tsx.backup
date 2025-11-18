@@ -1,0 +1,739 @@
+/**
+ * Replay Detail Page
+ * Comprehensive analysis of a single replay
+ */
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
+import {
+  ArrowLeft,
+  Trophy,
+  Target,
+  TrendingUp,
+  Clock,
+  Map,
+  Swords,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+} from 'lucide-react';
+import Link from 'next/link';
+import type { UserReplayData, TimingComparison } from '@/lib/replay-types';
+
+export default function ReplayDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [replay, setReplay] = useState<UserReplayData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const replayId = params.id as string;
+
+  useEffect(() => {
+    if (status === 'authenticated' && replayId) {
+      fetchReplay();
+    } else if (status === 'unauthenticated') {
+      setIsLoading(false);
+    }
+  }, [status, replayId]);
+
+  const fetchReplay = async () => {
+    try {
+      const response = await fetch('/api/my-replays');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch replay');
+      }
+
+      const foundReplay = data.replays.find((r: UserReplayData) => r.id === replayId);
+
+      if (!foundReplay) {
+        setError('Replay not found');
+      } else {
+        setReplay(foundReplay);
+      }
+    } catch (err) {
+      console.error('Error fetching replay:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load replay');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (status === 'loading' || isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-12 w-64 mb-6" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert>
+          <AlertDescription>Please sign in to view replays.</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (error || !replay) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertDescription>{error || 'Replay not found'}</AlertDescription>
+        </Alert>
+        <Link href="/my-replays" className="mt-4 inline-block">
+          <Button variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to My Replays
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const { fingerprint, detection, comparison } = replay;
+  const result = fingerprint.metadata.result;
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* Back Button */}
+      <Link href="/my-replays" className="inline-block mb-6">
+        <Button variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to My Replays
+        </Button>
+      </Link>
+
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{replay.filename}</h1>
+            <div className="flex items-center gap-2">
+              <Badge variant={result === 'Win' ? 'default' : 'secondary'} className="text-lg px-3 py-1">
+                {result}
+              </Badge>
+              <Badge variant="outline" className="text-lg px-3 py-1">
+                {fingerprint.matchup}
+              </Badge>
+              <Badge variant="outline" className="text-lg px-3 py-1">
+                {fingerprint.race}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Game Info */}
+        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Map className="h-4 w-4" />
+            {fingerprint.metadata.map}
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock className="h-4 w-4" />
+            {fingerprint.metadata.duration
+              ? `${Math.floor(fingerprint.metadata.duration / 60)}:${String(Math.floor(fingerprint.metadata.duration % 60)).padStart(2, '0')}`
+              : 'N/A'}
+          </div>
+          <div className="flex items-center gap-1">
+            <Swords className="h-4 w-4" />
+            vs {fingerprint.metadata.opponent_race}
+          </div>
+          <div>
+            Uploaded {new Date(replay.uploaded_at).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Detection & Execution */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Build Detection */}
+          {detection && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Build Detected
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold mb-2">{detection.build_name}</h3>
+                  <div className="text-3xl font-bold mb-2">
+                    {Math.round(detection.confidence)}%
+                  </div>
+                  <p className="text-sm text-muted-foreground">Confidence</p>
+                </div>
+                <Progress value={detection.confidence} className="h-2" />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Execution Score */}
+          {comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Execution Score
+                </CardTitle>
+                <CardDescription>vs {comparison.build_name}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center mb-4">
+                  <div className="text-5xl font-bold mb-2">
+                    {Math.round(comparison.execution_score)}%
+                  </div>
+                  <Badge
+                    className="text-lg px-4 py-1"
+                    variant={
+                      comparison.tier === 'S' || comparison.tier === 'A' ? 'default' : 'secondary'
+                    }
+                  >
+                    {comparison.tier}-Tier
+                  </Badge>
+                </div>
+                <Progress value={comparison.execution_score} className="h-3 mb-2" />
+                <p className="text-xs text-center text-muted-foreground">
+                  {comparison.tier === 'S' && 'Outstanding execution!'}
+                  {comparison.tier === 'A' && 'Great execution!'}
+                  {comparison.tier === 'B' && 'Good execution'}
+                  {comparison.tier === 'C' && 'Room for improvement'}
+                  {comparison.tier === 'D' && 'Needs work'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Accuracy Score Dashboard */}
+          {comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+                <CardDescription>Detailed breakdown of execution quality</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Timing Accuracy */}
+                {(() => {
+                  const deviations = Object.values(comparison.timing_comparison).map(t => Math.abs(t.deviation));
+                  const avgDeviation = deviations.length > 0
+                    ? deviations.reduce((a, b) => a + b, 0) / deviations.length
+                    : 0;
+                  const grade = avgDeviation <= 5 ? 'A' : avgDeviation <= 10 ? 'B' : avgDeviation <= 20 ? 'C' : 'D';
+                  const gradeColor = grade === 'A' ? 'text-green-600 dark:text-green-400' :
+                                    grade === 'B' ? 'text-yellow-600 dark:text-yellow-400' :
+                                    grade === 'C' ? 'text-orange-600 dark:text-orange-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Timing Accuracy</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          Grade {grade}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        ±{Math.round(avgDeviation)}s average deviation
+                      </div>
+                      <Progress
+                        value={Math.max(0, 100 - (avgDeviation * 4))}
+                        className="h-2"
+                      />
+                    </div>
+                  );
+                })()}
+
+                {/* Macro Score */}
+                {(() => {
+                  let macroScore = 100;
+                  const penalties: string[] = [];
+
+                  // Worker benchmark penalties
+                  const economy = fingerprint.economy;
+                  if (economy.workers_3min !== null && economy.workers_3min < 10) {
+                    const penalty = (10 - economy.workers_3min) * 2;
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 3min (-${penalty})`);
+                  }
+                  if (economy.workers_5min !== null && economy.workers_5min < 23) {
+                    const penalty = (23 - economy.workers_5min) * 1.5;
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 5min (-${Math.round(penalty)})`);
+                  }
+                  if (economy.workers_7min !== null && economy.workers_7min < 44) {
+                    const penalty = (44 - economy.workers_7min);
+                    macroScore -= penalty;
+                    penalties.push(`Low workers at 7min (-${Math.round(penalty)})`);
+                  }
+
+                  // Supply block penalties
+                  if (economy.supply_block_count !== undefined) {
+                    const penalty = economy.supply_block_count * 5;
+                    macroScore -= penalty;
+                    if (penalty > 0) penalties.push(`Supply blocks (-${penalty})`);
+                  }
+                  if (economy.total_supply_block_time !== undefined) {
+                    const penalty = Math.floor(economy.total_supply_block_time / 10);
+                    macroScore -= penalty;
+                    if (penalty > 0) penalties.push(`Supply block time (-${penalty})`);
+                  }
+
+                  // Resource float penalties (high float = bad)
+                  const avgFloat = (economy['avg_mineral_float_5min+'] || 0) + (economy['avg_gas_float_5min+'] || 0);
+                  if (avgFloat > 2000) {
+                    const penalty = Math.floor((avgFloat - 2000) / 100);
+                    macroScore -= penalty;
+                    penalties.push(`High resource float (-${penalty})`);
+                  }
+
+                  macroScore = Math.max(0, Math.min(100, macroScore));
+                  const grade = macroScore >= 90 ? 'A+' : macroScore >= 85 ? 'A' :
+                               macroScore >= 80 ? 'B+' : macroScore >= 75 ? 'B' :
+                               macroScore >= 70 ? 'C+' : macroScore >= 65 ? 'C' : 'D';
+                  const gradeColor = macroScore >= 85 ? 'text-green-600 dark:text-green-400' :
+                                    macroScore >= 75 ? 'text-yellow-600 dark:text-yellow-400' :
+                                    macroScore >= 65 ? 'text-orange-600 dark:text-orange-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2 pt-3 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Macro Score</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          {grade} ({Math.round(macroScore)}/100)
+                        </Badge>
+                      </div>
+                      {penalties.length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {penalties.slice(0, 2).join(', ')}
+                          {penalties.length > 2 && ` +${penalties.length - 2} more`}
+                        </div>
+                      )}
+                      <Progress value={macroScore} className="h-2" />
+                    </div>
+                  );
+                })()}
+
+                {/* Production Efficiency */}
+                {comparison.production_comparison && (() => {
+                  let totalUnits = 0;
+                  let onTargetUnits = 0;
+
+                  Object.values(comparison.production_comparison).forEach(minute => {
+                    Object.values(minute).forEach(comp => {
+                      totalUnits++;
+                      // Consider "on target" if within 2 units
+                      if (Math.abs(comp.difference) <= 2) {
+                        onTargetUnits++;
+                      }
+                    });
+                  });
+
+                  const efficiency = totalUnits > 0 ? (onTargetUnits / totalUnits) * 100 : 0;
+                  const grade = efficiency >= 90 ? 'A' : efficiency >= 80 ? 'B' :
+                               efficiency >= 70 ? 'C' : 'D';
+                  const gradeColor = efficiency >= 80 ? 'text-green-600 dark:text-green-400' :
+                                    efficiency >= 70 ? 'text-yellow-600 dark:text-yellow-400' :
+                                    'text-red-600 dark:text-red-400';
+
+                  return (
+                    <div className="space-y-2 pt-3 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Production Efficiency</span>
+                        <Badge variant="outline" className={gradeColor}>
+                          {Math.round(efficiency)}%
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {onTargetUnits} of {totalUnits} unit benchmarks hit
+                      </div>
+                      <Progress value={efficiency} className="h-2" />
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Economy */}
+          {fingerprint.economy && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Economy</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium mb-2">Worker Counts</p>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">3 min:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_3min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_3min !== null && fingerprint.economy.workers_3min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_3min >= 12 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_3min >= 12 ? '+' : ''}{fingerprint.economy.workers_3min - 12} vs benchmark)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">5 min:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_5min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_5min !== null && fingerprint.economy.workers_5min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_5min >= 29 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_5min >= 29 ? '+' : ''}{fingerprint.economy.workers_5min - 29} vs benchmark)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">7 min:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_7min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_7min !== null && fingerprint.economy.workers_7min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_7min >= 48 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_7min >= 48 ? '+' : ''}{fingerprint.economy.workers_7min - 48} vs benchmark)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Benchmarks from Speed Banshee Mech (Advanced)
+                  </p>
+                </div>
+
+                {fingerprint.economy.supply_block_count !== undefined && (
+                  <div className="pt-2 border-t">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Supply Blocks</span>
+                      <Badge variant={fingerprint.economy.supply_block_count === 0 ? 'default' : 'destructive'}>
+                        {fingerprint.economy.supply_block_count}
+                      </Badge>
+                    </div>
+
+                    {/* Severity Breakdown */}
+                    {fingerprint.economy.supply_block_categorization && (
+                      <div className="space-y-2 mb-2">
+                        {fingerprint.economy.supply_block_categorization.minor_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                              <span className="text-muted-foreground">Minor (&lt;30s)</span>
+                            </div>
+                            <span className="font-medium">{fingerprint.economy.supply_block_categorization.minor_count} ({Math.round(fingerprint.economy.supply_block_categorization.minor_time)}s)</span>
+                          </div>
+                        )}
+                        {fingerprint.economy.supply_block_categorization.warning_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                              <span className="text-muted-foreground">Warning (30-60s)</span>
+                            </div>
+                            <span className="font-medium">{fingerprint.economy.supply_block_categorization.warning_count} ({Math.round(fingerprint.economy.supply_block_categorization.warning_time)}s)</span>
+                          </div>
+                        )}
+                        {fingerprint.economy.supply_block_categorization.problem_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-red-500 rounded-full" />
+                              <span className="text-muted-foreground">Problem (60s+)</span>
+                            </div>
+                            <span className="font-medium text-destructive">{fingerprint.economy.supply_block_categorization.problem_count} ({Math.round(fingerprint.economy.supply_block_categorization.problem_time)}s)</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {fingerprint.economy.total_supply_block_time !== undefined && fingerprint.economy.total_supply_block_time > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Total block time: {Math.round(fingerprint.economy.total_supply_block_time)}s
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {fingerprint.economy['avg_mineral_float_5min+'] !== undefined && (
+                  <div className="pt-2 border-t">
+                    <p className="text-sm font-medium mb-2">Avg Resource Float (5min+)</p>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Minerals:</span>
+                        <span>{fingerprint.economy['avg_mineral_float_5min+']}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Gas:</span>
+                        <span>{fingerprint.economy['avg_gas_float_5min+'] ?? 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Tactical Events */}
+          {fingerprint.tactical && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Tactical Events</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Moveouts</span>
+                  <Badge variant="outline">{fingerprint.tactical.moveout_times?.length || 0}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Harass</span>
+                  <Badge variant="outline">{fingerprint.tactical.harass_count || 0}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Engagements</span>
+                  <Badge variant="outline">{fingerprint.tactical.engagement_count || 0}</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Right Column - Detailed Analysis */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Timing Comparison */}
+          {comparison && comparison.timing_comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Timing Comparison</CardTitle>
+                <CardDescription>How your timings compare to the target build</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {Object.entries(comparison.timing_comparison).map(([key, timing]) => {
+                    // Format time as M:SS
+                    const formatTime = (seconds: number) => {
+                      const mins = Math.floor(seconds / 60);
+                      const secs = Math.floor(seconds % 60);
+                      return `${mins}:${secs.toString().padStart(2, '0')}`;
+                    };
+
+                    // Determine status color based on deviation
+                    const deviation = timing.deviation;
+                    const absDeviation = Math.abs(deviation);
+
+                    // Green (on time): within ±5s
+                    // Yellow (acceptable): within ±10s
+                    // Red (off): > 10s
+                    const badgeColor =
+                      absDeviation <= 5 ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20' :
+                      absDeviation <= 10 ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20' :
+                      'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20';
+
+                    const Icon =
+                      absDeviation <= 5 ? CheckCircle2 :
+                      absDeviation <= 10 ? AlertCircle :
+                      XCircle;
+
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className={`h-4 w-4 ${absDeviation <= 5 ? 'text-green-500' : absDeviation <= 10 ? 'text-yellow-500' : 'text-red-500'}`} />
+                          <span className="font-medium capitalize">
+                            {key.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right text-sm font-mono">
+                            <span className="font-semibold">{formatTime(timing.actual)}</span>
+                            <span className="text-muted-foreground mx-1">/</span>
+                            <span className="text-muted-foreground">{formatTime(timing.target)}</span>
+                          </div>
+                          <Badge variant="outline" className={`min-w-[60px] justify-center font-mono ${badgeColor}`}>
+                            {deviation > 0 ? '+' : ''}
+                            {Math.floor(deviation)}
+                          </Badge>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Production Timeline Comparison (Cumulative) */}
+          {comparison && comparison.production_comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Production Timeline (Cumulative)</CardTitle>
+                <CardDescription>Total units produced minute-by-minute vs benchmark</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(comparison.production_comparison).map(([minute, units]) => (
+                    <div key={minute}>
+                      <h4 className="font-semibold mb-2">Minute {minute}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {Object.entries(units).map(([unit, comp]) => (
+                          <div key={unit} className="flex items-center justify-between p-2 border rounded">
+                            <span className="text-sm font-medium">{unit}</span>
+                            <div className="text-sm">
+                              <span className="font-medium">{comp.actual}</span>
+                              <span className="text-muted-foreground"> / {comp.target}</span>
+                              {comp.difference !== 0 && (
+                                <span
+                                  className={`ml-1 text-xs ${comp.difference > 0 ? 'text-green-600' : 'text-red-600'}`}
+                                >
+                                  ({comp.difference > 0 ? '+' : ''}
+                                  {comp.difference})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Army Composition Comparison (Snapshot) */}
+          {comparison && comparison.composition_comparison && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Army Composition (Alive)</CardTitle>
+                <CardDescription>Units alive at key timings (snapshot)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(comparison.composition_comparison).map(([time, units]) => (
+                    <div key={time}>
+                      <h4 className="font-semibold mb-2">{time}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {Object.entries(units).map(([unit, comp]) => (
+                          <div key={unit} className="flex items-center justify-between p-2 border rounded">
+                            <span className="text-sm">{unit}</span>
+                            <div className="text-sm">
+                              <span className="font-medium">{comp.actual}</span>
+                              <span className="text-muted-foreground"> / {comp.target}</span>
+                              {comp.difference !== 0 && (
+                                <span
+                                  className={`ml-1 ${comp.difference > 0 ? 'text-green-600' : 'text-red-600'}`}
+                                >
+                                  ({comp.difference > 0 ? '+' : ''}
+                                  {comp.difference})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Micro Stats */}
+          {fingerprint.micro && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Micro & APM</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Selections per minute</span>
+                  <span className="font-medium">
+                    {isNaN(fingerprint.micro.avg_selections_per_min)
+                      ? 'N/A'
+                      : Math.round(fingerprint.micro.avg_selections_per_min)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Camera movements per minute</span>
+                  <span className="font-medium">
+                    {isNaN(fingerprint.micro.avg_camera_moves_per_min)
+                      ? 'N/A'
+                      : Math.round(fingerprint.micro.avg_camera_moves_per_min)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Control groups used</span>
+                  <span className="font-medium">
+                    {fingerprint.micro.control_groups_used || 0}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Upgrades */}
+          {fingerprint.sequences && fingerprint.sequences.upgrade_sequence && fingerprint.sequences.upgrade_sequence.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Upgrades Researched</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {fingerprint.sequences.upgrade_sequence.map((upgrade, index) => (
+                    <Badge key={index} variant="outline">
+                      {upgrade}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* All Timings */}
+          {fingerprint.timings && Object.keys(fingerprint.timings).length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>All Building Timings</CardTitle>
+                <CardDescription>Complete timing breakdown for all buildings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {Object.entries(fingerprint.timings)
+                    .filter(([_, time]) => time !== null)
+                    .sort(([_, a], [__, b]) => (a as number) - (b as number))
+                    .map(([key, time]) => (
+                      <div key={key} className="p-2 border rounded text-sm">
+                        <div className="font-medium capitalize mb-1">
+                          {key.replace(/_/g, ' ')}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {Math.floor(time as number / 60)}:{String(Math.floor(time as number % 60)).padStart(2, '0')}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

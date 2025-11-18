@@ -173,6 +173,24 @@ export default function MyReplaysPage() {
     .reduce((sum, r) => sum + (r.comparison?.execution_score || 0), 0) /
     (replays.filter((r) => r.comparison).length || 1);
 
+  // Supply block severity stats
+  const supplyBlockStats = useMemo(() => {
+    let totalMinor = 0;
+    let totalWarning = 0;
+    let totalProblem = 0;
+
+    replays.forEach((replay) => {
+      const cat = replay.fingerprint.economy.supply_block_categorization;
+      if (cat) {
+        totalMinor += cat.minor_count;
+        totalWarning += cat.warning_count;
+        totalProblem += cat.problem_count;
+      }
+    });
+
+    return { totalMinor, totalWarning, totalProblem };
+  }, [replays]);
+
   // Time series data for charts
   const chartData = useMemo(() => {
     const sortedReplays = [...replays].sort((a, b) =>
@@ -183,11 +201,28 @@ export default function MyReplaysPage() {
       const winsUpTo = sortedReplays.slice(0, idx + 1).filter((r) => r.fingerprint.metadata.result === 'Win').length;
       const gamesUpTo = idx + 1;
 
+      // Calculate severity breakdown for supply blocks
+      const categorization = replay.fingerprint.economy.supply_block_categorization;
+      const supplyBlockSeverity = categorization
+        ? {
+            minor: categorization.minor_count,
+            warning: categorization.warning_count,
+            problem: categorization.problem_count,
+            total: replay.fingerprint.economy.supply_block_count || 0,
+          }
+        : {
+            minor: 0,
+            warning: 0,
+            problem: 0,
+            total: replay.fingerprint.economy.supply_block_count || 0,
+          };
+
       return {
         date: new Date(replay.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         winRate: Math.round((winsUpTo / gamesUpTo) * 100),
         executionScore: replay.comparison?.execution_score || null,
         supplyBlocks: replay.fingerprint.economy.supply_block_count || 0,
+        supplyBlockSeverity,
         workers3min: replay.fingerprint.economy.workers_3min || 0,
         workers5min: replay.fingerprint.economy.workers_5min || 0,
       };
@@ -280,7 +315,7 @@ export default function MyReplaysPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardDescription>Total Replays</CardDescription>
@@ -320,12 +355,37 @@ export default function MyReplaysPage() {
 
               <Card>
                 <CardHeader className="pb-2">
+                  <CardDescription>Supply Blocks</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                      <span className="text-sm font-semibold">{supplyBlockStats.totalMinor}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                      <span className="text-sm font-semibold">{supplyBlockStats.totalWarning}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full" />
+                      <span className="text-sm font-semibold">{supplyBlockStats.totalProblem}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Total across {totalReplays} games
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
                   <CardDescription>Latest Upload</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl font-bold">
                     {replays[0]
-                      ? new Date(replays[0].uploaded_at).toLocaleDateString()
+                      ? new Date(replays[0].uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                       : '-'}
                   </div>
                 </CardContent>
@@ -374,27 +434,72 @@ export default function MyReplaysPage() {
                     <TrendingUp className="h-5 w-5" />
                     Supply Block Trend
                   </CardTitle>
-                  <CardDescription>Supply blocks per game</CardDescription>
+                  <CardDescription>Supply blocks per game by severity</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64 flex items-end justify-between gap-1">
-                    {chartData.slice(-20).map((point, idx) => (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-full bg-destructive/20 rounded-t relative" style={{ height: '100%' }}>
-                          <div
-                            className="w-full bg-destructive rounded-t absolute bottom-0"
-                            style={{ height: `${Math.min((point.supplyBlocks / 10) * 100, 100)}%` }}
-                          />
+                    {chartData.slice(-20).map((point, idx) => {
+                      const maxBlocks = 10;
+                      const severity = point.supplyBlockSeverity;
+                      const total = severity.total;
+
+                      // Calculate heights as percentages
+                      const problemHeight = total > 0 ? (severity.problem / maxBlocks) * 100 : 0;
+                      const warningHeight = total > 0 ? (severity.warning / maxBlocks) * 100 : 0;
+                      const minorHeight = total > 0 ? (severity.minor / maxBlocks) * 100 : 0;
+
+                      return (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full relative" style={{ height: '100%' }}>
+                            {/* Stacked bars: problem (red) on top, warning (orange) middle, minor (yellow) bottom */}
+                            <div className="absolute bottom-0 w-full flex flex-col">
+                              {severity.minor > 0 && (
+                                <div
+                                  className="w-full bg-yellow-500/80"
+                                  style={{ height: `${Math.min(minorHeight, 100)}%` }}
+                                  title={`${severity.minor} minor blocks`}
+                                />
+                              )}
+                              {severity.warning > 0 && (
+                                <div
+                                  className="w-full bg-orange-500/80"
+                                  style={{ height: `${Math.min(warningHeight, 100)}%` }}
+                                  title={`${severity.warning} warning blocks`}
+                                />
+                              )}
+                              {severity.problem > 0 && (
+                                <div
+                                  className="w-full bg-red-500/80 rounded-t"
+                                  style={{ height: `${Math.min(problemHeight, 100)}%` }}
+                                  title={`${severity.problem} problem blocks`}
+                                />
+                              )}
+                            </div>
+                          </div>
+                          {idx % 3 === 0 && (
+                            <span className="text-xs text-muted-foreground rotate-45 origin-top-left">
+                              {point.date}
+                            </span>
+                          )}
                         </div>
-                        {idx % 3 === 0 && (
-                          <span className="text-xs text-muted-foreground rotate-45 origin-top-left">
-                            {point.date}
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
-                  <div className="text-center mt-4 text-sm text-muted-foreground">
+                  <div className="flex items-center justify-center gap-4 mt-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-yellow-500/80 rounded" />
+                      <span className="text-muted-foreground">Minor (&lt;30s)</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-orange-500/80 rounded" />
+                      <span className="text-muted-foreground">Warning (30-60s)</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-red-500/80 rounded" />
+                      <span className="text-muted-foreground">Problem (60s+)</span>
+                    </div>
+                  </div>
+                  <div className="text-center mt-2 text-sm text-muted-foreground">
                     Last 20 games (max 10 shown)
                   </div>
                 </CardContent>
@@ -443,39 +548,65 @@ export default function MyReplaysPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Worker Counts
+                    Worker Counts vs Benchmark
                   </CardTitle>
-                  <CardDescription>3min and 5min worker counts</CardDescription>
+                  <CardDescription>3min and 5min worker counts with benchmark lines</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-end justify-between gap-1">
-                    {chartData.slice(-20).map((point, idx) => (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-full relative" style={{ height: '100%' }}>
-                          <div
-                            className="w-1/2 bg-blue-500 rounded-tl absolute bottom-0 left-0"
-                            style={{ height: `${(point.workers3min / 30) * 100}%` }}
-                            title={`3min: ${point.workers3min}`}
-                          />
-                          <div
-                            className="w-1/2 bg-blue-300 rounded-tr absolute bottom-0 right-0"
-                            style={{ height: `${(point.workers5min / 50) * 100}%` }}
-                            title={`5min: ${point.workers5min}`}
-                          />
+                  <div className="relative h-64">
+                    {/* Benchmark lines - Speed Banshee benchmarks */}
+                    <div
+                      className="absolute w-full border-t-2 border-dashed border-green-500/40"
+                      style={{ bottom: `${(12 / 60) * 100}%` }}
+                      title="Benchmark: 12 workers @ 3min"
+                    />
+                    <div
+                      className="absolute w-full border-t-2 border-dashed border-emerald-500/40"
+                      style={{ bottom: `${(29 / 60) * 100}%` }}
+                      title="Benchmark: 29 workers @ 5min"
+                    />
+
+                    {/* Bars */}
+                    <div className="h-full flex items-end justify-between gap-1">
+                      {chartData.slice(-20).map((point, idx) => (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full relative" style={{ height: '100%' }}>
+                            <div
+                              className="w-1/2 bg-blue-500 rounded-tl absolute bottom-0 left-0"
+                              style={{ height: `${(point.workers3min / 60) * 100}%` }}
+                              title={`3min: ${point.workers3min} (target: 12)`}
+                            />
+                            <div
+                              className="w-1/2 bg-blue-300 rounded-tr absolute bottom-0 right-0"
+                              style={{ height: `${(point.workers5min / 60) * 100}%` }}
+                              title={`5min: ${point.workers5min} (target: 29)`}
+                            />
+                          </div>
+                          {idx % 3 === 0 && (
+                            <span className="text-xs text-muted-foreground rotate-45 origin-top-left">
+                              {point.date}
+                            </span>
+                          )}
                         </div>
-                        {idx % 3 === 0 && (
-                          <span className="text-xs text-muted-foreground rotate-45 origin-top-left">
-                            {point.date}
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-center mt-4 text-sm text-muted-foreground">
-                    <span className="inline-block w-3 h-3 bg-blue-500 mr-1"></span>
-                    3min workers
-                    <span className="inline-block w-3 h-3 bg-blue-300 ml-3 mr-1"></span>
-                    5min workers
+                  <div className="flex items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-blue-500 rounded" />
+                      <span>3min workers</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-blue-300 rounded" />
+                      <span>5min workers</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-6 h-0.5 border-t-2 border-dashed border-green-500/60" />
+                      <span>Benchmarks</span>
+                    </div>
+                  </div>
+                  <div className="text-center mt-2 text-xs text-muted-foreground">
+                    Benchmarks from Speed Banshee Mech build (Advanced)
                   </div>
                 </CardContent>
               </Card>

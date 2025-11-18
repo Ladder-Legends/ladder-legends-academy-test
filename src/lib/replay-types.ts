@@ -28,9 +28,27 @@ export interface ReplayFingerprint {
     avg_expansion_timing: number | null;
     'avg_mineral_float_5min+'?: number;
     'avg_gas_float_5min+'?: number;
+    'max_mineral_float_5min+'?: number;
+    'max_gas_float_5min+'?: number;
     supply_block_count?: number;
     total_supply_block_time?: number;
-    supply_block_periods?: Array<{ start: number; end: number; duration: number }>;
+    supply_block_periods?: Array<{
+      start: number;
+      end: number;
+      duration: number;
+      severity?: 'minor' | 'warning' | 'problem';
+    }>;
+    supply_block_categorization?: {
+      minor: Array<{ start: number; end: number; duration: number; severity: 'minor' }>;
+      warning: Array<{ start: number; end: number; duration: number; severity: 'warning' }>;
+      problem: Array<{ start: number; end: number; duration: number; severity: 'problem' }>;
+      minor_count: number;
+      warning_count: number;
+      problem_count: number;
+      minor_time: number;
+      warning_time: number;
+      problem_time: number;
+    };
   };
   tactical: {
     moveout_times: number[];

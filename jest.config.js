@@ -33,4 +33,10 @@ const customJestConfig = {
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig)
+// We need to use async export to override transformIgnorePatterns for @vercel/kv (ES module)
+module.exports = async () => ({
+  ...(await createJestConfig(customJestConfig)()),
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@vercel/kv)/)',
+  ],
+})

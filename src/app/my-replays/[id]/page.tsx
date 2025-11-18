@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   Trophy,
@@ -24,19 +25,133 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { UserReplayData, TimingComparison } from '@/lib/replay-types';
 
+// Helper function to calculate top issues
+interface Issue {
+  description: string;
+  pointsLost: number;
+  tip: string;
+  severity: 'critical' | 'warning' | 'info';
+}
+
+function calculateTopIssues(replay: UserReplayData): Issue[] {
+  const issues: Issue[] = [];
+  const { fingerprint, comparison } = replay;
+  const economy = fingerprint.economy;
+
+  // Supply block penalties (updated thresholds: <10s minor, 10-30s warning, 30s+ problem)
+  if (economy.supply_block_categorization) {
+    const { problem_count, problem_time, warning_count, warning_time } = economy.supply_block_categorization;
+
+    if (problem_count > 0) {
+      issues.push({
+        description: `${problem_count} severe supply block${problem_count > 1 ? 's' : ''} (30s+ each)`,
+        pointsLost: Math.round(problem_count * 15 + problem_time / 5),
+        tip: 'Set a timer reminder every 30 seconds to check supply. Build depots at 75% supply.',
+        severity: 'critical',
+      });
+    }
+
+    if (warning_count > 0) {
+      issues.push({
+        description: `${warning_count} moderate supply block${warning_count > 1 ? 's' : ''} (10-30s each)`,
+        pointsLost: Math.round(warning_count * 8 + warning_time / 10),
+        tip: 'Practice building supply depots earlier. Aim for depots at 15, 23, 31, 39 supply.',
+        severity: 'warning',
+      });
+    }
+  }
+
+  // Worker count deficits vs benchmarks
+  if (economy.workers_3min !== null && economy.workers_3min < 12) {
+    const deficit = 12 - economy.workers_3min;
+    issues.push({
+      description: `${deficit} workers below benchmark at 3min`,
+      pointsLost: deficit * 3,
+      tip: 'Continuous SCV production is critical. Never stop making workers early game.',
+      severity: 'critical',
+    });
+  }
+
+  if (economy.workers_5min !== null && economy.workers_5min < 29) {
+    const deficit = 29 - economy.workers_5min;
+    issues.push({
+      description: `${deficit} workers below benchmark at 5min`,
+      pointsLost: Math.round(deficit * 2),
+      tip: 'Set a 5-minute alarm to check worker count. You should have ~29 workers.',
+      severity: 'critical',
+    });
+  }
+
+  if (economy.workers_7min !== null && economy.workers_7min < 48) {
+    const deficit = 48 - economy.workers_7min;
+    issues.push({
+      description: `${deficit} workers below benchmark at 7min`,
+      pointsLost: deficit,
+      tip: 'Keep building workers until 7 minutes. Target: 48 workers on 3 bases.',
+      severity: 'warning',
+    });
+  }
+
+  // Late key timings
+  if (comparison) {
+    Object.entries(comparison.timing_comparison).forEach(([key, timing]) => {
+      const absDeviation = Math.abs(timing.deviation);
+      if (absDeviation > 15 && timing.deviation > 0) {
+        issues.push({
+          description: `${key.replace(/_/g, ' ')} was ${Math.round(absDeviation)}s late`,
+          pointsLost: Math.round(absDeviation / 2),
+          tip: `Review the ${key.replace(/_/g, ' ')} timing in the build guide. Practice until consistent.`,
+          severity: absDeviation > 30 ? 'critical' : 'warning',
+        });
+      }
+    });
+  }
+
+  // High resource float
+  const avgMineralFloat = economy['avg_mineral_float_5min+'] || 0;
+  const avgGasFloat = economy['avg_gas_float_5min+'] || 0;
+  const totalFloat = avgMineralFloat + avgGasFloat;
+
+  if (totalFloat > 2500) {
+    issues.push({
+      description: `High average resource float (${Math.round(totalFloat)} resources)`,
+      pointsLost: Math.round((totalFloat - 2000) / 200),
+      tip: 'Build more production facilities or expand faster to spend your resources.',
+      severity: 'warning',
+    });
+  }
+
+  // Sort by points lost (descending) and return top 3
+  return issues
+    .sort((a, b) => b.pointsLost - a.pointsLost)
+    .slice(0, 3);
+}
+
 export default function ReplayDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [replay, setReplay] = useState<UserReplayData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Active tab state with URL sync
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'overview');
+
   const replayId = params.id as string;
+
+  // Sync tab changes to URL
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const newUrl = `/my-replays/${replayId}?tab=${value}`;
+    router.push(newUrl, { scroll: false });
+  };
 
   useEffect(() => {
     if (status === 'authenticated' && replayId) {
@@ -107,9 +222,10 @@ export default function ReplayDetailPage() {
 
   const { fingerprint, detection, comparison } = replay;
   const result = fingerprint.metadata.result;
+  const topIssues = calculateTopIssues(replay);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Back Button */}
       <Link href="/my-replays" className="inline-block mb-6">
         <Button variant="outline">
@@ -119,7 +235,7 @@ export default function ReplayDetailPage() {
       </Link>
 
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold mb-2">{replay.filename}</h1>
@@ -159,73 +275,149 @@ export default function ReplayDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Detection & Execution */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Build Detection */}
-          {detection && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Build Detected
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold mb-2">{detection.build_name}</h3>
-                  <div className="text-3xl font-bold mb-2">
+      {/* Hero Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Execution Score Card */}
+        {comparison ? (
+          <Card className="border-2 cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('production')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-6 w-6" />
+                Execution Score
+              </CardTitle>
+              <CardDescription>vs {comparison.build_name}</CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="text-7xl font-bold mb-4">
+                {Math.round(comparison.execution_score)}%
+              </div>
+              <Badge
+                className="text-2xl px-6 py-2 mb-4"
+                variant={
+                  comparison.tier === 'S' || comparison.tier === 'A' ? 'default' : 'secondary'
+                }
+              >
+                {comparison.tier}-Tier
+              </Badge>
+              <Progress value={comparison.execution_score} className="h-4 mb-3" />
+              <p className="text-sm text-muted-foreground">
+                {comparison.tier === 'S' && 'Outstanding execution!'}
+                {comparison.tier === 'A' && 'Great execution!'}
+                {comparison.tier === 'B' && 'Good execution'}
+                {comparison.tier === 'C' && 'Room for improvement'}
+                {comparison.tier === 'D' && 'Needs work'}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-6 w-6" />
+                Build Detection
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              {detection ? (
+                <>
+                  <h3 className="text-2xl font-bold mb-4">{detection.build_name}</h3>
+                  <div className="text-5xl font-bold mb-4">
                     {Math.round(detection.confidence)}%
                   </div>
-                  <p className="text-sm text-muted-foreground">Confidence</p>
-                </div>
-                <Progress value={detection.confidence} className="h-2" />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Execution Score */}
-          {comparison && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Execution Score
-                </CardTitle>
-                <CardDescription>vs {comparison.build_name}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-4">
-                  <div className="text-5xl font-bold mb-2">
-                    {Math.round(comparison.execution_score)}%
-                  </div>
-                  <Badge
-                    className="text-lg px-4 py-1"
-                    variant={
-                      comparison.tier === 'S' || comparison.tier === 'A' ? 'default' : 'secondary'
-                    }
-                  >
-                    {comparison.tier}-Tier
-                  </Badge>
-                </div>
-                <Progress value={comparison.execution_score} className="h-3 mb-2" />
-                <p className="text-xs text-center text-muted-foreground">
-                  {comparison.tier === 'S' && 'Outstanding execution!'}
-                  {comparison.tier === 'A' && 'Great execution!'}
-                  {comparison.tier === 'B' && 'Good execution'}
-                  {comparison.tier === 'C' && 'Room for improvement'}
-                  {comparison.tier === 'D' && 'Needs work'}
+                  <p className="text-sm text-muted-foreground mb-4">Confidence</p>
+                  <Progress value={detection.confidence} className="h-4" />
+                </>
+              ) : (
+                <p className="text-4xl font-bold text-muted-foreground py-8">
+                  No build detected
                 </p>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-          {/* Accuracy Score Dashboard */}
+        {/* Top 3 Critical Issues Card */}
+        <Card className="border-2 cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('overview')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-6 w-6" />
+              Top Issues to Fix
+            </CardTitle>
+            <CardDescription>Focus on these for maximum improvement</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topIssues.length > 0 ? (
+              <div className="space-y-4">
+                {topIssues.map((issue, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border-l-4 ${
+                      issue.severity === 'critical'
+                        ? 'bg-red-50 dark:bg-red-950/20 border-red-500'
+                        : 'bg-orange-50 dark:bg-orange-950/20 border-orange-500'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertCircle
+                        className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                          issue.severity === 'critical' ? 'text-red-500' : 'text-orange-500'
+                        }`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-semibold text-sm">{issue.description}</p>
+                          <Badge
+                            variant="outline"
+                            className={
+                              issue.severity === 'critical'
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-300'
+                                : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-300'
+                            }
+                          >
+                            -{issue.pointsLost} pts
+                          </Badge>
+                        </div>
+                        <div className="flex items-start gap-2 mt-2">
+                          <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-muted-foreground">{issue.tip}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                  Excellent execution!
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  No major issues detected
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabbed Interface */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="overview" className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white">Overview</TabsTrigger>
+          <TabsTrigger value="vision" className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white">Vision</TabsTrigger>
+          <TabsTrigger value="production" className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white">Production</TabsTrigger>
+          <TabsTrigger value="supply" className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white">Supply</TabsTrigger>
+        </TabsList>
+
+        {/* Tab 1: Overview */}
+        <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Performance Metrics */}
           {comparison && (
             <Card>
               <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>Detailed breakdown of execution quality</CardDescription>
+                <CardTitle>Performance Breakdown</CardTitle>
+                <CardDescription>Detailed execution quality metrics</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Timing Accuracy */}
@@ -370,93 +562,341 @@ export default function ReplayDetailPage() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
 
-          {/* Economy */}
+        {/* Tab 2: Supply - Worker counts, supply blocks, resources */}
+        <TabsContent value="supply" className="space-y-6 mt-6">
           {fingerprint.economy && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Economy</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium mb-2">Worker Counts</p>
+            <>
+              {/* Worker Counts */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Worker Counts</CardTitle>
+                  <CardDescription>Track your worker production vs benchmarks</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">3 min:</span>
-                      <span>{fingerprint.economy.workers_3min ?? 'N/A'}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_3min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_3min !== null && fingerprint.economy.workers_3min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_3min >= 12 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_3min >= 12 ? '+' : ''}{fingerprint.economy.workers_3min - 12} vs benchmark)
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">5 min:</span>
-                      <span>{fingerprint.economy.workers_5min ?? 'N/A'}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_5min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_5min !== null && fingerprint.economy.workers_5min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_5min >= 29 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_5min >= 29 ? '+' : ''}{fingerprint.economy.workers_5min - 29} vs benchmark)
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">7 min:</span>
-                      <span>{fingerprint.economy.workers_7min ?? 'N/A'}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{fingerprint.economy.workers_7min ?? 'N/A'}</span>
+                        {fingerprint.economy.workers_7min !== null && fingerprint.economy.workers_7min !== undefined && (
+                          <span className={`text-xs ${fingerprint.economy.workers_7min >= 48 ? 'text-green-500' : 'text-orange-500'}`}>
+                            ({fingerprint.economy.workers_7min >= 48 ? '+' : ''}{fingerprint.economy.workers_7min - 48} vs benchmark)
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Target benchmarks for standard macro builds
+                  </p>
+                </CardContent>
+              </Card>
 
-                {fingerprint.economy.supply_block_count !== undefined && (
-                  <div className="pt-2 border-t">
+              {/* Supply Blocks with Timeline */}
+              {fingerprint.economy.supply_block_count !== undefined && (
+                <Card className="cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('supply')}>
+                  <CardHeader>
+                    <CardTitle>Supply Blocks</CardTitle>
+                    <CardDescription>
+                      {fingerprint.economy.supply_block_count === 0
+                        ? 'Perfect! No supply blocks detected'
+                        : `${fingerprint.economy.supply_block_count} supply block${fingerprint.economy.supply_block_count > 1 ? 's' : ''} detected`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">Supply Blocks</span>
+                      <span className="text-sm font-medium">Total Blocks</span>
                       <Badge variant={fingerprint.economy.supply_block_count === 0 ? 'default' : 'destructive'}>
                         {fingerprint.economy.supply_block_count}
                       </Badge>
                     </div>
+
+                    {/* Severity Breakdown */}
+                    {fingerprint.economy.supply_block_categorization && (
+                      <div className="space-y-2 mb-2">
+                        {fingerprint.economy.supply_block_categorization.minor_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                              <span className="text-muted-foreground">Minor (&lt;10s)</span>
+                            </div>
+                            <span className="font-medium">{fingerprint.economy.supply_block_categorization.minor_count} ({Math.round(fingerprint.economy.supply_block_categorization.minor_time)}s)</span>
+                          </div>
+                        )}
+                        {fingerprint.economy.supply_block_categorization.warning_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                              <span className="text-muted-foreground">Warning (10-30s)</span>
+                            </div>
+                            <span className="font-medium">{fingerprint.economy.supply_block_categorization.warning_count} ({Math.round(fingerprint.economy.supply_block_categorization.warning_time)}s)</span>
+                          </div>
+                        )}
+                        {fingerprint.economy.supply_block_categorization.problem_count > 0 && (
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-red-500 rounded-full" />
+                              <span className="text-muted-foreground">Problem (30s+)</span>
+                            </div>
+                            <span className="font-medium text-destructive">{fingerprint.economy.supply_block_categorization.problem_count} ({Math.round(fingerprint.economy.supply_block_categorization.problem_time)}s)</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {fingerprint.economy.total_supply_block_time !== undefined && fingerprint.economy.total_supply_block_time > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Total: {Math.round(fingerprint.economy.total_supply_block_time)}s
+                      <p className="text-xs text-muted-foreground">
+                        Total block time: {Math.round(fingerprint.economy.total_supply_block_time)}s
                       </p>
                     )}
-                  </div>
-                )}
 
-                {fingerprint.economy['avg_mineral_float_5min+'] !== undefined && (
-                  <div className="pt-2 border-t">
-                    <p className="text-sm font-medium mb-2">Avg Resource Float (5min+)</p>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Minerals:</span>
-                        <span>{fingerprint.economy['avg_mineral_float_5min+']}</span>
+                    {/* Supply Block Timeline */}
+                    {fingerprint.economy.supply_block_periods && fingerprint.economy.supply_block_periods.length > 0 && fingerprint.metadata.duration && (
+                      <div className="pt-4 border-t">
+                        <p className="text-sm font-medium mb-3">Supply Block Timeline</p>
+                        <div className="relative h-16 bg-muted/20 rounded-lg border">
+                          {/* Time markers */}
+                          <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 pb-1 text-[10px] text-muted-foreground">
+                            <span>0:00</span>
+                            {[3, 6, 9, 12].map(minute => {
+                              const seconds = minute * 60;
+                              if (seconds < fingerprint.metadata.duration!) {
+                                return (
+                                  <span key={minute}>
+                                    {minute}:00
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })}
+                            <span>
+                              {Math.floor(fingerprint.metadata.duration / 60)}:
+                              {String(Math.floor(fingerprint.metadata.duration % 60)).padStart(2, '0')}
+                            </span>
+                          </div>
+
+                          {/* Supply block bars */}
+                          <div className="absolute inset-0 pb-4 pointer-events-none">
+                            {fingerprint.economy.supply_block_periods.map((block, index) => {
+                              const startPercent = (block.start / fingerprint.metadata.duration!) * 100;
+                              const widthPercent = (block.duration / fingerprint.metadata.duration!) * 100;
+
+                              const color = block.severity === 'problem'
+                                ? 'bg-red-500'
+                                : block.severity === 'warning'
+                                ? 'bg-orange-500'
+                                : 'bg-yellow-500';
+
+                              const startMin = Math.floor(block.start / 60);
+                              const startSec = Math.floor(block.start % 60);
+                              const endMin = Math.floor(block.end / 60);
+                              const endSec = Math.floor(block.end % 60);
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`h-8 ${color} opacity-80 hover:opacity-100 transition-opacity cursor-help rounded-sm border-l-2 border-r-2 border-white/40 pointer-events-auto`}
+                                  style={{
+                                    position: 'absolute',
+                                    left: `${startPercent}%`,
+                                    width: `${widthPercent}%`,
+                                    top: 0,
+                                  }}
+                                  title={`Started: ${startMin}:${String(startSec).padStart(2, '0')} | Ended: ${endMin}:${String(endSec).padStart(2, '0')} | Duration: ${Math.round(block.duration)}s`}
+                                >
+                                  {/* Start marker */}
+                                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/60" />
+                                  {/* End marker */}
+                                  <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-white/60" />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 mt-3 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3 h-3 bg-yellow-500 rounded" />
+                            <span className="text-muted-foreground">Minor (&lt;10s)</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3 h-3 bg-orange-500 rounded" />
+                            <span className="text-muted-foreground">Warning (10-30s)</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3 h-3 bg-red-500 rounded" />
+                            <span className="text-muted-foreground">Problem (30s+)</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Gas:</span>
-                        <span>{fingerprint.economy['avg_gas_float_5min+'] ?? 'N/A'}</span>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Resource Float */}
+              {fingerprint.economy['avg_mineral_float_5min+'] !== undefined && (
+                <Card className="cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('supply')}>
+                  <CardHeader>
+                    <CardTitle>Resource Float</CardTitle>
+                    <CardDescription>Unspent resources over time (5min+)</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="space-y-2">
+                        <div className="text-xs text-muted-foreground">Minerals</div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span>Avg:</span>
+                            <span className="font-medium">{fingerprint.economy['avg_mineral_float_5min+']}</span>
+                          </div>
+                          {fingerprint.economy['max_mineral_float_5min+'] && (
+                            <div className="flex justify-between text-sm">
+                              <span>Max:</span>
+                              <span className="font-medium text-orange-500">{fingerprint.economy['max_mineral_float_5min+']}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-xs text-muted-foreground">Gas</div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span>Avg:</span>
+                            <span className="font-medium">{fingerprint.economy['avg_gas_float_5min+'] ?? 'N/A'}</span>
+                          </div>
+                          {fingerprint.economy['max_gas_float_5min+'] && (
+                            <div className="flex justify-between text-sm">
+                              <span>Max:</span>
+                              <span className="font-medium text-orange-500">{fingerprint.economy['max_gas_float_5min+']}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Tactical Events */}
-          {fingerprint.tactical && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Tactical Events</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Moveouts</span>
-                  <Badge variant="outline">{fingerprint.tactical.moveout_times?.length || 0}</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Harass</span>
-                  <Badge variant="outline">{fingerprint.tactical.harass_count || 0}</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Engagements</span>
-                  <Badge variant="outline">{fingerprint.tactical.engagement_count || 0}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                    {/* Timeline Visualization */}
+                    {fingerprint.resource_timeline && fingerprint.metadata.duration && (
+                      <div className="space-y-4 mt-6">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                            <span>Mineral Float Timeline</span>
+                            <span className="text-right">
+                              Yellow: 500+ | Orange: 750+ | Red: 1000+
+                            </span>
+                          </div>
+                          <div className="relative h-10 bg-muted/30 rounded">
+                            {Object.entries(fingerprint.resource_timeline)
+                              .filter(([time]) => parseInt(time) >= 300)
+                              .map(([time, resources]) => {
+                                const timestamp = parseInt(time);
+                                const position = (timestamp / fingerprint.metadata.duration!) * 100;
+                                const minerals = resources.minerals;
+                                const color = minerals >= 1000 ? 'bg-red-500' : minerals >= 750 ? 'bg-orange-500' : minerals >= 500 ? 'bg-yellow-500' : null;
 
-        {/* Right Column - Detailed Analysis */}
-        <div className="lg:col-span-2 space-y-6">
+                                if (!color) return null;
+
+                                const min = Math.floor(timestamp / 60);
+                                const sec = timestamp % 60;
+
+                                return (
+                                  <div
+                                    key={`minerals-${time}`}
+                                    className={`h-10 ${color} opacity-60 hover:opacity-100 transition-opacity`}
+                                    style={{
+                                      position: 'absolute',
+                                      left: `${position}%`,
+                                      width: '1%',
+                                      top: 0,
+                                    }}
+                                    title={`${min}:${String(sec).padStart(2, '0')} - ${minerals} minerals`}
+                                  />
+                                );
+                              })}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                            <span>Gas Float Timeline</span>
+                            <span className="text-right">
+                              Yellow: 500+ | Orange: 750+ | Red: 1000+
+                            </span>
+                          </div>
+                          <div className="relative h-10 bg-muted/30 rounded">
+                            {Object.entries(fingerprint.resource_timeline)
+                              .filter(([time]) => parseInt(time) >= 300)
+                              .map(([time, resources]) => {
+                                const timestamp = parseInt(time);
+                                const position = (timestamp / fingerprint.metadata.duration!) * 100;
+                                const gas = resources.gas;
+                                const color = gas >= 1000 ? 'bg-red-500' : gas >= 750 ? 'bg-orange-500' : gas >= 500 ? 'bg-yellow-500' : null;
+
+                                if (!color) return null;
+
+                                const min = Math.floor(timestamp / 60);
+                                const sec = timestamp % 60;
+
+                                return (
+                                  <div
+                                    key={`gas-${time}`}
+                                    className={`h-10 ${color} opacity-60 hover:opacity-100 transition-opacity`}
+                                    style={{
+                                      position: 'absolute',
+                                      left: `${position}%`,
+                                      width: '1%',
+                                      top: 0,
+                                    }}
+                                    title={`${min}:${String(sec).padStart(2, '0')} - ${gas} gas`}
+                                  />
+                                );
+                              })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {((fingerprint.economy['avg_mineral_float_5min+'] || 0) + (fingerprint.economy['avg_gas_float_5min+'] || 0)) > 2000 && (
+                      <Alert className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-xs">
+                          High resource float detected. Consider adding more production or expanding faster.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        {/* Tab 3: Production - Build order, timings, unit production */}
+        <TabsContent value="production" className="space-y-6 mt-6">
           {/* Timing Comparison */}
           {comparison && comparison.timing_comparison && (
             <Card>
@@ -559,82 +999,12 @@ export default function ReplayDetailPage() {
             </Card>
           )}
 
-          {/* Army Composition Comparison (Snapshot) */}
-          {comparison && comparison.composition_comparison && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Army Composition (Alive)</CardTitle>
-                <CardDescription>Units alive at key timings (snapshot)</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(comparison.composition_comparison).map(([time, units]) => (
-                    <div key={time}>
-                      <h4 className="font-semibold mb-2">{time}</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {Object.entries(units).map(([unit, comp]) => (
-                          <div key={unit} className="flex items-center justify-between p-2 border rounded">
-                            <span className="text-sm">{unit}</span>
-                            <div className="text-sm">
-                              <span className="font-medium">{comp.actual}</span>
-                              <span className="text-muted-foreground"> / {comp.target}</span>
-                              {comp.difference !== 0 && (
-                                <span
-                                  className={`ml-1 ${comp.difference > 0 ? 'text-green-600' : 'text-red-600'}`}
-                                >
-                                  ({comp.difference > 0 ? '+' : ''}
-                                  {comp.difference})
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Micro Stats */}
-          {fingerprint.micro && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Micro & APM</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Selections per minute</span>
-                  <span className="font-medium">
-                    {isNaN(fingerprint.micro.avg_selections_per_min)
-                      ? 'N/A'
-                      : Math.round(fingerprint.micro.avg_selections_per_min)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Camera movements per minute</span>
-                  <span className="font-medium">
-                    {isNaN(fingerprint.micro.avg_camera_moves_per_min)
-                      ? 'N/A'
-                      : Math.round(fingerprint.micro.avg_camera_moves_per_min)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Control groups used</span>
-                  <span className="font-medium">
-                    {fingerprint.micro.control_groups_used || 0}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Upgrades */}
           {fingerprint.sequences && fingerprint.sequences.upgrade_sequence && fingerprint.sequences.upgrade_sequence.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Upgrades Researched</CardTitle>
+                <CardDescription>Tech progression during the game</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -674,8 +1044,37 @@ export default function ReplayDetailPage() {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
+        </TabsContent>
+
+        {/* Tab 4: Vision - Positioning and map awareness */}
+        <TabsContent value="vision" className="space-y-6 mt-6">
+          {/* Positioning */}
+          {fingerprint.positioning && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Building Positioning</CardTitle>
+                <CardDescription>Proxy buildings and placement analysis</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Proxy Buildings</span>
+                  <Badge variant={fingerprint.positioning.proxy_buildings > 0 ? 'default' : 'outline'}>
+                    {fingerprint.positioning.proxy_buildings}
+                  </Badge>
+                </div>
+                {fingerprint.positioning.avg_building_distance_from_main !== null && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Avg. Distance from Main</span>
+                    <span className="font-medium text-sm">
+                      {Math.round(fingerprint.positioning.avg_building_distance_from_main)}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

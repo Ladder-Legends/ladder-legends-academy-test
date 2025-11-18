@@ -680,3 +680,13 @@
 .dark .logo-about-dark {
   display: block;
 }
+
+/* Faster tooltip display */
+[title] {
+  position: relative;
+}
+
+/* Reduce tooltip delay for faster display */
+*[title]:hover::after {
+  animation-delay: 0.1s !important;
+}

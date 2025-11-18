@@ -12,9 +12,19 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
-function UserAvatar({ name, email }: { name?: string | null; email?: string | null }) {
+function UserAvatar({ name, email, image }: { name?: string | null; email?: string | null; image?: string | null }) {
   const displayName = name || email || 'User';
   const initial = displayName.charAt(0).toUpperCase();
+
+  if (image) {
+    return (
+      <img
+        src={image}
+        alt={displayName}
+        className="w-9 h-9 rounded-full hover:opacity-90 transition-opacity"
+      />
+    );
+  }
 
   return (
     <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
@@ -64,7 +74,7 @@ export function UserMenu() {
 
   return (
     <DropdownMenu
-      trigger={<UserAvatar name={session.user.name} email={session.user.email} />}
+      trigger={<UserAvatar name={session.user.name} email={session.user.email} image={session.user.image} />}
       align="right"
     >
       <DropdownMenuLabel>
