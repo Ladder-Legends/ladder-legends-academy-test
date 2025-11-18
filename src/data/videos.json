@@ -1497,28 +1497,6 @@
     "isFree": false
   },
   {
-    "id": "c30f719a-a236-4065-a8d9-79526a1678bb",
-    "title": "ZvX Getting started with zerg and its main Build",
-    "description": "main zerg build order as well as how one should proceed with zerg macro",
-    "source": "mux",
-    "muxAssetId": "q4qScK01EBHPkO014hN02BlPiZYmV8r3IU901f02vBQw5BAE",
-    "muxPlaybackId": "kUgx1zzzN00CKLcpA5PTUJMnZ7Vr1FQ006RxPVfyt0056c",
-    "muxAssetStatus": "ready",
-    "thumbnail": "/thumbnails/c30f719a-a236-4065-a8d9-79526a1678bb.jpg",
-    "date": "2025-11-15",
-    "tags": [
-      "zerg",
-      "eon",
-      "macro",
-      "builds",
-      "mechanics"
-    ],
-    "race": "zerg",
-    "coach": "Eon",
-    "coachId": "eon",
-    "isFree": false
-  },
-  {
     "id": "d65e1d78-f855-4749-b2e2-63a0ec4ee625",
     "title": "ZvZ Recovering from a bad spot and Map usage",
     "description": "ZvZ of strange opening, trying to play safe, and falling behind and finding a way to recover.",
