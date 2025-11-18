@@ -85,7 +85,7 @@
     "name": "eon",
     "displayName": "Eon",
     "race": "zerg",
-    "bio": "Skilled coach with expertise in micro and macro mechanics. Helps players refine their mechanical execution and game sense.Skilled coach with expertise in micro and macro mechanics. ",
+    "bio": "Skilled coach with expertise in micro and macro mechanics. Helps players refine their mechanical execution and game sense.  ",
     "specialties": [
       "Micro management",
       "Macro management",
@@ -93,10 +93,7 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/84352373/calendar/12406706",
     "pricePerHour": "£10/hr",
-    "battleTags": [
-      "EON",
-      "EONs"
-    ],
+    "isActive": true,
     "socialLinks": {}
   },
   {
