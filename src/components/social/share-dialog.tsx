@@ -115,7 +115,7 @@ export function ShareDialog({
         {/* Share Buttons */}
         <div className="space-y-2">
           {/* Native Share (mobile) */}
-          {typeof navigator !== 'undefined' && navigator.share && (
+          {typeof navigator !== 'undefined' && 'share' in navigator && (
             <Button
               onClick={handleNativeShare}
               className="w-full justify-start gap-3"

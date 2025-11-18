@@ -36,8 +36,8 @@ class FileBasedStore {
         const parsed = JSON.parse(data);
 
         // Convert date strings back to Date objects
-        for (const [key, value] of Object.entries(parsed)) {
-          const code = value as any;
+        for (const [, value] of Object.entries(parsed)) {
+          const code = value as DeviceCode;
           code.created_at = new Date(code.created_at);
           code.expires_at = new Date(code.expires_at);
           if (code.authorized_at) {
