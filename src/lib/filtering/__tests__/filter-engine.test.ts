@@ -2,6 +2,7 @@
  * Tests for the core filtering engine
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   validateFilterConfig,
   applyFilters,
@@ -19,8 +20,8 @@ const originalConsoleWarn = console.warn;
 const originalConsoleError = console.error;
 
 beforeEach(() => {
-  console.warn = jest.fn();
-  console.error = jest.fn();
+  console.warn = vi.fn();
+  console.error = vi.fn();
 });
 
 afterEach(() => {

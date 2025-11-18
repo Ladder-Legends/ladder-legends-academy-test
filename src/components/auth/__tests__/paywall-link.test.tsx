@@ -3,31 +3,33 @@
  * Critical for revenue protection - ensures non-subscribers can't access premium content
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { PaywallLink } from '../paywall-link'
+import type { MockedFunction } from 'vitest';
 
 // Mock next-auth
-jest.mock('next-auth/react')
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
+vi.mock('next-auth/react')
+const mockUseSession = useSession as MockedFunction<typeof useSession>
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }))
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>
+const mockUseRouter = useRouter as MockedFunction<typeof useRouter>
 
 describe('PaywallLink Component', () => {
-  let mockPush: jest.Mock
+  let mockPush: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    mockPush = jest.fn()
+    mockPush = vi.fn()
     mockUseRouter.mockReturnValue({ push: mockPush } as any)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Free Content', () => {

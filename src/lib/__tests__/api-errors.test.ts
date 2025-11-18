@@ -2,6 +2,7 @@
  * Tests for API error handling utilities
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { handleMuxError, handleGitHubError, ErrorCodes } from '../api-errors';
 
 describe('ErrorCodes', () => {
@@ -41,7 +42,7 @@ describe('handleMuxError', () => {
   const originalConsoleError = console.error;
 
   beforeEach(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterEach(() => {
@@ -192,7 +193,7 @@ describe('handleGitHubError', () => {
   const originalConsoleError = console.error;
 
   beforeEach(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterEach(() => {

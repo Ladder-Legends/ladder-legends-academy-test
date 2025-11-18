@@ -1,14 +1,16 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GET } from '../poll/route';
 import { deviceCodeStore } from '@/lib/device-code-store';
 import { NextRequest } from 'next/server';
+import type { MockedObject } from 'vitest';
 
 // Mock dependencies
-jest.mock('@/lib/device-code-store');
-jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn((payload, secret, options) => `mock-jwt-token-${payload.type}`),
+vi.mock('@/lib/device-code-store');
+vi.mock('jsonwebtoken', () => ({
+  sign: vi.fn((payload, secret, options) => `mock-jwt-token-${payload.type}`),
 }));
 
-const mockDeviceCodeStore = deviceCodeStore as jest.Mocked<typeof deviceCodeStore>;
+const mockDeviceCodeStore = deviceCodeStore as MockedObject<typeof deviceCodeStore>;
 
 describe('GET /api/auth/device/poll', () => {
   const mockDeviceCode = {
@@ -20,7 +22,7 @@ describe('GET /api/auth/device/poll', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return 400 if device_code is missing', async () => {

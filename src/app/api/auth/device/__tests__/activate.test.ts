@@ -1,14 +1,16 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../activate/route';
 import { deviceCodeStore } from '@/lib/device-code-store';
 import { auth } from '@/lib/auth';
 import { NextRequest } from 'next/server';
+import type { MockedFunction, MockedObject } from 'vitest';
 
 // Mock dependencies
-jest.mock('@/lib/device-code-store');
-jest.mock('@/lib/auth');
+vi.mock('@/lib/device-code-store');
+vi.mock('@/lib/auth');
 
-const mockAuth = auth as jest.MockedFunction<typeof auth>;
-const mockDeviceCodeStore = deviceCodeStore as jest.Mocked<typeof deviceCodeStore>;
+const mockAuth = auth as MockedFunction<typeof auth>;
+const mockDeviceCodeStore = deviceCodeStore as MockedObject<typeof deviceCodeStore>;
 
 describe('POST /api/auth/device/activate', () => {
   const mockSession = {
@@ -29,7 +31,7 @@ describe('POST /api/auth/device/activate', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAuth.mockResolvedValue(mockSession as any);
   });
 

@@ -1,17 +1,18 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../code/route';
 import { deviceCodeStore } from '@/lib/device-code-store';
 import { NextRequest } from 'next/server';
 
 // Mock the device code store
-jest.mock('@/lib/device-code-store', () => ({
+vi.mock('@/lib/device-code-store', () => ({
   deviceCodeStore: {
-    set: jest.fn(),
+    set: vi.fn(),
   },
 }));
 
 describe('POST /api/auth/device/code', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should generate a device code successfully', async () => {
@@ -82,7 +83,7 @@ describe('POST /api/auth/device/code', () => {
     );
 
     // Check expiration is 15 minutes from now
-    const [[, storedCode]] = (deviceCodeStore.set as jest.Mock).mock.calls;
+    const [[, storedCode]] = (deviceCodeStore.set as ReturnType<typeof vi.fn>).mock.calls;
     const expiresInMs = storedCode.expires_at.getTime() - storedCode.created_at.getTime();
     expect(expiresInMs).toBeCloseTo(15 * 60 * 1000, -2); // 15 minutes ±100ms
   });

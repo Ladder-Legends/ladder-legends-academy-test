@@ -3,14 +3,16 @@
  * Verifies that coach booking links are properly paywalled
  */
 
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { CoachCard } from '../coach-card'
 import type { Coach } from '@/types/coach'
+import type { MockedFunction } from 'vitest';
 
 // Mock next-auth
-jest.mock('next-auth/react')
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
+vi.mock('next-auth/react')
+const mockUseSession = useSession as MockedFunction<typeof useSession>
 
 describe('CoachCard - Booking Paywall', () => {
   const mockCoach: Coach = {
@@ -25,7 +27,7 @@ describe('CoachCard - Booking Paywall', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Non-Subscriber Access', () => {

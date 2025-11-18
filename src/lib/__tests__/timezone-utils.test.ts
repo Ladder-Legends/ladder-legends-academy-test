@@ -2,6 +2,7 @@
  * Tests for timezone utility functions
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getBrowserTimezone, getTimezoneAbbreviation, TIMEZONES } from '../timezone-utils';
 
 describe('TIMEZONES', () => {
@@ -45,7 +46,7 @@ describe('getBrowserTimezone', () => {
   const originalConsoleError = console.error;
 
   beforeEach(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterEach(() => {
@@ -67,7 +68,7 @@ describe('getBrowserTimezone', () => {
 
   it('should handle errors gracefully and return fallback', () => {
     // Mock Intl.DateTimeFormat to throw error
-    Intl.DateTimeFormat = jest.fn().mockImplementation(() => {
+    Intl.DateTimeFormat = vi.fn().mockImplementation(() => {
       throw new Error('Test error');
     }) as unknown as typeof Intl.DateTimeFormat;
 
@@ -80,7 +81,7 @@ describe('getBrowserTimezone', () => {
   });
 
   it('should not throw an error even if Intl API fails', () => {
-    Intl.DateTimeFormat = jest.fn().mockImplementation(() => {
+    Intl.DateTimeFormat = vi.fn().mockImplementation(() => {
       throw new Error('Test error');
     }) as unknown as typeof Intl.DateTimeFormat;
 
@@ -92,7 +93,7 @@ describe('getTimezoneAbbreviation', () => {
   const originalConsoleError = console.error;
 
   beforeEach(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterEach(() => {

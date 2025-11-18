@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { deviceCodeStore, DeviceCode } from '../device-code-store';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
 // Mock Vercel KV
-jest.mock('@vercel/kv', () => ({
+vi.mock('@vercel/kv', () => ({
   kv: {
-    get: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
   },
 }));
 

@@ -3,23 +3,24 @@
  * Focuses on count aggregation for hierarchical filter options
  */
 
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useContentFiltering } from '../use-content-filtering';
 import type { FilterConfig } from '../../types';
 
 // Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({ data: null })),
+vi.mock('next-auth/react', () => ({
+  useSession: vi.fn(() => ({ data: null })),
 }));
 
 // Mock URL state hooks
-jest.mock('../../url-state', () => ({
-  useInitialFiltersFromUrl: jest.fn(() => ({
+vi.mock('../../url-state', () => ({
+  useInitialFiltersFromUrl: vi.fn(() => ({
     initialFilters: {},
     initialSearch: '',
     initialTags: [],
   })),
-  useSyncFiltersToUrl: jest.fn(),
+  useSyncFiltersToUrl: vi.fn(),
 }));
 
 interface TestItem {

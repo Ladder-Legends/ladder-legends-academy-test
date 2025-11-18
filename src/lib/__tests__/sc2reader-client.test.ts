@@ -2,6 +2,7 @@
  * Tests for SC2 Replay Analyzer API Client
  */
 
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   SC2ReplayAPIClient,
   formatReplayTime,
@@ -13,11 +14,11 @@ import {
 } from '../sc2reader-client';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('SC2ReplayAPIClient', () => {
   beforeEach(() => {
-    (fetch as jest.Mock).mockClear();
+    (fetch as ReturnType<typeof vi.fn>).mockClear();
   });
 
   describe('constructor', () => {
@@ -88,7 +89,7 @@ describe('SC2ReplayAPIClient', () => {
         },
       };
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -111,7 +112,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: async () => ({ error: 'Unauthorized' }),
@@ -126,7 +127,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 422,
         json: async () => ({ error: 'Parse error', detail: 'Corrupted replay file' }),
@@ -141,7 +142,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 400,
         json: async () => ({ error: 'Invalid request' }),
@@ -154,7 +155,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 500,
         json: async () => ({ error: 'Internal server error' }),
@@ -167,7 +168,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
       await expect(client.analyzeReplay(file)).rejects.toThrow('Network error');
     });
@@ -176,7 +177,7 @@ describe('SC2ReplayAPIClient', () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 500,
         json: async () => {
@@ -192,7 +193,7 @@ describe('SC2ReplayAPIClient', () => {
     it('should return true when API is healthy', async () => {
       const client = new SC2ReplayAPIClient();
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ status: 'healthy' }),
       });
@@ -204,7 +205,7 @@ describe('SC2ReplayAPIClient', () => {
     it('should return false when API is unhealthy', async () => {
       const client = new SC2ReplayAPIClient();
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ status: 'unhealthy' }),
       });
@@ -216,7 +217,7 @@ describe('SC2ReplayAPIClient', () => {
     it('should return false when API returns non-OK status', async () => {
       const client = new SC2ReplayAPIClient();
 
-      (fetch as jest.Mock).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
       });
 
@@ -227,7 +228,7 @@ describe('SC2ReplayAPIClient', () => {
     it('should return false on network error', async () => {
       const client = new SC2ReplayAPIClient();
 
-      (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
       const result = await client.healthCheck();
       expect(result).toBe(false);
