@@ -12,7 +12,11 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610500/calendar/12406500",
     "pricePerHour": "£20/hr",
-    "battleTags": ["Groovy", "Proxyimba", "groovyman12"],
+    "battleTags": [
+      "Groovy",
+      "Proxyimba",
+      "groovyman12"
+    ],
     "socialLinks": {}
   },
   {
@@ -28,7 +32,11 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610531/calendar/12406495",
     "pricePerHour": "£15/hr",
-    "battleTags": ["nicojuniba", "Mabadi", "GamerNico"],
+    "battleTags": [
+      "nicojuniba",
+      "Mabadi",
+      "GamerNico"
+    ],
     "socialLinks": {}
   },
   {
@@ -36,7 +44,7 @@
     "name": "gamerrichy",
     "displayName": "GamerRichy",
     "race": "all",
-    "bio": "Top grandmaster coach with 10+ years of coaching experience and a long history in the pro scene. Head coach of Ladder Legends who focuses on an individual bases and not just standard play. I enjoy helping people and participating in your development personally as well as in game. I have coached over 50+ players to grandmaster from as low an platinum league in my time.  ",
+    "bio": "Top grandmaster coach with 10+ years of coaching experience and a long history in the pro scene. Head coach of Ladder Legends who focuses on an individual basis and not just standard play. I enjoy helping people and participating in your development personally as well as in game. I have coached over 50+ players to grandmaster from as low an platinum league in my time.  ",
     "specialties": [
       "Multi-race coaching",
       "Matchup analysis",
@@ -50,7 +58,7 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/81934680/calendar/12364368?appointmentTypeIds[]=81934680",
     "pricePerHour": "£30/hr",
-    "battleTags": ["GamerRichy"],
+    "isActive": true,
     "socialLinks": {}
   },
   {
@@ -67,7 +75,9 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/82062409/calendar/12572587?appointmentTypeIds[]=82062409",
     "pricePerHour": "£25/hr",
-    "battleTags": ["Krystianer"],
+    "battleTags": [
+      "Krystianer"
+    ],
     "socialLinks": {}
   },
   {
@@ -83,7 +93,10 @@
     ],
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/84352373/calendar/12406706",
     "pricePerHour": "£10/hr",
-    "battleTags": ["EON", "EONs"],
+    "battleTags": [
+      "EON",
+      "EONs"
+    ],
     "socialLinks": {}
   },
   {
