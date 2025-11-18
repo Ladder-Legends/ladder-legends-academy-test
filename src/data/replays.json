@@ -791,5 +791,31 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "a93b6234-82db-4190-a3d1-4194cb63e225",
+    "title": "How/When to Suddenly Tech Switch",
+    "map": "Ultralove",
+    "matchup": "ZvP",
+    "player1": {
+      "name": "Groovy",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "Blade",
+      "race": "protoss",
+      "result": "loss"
+    },
+    "duration": "15:16",
+    "gameDate": "2025-09-22",
+    "uploadDate": "2025-11-18",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Ultralove%20%289%29-3LzWnuVI3xuRqcctRKoFTIjV8R1Fn3.SC2Replay",
+    "videoIds": [],
+    "coach": "groovy",
+    "tags": [],
+    "patch": "5.0.14.94137",
+    "notes": "",
+    "isFree": false
   }
 ]
