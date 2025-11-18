@@ -1251,8 +1251,7 @@
     "race": "zerg",
     "coach": "",
     "coachId": "",
-    "isFree": false,
-    "categories": []
+    "isFree": false
   },
   {
     "id": "0e9a28fa-9a18-42ca-97e5-535746ce403d",
