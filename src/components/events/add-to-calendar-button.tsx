@@ -1,7 +1,7 @@
 'use client';
 
 import { Event } from '@/types/event';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateGoogleCalendarUrl, downloadICalFile } from '@/lib/calendar';
 import { useState, useRef, useEffect } from 'react';
@@ -11,9 +11,17 @@ interface AddToCalendarButtonProps {
   event: Event;
   variant?: 'default' | 'ghost' | 'outline';
   size?: 'default' | 'sm' | 'lg' | 'icon';
+  isPremium?: boolean; // Is this premium content?
+  hasSubscriberRole?: boolean; // Does the user have subscriber access?
 }
 
-export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }: AddToCalendarButtonProps) {
+export function AddToCalendarButton({
+  event,
+  variant = 'outline',
+  size = 'sm',
+  isPremium = false,
+  hasSubscriberRole = false,
+}: AddToCalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,7 +68,14 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
     }
   }, [isOpen]);
 
+  // Check if calendar should be gated
+  const showPaywall = isPremium && !hasSubscriberRole;
+
   const handleGoogleCalendar = () => {
+    if (showPaywall) {
+      window.location.href = '/subscribe';
+      return;
+    }
     const url = generateGoogleCalendarUrl(event);
     console.log('Google Calendar URL:', url);
     window.open(url, '_blank');
@@ -68,6 +83,10 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
   };
 
   const handleICalDownload = () => {
+    if (showPaywall) {
+      window.location.href = '/subscribe';
+      return;
+    }
     downloadICalFile(event);
     setIsOpen(false);
   };
@@ -101,15 +120,26 @@ export function AddToCalendarButton({ event, variant = 'outline', size = 'sm' }:
         ref={buttonRef}
         variant={variant}
         size={size}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (showPaywall) {
+            window.location.href = '/subscribe';
+          } else {
+            setIsOpen(!isOpen);
+          }
+        }}
         className="flex items-center gap-1"
+        title={showPaywall ? 'Subscribe to add events to your calendar' : 'Add to Calendar'}
       >
-        <Calendar className="h-4 w-4" />
+        {showPaywall ? (
+          <Lock className="h-4 w-4" />
+        ) : (
+          <Calendar className="h-4 w-4" />
+        )}
         <span className="hidden sm:inline">Add to Calendar</span>
-        <ChevronDown className="h-3 w-3" />
+        {!showPaywall && <ChevronDown className="h-3 w-3" />}
       </Button>
 
-      {mounted && dropdownContent && createPortal(dropdownContent, document.body)}
+      {mounted && !showPaywall && dropdownContent && createPortal(dropdownContent, document.body)}
     </>
   );
 }

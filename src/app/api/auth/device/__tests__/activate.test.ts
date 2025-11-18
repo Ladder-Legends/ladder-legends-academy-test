@@ -72,7 +72,7 @@ describe('POST /api/auth/device/activate', () => {
   });
 
   it('should return 401 if user is not logged in', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as any);
 
     const mockRequest = new NextRequest('http://localhost:3000/api/auth/device/activate', {
       method: 'POST',

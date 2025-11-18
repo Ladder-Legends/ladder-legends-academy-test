@@ -14,6 +14,7 @@ import { DidYouKnow } from '@/components/coaches/did-you-know';
 import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { CoachEditModal } from '@/components/admin/coach-edit-modal';
+import { ShareDialog } from '@/components/social/share-dialog';
 import type { Video } from '@/types/video';
 import type { Replay } from '@/types/replay';
 import type { BuildOrder } from '@/types/build-order';
@@ -90,9 +91,14 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
         <div className="max-w-7xl mx-auto">
           {/* Coach Header */}
           <div className="mb-8 relative">
-            {/* Edit Button */}
-            <PermissionGate require="coaches">
-              <div className="absolute top-0 right-0">
+            {/* Share and Edit Buttons */}
+            <div className="absolute top-0 right-0 flex items-center gap-2">
+              <ShareDialog
+                url={`/coaches/${coach.id}`}
+                title={coach.displayName}
+                description={coach.bio}
+              />
+              <PermissionGate require="coaches">
                 <Button
                   onClick={() => setIsCoachEditModalOpen(true)}
                   variant="secondary"
@@ -102,8 +108,8 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
                   <Edit className="h-4 w-4" />
                   Edit Coach
                 </Button>
-              </div>
-            </PermissionGate>
+              </PermissionGate>
+            </div>
 
             <div className="mb-6">
               <h1 className="text-4xl font-bold mb-2">{coach.displayName}</h1>

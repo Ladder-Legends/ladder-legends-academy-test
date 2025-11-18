@@ -154,7 +154,11 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
       sortable: false,
       render: (event) => (
         <div className="flex items-center gap-2">
-          <AddToCalendarButton event={event} />
+          <AddToCalendarButton
+            event={event}
+            isPremium={!event.isFree}
+            hasSubscriberRole={hasSubscriberRole}
+          />
           <Link href={`/events/${event.id}`}>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
               View

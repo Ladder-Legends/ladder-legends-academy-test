@@ -6,11 +6,13 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Replay } from '@/types/replay';
-import { Download, ArrowLeft, Calendar, Clock, Map, Edit, Trash2, FileText } from 'lucide-react';
+import { Download, ArrowLeft, Calendar, Clock, Map, Edit, Trash2, FileText, Lock } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { ShareDialog } from '@/components/social/share-dialog';
 import videosData from '@/data/videos.json';
 import buildOrdersData from '@/data/build-orders.json';
 import { Video as VideoType } from '@/types/video';
@@ -18,6 +20,7 @@ import { BuildOrder } from '@/types/build-order';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
+import { SoftPaywallOverlay } from '@/components/paywall/soft-paywall-overlay';
 
 interface ReplayDetailClientProps {
   replay: Replay;
@@ -27,6 +30,12 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const allVideos = videosData as VideoType[];
   const allBuildOrders = buildOrdersData as BuildOrder[];
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  // Determine if paywall should be shown
+  const isPremiumContent = !replay.isFree;
+  const showPaywall = isPremiumContent && !hasSubscriberRole;
 
   // Look up videos from videoIds
   const replayVideos = replay.videoIds && replay.videoIds.length > 0
@@ -92,29 +101,38 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                 Back to Replays
               </Link>
 
-              {/* Admin Actions */}
-              <PermissionGate require="coaches">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </PermissionGate>
+              <div className="flex items-center gap-2">
+                {/* Share Button */}
+                <ShareDialog
+                  url={`/replays/${replay.id}`}
+                  title={replay.title}
+                  description={replay.notes || `${replay.matchup} on ${replay.map}`}
+                />
+
+                {/* Admin Actions */}
+                <PermissionGate require="coaches">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </PermissionGate>
+              </div>
             </div>
 
             {/* Video Player and Playlist Layout (if videos exist) */}
@@ -122,11 +140,21 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
               <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
                 {/* Main Video Player Section */}
                 <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
-                  <VideoPlayer
-                    videos={replayVideos}
-                    currentVideoIndex={currentVideoIndex}
-                    isPlaylist={hasMultipleVideos}
-                  />
+                  <div className="relative">
+                    <VideoPlayer
+                      videos={replayVideos}
+                      currentVideoIndex={currentVideoIndex}
+                      isPlaylist={hasMultipleVideos}
+                      showPaywallPreview={showPaywall}
+                    />
+                    {/* Inline paywall overlay on video player */}
+                    <SoftPaywallOverlay
+                      show={showPaywall}
+                      title="Premium Replay"
+                      description="Subscribe to watch replay analysis from professional coaches."
+                      variant="inline"
+                    />
+                  </div>
                 </div>
 
                 {/* Playlist Sidebar (only shown for playlists) */}
@@ -147,13 +175,24 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
                 <h1 className="text-4xl font-bold">{replay.title}</h1>
                 <SubscriberBadge isFree={replay.isFree} />
                 {replay.downloadUrl && (
-                  <a
-                    href={`/api/replay-download?replayId=${replay.id}`}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Replay
-                  </a>
+                  showPaywall ? (
+                    <button
+                      onClick={() => window.location.href = '/subscribe'}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                      title="Subscribe to download replays"
+                    >
+                      <Lock className="h-4 w-4" />
+                      Download Replay
+                    </button>
+                  ) : (
+                    <a
+                      href={`/api/replay-download?replayId=${replay.id}`}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download Replay
+                    </a>
+                  )
                 )}
               </div>
 

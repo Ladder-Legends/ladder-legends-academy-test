@@ -65,8 +65,8 @@ describe('POST /api/auth/device/code', () => {
     // Use real uuid for this test
     const { v4 } = await import('uuid');
     vi.mocked(v4)
-      .mockReturnValueOnce('device-code-1')
-      .mockReturnValueOnce('device-code-2');
+      .mockReturnValueOnce('device-code-1' as any)
+      .mockReturnValueOnce('device-code-2' as any);
 
     const mockRequest1 = new NextRequest('http://localhost:3000/api/auth/device/code', {
       method: 'POST',

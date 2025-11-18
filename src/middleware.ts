@@ -33,19 +33,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Define detail page patterns that require subscription
-  const detailPagePatterns = [
-    /^\/library\/[^/]+$/,         // /library/:id (video pages)
-    /^\/build-orders\/[^/]+$/,    // /build-orders/:id
-    /^\/replays\/[^/]+$/,         // /replays/:id
-    /^\/masterclasses\/[^/]+$/,   // /masterclasses/:id
-    /^\/events\/[^/]+$/,          // /events/:id
-  ];
-
-  const isDetailPage = detailPagePatterns.some(pattern => pattern.test(pathname));
-
-  // Only check auth for detail pages and admin routes
-  if (isDetailPage || pathname.startsWith("/admin")) {
+  // Admin routes require authentication
+  // Detail pages now use soft paywall (no redirect, handled client-side)
+  if (pathname.startsWith("/admin")) {
     const session = await auth();
 
     if (!session) {

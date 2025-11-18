@@ -10,6 +10,7 @@ interface VideoPlayerProps {
   currentVideoIndex: number;
   isPlaylist: boolean;
   className?: string;
+  showPaywallPreview?: boolean; // Show blurred preview for premium content
 }
 
 /**
@@ -28,7 +29,7 @@ interface VideoPlayerProps {
  * // Playlist
  * <VideoPlayer videos={playlistVideos} currentVideoIndex={2} isPlaylist={true} />
  */
-export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className = '' }: VideoPlayerProps) {
+export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className = '', showPaywallPreview = false }: VideoPlayerProps) {
   const { data: session } = useSession();
   const currentVideo = videos[currentVideoIndex];
 
@@ -36,6 +37,9 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
   const viewerUserId = session?.user?.discordId ?? undefined;
   const viewerUserName = session?.user?.name ?? undefined;
   const viewerIsSubscriber = session?.user?.hasSubscriberRole ?? false;
+
+  // Determine if current video is premium
+  const isPremium = !currentVideo?.isFree;
 
   // No video available
   if (!currentVideo) {
@@ -57,6 +61,8 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
               viewerUserId={viewerUserId}
               viewerUserName={viewerUserName}
               viewerIsSubscriber={viewerIsSubscriber}
+              isPremium={isPremium}
+              showPaywallPreview={showPaywallPreview}
             />
           ) : (
             <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">
@@ -98,6 +104,8 @@ export function VideoPlayer({ videos, currentVideoIndex, isPlaylist, className =
             viewerUserId={viewerUserId}
             viewerUserName={viewerUserName}
             viewerIsSubscriber={viewerIsSubscriber}
+            isPremium={isPremium}
+            showPaywallPreview={showPaywallPreview}
           />
         ) : (
           <div className="aspect-video bg-black/10 rounded-lg flex items-center justify-center">

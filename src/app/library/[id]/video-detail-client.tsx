@@ -19,12 +19,14 @@ import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { toast } from 'sonner';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { ShareDialog } from '@/components/social/share-dialog';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 import { BuildOrder } from '@/types/build-order';
 import { Replay } from '@/types/replay';
 import { Masterclass } from '@/types/masterclass';
+import { SoftPaywallOverlay } from '@/components/paywall/soft-paywall-overlay';
 
 interface VideoDetailClientProps {
   video: Video;
@@ -37,6 +39,10 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  // Determine if paywall should be shown
+  const isPremiumContent = !video.isFree;
+  const showPaywall = isPremiumContent && !hasSubscriberRole;
 
   const videoIsPlaylist = isPlaylist(video);
 
@@ -99,8 +105,13 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
-      console.log('Delete video:', video.id);
-      // The actual delete would be handled by the modal/CMS system
+      addChange({
+        id: video.id,
+        contentType: 'videos',
+        operation: 'delete',
+        data: video as unknown as Record<string, unknown>,
+      });
+      toast.success('Video marked for deletion (pending commit)');
     }
   };
 
@@ -149,29 +160,39 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
                 Back to Library
               </Link>
 
-              {/* Admin Actions */}
-              <PermissionGate require="coaches">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </PermissionGate>
+              <div className="flex items-center gap-2">
+                {/* Share Button */}
+                <ShareDialog
+                  url={`/library/${video.id}`}
+                  title={videoIsPlaylist ? currentVideo?.title || video.title : video.title}
+                  description={videoIsPlaylist ? currentVideo?.description || video.description : video.description}
+                  imageUrl={videoIsPlaylist ? currentVideo?.thumbnail || video.thumbnail : video.thumbnail}
+                />
+
+                {/* Admin Actions */}
+                <PermissionGate require="coaches">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </PermissionGate>
+              </div>
             </div>
 
             {/* Video Player and Playlist Layout */}
@@ -179,11 +200,21 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
               {/* Main Video Player Section */}
               <div className={videoIsPlaylist ? 'lg:col-span-3' : ''}>
                 {/* Video Player */}
-                <VideoPlayer
-                  videos={playlistVideos}
-                  currentVideoIndex={currentVideoIndex}
-                  isPlaylist={videoIsPlaylist}
-                />
+                <div className="relative">
+                  <VideoPlayer
+                    videos={playlistVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    isPlaylist={videoIsPlaylist}
+                    showPaywallPreview={showPaywall}
+                  />
+                  {/* Inline paywall overlay on video player */}
+                  <SoftPaywallOverlay
+                    show={showPaywall}
+                    title="Premium Video"
+                    description="Subscribe to watch exclusive coaching videos from Grandmaster players."
+                    variant="inline"
+                  />
+                </div>
 
                 {/* Video Info */}
                 <div className="mt-6 space-y-4">

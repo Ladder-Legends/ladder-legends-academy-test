@@ -13,6 +13,9 @@ interface MuxVideoPlayerProps {
   viewerUserId?: string; // Discord ID or user identifier
   viewerUserName?: string; // Discord username
   viewerIsSubscriber?: boolean; // Subscriber status
+  // Paywall
+  isPremium?: boolean; // Is this premium content?
+  showPaywallPreview?: boolean; // Show blurred preview instead of player
 }
 
 interface CachedToken {
@@ -66,6 +69,8 @@ export function MuxVideoPlayer({
   viewerUserId,
   viewerUserName,
   viewerIsSubscriber,
+  isPremium = false,
+  showPaywallPreview = false,
 }: MuxVideoPlayerProps) {
   const [playbackToken, setPlaybackToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +79,15 @@ export function MuxVideoPlayer({
   // Use static thumbnail file for poster (downloaded at build time)
   const posterUrl = videoId ? `/thumbnails/${videoId}.jpg` : undefined;
 
+  // Determine if we should show the paywall preview
+  const shouldShowPaywall = showPaywallPreview && isPremium && !viewerIsSubscriber;
+
   useEffect(() => {
+    // Skip token fetching if showing paywall preview
+    if (shouldShowPaywall) {
+      setLoading(false);
+      return;
+    }
     // Check if we have a valid cached token first
     const getCachedToken = (): string | null => {
       try {
@@ -202,7 +215,24 @@ export function MuxVideoPlayer({
     };
 
     fetchTokens();
-  }, [playbackId]);
+  }, [playbackId, shouldShowPaywall]);
+
+  // Show static thumbnail for premium content without subscription
+  if (shouldShowPaywall) {
+    return (
+      <div className={`relative w-full aspect-video overflow-hidden bg-muted ${className}`}>
+        {posterUrl ? (
+          <img
+            src={posterUrl}
+            alt={title || 'Video thumbnail'}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+        )}
+      </div>
+    );
+  }
 
   if (loading) {
     return (

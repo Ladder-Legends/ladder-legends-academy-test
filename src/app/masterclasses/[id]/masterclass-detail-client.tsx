@@ -10,7 +10,9 @@ import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { ShareDialog } from '@/components/social/share-dialog';
 import { Video } from '@/types/video';
 import videosData from '@/data/videos.json';
 import { Replay, normalizeReplays } from '@/types/replay';
@@ -20,6 +22,7 @@ import buildOrdersData from '@/data/build-orders.json';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
+import { SoftPaywallOverlay } from '@/components/paywall/soft-paywall-overlay';
 
 interface MasterclassDetailClientProps {
   masterclass: Masterclass;
@@ -27,6 +30,12 @@ interface MasterclassDetailClientProps {
 
 export function MasterclassDetailClient({ masterclass }: MasterclassDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  // Determine if paywall should be shown
+  const isPremiumContent = !masterclass.isFree;
+  const showPaywall = isPremiumContent && !hasSubscriberRole;
 
   useTrackPageView({
     contentType: 'masterclass',
@@ -106,29 +115,38 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
                 Back to Masterclasses
               </Link>
 
-              {/* Admin Actions */}
-              <PermissionGate require="coaches">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </PermissionGate>
+              <div className="flex items-center gap-2">
+                {/* Share Button */}
+                <ShareDialog
+                  url={`/masterclasses/${masterclass.id}`}
+                  title={masterclass.title}
+                  description={masterclass.description}
+                />
+
+                {/* Admin Actions */}
+                <PermissionGate require="coaches">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </PermissionGate>
+              </div>
             </div>
 
             {/* Video Player and Playlist Layout */}
@@ -136,11 +154,21 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
               {/* Main Video Player Section */}
               <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
                 {/* Video Player */}
-                <VideoPlayer
-                  videos={masterclassVideos}
-                  currentVideoIndex={currentVideoIndex}
-                  isPlaylist={hasMultipleVideos}
-                />
+                <div className="relative">
+                  <VideoPlayer
+                    videos={masterclassVideos}
+                    currentVideoIndex={currentVideoIndex}
+                    isPlaylist={hasMultipleVideos}
+                    showPaywallPreview={showPaywall}
+                  />
+                  {/* Inline paywall overlay on video player */}
+                  <SoftPaywallOverlay
+                    show={showPaywall}
+                    title="Premium Masterclass"
+                    description="Subscribe to access exclusive masterclass content from professional coaches."
+                    variant="inline"
+                  />
+                </div>
 
                 {/* Masterclass Info */}
                 <div className="mt-6 space-y-4">

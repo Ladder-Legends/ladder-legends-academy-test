@@ -6,12 +6,14 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BuildOrder } from '@/types/build-order';
-import { ArrowLeft, Edit, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Download, Lock } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { ShareDialog } from '@/components/social/share-dialog';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
 import { Replay, normalizeReplays } from '@/types/replay';
@@ -19,6 +21,7 @@ import { Video } from '@/types/video';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
+import { SoftPaywallOverlay } from '@/components/paywall/soft-paywall-overlay';
 
 const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
 const allVideos = videosData as Video[];
@@ -29,6 +32,12 @@ interface BuildOrderDetailClientProps {
 
 export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
+
+  // Determine if paywall should be shown
+  const isPremiumContent = !buildOrder.isFree;
+  const showPaywall = isPremiumContent && !hasSubscriberRole;
 
   // Look up videos from videoIds
   const buildOrderVideos = buildOrder.videoIds && buildOrder.videoIds.length > 0
@@ -107,29 +116,38 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
                 Back to Build Orders
               </Link>
 
-              {/* Admin Actions */}
-              <PermissionGate require="coaches">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </PermissionGate>
+              <div className="flex items-center gap-2">
+                {/* Share Button */}
+                <ShareDialog
+                  url={`/build-orders/${buildOrder.id}`}
+                  title={buildOrder.name}
+                  description={buildOrder.description}
+                />
+
+                {/* Admin Actions */}
+                <PermissionGate require="coaches">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </PermissionGate>
+              </div>
             </div>
 
             {/* Video Player and Playlist Layout (if videos exist) */}
@@ -137,11 +155,21 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
               <div className={hasMultipleVideos ? 'grid lg:grid-cols-4 gap-6' : ''}>
                 {/* Main Video Player Section */}
                 <div className={hasMultipleVideos ? 'lg:col-span-3' : ''}>
-                  <VideoPlayer
-                    videos={buildOrderVideos}
-                    currentVideoIndex={currentVideoIndex}
-                    isPlaylist={hasMultipleVideos}
-                  />
+                  <div className="relative">
+                    <VideoPlayer
+                      videos={buildOrderVideos}
+                      currentVideoIndex={currentVideoIndex}
+                      isPlaylist={hasMultipleVideos}
+                      showPaywallPreview={showPaywall}
+                    />
+                    {/* Inline paywall overlay on video player */}
+                    <SoftPaywallOverlay
+                      show={showPaywall}
+                      title="Premium Build Order"
+                      description="Subscribe to watch video guides for this build order."
+                      variant="inline"
+                    />
+                  </div>
                 </div>
 
                 {/* Playlist Sidebar (only shown for playlists) */}
@@ -162,13 +190,24 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
                 <h1 className="text-4xl font-bold">{buildOrder.name}</h1>
                 <SubscriberBadge isFree={buildOrder.isFree} />
                 {linkedReplay?.downloadUrl && (
-                  <a
-                    href={`/api/replay-download?replayId=${linkedReplay.id}`}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Replay
-                  </a>
+                  showPaywall ? (
+                    <button
+                      onClick={() => window.location.href = '/subscribe'}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                      title="Subscribe to download replays"
+                    >
+                      <Lock className="h-4 w-4" />
+                      Download Replay
+                    </button>
+                  ) : (
+                    <a
+                      href={`/api/replay-download?replayId=${linkedReplay.id}`}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium ml-auto"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download Replay
+                    </a>
+                  )
                 )}
               </div>
 
@@ -225,7 +264,7 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
 
 
             {/* Build Order Steps */}
-            <div className="border border-border rounded-lg p-6 bg-card">
+            <div className="border border-border rounded-lg p-6 bg-card relative">
               <h2 className="text-xl font-semibold mb-4">Build Order Steps</h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -252,6 +291,13 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
                   </tbody>
                 </table>
               </div>
+              {/* Inline paywall overlay on build order table */}
+              <SoftPaywallOverlay
+                show={showPaywall}
+                title="Premium Build Order"
+                description="Subscribe to view detailed step-by-step build order instructions."
+                variant="inline"
+              />
             </div>
 
             {/* Tags */}

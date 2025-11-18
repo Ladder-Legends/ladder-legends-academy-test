@@ -3,7 +3,7 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
-import { ShareButtons } from '@/components/social/share-buttons';
+import { ShareDialog } from '@/components/social/share-dialog';
 import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { SubscriberBadge } from '@/components/subscriber-badge';
 import { EventDateDisplay } from '@/components/events/event-date-display';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { useSession } from 'next-auth/react';
 
 interface Coach {
   id: string;
@@ -35,7 +36,12 @@ interface EventDetailClientProps {
 
 export function EventDetailClient({ event, coach }: EventDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const status = getEventStatus(event);
+
+  // Determine if event is premium
+  const isPremiumContent = !event.isFree;
 
   useTrackPageView({
     contentType: 'event',
@@ -124,12 +130,18 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
                   <SubscriberBadge isFree={event.isFree} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <ShareButtons
+                  <ShareDialog
                     url={`/events/${event.id}`}
                     title={event.title}
                     description={event.description.slice(0, 160)}
                   />
-                  <AddToCalendarButton event={event} variant="default" size="default" />
+                  <AddToCalendarButton
+                    event={event}
+                    variant="default"
+                    size="default"
+                    isPremium={isPremiumContent}
+                    hasSubscriberRole={hasSubscriberRole}
+                  />
                 </div>
               </div>
 
