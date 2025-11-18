@@ -54,18 +54,22 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('[DEVICE AUTH] session.user:', session.user);
-    console.log('[DEVICE AUTH] session.user.discordId:', (session.user as any).discordId);
+
+    // Type assertion for session user with discordId
+    const userWithDiscordId = session.user as { discordId?: string; name?: string | null; email?: string | null; image?: string | null };
+    const discordId = userWithDiscordId.discordId || '';
+    console.log('[DEVICE AUTH] session.user.discordId:', discordId);
 
     // Create updated code with proper Date objects
     const updatedCode = {
       ...code,
       status: 'authorized' as const,
-      user_id: (session.user as any).discordId, // Use discordId, not id
+      user_id: discordId, // Use discordId, not id
       authorized_at: new Date(),
       created_at: new Date(code.created_at),
       expires_at: new Date(code.expires_at),
       user_data: {
-        id: (session.user as any).discordId, // Use discordId, not id
+        id: discordId, // Use discordId, not id
         username: session.user.name || session.user.email || 'Unknown User',
         avatar_url: session.user.image || '',
       },

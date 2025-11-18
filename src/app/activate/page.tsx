@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSession, signIn } from 'next-auth/react';
@@ -8,7 +8,7 @@ import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function ActivatePage() {
+function ActivateContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const [code, setCode] = useState('');
@@ -46,8 +46,8 @@ export default function ActivatePage() {
       }
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -139,7 +139,7 @@ export default function ActivatePage() {
                     ✓ Next Step
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Return to the app and click <strong>"Check Authorization"</strong> to complete the process.
+                    Return to the app and click <strong>&quot;Check Authorization&quot;</strong> to complete the process.
                   </p>
                 </div>
               </div>
@@ -255,7 +255,7 @@ export default function ActivatePage() {
 
           <div className="space-y-2 text-center text-sm text-muted-foreground">
             <p>
-              Don't have the app yet?{' '}
+              Don&apos;t have the app yet?{' '}
               <Link href="/download" className="text-foreground hover:underline">
                 Download here
               </Link>
@@ -271,5 +271,20 @@ export default function ActivatePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ActivatePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ActivateContent />
+    </Suspense>
   );
 }
