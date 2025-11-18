@@ -75,13 +75,26 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
   const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
   const allMasterclasses = masterclassesData as Masterclass[];
 
-  const relatedBuildOrders = allBuildOrders.filter(bo =>
-    bo.videoIds && bo.videoIds.includes(video.id)
-  );
-
+  // Find replays that reference this video
   const relatedReplays = allReplays.filter(replay =>
     replay.videoIds && replay.videoIds.includes(video.id)
   );
+
+  // Find build orders that reference this video OR build orders linked to replays that reference this video
+  const relatedBuildOrders = allBuildOrders.filter(bo => {
+    // Direct video link
+    if (bo.videoIds && bo.videoIds.includes(video.id)) {
+      return true;
+    }
+    // Indirect link via replay
+    if (bo.replayId) {
+      const linkedReplay = relatedReplays.find(r => r.id === bo.replayId);
+      if (linkedReplay) {
+        return true;
+      }
+    }
+    return false;
+  });
 
   const relatedMasterclasses = allMasterclasses.filter(mc =>
     mc.videoIds && mc.videoIds.includes(video.id)

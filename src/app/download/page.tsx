@@ -17,11 +17,11 @@ export default function DownloadPage() {
     // Check authentication and authorization - download restricted to Coach/Owner only
     if (status === 'loading') return;
 
-    if (!session) {
+    if (!session || !session.user) {
       router.push('/login?callbackUrl=/download');
     } else {
       // Check if user is Coach or Owner only
-      const isCoachOrOwner = session.user?.role === 'Coach' || session.user?.role === 'Owner';
+      const isCoachOrOwner = session.user.role === 'Coach' || session.user.role === 'Owner';
 
       if (!isCoachOrOwner) {
         router.push('/subscribe?feature=uploader');
@@ -39,9 +39,13 @@ export default function DownloadPage() {
   }
 
   // Block access if not Coach or Owner
-  const isCoachOrOwner = session.user?.role === 'Coach' || session.user?.role === 'Owner';
+  if (!session || !session.user) {
+    return null;
+  }
 
-  if (!session || !isCoachOrOwner) {
+  const isCoachOrOwner = session.user.role === 'Coach' || session.user.role === 'Owner';
+
+  if (!isCoachOrOwner) {
     return null;
   }
   return (

@@ -37,12 +37,16 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const isPremiumContent = !replay.isFree;
   const showPaywall = isPremiumContent && !hasSubscriberRole;
 
-  // Look up videos from videoIds
+  // Look up videos from videoIds and sort so attached videos appear first
   const replayVideos = replay.videoIds && replay.videoIds.length > 0
-    ? replay.videoIds.map(videoId =>
-        allVideos.find(v => v.id === videoId)
-      ).filter(Boolean) as VideoType[]
+    ? replay.videoIds
+        .map(videoId => allVideos.find(v => v.id === videoId))
+        .filter(Boolean) as VideoType[]
     : [];
+
+  // Sort videos: those explicitly attached to this replay (via replay.videoIds) come first
+  // This is already sorted by the order in replay.videoIds, which is what we want
+  // The videos are already in the order they were added to the replay
 
   // Find related build order (if this replay is linked to a build order)
   const relatedBuildOrder = allBuildOrders.find(bo => bo.replayId === replay.id);

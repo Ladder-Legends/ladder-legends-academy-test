@@ -243,13 +243,13 @@ export default function MyReplaysPage() {
   }
 
   // Check authentication
-  if (!session) {
+  if (!session || !session.user) {
     router.push('/login?callbackUrl=/my-replays');
     return null;
   }
 
   // Check if user is Coach or Owner only (my-replays restricted to coaches)
-  const isCoachOrOwner = session.user?.role === 'Coach' || session.user?.role === 'Owner';
+  const isCoachOrOwner = session.user.role === 'Coach' || session.user.role === 'Owner';
 
   if (!isCoachOrOwner) {
     router.push('/subscribe?feature=my-replays');

@@ -53,12 +53,20 @@ export function VideoSelector({
 
   const filteredVideos = useMemo(() => {
     if (!searchQuery.trim()) return allVideos;
-    const query = searchQuery.toLowerCase();
-    return allVideos.filter(v =>
-      v.title.toLowerCase().includes(query) ||
-      v.description?.toLowerCase().includes(query) ||
-      v.coach?.toLowerCase().includes(query)
-    );
+    const query = searchQuery.toLowerCase().trim();
+
+    // Split query into words and search for each word separately
+    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+
+    return allVideos.filter(v => {
+      const title = v.title.toLowerCase();
+      const description = v.description?.toLowerCase() || '';
+      const coach = v.coach?.toLowerCase() || '';
+      const searchText = `${title} ${description} ${coach}`;
+
+      // Check if all query words are present in the combined search text
+      return queryWords.every(word => searchText.includes(word));
+    });
   }, [searchQuery, allVideos]);
 
   const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
