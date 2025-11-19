@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 import { PATCH } from '../route';
 import type { UserSettings } from '@/lib/replay-types';
 
@@ -46,7 +47,7 @@ describe('Settings API - Backwards Compatibility', () => {
     mockGetUserSettings.mockResolvedValue(oldSettings);
     mockUpdateUserSettings.mockResolvedValue(undefined);
 
-    const request = new Request('http://localhost:3000/api/settings', {
+    const request = new NextRequest('http://localhost:3000/api/settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ describe('Settings API - Backwards Compatibility', () => {
     mockGetUserSettings.mockResolvedValue(oldSettings);
     mockUpdateUserSettings.mockResolvedValue(undefined);
 
-    const request = new Request('http://localhost:3000/api/settings', {
+    const request = new NextRequest('http://localhost:3000/api/settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -124,7 +125,7 @@ describe('Settings API - Backwards Compatibility', () => {
     mockGetUserSettings.mockResolvedValue(settings);
     mockUpdateUserSettings.mockResolvedValue(undefined);
 
-    const request = new Request('http://localhost:3000/api/settings', {
+    const request = new NextRequest('http://localhost:3000/api/settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -160,7 +161,7 @@ describe('Settings API - Backwards Compatibility', () => {
     mockGetUserSettings.mockResolvedValue(settings);
     mockUpdateUserSettings.mockResolvedValue(undefined);
 
-    const request = new Request('http://localhost:3000/api/settings', {
+    const request = new NextRequest('http://localhost:3000/api/settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -194,7 +195,7 @@ describe('Settings API - Backwards Compatibility', () => {
     });
     mockUpdateUserSettings.mockResolvedValue(undefined);
 
-    const request = new Request('http://localhost:3000/api/settings', {
+    const request = new NextRequest('http://localhost:3000/api/settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

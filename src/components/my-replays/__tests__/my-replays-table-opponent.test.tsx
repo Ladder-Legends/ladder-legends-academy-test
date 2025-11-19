@@ -50,6 +50,7 @@ describe('MyReplaysTable - Opponent Column', () => {
         opponent_race: 'Zerg',
         game_type: '1v1',
         category: 'Ladder',
+        game_date: '2025-11-19',
       },
       timings: {},
       sequences: {

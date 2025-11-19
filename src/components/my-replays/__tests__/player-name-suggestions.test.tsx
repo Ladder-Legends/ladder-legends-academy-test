@@ -51,7 +51,7 @@ describe('Player Name Suggestions', () => {
 
   it('should show player name suggestion after 3 replays from same player', async () => {
     // Mock API responses
-    (global.fetch as vi.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -94,7 +94,7 @@ describe('Player Name Suggestions', () => {
   });
 
   it('should not show suggestion for player names with less than 3 occurrences', async () => {
-    (global.fetch as vi.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -130,7 +130,7 @@ describe('Player Name Suggestions', () => {
   });
 
   it('should not show suggestion for already confirmed player names', async () => {
-    (global.fetch as vi.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -167,7 +167,7 @@ describe('Player Name Suggestions', () => {
   });
 
   it('should show suggestion with highest count when multiple candidates exist', async () => {
-    (global.fetch as vi.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -208,7 +208,7 @@ describe('Player Name Suggestions', () => {
     const user = userEvent.setup();
     let fetchCallCount = 0;
 
-    (global.fetch as vi.Mock).mockImplementation(() => {
+    (global.fetch as any).mockImplementation(() => {
       fetchCallCount++;
 
       // First two calls: initial load (replays + settings)
@@ -288,7 +288,7 @@ describe('Player Name Suggestions', () => {
     const user = userEvent.setup();
     let fetchCallCount = 0;
 
-    (global.fetch as vi.Mock).mockImplementation(() => {
+    (global.fetch as any).mockImplementation(() => {
       fetchCallCount++;
 
       if (fetchCallCount === 1) {

@@ -39,6 +39,7 @@ describe('MyReplaysTable - Matchup Normalization', () => {
         opponent_race: opponentRace,
         game_type: '1v1',
         category: 'Ladder',
+        game_date: '2025-11-19',
       },
       timings: {},
       sequences: {
