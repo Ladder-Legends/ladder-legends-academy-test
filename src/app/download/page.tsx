@@ -59,7 +59,7 @@ export default function DownloadPage() {
       </div>
 
       {/* Download Cards */}
-      <div className="grid md:grid-cols-2 gap-6 mb-12">
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* macOS */}
         <Card>
           <CardHeader>
@@ -128,6 +128,74 @@ export default function DownloadPage() {
                 <li>Click &quot;Run anyway&quot;</li>
                 <li>Follow the installation wizard</li>
               </ol>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* What the Uploader Does + After Installing (Side by Side) */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Features */}
+        <Card>
+          <CardHeader>
+            <CardTitle>What the Uploader Does</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">✓</span>
+                <span>Automatically detects your StarCraft 2 replay folder</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">✓</span>
+                <span>Uploads new replays instantly after each game</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">✓</span>
+                <span>Runs quietly in the background (menu bar/system tray)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">✓</span>
+                <span>Optional: Start automatically when you log in</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">✓</span>
+                <span>Secure device code authentication (no password needed)</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Next Steps */}
+        <Card>
+          <CardHeader>
+            <CardTitle>After Installing</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
+              <li>
+                Launch the Ladder Legends Uploader app
+              </li>
+              <li>
+                You&apos;ll see an activation code - keep the app open
+              </li>
+              <li>
+                <Link href="/activate" className="text-primary hover:underline">
+                  Go to the activation page
+                </Link>{' '}
+                and enter your code
+              </li>
+              <li>
+                The app will start uploading your replays automatically!
+              </li>
+            </ol>
+
+            <div className="pt-4 mt-6 border-t">
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/activate">
+                  Already installed? Activate your app →
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -221,71 +289,6 @@ export default function DownloadPage() {
                 This warning appears because the app doesn&apos;t have an EV Code Signing certificate ($300/year).
               </p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Features */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>What the Uploader Does</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">✓</span>
-              <span>Automatically detects your StarCraft 2 replay folder</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">✓</span>
-              <span>Uploads new replays instantly after each game</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">✓</span>
-              <span>Runs quietly in the background (menu bar/system tray)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">✓</span>
-              <span>Optional: Start automatically when you log in</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">✓</span>
-              <span>Secure device code authentication (no password needed)</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Next Steps */}
-      <Card>
-        <CardHeader>
-          <CardTitle>After Installing</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-            <li>
-              Launch the Ladder Legends Uploader app
-            </li>
-            <li>
-              You&apos;ll see an activation code - keep the app open
-            </li>
-            <li>
-              <Link href="/activate" className="text-primary hover:underline">
-                Go to the activation page
-              </Link>{' '}
-              and enter your code
-            </li>
-            <li>
-              The app will start uploading your replays automatically!
-            </li>
-          </ol>
-
-          <div className="pt-4 mt-6 border-t">
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/activate">
-                Already installed? Activate your app →
-              </Link>
-            </Button>
           </div>
         </CardContent>
       </Card>

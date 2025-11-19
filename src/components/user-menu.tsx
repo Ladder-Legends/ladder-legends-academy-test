@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
-import { LogOut, User, LogIn, Activity, CreditCard, Settings } from "lucide-react";
+import { LogOut, User, LogIn, Activity, CreditCard, Settings, Download, FileText } from "lucide-react";
 import Link from "next/link";
-import { isOwner } from "@/lib/permissions";
+import { isOwner, isCoach } from "@/lib/permissions";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -71,6 +71,7 @@ export function UserMenu() {
   const userName = session.user.name || session.user.email || 'User';
   const isSubscribed = session.user.hasSubscriberRole;
   const isAdmin = isOwner(session);
+  const isCoachOrOwner = isCoach(session);
 
   return (
     <DropdownMenu
@@ -105,6 +106,24 @@ export function UserMenu() {
             <DropdownMenuItem>
               <Activity className="w-4 h-4 mr-2" />
               Checkup
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
+        </>
+      )}
+
+      {isCoachOrOwner && (
+        <>
+          <Link href="/my-replays">
+            <DropdownMenuItem>
+              <FileText className="w-4 h-4 mr-2" />
+              My Replays
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/download">
+            <DropdownMenuItem>
+              <Download className="w-4 h-4 mr-2" />
+              Download
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
