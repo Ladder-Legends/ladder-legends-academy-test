@@ -133,19 +133,22 @@ export interface UserReplayData {
   discord_user_id: string;
   uploaded_at: string; // ISO timestamp
   filename: string;
-  
+
+  // Game type from uploader (1v1-ladder, 1v1-private, 2v2-ladder, etc.)
+  game_type?: string;
+
   // Optional target build (if user selected one)
   target_build_id?: string;
-  
+
   // Detection result
   detection: BuildDetection | null;
-  
+
   // Comparison result (if target_build_id is set)
   comparison: ComparisonResult | null;
-  
+
   // Full fingerprint
   fingerprint: ReplayFingerprint;
-  
+
   // User notes
   notes?: string;
   tags?: string[];

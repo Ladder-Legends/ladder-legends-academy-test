@@ -76,6 +76,23 @@ const defaultConfig: SC2ReplayAPIConfig = {
 };
 
 /**
+ * Timeout duration for API calls (30 seconds)
+ */
+const API_TIMEOUT_MS = 30000;
+
+/**
+ * Helper to add timeout to promises
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${operation} timed out after ${timeoutMs}ms`)), timeoutMs)
+    ),
+  ]);
+}
+
+/**
  * Client for SC2 Replay Analyzer API
  */
 export class SC2ReplayAPIClient {
@@ -168,13 +185,17 @@ export class SC2ReplayAPIClient {
     }
 
     try {
-      const response = await fetch(`${this.config.apiUrl}/fingerprint`, {
-        method: 'POST',
-        headers: {
-          'X-API-Key': this.config.apiKey,
-        },
-        body: formData,
-      });
+      const response = await withTimeout(
+        fetch(`${this.config.apiUrl}/fingerprint`, {
+          method: 'POST',
+          headers: {
+            'X-API-Key': this.config.apiKey,
+          },
+          body: formData,
+        }),
+        API_TIMEOUT_MS,
+        'Fingerprint extraction'
+      );
 
       if (!response.ok) {
         throw await this.handleError(response);
@@ -206,13 +227,17 @@ export class SC2ReplayAPIClient {
     }
 
     try {
-      const response = await fetch(`${this.config.apiUrl}/detect-build`, {
-        method: 'POST',
-        headers: {
-          'X-API-Key': this.config.apiKey,
-        },
-        body: formData,
-      });
+      const response = await withTimeout(
+        fetch(`${this.config.apiUrl}/detect-build`, {
+          method: 'POST',
+          headers: {
+            'X-API-Key': this.config.apiKey,
+          },
+          body: formData,
+        }),
+        API_TIMEOUT_MS,
+        'Build detection'
+      );
 
       if (!response.ok) {
         throw await this.handleError(response);
@@ -249,15 +274,19 @@ export class SC2ReplayAPIClient {
     }
 
     try {
-      const response = await fetch(
-        `${this.config.apiUrl}/compare?build_id=${encodeURIComponent(buildId)}`,
-        {
-          method: 'POST',
-          headers: {
-            'X-API-Key': this.config.apiKey,
-          },
-          body: formData,
-        }
+      const response = await withTimeout(
+        fetch(
+          `${this.config.apiUrl}/compare?build_id=${encodeURIComponent(buildId)}`,
+          {
+            method: 'POST',
+            headers: {
+              'X-API-Key': this.config.apiKey,
+            },
+            body: formData,
+          }
+        ),
+        API_TIMEOUT_MS,
+        'Build comparison'
       );
 
       if (!response.ok) {

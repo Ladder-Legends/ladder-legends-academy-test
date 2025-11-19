@@ -242,3 +242,27 @@ export async function getUserReplayStats(discordUserId: string) {
     avgExecutionScore: Math.round(avgExecutionScore * 10) / 10,
   };
 }
+
+/**
+ * Clear all replays for a user (for testing/reset)
+ */
+export async function clearUserReplays(discordUserId: string): Promise<number> {
+  try {
+    const replayIds = await getUserReplayIds(discordUserId);
+    const count = replayIds.length;
+
+    // Delete all replay data
+    for (const replayId of replayIds) {
+      await kv.del(KEYS.userReplay(discordUserId, replayId));
+    }
+
+    // Clear the replay IDs list
+    await kv.set(KEYS.userReplays(discordUserId), []);
+
+    console.log(`🗑️  Cleared ${count} replays for user ${discordUserId}`);
+    return count;
+  } catch (error) {
+    console.error('Error clearing replays:', error);
+    throw new Error('Failed to clear replays');
+  }
+}

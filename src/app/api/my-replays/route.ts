@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const targetBuildId = searchParams.get('target_build_id');
     const playerName = searchParams.get('player_name');
+    const gameType = searchParams.get('game_type');
 
     // Get file from form data
     const formData = await request.formData();
@@ -159,6 +160,7 @@ export async function POST(request: NextRequest) {
       discord_user_id: discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
+      game_type: gameType || undefined,
       target_build_id: targetBuildId || detection?.build_id,
       detection,
       comparison,

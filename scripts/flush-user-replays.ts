@@ -16,7 +16,7 @@ process.env.KV_REST_API_URL = process.env.UPSTASH_REDIS_KV_REST_API_URL;
 process.env.KV_REST_API_TOKEN = process.env.UPSTASH_REDIS_KV_REST_API_TOKEN;
 
 import { kv } from '@vercel/kv';
-import { del } from '@vercel/blob';
+import { del, list } from '@vercel/blob';
 import { UserReplayData } from '../src/lib/replay-types';
 
 const DISCORD_USER_ID = process.argv[2] || '161384451518103552'; // Default to your ID
@@ -106,10 +106,28 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
   await kv.set(KEYS.userReplays(discordUserId), []);
 
   console.log(`\n✅ Successfully flushed ${replayIds.length} replays from KV`);
+
+  // Delete hash manifest from Blob storage
+  console.log('\n🗑️  Deleting hash manifest...');
+  const manifestPath = `replay-hashes/${discordUserId}.json`;
+  try {
+    const { blobs } = await list({ prefix: manifestPath, limit: 1 });
+    if (blobs.length > 0) {
+      await del(blobs[0].url);
+      console.log('✅ Deleted hash manifest');
+    } else {
+      console.log('ℹ️  No hash manifest found');
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`⚠️  Could not delete hash manifest: ${message}`);
+  }
+
   console.log('');
   console.log('Summary:');
   console.log(`  - KV entries deleted: ${replayIds.length}`);
   console.log(`  - Blob files deleted: ${blobDeleteCount}`);
+  console.log(`  - Hash manifest: cleared`);
 }
 
 // Run the script
