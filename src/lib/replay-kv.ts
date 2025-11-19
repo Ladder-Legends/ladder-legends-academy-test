@@ -51,6 +51,8 @@ export async function createUserSettings(discordUserId: string): Promise<UserSet
     discord_user_id: discordUserId,
     default_race: null,
     favorite_builds: [],
+    confirmed_player_names: [],
+    possible_player_names: {},
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
