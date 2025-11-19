@@ -75,8 +75,16 @@ export function generatePlaylistMetadata({
   let displayThumbnail: string | null = null;
   let playlistContext = '';
 
+  // Check if the content itself is a Video (has youtubeId or muxPlaybackId)
+  const contentAsVideo = content as unknown as Video;
+  const isVideoContent = contentAsVideo.youtubeId || contentAsVideo.muxPlaybackId;
+
+  // If the content itself is a video, use its thumbnail
+  if (isVideoContent) {
+    displayThumbnail = getVideoThumbnailUrl(contentAsVideo, 'high');
+  }
   // For content with videos, check if a specific video is requested via ?v= query param
-  if (hasVideos && content.videoIds) {
+  else if (hasVideos && content.videoIds) {
     const vParam = searchParams.v;
     const videoIndex = typeof vParam === 'string' ? parseInt(vParam, 10) : 0;
 
