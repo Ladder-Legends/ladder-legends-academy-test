@@ -3936,19 +3936,631 @@
     "videoIds": [],
     "steps": [
       {
-        "supply": 0,
-        "action": ""
+        "supply": 13,
+        "time": "0:18",
+        "action": "Pylon"
+      },
+      {
+        "supply": 15,
+        "time": "0:37",
+        "action": "Gateway"
+      },
+      {
+        "supply": 16,
+        "time": "0:46",
+        "action": "Assimilator"
+      },
+      {
+        "supply": 17,
+        "time": "0:54",
+        "action": "Assimilator"
+      },
+      {
+        "supply": 18,
+        "time": "1:07",
+        "action": "Gateway"
+      },
+      {
+        "supply": 20,
+        "time": "1:24",
+        "action": "CyberneticsCore"
+      },
+      {
+        "supply": 21,
+        "time": "1:32",
+        "action": "Pylon"
+      },
+      {
+        "supply": 24,
+        "time": "2:08",
+        "action": "Pylon"
+      },
+      {
+        "supply": 24,
+        "time": "2:27",
+        "action": "Stalker"
+      },
+      {
+        "supply": 26,
+        "time": "2:27",
+        "action": "Stalker"
+      },
+      {
+        "supply": 28,
+        "time": "2:46",
+        "action": "Nexus"
+      },
+      {
+        "supply": 28,
+        "time": "2:50",
+        "action": "Sentry"
+      },
+      {
+        "supply": 30,
+        "time": "2:54",
+        "action": "Sentry"
+      },
+      {
+        "supply": 32,
+        "time": "2:54",
+        "action": "Pylon"
+      },
+      {
+        "supply": 33,
+        "time": "3:00",
+        "action": "Phoenix"
+      },
+      {
+        "supply": 35,
+        "time": "3:10",
+        "action": "TwilightCouncil"
+      },
+      {
+        "supply": 36,
+        "time": "3:19",
+        "action": "Sentry"
+      },
+      {
+        "supply": 38,
+        "time": "3:22",
+        "action": "ShieldBattery"
+      },
+      {
+        "supply": 40,
+        "time": "3:40",
+        "action": "Upgrade: WarpGateResearch"
+      },
+      {
+        "supply": 39,
+        "time": "3:50",
+        "action": "Adept"
+      },
+      {
+        "supply": 41,
+        "time": "3:50",
+        "action": "Adept"
+      },
+      {
+        "supply": 44,
+        "time": "3:54",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 44,
+        "time": "3:54",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 47,
+        "time": "4:15",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 47,
+        "time": "4:15",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 48,
+        "time": "4:18",
+        "action": "Stalker"
+      },
+      {
+        "supply": 50,
+        "time": "4:18",
+        "action": "Stalker"
+      },
+      {
+        "supply": 52,
+        "time": "4:31",
+        "action": "Gateway"
+      },
+      {
+        "supply": 51,
+        "time": "4:36",
+        "action": "RoboticsFacility"
+      },
+      {
+        "supply": 52,
+        "time": "4:43",
+        "action": "Stalker"
+      },
+      {
+        "supply": 54,
+        "time": "4:43",
+        "action": "Stalker"
+      },
+      {
+        "supply": 57,
+        "time": "4:54",
+        "action": "Pylon"
+      },
+      {
+        "supply": 57,
+        "time": "5:01",
+        "action": "Nexus"
+      },
+      {
+        "supply": 57,
+        "time": "5:06",
+        "action": "Phoenix"
+      },
+      {
+        "supply": 59,
+        "time": "5:12",
+        "action": "Stalker"
+      },
+      {
+        "supply": 61,
+        "time": "5:12",
+        "action": "Stalker"
+      },
+      {
+        "supply": 65,
+        "time": "5:21",
+        "action": "Pylon"
+      },
+      {
+        "supply": 66,
+        "time": "5:29",
+        "action": "Gateway"
+      },
+      {
+        "supply": 67,
+        "time": "5:32",
+        "action": "Upgrade: BlinkTech"
+      },
+      {
+        "supply": 67,
+        "time": "5:35",
+        "action": "Observer"
+      },
+      {
+        "supply": 68,
+        "time": "5:40",
+        "action": "Stalker"
+      },
+      {
+        "supply": 68,
+        "time": "5:45",
+        "action": "Stalker"
+      },
+      {
+        "supply": 72,
+        "time": "5:48",
+        "action": "Stalker"
+      },
+      {
+        "supply": 74,
+        "time": "6:09",
+        "action": "Forge"
+      },
+      {
+        "supply": 76,
+        "time": "6:10",
+        "action": "Assimilator"
+      },
+      {
+        "supply": 72,
+        "time": "6:20",
+        "action": "Observer"
+      },
+      {
+        "supply": 73,
+        "time": "6:31",
+        "action": "Gateway"
+      },
+      {
+        "supply": 73,
+        "time": "6:32",
+        "action": "Gateway"
+      },
+      {
+        "supply": 76,
+        "time": "6:37",
+        "action": "Pylon"
+      },
+      {
+        "supply": 76,
+        "time": "6:38",
+        "action": "Phoenix"
+      },
+      {
+        "supply": 81,
+        "time": "6:47",
+        "action": "TemplarArchive"
+      },
+      {
+        "supply": 81,
+        "time": "6:47",
+        "action": "Gateway"
+      },
+      {
+        "supply": 81,
+        "time": "6:48",
+        "action": "Gateway"
+      },
+      {
+        "supply": 82,
+        "time": "6:51",
+        "action": "Gateway"
+      },
+      {
+        "supply": 81,
+        "time": "6:57",
+        "action": "Adept"
+      },
+      {
+        "supply": 83,
+        "time": "6:57",
+        "action": "Adept"
+      },
+      {
+        "supply": 86,
+        "time": "7:01",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 86,
+        "time": "7:01",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 87,
+        "time": "7:05",
+        "action": "Gateway"
+      },
+      {
+        "supply": 87,
+        "time": "7:05",
+        "action": "Gateway"
+      },
+      {
+        "supply": 88,
+        "time": "7:13",
+        "action": "Pylon"
+      },
+      {
+        "supply": 89,
+        "time": "7:20",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 89,
+        "time": "7:20",
+        "action": "AdeptPhaseShift"
+      },
+      {
+        "supply": 89,
+        "time": "7:24",
+        "action": "Stalker"
+      },
+      {
+        "supply": 91,
+        "time": "7:24",
+        "action": "Stalker"
+      },
+      {
+        "supply": 89,
+        "time": "7:35",
+        "action": "Zealot"
+      },
+      {
+        "supply": 91,
+        "time": "7:35",
+        "action": "Zealot"
+      },
+      {
+        "supply": 89,
+        "time": "7:39",
+        "action": "Nexus"
+      },
+      {
+        "supply": 90,
+        "time": "7:44",
+        "action": "Zealot"
+      },
+      {
+        "supply": 92,
+        "time": "7:44",
+        "action": "Zealot"
+      },
+      {
+        "supply": 94,
+        "time": "7:44",
+        "action": "Zealot"
+      },
+      {
+        "supply": 96,
+        "time": "7:44",
+        "action": "Zealot"
+      },
+      {
+        "supply": 93,
+        "time": "7:55",
+        "action": "Pylon"
+      },
+      {
+        "supply": 93,
+        "time": "7:57",
+        "action": "HighTemplar"
+      },
+      {
+        "supply": 95,
+        "time": "7:57",
+        "action": "HighTemplar"
+      },
+      {
+        "supply": 97,
+        "time": "8:00",
+        "action": "Pylon"
+      },
+      {
+        "supply": 97,
+        "time": "8:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 99,
+        "time": "8:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 101,
+        "time": "8:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 103,
+        "time": "8:13",
+        "action": "Zealot"
+      },
+      {
+        "supply": 105,
+        "time": "8:13",
+        "action": "Zealot"
+      },
+      {
+        "supply": 107,
+        "time": "8:13",
+        "action": "Zealot"
+      },
+      {
+        "supply": 109,
+        "time": "8:13",
+        "action": "Zealot"
+      },
+      {
+        "supply": 111,
+        "time": "8:16",
+        "action": "WarpPrism"
+      },
+      {
+        "supply": 113,
+        "time": "8:16",
+        "action": "Archon"
+      },
+      {
+        "supply": 108,
+        "time": "8:19",
+        "action": "Zealot"
+      },
+      {
+        "supply": 110,
+        "time": "8:19",
+        "action": "Zealot"
+      },
+      {
+        "supply": 112,
+        "time": "8:25",
+        "action": "Pylon"
+      },
+      {
+        "supply": 112,
+        "time": "8:27",
+        "action": "Upgrade: ProtossGroundWeaponsLevel1"
+      },
+      {
+        "supply": 112,
+        "time": "8:30",
+        "action": "Zealot"
+      },
+      {
+        "supply": 114,
+        "time": "8:30",
+        "action": "Zealot"
+      },
+      {
+        "supply": 116,
+        "time": "8:30",
+        "action": "Zealot"
+      },
+      {
+        "supply": 118,
+        "time": "8:34",
+        "action": "Pylon"
+      },
+      {
+        "supply": 118,
+        "time": "8:42",
+        "action": "Upgrade: Charge"
+      },
+      {
+        "supply": 118,
+        "time": "8:42",
+        "action": "HighTemplar"
+      },
+      {
+        "supply": 120,
+        "time": "8:43",
+        "action": "Zealot"
+      },
+      {
+        "supply": 122,
+        "time": "8:43",
+        "action": "Zealot"
+      },
+      {
+        "supply": 124,
+        "time": "8:43",
+        "action": "Zealot"
+      },
+      {
+        "supply": 126,
+        "time": "8:43",
+        "action": "Zealot"
+      },
+      {
+        "supply": 126,
+        "time": "8:52",
+        "action": "Zealot"
+      },
+      {
+        "supply": 128,
+        "time": "8:52",
+        "action": "Zealot"
+      },
+      {
+        "supply": 130,
+        "time": "8:52",
+        "action": "Zealot"
+      },
+      {
+        "supply": 130,
+        "time": "8:55",
+        "action": "Zealot"
+      },
+      {
+        "supply": 132,
+        "time": "8:56",
+        "action": "Zealot"
+      },
+      {
+        "supply": 132,
+        "time": "8:57",
+        "action": "HighTemplar"
+      },
+      {
+        "supply": 128,
+        "time": "9:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 130,
+        "time": "9:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 132,
+        "time": "9:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 134,
+        "time": "9:05",
+        "action": "Zealot"
+      },
+      {
+        "supply": 134,
+        "time": "9:12",
+        "action": "Archon"
+      },
+      {
+        "supply": 126,
+        "time": "9:14",
+        "action": "Zealot"
+      },
+      {
+        "supply": 128,
+        "time": "9:14",
+        "action": "Zealot"
+      },
+      {
+        "supply": 130,
+        "time": "9:14",
+        "action": "Zealot"
+      },
+      {
+        "supply": 120,
+        "time": "9:22",
+        "action": "Zealot"
+      },
+      {
+        "supply": 122,
+        "time": "9:22",
+        "action": "Zealot"
+      },
+      {
+        "supply": 124,
+        "time": "9:22",
+        "action": "Zealot"
+      },
+      {
+        "supply": 118,
+        "time": "9:28",
+        "action": "Zealot"
+      },
+      {
+        "supply": 120,
+        "time": "9:28",
+        "action": "Zealot"
+      },
+      {
+        "supply": 122,
+        "time": "9:28",
+        "action": "Zealot"
+      },
+      {
+        "supply": 118,
+        "time": "9:33",
+        "action": "Zealot"
+      },
+      {
+        "supply": 120,
+        "time": "9:33",
+        "action": "Zealot"
+      },
+      {
+        "supply": 114,
+        "time": "9:39",
+        "action": "Zealot"
+      },
+      {
+        "supply": 116,
+        "time": "9:40",
+        "action": "Zealot"
+      },
+      {
+        "supply": 118,
+        "time": "9:40",
+        "action": "Zealot"
       }
     ],
     "tags": [],
-    "patch": "5.0.15",
-    "updatedAt": "2025-11-05",
+    "patch": "5.0.15.95299",
+    "updatedAt": "2025-11-19",
     "isFree": false,
-    "replayId": "8225f0a6-e432-4a37-9785-37308dfbdf2f",
-    "categories": [
-      "builds",
-      "matchups.pvp"
-    ]
+    "replayId": "8225f0a6-e432-4a37-9785-37308dfbdf2f"
   },
   {
     "id": "0683f0d3-5353-428f-a14d-b7864ca34809",
