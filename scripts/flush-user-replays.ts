@@ -17,6 +17,7 @@ process.env.KV_REST_API_TOKEN = process.env.UPSTASH_REDIS_KV_REST_API_TOKEN;
 
 import { kv } from '@vercel/kv';
 import { del } from '@vercel/blob';
+import { UserReplayData } from '../src/lib/replay-types';
 
 const DISCORD_USER_ID = process.argv[2] || '161384451518103552'; // Default to your ID
 const DRY_RUN = !process.argv.includes('--execute');
@@ -48,7 +49,7 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
   console.log('\n📥 Fetching replay data...');
   const replays = await Promise.all(
     replayIds.map(async (id) => {
-      const replay = await kv.get<any>(KEYS.userReplay(discordUserId, id));
+      const replay = await kv.get<UserReplayData>(KEYS.userReplay(discordUserId, id));
       return { id, replay };
     })
   );
@@ -85,9 +86,10 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
         console.log(`  Deleting: ${replay.filename}`);
         await del(blobUrl);
         blobDeleteCount++;
-      } catch (error: any) {
+      } catch (error) {
         // Blob might not exist, that's okay
-        console.log(`  ⚠️  Could not delete blob for ${replay.filename}: ${error.message}`);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.log(`  ⚠️  Could not delete blob for ${replay.filename}: ${message}`);
       }
     }
   }

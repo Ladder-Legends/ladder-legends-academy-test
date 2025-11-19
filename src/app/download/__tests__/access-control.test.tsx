@@ -28,8 +28,8 @@ describe('Download Page - Access Control', () => {
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
 
     // Dynamically import the page component
-    const module = await import('../page');
-    DownloadPage = module.default;
+    const pageModule = await import('../page');
+    DownloadPage = pageModule.default;
   });
 
   afterEach(() => {

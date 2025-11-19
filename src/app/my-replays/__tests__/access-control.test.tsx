@@ -31,8 +31,8 @@ describe('My Replays Page - Access Control', () => {
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
 
     // Dynamically import the page component
-    const module = await import('../page');
-    MyReplaysPage = module.default;
+    const pageModule = await import('../page');
+    MyReplaysPage = pageModule.default;
 
     // Mock fetch to return empty replays
     (global.fetch as any).mockResolvedValue({
