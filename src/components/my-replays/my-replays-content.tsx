@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { MyReplaysTable } from './my-replays-table';
-import { MyReplayCard } from './my-replay-card';
+import { MyReplaysOverview } from './my-replays-overview';
 import { UserReplayData } from '@/lib/replay-types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -228,7 +228,7 @@ export function MyReplaysContent() {
     />
   );
 
-  // Table content
+  // List content (table view)
   const tableContent = (
     <MyReplaysTable
       replays={sortedReplays}
@@ -236,17 +236,9 @@ export function MyReplaysContent() {
     />
   );
 
-  // Grid content
+  // Overview content (stats view)
   const gridContent = (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {sortedReplays.map((replay) => (
-        <MyReplayCard
-          key={replay.id}
-          replay={replay}
-          onDelete={confirmDelete}
-        />
-      ))}
-    </div>
+    <MyReplaysOverview replays={sortedReplays} />
   );
 
   return (
@@ -258,8 +250,12 @@ export function MyReplaysContent() {
         filterContent={filterContent}
         tableContent={tableContent}
         gridContent={gridContent}
-        defaultView="table"
+        defaultView="grid"
         showViewToggle={true}
+        gridLabel="Overview"
+        tableLabel="List"
+        gridIcon="chart"
+        tableIcon="list"
         filters={filters}
         searchQuery={searchQuery}
         selectedTags={[]}

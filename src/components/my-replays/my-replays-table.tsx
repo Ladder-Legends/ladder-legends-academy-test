@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { UserReplayData } from '@/lib/replay-types';
 import { Trash2, Trophy, TrendingUp, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ interface MyReplaysTableProps {
 }
 
 export function MyReplaysTable({ replays, onDelete }: MyReplaysTableProps) {
+  const router = useRouter();
   // Helper to format duration from seconds to MM:SS
   const formatDuration = (seconds: number | null): string => {
     if (!seconds) return '—';
@@ -201,5 +203,13 @@ export function MyReplaysTable({ replays, onDelete }: MyReplaysTableProps) {
     },
   ];
 
-  return <SortableTable columns={columns} items={replays} defaultSortField="gameDate" />;
+  return (
+    <SortableTable
+      columns={columns}
+      items={replays}
+      defaultSortField="gameDate"
+      onRowClick={(replay) => router.push(`/my-replays/${replay.id}`)}
+      getRowKey={(replay) => replay.id}
+    />
+  );
 }

@@ -25,6 +25,10 @@ interface FilterableContentLayoutProps {
   pageKey?: string; // Unique key for localStorage (e.g., 'videos', 'replays')
   defaultView?: 'grid' | 'table';
   showViewToggle?: boolean;
+  gridLabel?: string;
+  tableLabel?: string;
+  gridIcon?: 'grid' | 'chart';
+  tableIcon?: 'table' | 'list';
 
   // Additional header actions (e.g., "Show Past Events")
   headerActions?: ReactNode;
@@ -51,6 +55,10 @@ export function FilterableContentLayout({
   pageKey,
   defaultView = 'table',
   showViewToggle = true,
+  gridLabel,
+  tableLabel,
+  gridIcon,
+  tableIcon,
   headerActions,
   filters,
   searchQuery,
@@ -132,7 +140,14 @@ export function FilterableContentLayout({
               <div className="flex items-center justify-between lg:justify-end gap-3">
                 {headerActions}
                 {showViewToggle && (
-                  <ViewToggle view={view} onViewChange={handleViewChange} />
+                  <ViewToggle
+                    view={view}
+                    onViewChange={handleViewChange}
+                    gridLabel={gridLabel}
+                    tableLabel={tableLabel}
+                    gridIcon={gridIcon}
+                    tableIcon={tableIcon}
+                  />
                 )}
               </div>
             </div>

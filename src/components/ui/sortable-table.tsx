@@ -52,6 +52,9 @@ interface SortableTableProps<T> {
 
   /** Min width for the table */
   minWidth?: string;
+
+  /** Optional function called when a row is clicked */
+  onRowClick?: (item: T) => void;
 }
 
 /**
@@ -66,6 +69,7 @@ export function SortableTable<T>({
   getRowKey,
   className = '',
   minWidth = '800px',
+  onRowClick,
 }: SortableTableProps<T>) {
   const [sortField, setSortField] = useState<string | null>(defaultSortField || null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSortDirection);
@@ -173,9 +177,10 @@ export function SortableTable<T>({
           {sortedItems.map((item, index) => (
             <tr
               key={getRowKey ? getRowKey(item) : index}
+              onClick={() => onRowClick?.(item)}
               className={`border-t border-border hover:bg-muted/30 transition-colors ${
-                index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
-              }`}
+                onRowClick ? 'cursor-pointer' : ''
+              } ${index % 2 === 0 ? 'bg-card' : 'bg-muted/10'}`}
             >
               {columns.map((column) => (
                 <td
