@@ -1638,5 +1638,20 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "090ff9a5-3623-42c1-9021-edfd910f9355",
+    "title": "Tip of the week #5: Zerg Macro Trick",
+    "description": "In this video our new coach Fairespiter goes over this cool trick you can use to save yourself some time and attention when it comes to producing with zerg",
+    "source": "youtube",
+    "youtubeId": "VGJ52c2oOj4",
+    "thumbnail": "https://img.youtube.com/vi/VGJ52c2oOj4/hqdefault.jpg",
+    "date": "2025-11-19",
+    "categories": [],
+    "tags": [],
+    "race": "zerg",
+    "coach": "",
+    "coachId": "",
+    "isFree": true
   }
 ]
