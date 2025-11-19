@@ -897,3 +897,160 @@ describe('Integration: Reference Cleanup + Apply Changes', () => {
     // In real app, user would manually add new-mux-id
   })
 })
+
+describe('Coach Content Management', () => {
+  it('should allow coaches to create new coach profiles', () => {
+    const files = {
+      coaches: {
+        path: 'src/data/coaches.json',
+        sha: 'test-sha',
+        content: [
+          { id: 'coach-1', name: 'Groovy', displayName: 'Groovy', race: 'all' },
+        ],
+      },
+    }
+
+    const changesByType = {
+      coaches: [
+        {
+          id: 'coach-2',
+          contentType: 'coaches' as const,
+          operation: 'create' as const,
+          data: {
+            id: 'coach-2',
+            name: 'newcoach',
+            displayName: 'New Coach',
+            race: 'terran',
+            bio: 'New coach bio',
+            specialties: ['Build orders'],
+            isActive: true,
+          },
+        },
+      ],
+    }
+
+    const result = applyChanges(files, changesByType as any)
+
+    expect(result.coaches.content).toHaveLength(2)
+    expect((result.coaches.content as any[])[1]).toMatchObject({
+      id: 'coach-2',
+      displayName: 'New Coach',
+      race: 'terran',
+    })
+  })
+
+  it('should allow coaches to update existing coach profiles', () => {
+    const files = {
+      coaches: {
+        path: 'src/data/coaches.json',
+        sha: 'test-sha',
+        content: [
+          {
+            id: 'coach-1',
+            name: 'groovy',
+            displayName: 'Groovy',
+            race: 'all',
+            bio: 'Old bio',
+            specialties: ['Ladder coaching'],
+          },
+        ],
+      },
+    }
+
+    const changesByType = {
+      coaches: [
+        {
+          id: 'coach-1',
+          contentType: 'coaches' as const,
+          operation: 'update' as const,
+          data: {
+            id: 'coach-1',
+            name: 'groovy',
+            displayName: 'Groovy',
+            race: 'all',
+            bio: 'Updated bio with more details',
+            specialties: ['Ladder coaching', 'Build orders'],
+            pricePerHour: '£25/hr',
+          },
+        },
+      ],
+    }
+
+    const result = applyChanges(files, changesByType as any)
+
+    expect(result.coaches.content).toHaveLength(1)
+    expect((result.coaches.content as any[])[0]).toMatchObject({
+      bio: 'Updated bio with more details',
+      specialties: ['Ladder coaching', 'Build orders'],
+      pricePerHour: '£25/hr',
+    })
+  })
+
+  it('should allow coaches to delete coach profiles', () => {
+    const files = {
+      coaches: {
+        path: 'src/data/coaches.json',
+        sha: 'test-sha',
+        content: [
+          { id: 'coach-1', name: 'Groovy', displayName: 'Groovy', race: 'all' },
+          { id: 'coach-2', name: 'nico', displayName: 'Coach Nico', race: 'terran' },
+        ],
+      },
+    }
+
+    const changesByType = {
+      coaches: [
+        {
+          id: 'coach-1',
+          contentType: 'coaches' as const,
+          operation: 'delete' as const,
+          data: { id: 'coach-1' },
+        },
+      ],
+    }
+
+    const result = applyChanges(files, changesByType as any)
+
+    expect(result.coaches.content).toHaveLength(1)
+    expect((result.coaches.content as any[])[0].id).toBe('coach-2')
+  })
+
+  it('should allow coaches to set themselves as inactive', () => {
+    const files = {
+      coaches: {
+        path: 'src/data/coaches.json',
+        sha: 'test-sha',
+        content: [
+          {
+            id: 'coach-1',
+            name: 'groovy',
+            displayName: 'Groovy',
+            race: 'all',
+            isActive: true,
+          },
+        ],
+      },
+    }
+
+    const changesByType = {
+      coaches: [
+        {
+          id: 'coach-1',
+          contentType: 'coaches' as const,
+          operation: 'update' as const,
+          data: {
+            id: 'coach-1',
+            name: 'groovy',
+            displayName: 'Groovy',
+            race: 'all',
+            isActive: false, // Coach setting themselves as inactive
+          },
+        },
+      ],
+    }
+
+    const result = applyChanges(files, changesByType as any)
+
+    expect((result.coaches.content as any[])[0].isActive).toBe(false)
+  })
+})
