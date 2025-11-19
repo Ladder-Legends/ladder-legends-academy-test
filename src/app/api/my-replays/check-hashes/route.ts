@@ -10,7 +10,9 @@ export async function POST(request: NextRequest) {
   try {
     // Extract bearer token from Authorization header
     const authHeader = request.headers.get('authorization');
+    console.log('🔐 [CHECK-HASHES] Auth header:', authHeader ? `${authHeader.substring(0, 30)}...` : 'MISSING');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('❌ [CHECK-HASHES] Missing or invalid bearer token');
       return NextResponse.json({ error: 'Unauthorized: Missing bearer token' }, { status: 401 });
     }
 
