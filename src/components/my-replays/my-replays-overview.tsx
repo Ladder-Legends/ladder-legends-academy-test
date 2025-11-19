@@ -2,7 +2,7 @@
 
 import { UserReplayData } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, Target, BarChart3 } from 'lucide-react';
+import { Trophy, TrendingUp, BarChart3, Lightbulb, Calendar, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
@@ -79,17 +79,155 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
     return acc;
   }, {} as Record<string, { total: number; wins: number; losses: number }>);
 
-  // Build detection stats
-  const detectedBuilds = activeReplays.filter((r) => r.detection).length;
-  const detectionRate = totalGames > 0 ? ((detectedBuilds / totalGames) * 100).toFixed(1) : '0.0';
+  // Calculate execution score based on available data
+  // Priority: 1) comparison.execution_score, 2) calculate from economy metrics
+  const executionScores = activeReplays.map((r) => {
+    // Use comparison execution score if available
+    if (r.comparison?.execution_score != null) {
+      return r.comparison.execution_score;
+    }
 
-  // Average execution score (for detected builds)
-  const executionScores = activeReplays
-    .filter((r) => r.comparison?.execution_score != null)
-    .map((r) => r.comparison!.execution_score!);
+    // Otherwise calculate from economy metrics (if available)
+    const economy = r.fingerprint?.economy;
+    if (!economy) {
+      return 100; // Default score when economy data is not available
+    }
+
+    let score = 100;
+
+    // Penalize supply blocks (0-30 points)
+    if (economy.supply_block_count != null) {
+      const blockPenalty = Math.min(30, economy.supply_block_count * 3);
+      score -= blockPenalty;
+    }
+
+    // Penalize resource float (0-30 points)
+    if (economy['avg_mineral_float_5min+'] != null) {
+      const mineralFloat = economy['avg_mineral_float_5min+'];
+      // Ideal is ~500, penalize if over 800
+      if (mineralFloat > 800) {
+        const floatPenalty = Math.min(15, (mineralFloat - 800) / 100);
+        score -= floatPenalty;
+      }
+    }
+    if (economy['avg_gas_float_5min+'] != null) {
+      const gasFloat = economy['avg_gas_float_5min+'];
+      // Ideal is ~200, penalize if over 400
+      if (gasFloat > 400) {
+        const floatPenalty = Math.min(15, (gasFloat - 400) / 50);
+        score -= floatPenalty;
+      }
+    }
+
+    return Math.max(0, Math.min(100, score));
+  });
+
   const avgExecution = executionScores.length > 0
     ? (executionScores.reduce((sum, score) => sum + score, 0) / executionScores.length).toFixed(1)
     : null;
+
+  // Calculate average supply blocks
+  const supplyBlockCounts = activeReplays
+    .map((r) => r.fingerprint?.economy?.supply_block_count)
+    .filter((count): count is number => count != null);
+  const avgSupplyBlocks = supplyBlockCounts.length > 0
+    ? (supplyBlockCounts.reduce((sum, count) => sum + count, 0) / supplyBlockCounts.length).toFixed(1)
+    : null;
+
+  // Calculate progress trends (compare recent 5 games to previous 5 games)
+  const sortedByDate = [...activeReplays].sort((a, b) =>
+    new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime()
+  );
+
+  const recentGames = sortedByDate.slice(-5);
+  const previousGames = sortedByDate.slice(-10, -5);
+
+  // Win rate trend
+  const recentWinRate = recentGames.length > 0
+    ? (recentGames.filter(r => r.fingerprint.metadata.result === 'Win').length / recentGames.length) * 100
+    : 0;
+  const previousWinRate = previousGames.length > 0
+    ? (previousGames.filter(r => r.fingerprint.metadata.result === 'Win').length / previousGames.length) * 100
+    : recentWinRate;
+  const winRateTrend = recentWinRate - previousWinRate;
+
+  // Supply block trend
+  const recentSupplyBlocks = recentGames
+    .map(r => r.fingerprint?.economy?.supply_block_count)
+    .filter((c): c is number => c != null);
+  const previousSupplyBlocks = previousGames
+    .map(r => r.fingerprint?.economy?.supply_block_count)
+    .filter((c): c is number => c != null);
+  const recentAvgBlocks = recentSupplyBlocks.length > 0
+    ? recentSupplyBlocks.reduce((sum, count) => sum + count, 0) / recentSupplyBlocks.length
+    : 0;
+  const previousAvgBlocks = previousSupplyBlocks.length > 0
+    ? previousSupplyBlocks.reduce((sum, count) => sum + count, 0) / previousSupplyBlocks.length
+    : recentAvgBlocks;
+  const supplyBlockTrend = previousAvgBlocks - recentAvgBlocks; // Positive if improving (fewer blocks)
+
+  // Generate personalized tips
+  const tips: string[] = [];
+
+  // Win rate tips
+  if (totalGames < 5) {
+    tips.push("Keep uploading replays! The more games you track, the better insights you'll get.");
+  } else if (parseFloat(winRate) >= 60) {
+    tips.push("Great win rate! You're performing well. Keep up the momentum!");
+  } else if (parseFloat(winRate) < 45) {
+    tips.push("Focus on one matchup at a time to improve your win rate.");
+  }
+
+  // Supply block tips
+  if (avgSupplyBlocks != null) {
+    const avgBlocks = parseFloat(avgSupplyBlocks);
+    if (avgBlocks > 8) {
+      tips.push("Try setting a mental reminder to build supply every time you build production.");
+    } else if (avgBlocks > 4) {
+      tips.push("You're getting supply blocked a bit often. Work on building supply proactively!");
+    } else if (avgBlocks <= 2) {
+      tips.push("Excellent supply management! You're rarely getting blocked.");
+    }
+  }
+
+  // Execution tips
+  if (avgExecution != null) {
+    const execution = parseFloat(avgExecution);
+    if (execution >= 85) {
+      tips.push("Your execution is solid! Focus on decision-making and strategy.");
+    } else if (execution < 70) {
+      tips.push("Work on hitting your build order timings and managing resources.");
+    }
+  }
+
+  // Matchup-specific tips
+  const worstMatchup = Object.entries(matchupStats)
+    .filter(([_, stats]) => stats.total >= 3)
+    .sort((a, b) => (a[1].wins / a[1].total) - (b[1].wins / b[1].total))[0];
+  if (worstMatchup) {
+    const matchupWinRate = (worstMatchup[1].wins / worstMatchup[1].total) * 100;
+    if (matchupWinRate < 40) {
+      tips.push(`Your ${worstMatchup[0]} needs work. Review pro builds for this matchup.`);
+    }
+  }
+
+  // Progress tips
+  if (totalGames >= 10) {
+    if (winRateTrend > 10) {
+      tips.push("You're improving! Your recent games show a positive trend.");
+    } else if (winRateTrend < -10) {
+      tips.push("Take a break and watch some replays to see where you can improve.");
+    }
+
+    if (supplyBlockTrend > 2) {
+      tips.push("Nice! You're getting supply blocked less frequently.");
+    }
+  }
+
+  // Ensure we always have at least one tip
+  if (tips.length === 0) {
+    tips.push("Keep playing and tracking your games to unlock personalized tips!");
+  }
 
   // Most played matchup
   const mostPlayedMatchup = Object.entries(matchupStats).sort((a, b) => b[1].total - a[1].total)[0];
@@ -116,7 +254,20 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
           <CardContent>
             <div className="text-2xl font-bold">{winRate}%</div>
             <p className="text-xs text-muted-foreground">
-              {wins}W - {losses}L ({totalGames} games)
+              {wins}W - {losses}L
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Games</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalGames}</div>
+            <p className="text-xs text-muted-foreground">
+              {totalGames === 0 ? 'Upload replays to start' : 'replays tracked'}
             </p>
           </CardContent>
         </Card>
@@ -136,30 +287,104 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Build Detection</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{detectionRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              {detectedBuilds} of {totalGames} games
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg Execution</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgExecution !== null ? `${avgExecution}%` : 'N/A'}</div>
             <p className="text-xs text-muted-foreground">
-              {executionScores.length > 0 ? `${executionScores.length} detected builds` : 'No detected builds'}
+              {avgExecution !== null ? 'Based on mechanics' : 'No data yet'}
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Tips Section */}
+      {tips.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-yellow-500" />
+              <CardTitle>Tips for Improvement</CardTitle>
+            </div>
+            <CardDescription>Personalized suggestions based on your recent games</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {tips.map((tip, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="text-yellow-500 mt-1">•</span>
+                  <span className="text-sm">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Progress */}
+      {totalGames >= 10 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Progress</CardTitle>
+            <CardDescription>Your last 5 games vs. previous 5 games</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Win Rate</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{recentWinRate.toFixed(1)}%</span>
+                  {winRateTrend > 5 && (
+                    <div className="flex items-center gap-1 text-green-500">
+                      <ArrowUp className="h-4 w-4" />
+                      <span className="text-xs">+{winRateTrend.toFixed(1)}%</span>
+                    </div>
+                  )}
+                  {winRateTrend < -5 && (
+                    <div className="flex items-center gap-1 text-red-500">
+                      <ArrowDown className="h-4 w-4" />
+                      <span className="text-xs">{winRateTrend.toFixed(1)}%</span>
+                    </div>
+                  )}
+                  {Math.abs(winRateTrend) <= 5 && (
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <Minus className="h-4 w-4" />
+                      <span className="text-xs">Steady</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {avgSupplyBlocks != null && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Supply Blocks</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{recentAvgBlocks.toFixed(1)} avg</span>
+                    {supplyBlockTrend > 1 && (
+                      <div className="flex items-center gap-1 text-green-500">
+                        <ArrowUp className="h-4 w-4" />
+                        <span className="text-xs">Improving!</span>
+                      </div>
+                    )}
+                    {supplyBlockTrend < -1 && (
+                      <div className="flex items-center gap-1 text-red-500">
+                        <ArrowDown className="h-4 w-4" />
+                        <span className="text-xs">Needs work</span>
+                      </div>
+                    )}
+                    {Math.abs(supplyBlockTrend) <= 1 && (
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Minus className="h-4 w-4" />
+                        <span className="text-xs">Steady</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Matchup Breakdown */}
       <Card>

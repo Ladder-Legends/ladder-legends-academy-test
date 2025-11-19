@@ -25,6 +25,7 @@ export interface ReplayFingerprint {
     opponent_race: string;
     game_type: string | null; // "1v1", "2v2", "3v3", "4v4", "FFA"
     category: string | null; // "Ladder", "Custom", "Tournament", etc.
+    game_date: string | null; // ISO 8601 date string when the game was played
   };
   timings: Record<string, number | null>;
   sequences: {

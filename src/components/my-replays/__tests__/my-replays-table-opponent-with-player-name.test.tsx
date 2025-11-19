@@ -7,6 +7,13 @@ import { render, screen } from '@testing-library/react';
 import { MyReplaysTable } from '../my-replays-table';
 import { UserReplayData } from '@/lib/replay-types';
 
+// Mock useRouter
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 // Helper to create mock replay with player_name field
 function createMockReplayWithPlayerName(
   playerName: string,

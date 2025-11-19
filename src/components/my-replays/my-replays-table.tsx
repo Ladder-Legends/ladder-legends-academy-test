@@ -56,9 +56,15 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
       id: 'gameDate',
       label: 'Date Played',
       sortable: true,
-      getValue: (replay) => new Date(replay.fingerprint.metadata.result === 'Win' ? replay.uploaded_at : replay.uploaded_at).getTime(),
+      getValue: (replay) => {
+        // Use game_date if available, otherwise fall back to uploaded_at
+        const dateStr = replay.fingerprint.metadata.game_date || replay.uploaded_at;
+        return new Date(dateStr).getTime();
+      },
       render: (replay) => {
-        const date = new Date(replay.uploaded_at);
+        // Use game_date if available, otherwise fall back to uploaded_at
+        const dateStr = replay.fingerprint.metadata.game_date || replay.uploaded_at;
+        const date = new Date(dateStr);
         return (
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium">
