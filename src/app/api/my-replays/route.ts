@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
+import { hashManifestManager } from '@/lib/replay-hash-manifest';
+import crypto from 'crypto';
 
 // Use mock KV in development if real KV is not configured
 const USE_MOCK_KV = !process.env.KV_REST_API_URL;
@@ -61,17 +63,52 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/my-replays
  * Upload and analyze a new replay
- * 
+ *
  * Query params:
  * - target_build_id: Optional build ID to compare against
  * - player_name: Optional player name to analyze
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    // Check for bearer token first (for desktop app), fall back to session (for web)
+    let discordId: string | undefined;
 
-    if (!session?.user?.discordId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Desktop app with bearer token
+      const token = authHeader.substring(7);
+      const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
+
+      try {
+        const { verify } = await import('jsonwebtoken');
+        const decoded = verify(token, jwtSecret) as {
+          userId: string;
+          type: string;
+        };
+
+        if (decoded.type !== 'uploader') {
+          return NextResponse.json({ error: 'Unauthorized: Invalid token type' }, { status: 401 });
+        }
+
+        discordId = decoded.userId;
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.name === 'TokenExpiredError') {
+            return NextResponse.json({ error: 'Unauthorized: Token expired' }, { status: 401 });
+          }
+          if (error.name === 'JsonWebTokenError') {
+            return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+          }
+        }
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    } else {
+      // Web app with session cookie
+      const session = await auth();
+      if (!session?.user?.discordId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      discordId = session.user.discordId;
     }
 
     // Get query params
@@ -94,6 +131,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Calculate hash of the file
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+    console.log('📊 Calculated hash:', hash);
+
     // Extract fingerprint
     console.log('📊 Extracting fingerprint...');
     const fingerprint = await sc2readerClient.extractFingerprint(file, playerName || undefined);
@@ -114,7 +156,7 @@ export async function POST(request: NextRequest) {
     // Create replay data object
     const replayData: UserReplayData = {
       id: nanoid(),
-      discord_user_id: session.user.discordId,
+      discord_user_id: discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
       target_build_id: targetBuildId || detection?.build_id,
@@ -127,7 +169,17 @@ export async function POST(request: NextRequest) {
     console.log('💾 Saving to KV...');
     await saveReplay(replayData);
 
-    console.log('✅ Replay uploaded and analyzed successfully');
+    // Save hash to manifest
+    console.log('💾 Saving hash to manifest...');
+    await hashManifestManager.addHash(
+      discordId,
+      hash,
+      file.name,
+      file.size,
+      replayData.id
+    );
+
+    console.log('✅ Replay uploaded, analyzed, and hash saved successfully');
 
     return NextResponse.json({
       success: true,

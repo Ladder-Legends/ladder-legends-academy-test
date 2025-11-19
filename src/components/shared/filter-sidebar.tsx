@@ -166,7 +166,11 @@ export function FilterSidebar({
 
         {hasChildren && isExpanded && (
           <div className="mt-1 space-y-1 ml-1">
-            {item.children!.map(child => renderItem(sectionId, child, depth + 1))}
+            {item.children!.map(child => (
+              <div key={`${sectionId}-${child.id}`}>
+                {renderItem(sectionId, child, depth + 1)}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -265,7 +269,11 @@ export function FilterSidebar({
               </div>
               {isSectionExpanded && (
                 <div className="space-y-1">
-                  {section.items.map(item => renderItem(section.id, item))}
+                  {section.items.map(item => (
+                    <div key={`${section.id}-${item.id}`}>
+                      {renderItem(section.id, item)}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

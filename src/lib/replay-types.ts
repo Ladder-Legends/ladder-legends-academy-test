@@ -11,6 +11,8 @@ export interface ReplayFingerprint {
     duration: number | null;
     result: string; // "Win" | "Loss"
     opponent_race: string;
+    game_type: string | null; // "1v1", "2v2", "3v3", "4v4", "FFA"
+    category: string | null; // "Ladder", "Custom", "Tournament", etc.
   };
   timings: Record<string, number | null>;
   sequences: {
