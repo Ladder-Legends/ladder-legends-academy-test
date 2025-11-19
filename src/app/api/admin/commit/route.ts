@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { isCoach, isOwner } from '@/lib/permissions';
-import { handleGitHubError, createErrorResponse, ErrorCodes } from '@/lib/api-errors';
-import { fixVideoReferences, applyChanges, type Change as LogicChange, type FileInfo as LogicFileInfo } from './commit-logic';
+import { isCoach } from '@/lib/permissions';
+import { handleGitHubError, createErrorResponse } from '@/lib/api-errors';
+import { fixVideoReferences, applyChanges } from './commit-logic';
 
 // GitHub API configuration
 const GITHUB_API_URL = 'https://api.github.com';
@@ -387,20 +387,10 @@ export async function POST(request: NextRequest) {
 
     // 3. Verify permissions
     const canEdit = isCoach(session);
-    const canEditCoaches = isOwner(session);
 
     if (!canEdit) {
       return NextResponse.json(
         { error: 'Forbidden - You do not have permission to edit content' },
-        { status: 403 }
-      );
-    }
-
-    // Check if any changes require owner permission
-    const hasCoachChanges = changes.some(c => c.contentType === 'coaches');
-    if (hasCoachChanges && !canEditCoaches) {
-      return NextResponse.json(
-        { error: 'Forbidden - Only owners can edit coaches' },
         { status: 403 }
       );
     }
