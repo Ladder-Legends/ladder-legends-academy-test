@@ -1617,5 +1617,26 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "c232c8fa-e08f-4828-a715-58bff2a839ef",
+    "title": "A Nicosystem™ Guide to Skipping Tanks in TvP with 5-1-1",
+    "description": "Hello everyone, I've had a lot of requests for different builds in TvP to keep protoss honest, or to try if the regular 5-1-1 doesn't work. This build is a minor variation of 5-1-1 that skips tanks, to hit harder against protoss players that play more passive, which also serves to catch regular opponents you play repeatedly by surprise as the build looks mostly the same. ",
+    "source": "mux",
+    "muxAssetId": "TiwcLdSOo5B8bz9EwWxOhJN8WxOdndOoIQ3IIuAyaFo",
+    "muxPlaybackId": "00PxIOUXQ4zAY01402CtPZLHKP2pYvT8MHgPa3GFT2r8Qg",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/c232c8fa-e08f-4828-a715-58bff2a839ef.jpg",
+    "date": "2025-11-19",
+    "categories": [
+      "builds.timing-attack",
+      "matchups.tvp",
+      "strategy.mid-game"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
