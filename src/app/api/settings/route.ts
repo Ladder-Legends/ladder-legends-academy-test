@@ -9,9 +9,11 @@ import { auth } from '@/lib/auth';
 const USE_MOCK_KV = !process.env.KV_REST_API_URL;
 
 // Import the appropriate KV module dynamically
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic import needed for mock selection
 const kvModule = USE_MOCK_KV
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ? require('@/lib/replay-kv-mock')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   : require('@/lib/replay-kv');
 
 const {
