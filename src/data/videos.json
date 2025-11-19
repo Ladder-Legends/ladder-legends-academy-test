@@ -1596,5 +1596,26 @@
     "coach": "",
     "coachId": "",
     "isFree": false
+  },
+  {
+    "id": "1f17ad3a-b08d-4613-bfaf-b2e3788e34ae",
+    "title": "A Nicosystem™ Theory Guide to Defending Cheese: ",
+    "description": "Here's a different style of video exploring how to defend cheese effectively on a conceptual level, giving you tools to start exploring your own style of defense - rather than copying a response from other players. ",
+    "source": "mux",
+    "muxAssetId": "3wVNY00TfX5mgQ9mK5bDvYUcKJh5d1QH75JCHB5FE9pk",
+    "muxPlaybackId": "W8wBaI7aL0100GOGHMwtpCzMNApSlZbqgZ2HF3iS902r1o",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/1f17ad3a-b08d-4613-bfaf-b2e3788e34ae.jpg",
+    "date": "2025-11-19",
+    "categories": [
+      "strategy.scouting",
+      "analysis",
+      "mindset.learning"
+    ],
+    "tags": [],
+    "race": "all",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
