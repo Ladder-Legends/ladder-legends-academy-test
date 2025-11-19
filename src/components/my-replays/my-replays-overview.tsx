@@ -9,39 +9,53 @@ interface MyReplaysOverviewProps {
 }
 
 export function MyReplaysOverview({ replays }: MyReplaysOverviewProps) {
+  // Filter out observer games (games where we didn't actually play)
+  const activeReplays = replays.filter((r) => {
+    // If we have all_players data, check if the player was an observer
+    if (r.fingerprint.all_players && r.fingerprint.player_name) {
+      const playerData = r.fingerprint.all_players.find(p => p.name === r.fingerprint.player_name);
+      return playerData && !playerData.is_observer;
+    }
+    // If we don't have all_players data (older replays), include them
+    return true;
+  });
+
   // Calculate stats
-  const totalGames = replays.length;
-  const wins = replays.filter((r) => r.fingerprint.metadata.result === 'Win').length;
-  const losses = replays.filter((r) => r.fingerprint.metadata.result === 'Loss').length;
+  const totalGames = activeReplays.length;
+  const wins = activeReplays.filter((r) => r.fingerprint.metadata.result === 'Win').length;
+  const losses = activeReplays.filter((r) => r.fingerprint.metadata.result === 'Loss').length;
   const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
 
   // Determine player's race (most common race they play)
-  const raceCount = replays.reduce((acc, r) => {
+  const raceCount = activeReplays.reduce((acc, r) => {
     const race = r.fingerprint.race;
-    acc[race] = (acc[race] || 0) + 1;
+    if (race) {
+      acc[race] = (acc[race] || 0) + 1;
+    }
     return acc;
   }, {} as Record<string, number>);
+
   const playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const playerRaceAbbr = playerRace?.[0]; // First letter (T, Z, or P)
 
-  // Matchup stats - only show matchups where player's race is first
-  const matchupStats = replays.reduce((acc, r) => {
+  // Matchup stats - normalize to show player's race first (using the race from EACH replay)
+  const matchupStats = activeReplays.reduce((acc, r) => {
     const matchup = r.fingerprint.matchup;
+    const playerRaceInThisGame = r.fingerprint.race?.[0]?.toUpperCase(); // First letter of race (T, Z, or P)
 
-    // Only include matchups where our race is first letter
-    // Since matchup format is now "WinnerRacevLoserRace", we need to include both
-    // - Games we won: Our race is first (e.g., "TvP" if we play Terran and won vs Protoss)
-    // - Games we lost: Our race is second (e.g., "PvT" if we play Terran and lost vs Protoss)
-    // We'll normalize all matchups to show our race first
+    if (!playerRaceInThisGame) {
+      return acc;
+    }
 
+    // Matchup format is "WinnerRacevLoserRace"
+    // We want to normalize to "PlayerRacevOpponentRace" regardless of who won
     const [firstRace, secondRace] = matchup.split('v');
     let normalizedMatchup: string;
 
-    if (firstRace === playerRaceAbbr) {
-      // Our race is already first
+    if (firstRace === playerRaceInThisGame) {
+      // Player's race is already first (player won)
       normalizedMatchup = matchup;
-    } else if (secondRace === playerRaceAbbr) {
-      // Our race is second, flip it
+    } else if (secondRace === playerRaceInThisGame) {
+      // Player's race is second (player lost), flip it
       normalizedMatchup = `${secondRace}v${firstRace}`;
     } else {
       // Neither race matches (shouldn't happen, but skip if it does)
@@ -58,11 +72,11 @@ export function MyReplaysOverview({ replays }: MyReplaysOverviewProps) {
   }, {} as Record<string, { total: number; wins: number; losses: number }>);
 
   // Build detection stats
-  const detectedBuilds = replays.filter((r) => r.detection).length;
+  const detectedBuilds = activeReplays.filter((r) => r.detection).length;
   const detectionRate = totalGames > 0 ? ((detectedBuilds / totalGames) * 100).toFixed(1) : '0.0';
 
   // Average execution score (for detected builds)
-  const executionScores = replays
+  const executionScores = activeReplays
     .filter((r) => r.comparison?.execution_score != null)
     .map((r) => r.comparison!.execution_score!);
   const avgExecution = executionScores.length > 0

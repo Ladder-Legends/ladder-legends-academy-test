@@ -3,9 +3,18 @@
  */
 
 // SC2Reader API Response Types
+export interface ReplayPlayer {
+  name: string;
+  race: string;
+  result: string; // "Win" | "Loss"
+  is_observer: boolean;
+}
+
 export interface ReplayFingerprint {
   matchup: string;
   race: string;
+  player_name: string; // The player this fingerprint is for
+  all_players: ReplayPlayer[]; // All players in the game
   metadata: {
     map: string;
     duration: number | null;
@@ -158,6 +167,8 @@ export interface UserSettings {
   discord_user_id: string;
   default_race: "terran" | "protoss" | "zerg" | null;
   favorite_builds: string[]; // Array of build IDs
+  confirmed_player_names: string[]; // Player names confirmed by user
+  possible_player_names: Record<string, number>; // Player name -> count (appears 3+ times)
   created_at: string;
   updated_at: string;
 }

@@ -7,7 +7,8 @@ import { FilterableContentLayout } from '@/components/ui/filterable-content-layo
 import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { MyReplaysTable } from './my-replays-table';
 import { MyReplaysOverview } from './my-replays-overview';
-import { UserReplayData } from '@/lib/replay-types';
+import { PlayerNameSuggestionCard } from './player-name-suggestion-card';
+import { UserReplayData, UserSettings } from '@/lib/replay-types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
@@ -15,6 +16,7 @@ export function MyReplaysContent() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [replays, setReplays] = useState<UserReplayData[]>([]);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -55,19 +57,78 @@ export function MyReplaysContent() {
 
   const fetchReplays = async () => {
     try {
-      const response = await fetch('/api/my-replays');
-      const data = await response.json();
+      const [replaysResponse, settingsResponse] = await Promise.all([
+        fetch('/api/my-replays'),
+        fetch('/api/settings'),
+      ]);
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch replays');
+      const replaysData = await replaysResponse.json();
+
+      if (!replaysResponse.ok) {
+        throw new Error(replaysData.error || 'Failed to fetch replays');
       }
 
-      setReplays(data.replays || []);
+      setReplays(replaysData.replays || []);
+
+      // Settings endpoint might not exist yet, handle gracefully
+      if (settingsResponse.ok) {
+        const settingsData = await settingsResponse.json();
+        setUserSettings(settingsData.settings || null);
+      } else {
+        console.warn('Settings endpoint not available yet');
+        setUserSettings(null);
+      }
     } catch (err) {
       console.error('Error fetching replays:', err);
       setError(err instanceof Error ? err.message : 'Failed to load replays');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleConfirmPlayerName = async (playerName: string) => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'confirm_player_name',
+          player_name: playerName,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to confirm player name');
+
+      // Refresh settings
+      const settingsResponse = await fetch('/api/settings');
+      const settingsData = await settingsResponse.json();
+      setUserSettings(settingsData.settings || null);
+    } catch (err) {
+      console.error('Error confirming player name:', err);
+      setError('Failed to confirm player name');
+    }
+  };
+
+  const handleRejectPlayerName = async (playerName: string) => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reject_player_name',
+          player_name: playerName,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to reject player name');
+
+      // Refresh settings
+      const settingsResponse = await fetch('/api/settings');
+      const settingsData = await settingsResponse.json();
+      setUserSettings(settingsData.settings || null);
+    } catch (err) {
+      console.error('Error rejecting player name:', err);
+      setError('Failed to reject player name');
     }
   };
 
@@ -193,6 +254,21 @@ export function MyReplaysContent() {
     return filters;
   }, [filters]);
 
+  // Find next player name suggestion (must have 3+ occurrences)
+  const nextSuggestion = useMemo(() => {
+    if (!userSettings) return null;
+
+    const possibleNames = userSettings.possible_player_names || {};
+    const confirmedNames = userSettings.confirmed_player_names || [];
+
+    // Find names with 3+ occurrences that aren't confirmed
+    const suggestions = Object.entries(possibleNames)
+      .filter(([name, count]) => count >= 3 && !confirmedNames.includes(name))
+      .sort((a, b) => b[1] - a[1]); // Sort by count descending
+
+    return suggestions.length > 0 ? { name: suggestions[0][0], count: suggestions[0][1] } : null;
+  }, [userSettings]);
+
   // Handle selection changes from FilterSidebar
   const handleSelectionChange = (newSelectedItems: Record<string, string[]>) => {
     setFilters(newSelectedItems);
@@ -230,15 +306,39 @@ export function MyReplaysContent() {
 
   // List content (table view)
   const tableContent = (
-    <MyReplaysTable
-      replays={sortedReplays}
-      onDelete={confirmDelete}
-    />
+    <>
+      {nextSuggestion && (
+        <div className="mb-6">
+          <PlayerNameSuggestionCard
+            playerName={nextSuggestion.name}
+            count={nextSuggestion.count}
+            onConfirm={handleConfirmPlayerName}
+            onReject={handleRejectPlayerName}
+          />
+        </div>
+      )}
+      <MyReplaysTable
+        replays={sortedReplays}
+        onDelete={confirmDelete}
+      />
+    </>
   );
 
   // Overview content (stats view)
   const gridContent = (
-    <MyReplaysOverview replays={sortedReplays} />
+    <>
+      {nextSuggestion && (
+        <div className="mb-6">
+          <PlayerNameSuggestionCard
+            playerName={nextSuggestion.name}
+            count={nextSuggestion.count}
+            onConfirm={handleConfirmPlayerName}
+            onReject={handleRejectPlayerName}
+          />
+        </div>
+      )}
+      <MyReplaysOverview replays={sortedReplays} />
+    </>
   );
 
   return (
