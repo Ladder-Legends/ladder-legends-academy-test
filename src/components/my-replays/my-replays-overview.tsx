@@ -6,9 +6,10 @@ import { Trophy, TrendingUp, Target, BarChart3 } from 'lucide-react';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
+  confirmedPlayerNames?: string[];
 }
 
-export function MyReplaysOverview({ replays }: MyReplaysOverviewProps) {
+export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyReplaysOverviewProps) {
   // Filter out observer games (games where we didn't actually play)
   const activeReplays = replays.filter((r) => {
     // If we have all_players data, check if the player was an observer
@@ -37,30 +38,37 @@ export function MyReplaysOverview({ replays }: MyReplaysOverviewProps) {
 
   const playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
 
-  // Matchup stats - normalize to show player's race first (using the race from EACH replay)
+  // Matchup stats - normalize to show player's race first (using confirmed/suggested player name)
   const matchupStats = activeReplays.reduce((acc, r) => {
-    const matchup = r.fingerprint.matchup;
-    const playerRaceInThisGame = r.fingerprint.race?.[0]?.toUpperCase(); // First letter of race (T, Z, or P)
+    if (!r.fingerprint.all_players) return acc;
 
-    if (!playerRaceInThisGame) {
-      return acc;
+    // Find player using confirmed/suggested name priority
+    let playerData = null;
+    for (const confirmedName of confirmedPlayerNames) {
+      playerData = r.fingerprint.all_players.find(p => p.name === confirmedName);
+      if (playerData) break;
+    }
+    if (!playerData && r.player_name) {
+      playerData = r.fingerprint.all_players.find(p => p.name === r.player_name);
+    }
+    if (!playerData && r.fingerprint.player_name) {
+      playerData = r.fingerprint.all_players.find(p => p.name === r.fingerprint.player_name);
     }
 
-    // Matchup format is "WinnerRacevLoserRace"
-    // We want to normalize to "PlayerRacevOpponentRace" regardless of who won
-    const [firstRace, secondRace] = matchup.split('v');
-    let normalizedMatchup: string;
+    if (!playerData) return acc;
 
-    if (firstRace === playerRaceInThisGame) {
-      // Player's race is already first (player won)
-      normalizedMatchup = matchup;
-    } else if (secondRace === playerRaceInThisGame) {
-      // Player's race is second (player lost), flip it
-      normalizedMatchup = `${secondRace}v${firstRace}`;
-    } else {
-      // Neither race matches (shouldn't happen, but skip if it does)
-      return acc;
-    }
+    // Find opponent(s)
+    const opponents = r.fingerprint.all_players.filter(
+      p => !p.is_observer && p.team !== playerData.team
+    );
+
+    if (opponents.length === 0) return acc;
+
+    const playerRaceInThisGame = playerData.race;
+    const opponentRace = opponents[0].race;
+
+    // Create normalized matchup: PlayerRace[0]vOpponentRace[0] (e.g., "TvZ", "PvT")
+    const normalizedMatchup = `${playerRaceInThisGame[0]}v${opponentRace[0]}`;
 
     if (!acc[normalizedMatchup]) {
       acc[normalizedMatchup] = { total: 0, wins: 0, losses: 0 };

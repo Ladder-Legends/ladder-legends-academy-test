@@ -253,32 +253,60 @@ export default function ReplayDetailPage() {
           </div>
         </div>
 
-        {/* Game Info */}
-        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Map className="h-4 w-4" />
-            {fingerprint.metadata.map}
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            {fingerprint.metadata.duration
-              ? `${Math.floor(fingerprint.metadata.duration / 60)}:${String(Math.floor(fingerprint.metadata.duration % 60)).padStart(2, '0')}`
-              : 'N/A'}
-          </div>
-          <div className="flex items-center gap-1">
-            <Swords className="h-4 w-4" />
-            vs {fingerprint.metadata.opponent_race}
-          </div>
-          <div>
-            Uploaded {new Date(replay.uploaded_at).toLocaleDateString()}
-          </div>
-        </div>
+        {/* Detailed Game Info */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Map</div>
+                <div className="font-medium">{fingerprint.metadata.map}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Duration</div>
+                <div className="font-medium">
+                  {fingerprint.metadata.duration
+                    ? `${Math.floor(fingerprint.metadata.duration / 60)}:${String(Math.floor(fingerprint.metadata.duration % 60)).padStart(2, '0')}`
+                    : 'N/A'}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Game Date</div>
+                <div className="font-medium">{fingerprint.metadata.game_date ? new Date(fingerprint.metadata.game_date).toLocaleDateString() : 'N/A'}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Uploaded</div>
+                <div className="font-medium">{new Date(replay.uploaded_at).toLocaleDateString()}</div>
+              </div>
+            </div>
+            {fingerprint.all_players && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="text-xs text-muted-foreground mb-2">Players</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {fingerprint.all_players
+                    .filter(p => !p.is_observer)
+                    .map((player, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-2 rounded bg-muted/30">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{player.name}</span>
+                          <Badge variant="outline" className="text-xs">{player.race}</Badge>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm">
+                          {player.mmr && <span className="text-muted-foreground">MMR: {player.mmr}</span>}
+                          {player.apm && <span className="text-muted-foreground">APM: {player.apm}</span>}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Hero Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Execution Score Card */}
-        {comparison ? (
+      {comparison && (
+        <div className="mb-8">
+          {/* Execution Score Card */}
           <Card className="border-2 cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('production')}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -309,97 +337,8 @@ export default function ReplayDetailPage() {
               </p>
             </CardContent>
           </Card>
-        ) : (
-          <Card className="border-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-6 w-6" />
-                Build Detection
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              {detection ? (
-                <>
-                  <h3 className="text-2xl font-bold mb-4">{detection.build_name}</h3>
-                  <div className="text-5xl font-bold mb-4">
-                    {Math.round(detection.confidence)}%
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">Confidence</p>
-                  <Progress value={detection.confidence} className="h-4" />
-                </>
-              ) : (
-                <p className="text-4xl font-bold text-muted-foreground py-8">
-                  No build detected
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Top 3 Critical Issues Card */}
-        <Card className="border-2 cursor-pointer hover:border-orange-500/50 transition-colors" onClick={() => handleTabChange('overview')}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-6 w-6" />
-              Top Issues to Fix
-            </CardTitle>
-            <CardDescription>Focus on these for maximum improvement</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topIssues.length > 0 ? (
-              <div className="space-y-4">
-                {topIssues.map((issue, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      issue.severity === 'critical'
-                        ? 'bg-red-50 dark:bg-red-950/20 border-red-500'
-                        : 'bg-orange-50 dark:bg-orange-950/20 border-orange-500'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <AlertCircle
-                        className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                          issue.severity === 'critical' ? 'text-red-500' : 'text-orange-500'
-                        }`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold text-sm">{issue.description}</p>
-                          <Badge
-                            variant="outline"
-                            className={
-                              issue.severity === 'critical'
-                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-300'
-                                : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-300'
-                            }
-                          >
-                            -{issue.pointsLost} pts
-                          </Badge>
-                        </div>
-                        <div className="flex items-start gap-2 mt-2">
-                          <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-muted-foreground">{issue.tip}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                  Excellent execution!
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  No major issues detected
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+        </div>
+      )}
 
       {/* Tabbed Interface */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
@@ -412,6 +351,106 @@ export default function ReplayDetailPage() {
 
         {/* Tab 1: Overview */}
         <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Build Detection Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-6 w-6" />
+                Build Detection
+              </CardTitle>
+              <CardDescription>Identified build order from your replay</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {detection ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-1">{detection.build_name}</h3>
+                      <p className="text-sm text-muted-foreground">Detected Build Order</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-4xl font-bold text-primary">{Math.round(detection.confidence)}%</div>
+                      <p className="text-sm text-muted-foreground">Confidence</p>
+                    </div>
+                  </div>
+                  <Progress value={detection.confidence} className="h-3" />
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Target className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-30" />
+                  <p className="text-lg font-semibold text-muted-foreground">No Build Detected</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Build detection requires a clear opening sequence
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Top 3 Critical Issues Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-6 w-6" />
+                Top Issues to Fix
+              </CardTitle>
+              <CardDescription>Focus on these for maximum improvement</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {topIssues.length > 0 ? (
+                <div className="space-y-4">
+                  {topIssues.map((issue, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border-l-4 ${
+                        issue.severity === 'critical'
+                          ? 'bg-red-50 dark:bg-red-950/20 border-red-500'
+                          : 'bg-orange-50 dark:bg-orange-950/20 border-orange-500'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertCircle
+                          className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                            issue.severity === 'critical' ? 'text-red-500' : 'text-orange-500'
+                          }`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-semibold text-sm">{issue.description}</p>
+                            <Badge
+                              variant="outline"
+                              className={
+                                issue.severity === 'critical'
+                                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-300'
+                                  : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-300'
+                              }
+                            >
+                              -{issue.pointsLost} pts
+                            </Badge>
+                          </div>
+                          <div className="flex items-start gap-2 mt-2">
+                            <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-muted-foreground">{issue.tip}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                  <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                    Excellent execution!
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    No major issues detected
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Performance Metrics */}
           {comparison && (
             <Card>

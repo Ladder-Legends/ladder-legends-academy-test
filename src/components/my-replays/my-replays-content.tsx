@@ -320,6 +320,7 @@ export function MyReplaysContent() {
       <MyReplaysTable
         replays={sortedReplays}
         onDelete={confirmDelete}
+        confirmedPlayerNames={userSettings?.confirmed_player_names || []}
       />
     </>
   );
@@ -337,7 +338,10 @@ export function MyReplaysContent() {
           />
         </div>
       )}
-      <MyReplaysOverview replays={sortedReplays} />
+      <MyReplaysOverview
+        replays={sortedReplays}
+        confirmedPlayerNames={userSettings?.confirmed_player_names || []}
+      />
     </>
   );
 

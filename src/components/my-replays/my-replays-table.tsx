@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { UserReplayData } from '@/lib/replay-types';
-import { Trash2, Trophy, TrendingUp, Target } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,10 @@ import { Badge } from '@/components/ui/badge';
 interface MyReplaysTableProps {
   replays: UserReplayData[];
   onDelete?: (replay: UserReplayData) => void;
+  confirmedPlayerNames?: string[];
 }
 
-export function MyReplaysTable({ replays, onDelete }: MyReplaysTableProps) {
+export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }: MyReplaysTableProps) {
   const router = useRouter();
   // Helper to format duration from seconds to MM:SS
   const formatDuration = (seconds: number | null): string => {
@@ -92,6 +93,75 @@ export function MyReplaysTable({ replays, onDelete }: MyReplaysTableProps) {
       },
     },
     {
+      id: 'opponent',
+      label: 'Opponent',
+      sortable: true,
+      getValue: (replay) => {
+        // Find all opponents from all_players (excluding player and observers)
+        // Priority: confirmed player name > uploader suggested name > extracted name
+        if (!replay.fingerprint.all_players) return 'zzz';
+
+        // Try to find a confirmed player name in the game
+        let playerData = null;
+        for (const confirmedName of confirmedPlayerNames) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === confirmedName);
+          if (playerData) break;
+        }
+
+        // Fallback to uploader's suggested name
+        if (!playerData && replay.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.player_name);
+        }
+
+        // Last fallback to extracted name
+        if (!playerData && replay.fingerprint.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.fingerprint.player_name);
+        }
+
+        if (playerData) {
+          const opponents = replay.fingerprint.all_players.filter(
+            p => !p.is_observer && p.team !== playerData.team
+          );
+          return opponents[0]?.name?.toLowerCase() || 'zzz';
+        }
+        return 'zzz';
+      },
+      render: (replay) => {
+        // Find all opponents from all_players (different team than player)
+        // Priority: confirmed player name > uploader suggested name > extracted name
+        if (!replay.fingerprint.all_players) {
+          return <span className="text-sm text-muted-foreground">—</span>;
+        }
+
+        // Try to find a confirmed player name in the game
+        let playerData = null;
+        for (const confirmedName of confirmedPlayerNames) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === confirmedName);
+          if (playerData) break;
+        }
+
+        // Fallback to uploader's suggested name
+        if (!playerData && replay.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.player_name);
+        }
+
+        // Last fallback to extracted name
+        if (!playerData && replay.fingerprint.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.fingerprint.player_name);
+        }
+
+        if (playerData) {
+          const opponents = replay.fingerprint.all_players.filter(
+            p => !p.is_observer && p.team !== playerData.team
+          );
+          if (opponents.length > 0) {
+            return <span className="text-sm font-medium">{opponents.map(o => o.name).join(', ')}</span>;
+          }
+        }
+        return <span className="text-sm text-muted-foreground">—</span>;
+      },
+    },
+    {
       id: 'map',
       label: 'Map',
       sortable: true,
@@ -106,15 +176,51 @@ export function MyReplaysTable({ replays, onDelete }: MyReplaysTableProps) {
       sortable: true,
       getValue: (replay) => replay.fingerprint?.matchup?.toLowerCase() || '',
       render: (replay) => {
-        if (!replay.fingerprint?.matchup) {
+        // Determine player's race using confirmed/suggested player name
+        // Priority: confirmed player name > uploader suggested name > extracted name
+        if (!replay.fingerprint.all_players) {
           return <span className="text-sm text-muted-foreground">—</span>;
         }
-        const [race1, race2] = replay.fingerprint.matchup.split('v');
+
+        // Try to find a confirmed player name in the game
+        let playerData = null;
+        for (const confirmedName of confirmedPlayerNames) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === confirmedName);
+          if (playerData) break;
+        }
+
+        // Fallback to uploader's suggested name
+        if (!playerData && replay.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.player_name);
+        }
+
+        // Last fallback to extracted name
+        if (!playerData && replay.fingerprint.player_name) {
+          playerData = replay.fingerprint.all_players.find(p => p.name === replay.fingerprint.player_name);
+        }
+
+        if (!playerData) {
+          return <span className="text-sm text-muted-foreground">—</span>;
+        }
+
+        // Find opponent(s)
+        const opponents = replay.fingerprint.all_players.filter(
+          p => !p.is_observer && p.team !== playerData.team
+        );
+
+        if (opponents.length === 0) {
+          return <span className="text-sm text-muted-foreground">—</span>;
+        }
+
+        // Show player's race first, then opponent's race
+        const playerRace = playerData.race;
+        const opponentRace = opponents[0].race;
+
         return (
           <div className="flex items-center gap-1">
-            <span className={`font-bold ${getRaceColor(race1)}`}>{race1}</span>
+            <span className={`font-bold ${getRaceColor(playerRace)}`}>{playerRace}</span>
             <span className="text-muted-foreground">v</span>
-            <span className={`font-bold ${getRaceColor(race2)}`}>{race2}</span>
+            <span className={`font-bold ${getRaceColor(opponentRace)}`}>{opponentRace}</span>
           </div>
         );
       },

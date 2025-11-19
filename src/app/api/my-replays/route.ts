@@ -145,22 +145,22 @@ export async function POST(request: NextRequest) {
     const fingerprint = await sc2readerClient.extractFingerprint(file, playerName || undefined);
 
     // Track player names for detection
-    if (fingerprint.player_name) {
+    // Use the playerName from uploader (grouped name) not fingerprint.player_name (extracted from replay)
+    if (playerName) {
       let settings = await getUserSettings(discordId);
       if (!settings) {
         settings = await createUserSettings(discordId);
       }
 
-      const playerNameFromReplay = fingerprint.player_name;
-      const isConfirmed = settings.confirmed_player_names.includes(playerNameFromReplay);
+      const isConfirmed = (settings.confirmed_player_names || []).includes(playerName);
 
       if (!isConfirmed) {
         // Add or increment possible player name count
         const possibleNames = settings.possible_player_names || {};
-        possibleNames[playerNameFromReplay] = (possibleNames[playerNameFromReplay] || 0) + 1;
+        possibleNames[playerName] = (possibleNames[playerName] || 0) + 1;
         settings.possible_player_names = possibleNames;
         await updateUserSettings(settings);
-        console.log(`📝 Tracked possible player name: ${playerNameFromReplay} (count: ${possibleNames[playerNameFromReplay]})`);
+        console.log(`📝 Tracked possible player name: ${playerName} (count: ${possibleNames[playerName]})`);
       }
     }
 
@@ -184,6 +184,7 @@ export async function POST(request: NextRequest) {
       uploaded_at: new Date().toISOString(),
       filename: file.name,
       game_type: gameType || undefined,
+      player_name: playerName || undefined,
       target_build_id: targetBuildId || detection?.build_id,
       detection,
       comparison,

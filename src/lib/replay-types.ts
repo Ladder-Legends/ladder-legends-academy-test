@@ -7,7 +7,10 @@ export interface ReplayPlayer {
   name: string;
   race: string;
   result: string; // "Win" | "Loss"
+  team: number;
   is_observer: boolean;
+  mmr?: number | null;
+  apm?: number | null;
 }
 
 export interface ReplayFingerprint {
@@ -145,6 +148,9 @@ export interface UserReplayData {
 
   // Game type from uploader (1v1-ladder, 1v1-private, 2v2-ladder, etc.)
   game_type?: string;
+
+  // Player name from uploader (user's SC2 player name in this replay)
+  player_name?: string;
 
   // Optional target build (if user selected one)
   target_build_id?: string;

@@ -73,6 +73,14 @@ export async function PATCH(request: NextRequest) {
       settings = await createUserSettings(session.user.discordId);
     }
 
+    // Ensure player name fields exist (for backwards compatibility)
+    if (!settings.confirmed_player_names) {
+      settings.confirmed_player_names = [];
+    }
+    if (!settings.possible_player_names) {
+      settings.possible_player_names = {};
+    }
+
     if (action === 'confirm_player_name') {
       // Add to confirmed names if not already there
       if (!settings.confirmed_player_names.includes(player_name)) {

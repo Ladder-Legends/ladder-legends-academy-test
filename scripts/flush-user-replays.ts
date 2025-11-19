@@ -18,14 +18,22 @@ process.env.KV_REST_API_TOKEN = process.env.UPSTASH_REDIS_KV_REST_API_TOKEN;
 import { kv } from '@vercel/kv';
 import { del, list } from '@vercel/blob';
 import { UserReplayData } from '../src/lib/replay-types';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 const DISCORD_USER_ID = process.argv[2] || '161384451518103552'; // Default to your ID
 const DRY_RUN = !process.argv.includes('--execute');
+
+// Uploader local tracker path
+const UPLOADER_DATA_DIR = path.join(os.homedir(), 'Library', 'Application Support', 'ladder-legends-uploader');
+const LOCAL_TRACKER_PATH = path.join(UPLOADER_DATA_DIR, 'replays.json');
 
 // Key prefix constants (same as replay-kv.ts)
 const KEYS = {
   userReplays: (userId: string) => `user:${userId}:replays`,
   userReplay: (userId: string, replayId: string) => `user:${userId}:replay:${replayId}`,
+  userSettings: (userId: string) => `user:${userId}:settings`,
 };
 
 async function flushUserReplays(discordUserId: string, dryRun: boolean) {
@@ -123,11 +131,47 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
     console.log(`⚠️  Could not delete hash manifest: ${message}`);
   }
 
+  // Delete uploader's local tracker
+  console.log('\n🗑️  Deleting uploader local tracker...');
+  try {
+    if (fs.existsSync(LOCAL_TRACKER_PATH)) {
+      fs.unlinkSync(LOCAL_TRACKER_PATH);
+      console.log('✅ Deleted uploader local tracker');
+    } else {
+      console.log('ℹ️  No local tracker found');
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`⚠️  Could not delete local tracker: ${message}`);
+  }
+
+  // Clear user settings (possible_player_names and confirmed_player_names)
+  console.log('\n🗑️  Clearing user settings (player names)...');
+  try {
+    const settings = await kv.get(KEYS.userSettings(discordUserId));
+    if (settings) {
+      // Reset player names but keep other settings
+      await kv.set(KEYS.userSettings(discordUserId), {
+        ...settings,
+        possible_player_names: {},
+        confirmed_player_names: [],
+      });
+      console.log('✅ Cleared possible and confirmed player names');
+    } else {
+      console.log('ℹ️  No user settings found');
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`⚠️  Could not clear user settings: ${message}`);
+  }
+
   console.log('');
   console.log('Summary:');
   console.log(`  - KV entries deleted: ${replayIds.length}`);
   console.log(`  - Blob files deleted: ${blobDeleteCount}`);
   console.log(`  - Hash manifest: cleared`);
+  console.log(`  - Uploader local tracker: cleared`);
+  console.log(`  - User settings: player names cleared`);
 }
 
 // Run the script
