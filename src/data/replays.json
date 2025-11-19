@@ -819,5 +819,29 @@
     "patch": "5.0.14.94137",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "replay-6c03087b-7168-43a9-ab47-f7be946ae124",
+    "title": "ZvX basic zerg build order Replay",
+    "map": "Incorporeal LE",
+    "matchup": "ZvP",
+    "player1": {
+      "name": "EON",
+      "race": "zerg",
+      "result": "win"
+    },
+    "player2": {
+      "name": "A.I. 1 (Very Easy)",
+      "race": "protoss",
+      "result": "loss"
+    },
+    "duration": "10.10",
+    "gameDate": "2025-11-08",
+    "uploadDate": "2025-11-19",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "isFree": false,
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Incorporeal%20LE%20%2893%29-kKVywyRTm4AQ9fJISAO2YeR9ENQkEC.SC2Replay"
   }
 ]
