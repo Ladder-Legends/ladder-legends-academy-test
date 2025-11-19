@@ -36,7 +36,19 @@ const fields: FilterFieldConfig<Replay>[] = [
       }
 
       const matchups = Array.isArray(selectedMatchups) ? selectedMatchups : [String(selectedMatchups)];
-      return matchups.includes(replay.matchup);
+
+      // Check if any selected matchup matches
+      return matchups.some(selected => {
+        // Direct matchup match (e.g., "TvP")
+        if (selected === replay.matchup) return true;
+
+        // Parent race match (e.g., "terran" matches "TvP", "TvZ", "TvT")
+        if (selected === 'terran' && replay.matchup.startsWith('T')) return true;
+        if (selected === 'zerg' && replay.matchup.startsWith('Z')) return true;
+        if (selected === 'protoss' && replay.matchup.startsWith('P')) return true;
+
+        return false;
+      });
     },
   },
 
