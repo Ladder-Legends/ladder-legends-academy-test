@@ -55,7 +55,8 @@ const { handlers, signIn, signOut, auth: uncachedAuth } = NextAuth({
         token.discordId = profile.id;
         // Discord avatar URL format: https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png
         if (profile.image_url || profile.avatar) {
-          token.picture = profile.image_url || `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
+          const imageUrl = typeof profile.image_url === 'string' ? profile.image_url : undefined;
+          token.picture = imageUrl || `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
         }
       }
 

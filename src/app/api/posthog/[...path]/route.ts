@@ -17,16 +17,18 @@ const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posth
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return proxyRequest(request, params.path);
+  const { path } = await params;
+  return proxyRequest(request, path);
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return proxyRequest(request, params.path);
+  const { path } = await params;
+  return proxyRequest(request, path);
 }
 
 async function proxyRequest(request: NextRequest, pathSegments: string[]) {
