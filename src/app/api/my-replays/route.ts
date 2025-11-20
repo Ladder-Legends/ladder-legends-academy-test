@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 
     // Extract fingerprint
     console.log('📊 Extracting fingerprint...');
-    const fingerprint = await sc2readerClient.extractFingerprint(createReplayBlob(), playerName || undefined);
+    const fingerprint = await sc2readerClient.extractFingerprint(createReplayBlob(), playerName || undefined, replayFilename);
 
     // Track player names for detection
     // Use the playerName from uploader (grouped name) not fingerprint.player_name (extracted from replay)
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     // Detect build
     console.log('🔍 Detecting build...');
-    const detection = await sc2readerClient.detectBuild(createReplayBlob(), playerName || undefined);
+    const detection = await sc2readerClient.detectBuild(createReplayBlob(), playerName || undefined, replayFilename);
 
     // Compare to target build (use detected build if no target specified)
     let comparison = null;
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
 
     if (buildToCompare) {
       console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
-      comparison = await sc2readerClient.compareReplay(createReplayBlob(), buildToCompare, playerName || undefined);
+      comparison = await sc2readerClient.compareReplay(createReplayBlob(), buildToCompare, playerName || undefined, replayFilename);
     }
 
     // Create replay data object
