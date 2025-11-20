@@ -82,6 +82,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('[MY-REPLAYS] POST request received');
+    console.log('[MY-REPLAYS] Content-Type:', request.headers.get('content-type'));
+    console.log('[MY-REPLAYS] Content-Length:', request.headers.get('content-length'));
+
     // Check for bearer token first (for desktop app), fall back to session (for web)
     let discordId: string | undefined;
     let userRoles: string[] = [];
