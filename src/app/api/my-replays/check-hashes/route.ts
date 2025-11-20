@@ -9,11 +9,16 @@ import type { Session } from 'next-auth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Log ALL headers to debug
+    console.log('📋 [CHECK-HASHES] All headers:', Object.fromEntries(request.headers.entries()));
+
     // Extract bearer token from Authorization header
     const authHeader = request.headers.get('authorization');
     console.log('🔐 [CHECK-HASHES] Auth header:', authHeader ? `${authHeader.substring(0, 30)}...` : 'MISSING');
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('❌ [CHECK-HASHES] Missing or invalid bearer token');
+      console.log('🔍 [CHECK-HASHES] Header value:', authHeader);
       return NextResponse.json({ error: 'Unauthorized: Missing bearer token' }, { status: 401 });
     }
 
