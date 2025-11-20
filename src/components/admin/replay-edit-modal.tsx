@@ -209,14 +209,8 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     setIsUploading(true);
 
     try {
-      // Delete old blob if exists
-      if (formData.downloadUrl) {
-        await fetch('/api/delete-replay', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: formData.downloadUrl }),
-        });
-      }
+      // Note: Old blob files are not deleted here to keep operations reversible
+      // The checkup script will clean up orphaned blobs
 
       // Upload new file
       const uploadFormData = new FormData();

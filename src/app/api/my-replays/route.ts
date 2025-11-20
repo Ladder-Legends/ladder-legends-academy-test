@@ -8,9 +8,10 @@ import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
 import { hashManifestManager } from '@/lib/replay-hash-manifest';
 import crypto from 'crypto';
+import type { Session } from 'next-auth';
 
-// Use mock KV in development if real KV is not configured
-const USE_MOCK_KV = !process.env.KV_REST_API_URL;
+// Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
+const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
 
 // Import the appropriate KV module - using require for dynamic conditional import
 const kvModule = USE_MOCK_KV
@@ -70,11 +71,14 @@ export async function GET(request: NextRequest) {
  * Query params:
  * - target_build_id: Optional build ID to compare against
  * - player_name: Optional player name to analyze
+ *
+ * SECURITY: Requires subscriber role - replay uploads are a premium feature
  */
 export async function POST(request: NextRequest) {
   try {
     // Check for bearer token first (for desktop app), fall back to session (for web)
     let discordId: string | undefined;
+    let userRoles: string[] = [];
 
     const authHeader = request.headers.get('authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -87,6 +91,7 @@ export async function POST(request: NextRequest) {
         const decoded = verify(token, jwtSecret) as {
           userId: string;
           type: string;
+          roles?: string[];
         };
 
         if (decoded.type !== 'uploader') {
@@ -94,6 +99,7 @@ export async function POST(request: NextRequest) {
         }
 
         discordId = decoded.userId;
+        userRoles = decoded.roles || [];
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === 'TokenExpiredError') {
@@ -112,6 +118,29 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
       discordId = session.user.discordId;
+      userRoles = session.user.roles || [];
+    }
+
+    // CRITICAL SECURITY CHECK: Verify subscriber role
+    // Replay uploads are a premium feature requiring subscription
+    const { hasPermission } = await import('@/lib/permissions');
+
+    // Create a minimal session object for permission check
+    // Type assertion is safe here because hasPermission only reads user.roles
+    const permissionCheck: Session = {
+      user: {
+        roles: userRoles
+      }
+    } as Session;
+
+    if (!hasPermission(permissionCheck, 'subscribers')) {
+      return NextResponse.json(
+        {
+          error: 'Subscription required',
+          message: 'Replay uploads require an active Ladder Legends subscription. Visit https://ladderlegends.academy/subscribe to upgrade.'
+        },
+        { status: 403 }
+      );
     }
 
     // Get query params

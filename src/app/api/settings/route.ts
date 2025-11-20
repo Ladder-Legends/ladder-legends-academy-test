@@ -5,8 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 
-// Use mock KV in development if real KV is not configured
-const USE_MOCK_KV = !process.env.KV_REST_API_URL;
+// Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
+const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
 
 // Import the appropriate KV module dynamically
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic import needed for mock selection
