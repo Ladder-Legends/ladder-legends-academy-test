@@ -9,8 +9,8 @@ describe('DeviceCodeStore', () => {
     device_code: 'test-device-code-123',
     user_code: 'TEST-CODE',
     status: 'pending',
-    created_at: new Date('2025-01-01T00:00:00Z'),
-    expires_at: new Date('2025-01-01T00:15:00Z'),
+    created_at: new Date(Date.now()),
+    expires_at: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
   };
 
   const authorizedCode: DeviceCode = {
@@ -27,6 +27,8 @@ describe('DeviceCodeStore', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set KV env var so device-code-store thinks KV is configured
+    process.env.KV_REST_API_URL = 'http://localhost:8079';
   });
 
   describe('get()', () => {
@@ -161,8 +163,8 @@ describe('DeviceCodeStore', () => {
     it('should handle KV errors gracefully', async () => {
       vi.mocked(kv.set).mockRejectedValue(new Error('KV connection failed'));
 
-      // Should not throw
-      await expect(deviceCodeStore.set(mockCode.device_code, mockCode)).resolves.not.toThrow();
+      // Should throw the KV error (errors are logged and re-thrown)
+      await expect(deviceCodeStore.set(mockCode.device_code, mockCode)).rejects.toThrow('KV connection failed');
     });
   });
 

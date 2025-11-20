@@ -7,16 +7,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { verify } from 'jsonwebtoken';
 
+// Import both KV implementations
+import * as realKV from '@/lib/replay-kv';
+import * as mockKV from '@/lib/replay-kv-mock';
+
 // Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
 const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
 
-// Import the appropriate KV module dynamically
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic import needed for mock selection
-const kvModule = USE_MOCK_KV
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  ? require('@/lib/replay-kv-mock')
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  : require('@/lib/replay-kv');
+// Select the appropriate KV module
+const kvModule = USE_MOCK_KV ? mockKV : realKV;
 
 const {
   getUserSettings,

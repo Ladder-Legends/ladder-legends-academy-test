@@ -17,12 +17,18 @@ vi.mock('@/lib/auth', () => ({
   }),
 }));
 
-// Mock KV module
+// Mock KV module - need to mock both real and mock versions
 const mockGetUserSettings = vi.fn();
 const mockCreateUserSettings = vi.fn();
 const mockUpdateUserSettings = vi.fn();
 
 vi.mock('@/lib/replay-kv', () => ({
+  getUserSettings: (...args: any[]) => mockGetUserSettings(...args),
+  createUserSettings: (...args: any[]) => mockCreateUserSettings(...args),
+  updateUserSettings: (...args: any[]) => mockUpdateUserSettings(...args),
+}));
+
+vi.mock('@/lib/replay-kv-mock', () => ({
   getUserSettings: (...args: any[]) => mockGetUserSettings(...args),
   createUserSettings: (...args: any[]) => mockCreateUserSettings(...args),
   updateUserSettings: (...args: any[]) => mockUpdateUserSettings(...args),

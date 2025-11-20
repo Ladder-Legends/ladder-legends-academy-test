@@ -14,13 +14,15 @@ import type { Session } from 'next-auth';
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds max for replay processing
 
+// Import both KV implementations
+import * as realKV from '@/lib/replay-kv';
+import * as mockKV from '@/lib/replay-kv-mock';
+
 // Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
 const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
 
-// Import the appropriate KV module - using require for dynamic conditional import
-const kvModule = USE_MOCK_KV
-  ? require('@/lib/replay-kv-mock')
-  : require('@/lib/replay-kv');
+// Select the appropriate KV module
+const kvModule = USE_MOCK_KV ? mockKV : realKV;
 
 const {
   saveReplay,
@@ -168,14 +170,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate hash of the file
+    // Read file once into buffer for reuse (file streams can only be consumed once)
     const buffer = Buffer.from(await file.arrayBuffer());
     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
     console.log('📊 Calculated hash:', hash);
 
+    // Create a reusable File from buffer for sc2reader API calls
+    const createReplayFile = () => new File([buffer], file.name, { type: file.type });
+
     // Extract fingerprint
     console.log('📊 Extracting fingerprint...');
-    const fingerprint = await sc2readerClient.extractFingerprint(file, playerName || undefined);
+    const fingerprint = await sc2readerClient.extractFingerprint(createReplayFile(), playerName || undefined);
 
     // Track player names for detection
     // Use the playerName from uploader (grouped name) not fingerprint.player_name (extracted from replay)
@@ -199,7 +204,7 @@ export async function POST(request: NextRequest) {
 
     // Detect build
     console.log('🔍 Detecting build...');
-    const detection = await sc2readerClient.detectBuild(file, playerName || undefined);
+    const detection = await sc2readerClient.detectBuild(createReplayFile(), playerName || undefined);
 
     // Compare to target build (use detected build if no target specified)
     let comparison = null;
@@ -207,7 +212,7 @@ export async function POST(request: NextRequest) {
 
     if (buildToCompare) {
       console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
-      comparison = await sc2readerClient.compareReplay(file, buildToCompare, playerName || undefined);
+      comparison = await sc2readerClient.compareReplay(createReplayFile(), buildToCompare, playerName || undefined);
     }
 
     // Create replay data object

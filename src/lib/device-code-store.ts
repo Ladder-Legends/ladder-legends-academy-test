@@ -19,9 +19,12 @@ export interface DeviceCode {
 }
 
 // Check if KV is configured (supports both local dev and Vercel naming conventions)
-const isKVConfigured = !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
+// Function so it can be checked dynamically (important for testing)
+function isKVConfigured(): boolean {
+  return !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
+}
 
-if (!isKVConfigured) {
+if (!isKVConfigured()) {
   console.warn('[DEVICE STORE] WARNING: KV not configured! Device auth will not work.');
   console.warn('[DEVICE STORE] Set KV_REST_API_URL or UPSTASH_REDIS_KV_REST_API_URL in your environment variables.');
 }
@@ -29,7 +32,7 @@ if (!isKVConfigured) {
 // Device code store using Vercel KV (Redis)
 class DeviceCodeStore {
   async get(key: string): Promise<DeviceCode | undefined> {
-    if (!isKVConfigured) {
+    if (!isKVConfigured()) {
       console.error('[DEVICE STORE] KV not configured - cannot get code:', key);
       return undefined;
     }
@@ -79,7 +82,7 @@ class DeviceCodeStore {
   }
 
   async set(key: string, value: DeviceCode): Promise<void> {
-    if (!isKVConfigured) {
+    if (!isKVConfigured()) {
       console.error('[DEVICE STORE] KV not configured - cannot save code!');
       throw new Error('KV storage not configured. Set KV_REST_API_URL or UPSTASH_REDIS_KV_REST_API_URL environment variable.');
     }
