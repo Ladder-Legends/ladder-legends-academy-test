@@ -80,7 +80,7 @@ class DeviceCodeStore {
   async set(key: string, value: DeviceCode): Promise<void> {
     if (!isKVConfigured) {
       console.error('[DEVICE STORE] KV not configured - cannot save code!');
-      throw new Error('KV storage not configured. Set KV_REST_API_URL environment variable.');
+      throw new Error('KV storage not configured. Set KV_REST_API_URL or UPSTASH_REDIS_KV_REST_API_URL environment variable.');
     }
 
     try {
