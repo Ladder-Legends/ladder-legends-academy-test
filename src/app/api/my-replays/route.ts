@@ -107,7 +107,10 @@ export async function POST(request: NextRequest) {
         discordId = decoded.userId;
         userRoles = decoded.roles || [];
       } catch (error) {
+        console.error('[MY-REPLAYS] JWT verification error:', error);
         if (error instanceof Error) {
+          console.error('[MY-REPLAYS] Error name:', error.name);
+          console.error('[MY-REPLAYS] Error message:', error.message);
           if (error.name === 'TokenExpiredError') {
             return NextResponse.json({ error: 'Unauthorized: Token expired' }, { status: 401 });
           }
