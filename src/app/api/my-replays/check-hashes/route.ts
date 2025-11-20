@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
 
       discordId = decoded.userId;
       userRoles = decoded.roles || [];
+      console.log('✅ [CHECK-HASHES] JWT decoded successfully:', { discordId, userRoles, type: decoded.type });
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'TokenExpiredError') {
@@ -57,7 +58,11 @@ export async function POST(request: NextRequest) {
       }
     } as Session;
 
-    if (!hasPermission(permissionCheck, 'subscribers')) {
+    const hasSubscriberPermission = hasPermission(permissionCheck, 'subscribers');
+    console.log('🔒 [CHECK-HASHES] Permission check:', { hasSubscriberPermission, userRoles });
+
+    if (!hasSubscriberPermission) {
+      console.log('❌ [CHECK-HASHES] Permission denied - no subscriber role');
       return NextResponse.json(
         {
           error: 'Subscription required',
@@ -66,6 +71,8 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    console.log('✅ [CHECK-HASHES] Permission granted - proceeding with hash check');
 
     const body = await request.json();
     const { hashes } = body;
