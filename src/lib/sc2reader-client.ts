@@ -71,7 +71,7 @@ export interface SC2ReplayAPIConfig {
  * Default configuration - reads from environment variables
  */
 const defaultConfig: SC2ReplayAPIConfig = {
-  apiUrl: process.env.NEXT_PUBLIC_SC2READER_API_URL || 'http://localhost:8000',
+  apiUrl: process.env.SC2READER_API_URL || 'http://localhost:8000',
   apiKey: process.env.SC2READER_API_KEY || 'your-secret-key-change-this',
 };
 
