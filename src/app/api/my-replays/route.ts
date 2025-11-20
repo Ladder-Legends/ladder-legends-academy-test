@@ -10,6 +10,10 @@ import { hashManifestManager } from '@/lib/replay-hash-manifest';
 import crypto from 'crypto';
 import type { Session } from 'next-auth';
 
+// Configure route to handle file uploads
+export const runtime = 'nodejs';
+export const maxDuration = 60; // 60 seconds max for replay processing
+
 // Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
 const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
 
