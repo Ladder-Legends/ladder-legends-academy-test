@@ -70,10 +70,15 @@ export async function GET(req: NextRequest) {
       // Generate tokens
       const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
 
+      // Include roles in JWT for permission checks
+      const userRoles = code.user_data.roles || [];
+      console.log('[DEVICE POLL] Including roles in JWT:', userRoles);
+
       const access_token = sign(
         {
           userId: code.user_id,
           type: 'uploader',
+          roles: userRoles, // Include roles for hasPermission() checks
         },
         jwtSecret,
         { expiresIn: '1h' }
@@ -83,6 +88,7 @@ export async function GET(req: NextRequest) {
         {
           userId: code.user_id,
           type: 'refresh',
+          roles: userRoles, // Include roles in refresh token too
         },
         jwtSecret,
         { expiresIn: '30d' }

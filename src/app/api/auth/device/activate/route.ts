@@ -55,10 +55,12 @@ export async function POST(req: NextRequest) {
 
     console.log('[DEVICE AUTH] session.user:', session.user);
 
-    // Type assertion for session user with discordId
-    const userWithDiscordId = session.user as { discordId?: string; name?: string | null; email?: string | null; image?: string | null };
+    // Type assertion for session user with discordId and roles
+    const userWithDiscordId = session.user as { discordId?: string; name?: string | null; email?: string | null; image?: string | null; roles?: string[] };
     const discordId = userWithDiscordId.discordId || '';
+    const userRoles = userWithDiscordId.roles || [];
     console.log('[DEVICE AUTH] session.user.discordId:', discordId);
+    console.log('[DEVICE AUTH] session.user.roles:', userRoles);
 
     // Create updated code with proper Date objects
     const updatedCode = {
@@ -72,6 +74,7 @@ export async function POST(req: NextRequest) {
         id: discordId, // Use discordId, not id
         username: session.user.name || session.user.email || 'Unknown User',
         avatar_url: session.user.image || '',
+        roles: userRoles, // Include roles for permission checks
       },
     };
 

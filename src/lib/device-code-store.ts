@@ -14,6 +14,7 @@ export interface DeviceCode {
     id: string;
     username: string;
     avatar_url: string;
+    roles?: string[]; // Discord role IDs for permission checks
   };
 }
 
