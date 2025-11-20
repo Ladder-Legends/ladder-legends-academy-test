@@ -28,6 +28,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check KV configuration
+    const hasKvRestApiUrl = !!process.env.KV_REST_API_URL;
+    const hasUpstashKvUrl = !!process.env.UPSTASH_REDIS_KV_REST_API_URL;
+    console.log('[DEVICE CODE] KV configuration:', {
+      hasKvRestApiUrl,
+      hasUpstashKvUrl,
+      configured: hasKvRestApiUrl || hasUpstashKvUrl,
+    });
+
     // Generate codes
     const device_code = uuidv4();
     const user_code = generateUserCode();
@@ -43,7 +52,9 @@ export async function POST(req: NextRequest) {
       expires_at,
     };
 
+    console.log('[DEVICE CODE] About to store device code:', user_code);
     await deviceCodeStore.set(device_code, codeData);
+    console.log('[DEVICE CODE] Successfully stored device code:', user_code);
     // user_code is also stored automatically by the set method
 
     // Build verification URI from request origin in development, env var in production
@@ -58,9 +69,17 @@ export async function POST(req: NextRequest) {
       interval: 5, // Poll every 5 seconds
     });
   } catch (error) {
-    console.error('Error generating device code:', error);
+    console.error('[DEVICE CODE] Error generating device code:', error);
+    console.error('[DEVICE CODE] Error details:', {
+      name: error instanceof Error ? error.name : 'unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: 'internal_error' },
+      {
+        error: 'internal_error',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
