@@ -1,9 +1,11 @@
 /**
  * API Route: /api/settings
  * Handles user settings including confirmed player names
+ * Supports both session auth (browser) and JWT auth (uploader app)
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { verify } from 'jsonwebtoken';
 
 // Use mock KV in development if real KV is not configured (supports both local dev and Vercel naming)
 const USE_MOCK_KV = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_KV_REST_API_URL);
@@ -23,22 +25,52 @@ const {
 } = kvModule;
 
 /**
+ * Authenticate request via session (browser) or JWT bearer token (uploader)
+ */
+async function authenticateRequest(request: NextRequest): Promise<string | null> {
+  // Try bearer token first (for uploader app)
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
+
+    try {
+      const decoded = verify(token, jwtSecret) as {
+        userId: string;
+        type: string;
+      };
+
+      if (decoded.type === 'uploader' || decoded.type === 'refresh') {
+        return decoded.userId;
+      }
+    } catch (error) {
+      console.error('[SETTINGS] JWT verification failed:', error);
+      return null;
+    }
+  }
+
+  // Fall back to session auth (for browser)
+  const session = await auth();
+  return session?.user?.discordId || null;
+}
+
+/**
  * GET /api/settings
  * Fetch user settings
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const discordId = await authenticateRequest(request);
 
-    if (!session?.user?.discordId) {
+    if (!discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let settings = await getUserSettings(session.user.discordId);
+    let settings = await getUserSettings(discordId);
 
     // Create settings if they don't exist
     if (!settings) {
-      settings = await createUserSettings(session.user.discordId);
+      settings = await createUserSettings(discordId);
     }
 
     return NextResponse.json({ settings });
@@ -62,18 +94,18 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth();
+    const discordId = await authenticateRequest(request);
 
-    if (!session?.user?.discordId) {
+    if (!discordId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { action, player_name } = body;
 
-    let settings = await getUserSettings(session.user.discordId);
+    let settings = await getUserSettings(discordId);
     if (!settings) {
-      settings = await createUserSettings(session.user.discordId);
+      settings = await createUserSettings(discordId);
     }
 
     // Ensure player name fields exist (for backwards compatibility)
