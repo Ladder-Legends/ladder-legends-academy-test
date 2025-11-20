@@ -74,9 +74,10 @@ async function handleGenerateToken(
   // For premium content, check authentication first
   if (!isFree) {
     const session = await auth();
-    const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
-    if (!hasSubscriberRole) {
+    // CRITICAL SECURITY CHECK: Use hasPermission() instead of client-modifiable flag
+    const { hasPermission } = await import('@/lib/permissions');
+    if (!hasPermission(session, 'subscribers')) {
       return NextResponse.json(
         { error: 'Unauthorized. This replay requires a subscription.' },
         { status: 403 }

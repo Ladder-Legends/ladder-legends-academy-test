@@ -102,12 +102,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check for subscriber status - ALL Mux videos are premium content
-    const hasSubscription = session.user?.hasSubscriberRole ||
-                           session.user?.roles?.includes('coaches') ||
-                           session.user?.roles?.includes('owner');
+    // CRITICAL SECURITY CHECK: Use hasPermission() instead of client-modifiable flag
+    // ALL Mux videos are premium content
+    const { hasPermission } = await import('@/lib/permissions');
 
-    if (!hasSubscription) {
+    if (!hasPermission(session, 'subscribers')) {
       return NextResponse.json(
         { error: 'Premium subscription required. All videos require an active subscription.' },
         { status: 403 }
@@ -205,12 +204,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for subscriber status - ALL Mux videos are premium content
-    const hasSubscription = session.user?.hasSubscriberRole ||
-                           session.user?.roles?.includes('coaches') ||
-                           session.user?.roles?.includes('owner');
+    // CRITICAL SECURITY CHECK: Use hasPermission() instead of client-modifiable flag
+    // ALL Mux videos are premium content
+    const { hasPermission } = await import('@/lib/permissions');
 
-    if (!hasSubscription) {
+    if (!hasPermission(session, 'subscribers')) {
       return NextResponse.json(
         { error: 'Premium subscription required. All videos require an active subscription.' },
         { status: 403 }

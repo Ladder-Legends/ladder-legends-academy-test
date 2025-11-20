@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashManifestManager } from '@/lib/replay-hash-manifest';
 import { verify } from 'jsonwebtoken';
+import type { Session } from 'next-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,10 +21,12 @@ export async function POST(request: NextRequest) {
     const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
 
     let discordId: string;
+    let userRoles: string[] = [];
     try {
       const decoded = verify(token, jwtSecret) as {
         userId: string;
         type: string;
+        roles?: string[];
       };
 
       if (decoded.type !== 'uploader') {
@@ -31,6 +34,7 @@ export async function POST(request: NextRequest) {
       }
 
       discordId = decoded.userId;
+      userRoles = decoded.roles || [];
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'TokenExpiredError') {
@@ -41,6 +45,26 @@ export async function POST(request: NextRequest) {
         }
       }
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // CRITICAL SECURITY CHECK: Verify subscriber role
+    // Checking replay hashes requires subscription (part of replay upload feature)
+    const { hasPermission } = await import('@/lib/permissions');
+
+    const permissionCheck: Session = {
+      user: {
+        roles: userRoles
+      }
+    } as Session;
+
+    if (!hasPermission(permissionCheck, 'subscribers')) {
+      return NextResponse.json(
+        {
+          error: 'Subscription required',
+          message: 'Replay uploads require an active Ladder Legends subscription. Visit https://ladderlegends.academy/subscribe to upgrade.'
+        },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
