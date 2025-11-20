@@ -175,12 +175,17 @@ export async function POST(request: NextRequest) {
     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
     console.log('📊 Calculated hash:', hash);
 
-    // Create a reusable File from buffer for sc2reader API calls
-    const createReplayFile = () => new File([buffer], file.name, { type: file.type });
+    // Store filename for later use
+    const replayFilename = file.name;
+
+    // Create a reusable Blob from buffer for sc2reader API calls
+    // Note: In Node.js, we use Blob instead of File for proper multipart encoding
+    // The filename will be provided when appending to FormData in the client
+    const createReplayBlob = () => new Blob([buffer], { type: 'application/octet-stream' });
 
     // Extract fingerprint
     console.log('📊 Extracting fingerprint...');
-    const fingerprint = await sc2readerClient.extractFingerprint(createReplayFile(), playerName || undefined);
+    const fingerprint = await sc2readerClient.extractFingerprint(createReplayBlob(), playerName || undefined);
 
     // Track player names for detection
     // Use the playerName from uploader (grouped name) not fingerprint.player_name (extracted from replay)
@@ -204,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     // Detect build
     console.log('🔍 Detecting build...');
-    const detection = await sc2readerClient.detectBuild(createReplayFile(), playerName || undefined);
+    const detection = await sc2readerClient.detectBuild(createReplayBlob(), playerName || undefined);
 
     // Compare to target build (use detected build if no target specified)
     let comparison = null;
@@ -212,7 +217,7 @@ export async function POST(request: NextRequest) {
 
     if (buildToCompare) {
       console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
-      comparison = await sc2readerClient.compareReplay(createReplayFile(), buildToCompare, playerName || undefined);
+      comparison = await sc2readerClient.compareReplay(createReplayBlob(), buildToCompare, playerName || undefined);
     }
 
     // Create replay data object

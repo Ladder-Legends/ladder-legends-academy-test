@@ -169,17 +169,21 @@ export class SC2ReplayAPIClient {
 
   /**
    * Extract comprehensive fingerprint from a replay
-   * @param file - The .SC2Replay file
+   * @param file - The .SC2Replay file or Blob
    * @param playerName - Optional player name to analyze
    * @returns Promise with replay fingerprint
    */
-  async extractFingerprint(file: File, playerName?: string): Promise<ReplayFingerprint> {
-    if (!file.name.endsWith('.SC2Replay')) {
+  async extractFingerprint(file: File | Blob, playerName?: string): Promise<ReplayFingerprint> {
+    // Get filename for validation and FormData
+    const filename = file instanceof File ? file.name : 'replay.SC2Replay';
+
+    if (!filename.endsWith('.SC2Replay')) {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
     const formData = new FormData();
-    formData.append('file', file);
+    // When using Blob in Node.js, we must provide a filename
+    formData.append('file', file, filename);
     if (playerName) {
       formData.append('player_name', playerName);
     }
@@ -211,17 +215,19 @@ export class SC2ReplayAPIClient {
 
   /**
    * Detect build order from a replay
-   * @param file - The .SC2Replay file
+   * @param file - The .SC2Replay file or Blob
    * @param playerName - Optional player name to analyze
    * @returns Promise with build detection result
    */
-  async detectBuild(file: File, playerName?: string): Promise<BuildDetection | null> {
-    if (!file.name.endsWith('.SC2Replay')) {
+  async detectBuild(file: File | Blob, playerName?: string): Promise<BuildDetection | null> {
+    const filename = file instanceof File ? file.name : 'replay.SC2Replay';
+
+    if (!filename.endsWith('.SC2Replay')) {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', file, filename);
     if (playerName) {
       formData.append('player_name', playerName);
     }
@@ -253,22 +259,24 @@ export class SC2ReplayAPIClient {
 
   /**
    * Compare replay execution to a learned build
-   * @param file - The .SC2Replay file
+   * @param file - The .SC2Replay file or Blob
    * @param buildId - ID of learned build to compare against
    * @param playerName - Optional player name to analyze
    * @returns Promise with comparison result
    */
   async compareReplay(
-    file: File,
+    file: File | Blob,
     buildId: string,
     playerName?: string
   ): Promise<ComparisonResult> {
-    if (!file.name.endsWith('.SC2Replay')) {
+    const filename = file instanceof File ? file.name : 'replay.SC2Replay';
+
+    if (!filename.endsWith('.SC2Replay')) {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', file, filename);
     if (playerName) {
       formData.append('player_name', playerName);
     }
