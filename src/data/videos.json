@@ -1653,5 +1653,26 @@
     "coach": "",
     "coachId": "",
     "isFree": true
+  },
+  {
+    "id": "c68b3401-e001-4711-913d-3d84d293c387",
+    "title": "2 Base Viking/Tank Push in TvT Guide",
+    "description": "Hello everyone, here's a guide to the 1.5-2 base TvT Tank Viking push I often execute on ladder against opponents that play standard, aiming to swiftly end the game or create a massive economic lead after an scv pull from our opponents. ",
+    "source": "mux",
+    "muxAssetId": "x57vjuc01EbLofzHa2ALDgwbxWgql2SAqKuW02hdr4xIg",
+    "muxPlaybackId": "ChA7VOKYK02kO1cCnVl1dZ5BbC7qH8CvwS9aLCNVgBnc",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/c68b3401-e001-4711-913d-3d84d293c387.jpg",
+    "date": "2025-11-20",
+    "categories": [
+      "builds.timing-attack",
+      "strategy.mid-game",
+      "matchups.tvt"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
