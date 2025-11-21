@@ -1575,10 +1575,11 @@
     "youtubeId": "6Aiv5qhx0YQ",
     "thumbnail": "https://img.youtube.com/vi/6Aiv5qhx0YQ/hqdefault.jpg",
     "date": "2025-11-15",
+    "categories": [],
     "tags": [],
     "race": "protoss",
-    "coach": "",
-    "coachId": "",
+    "coach": "Fairespiter",
+    "coachId": "d391998b-1c4e-4474-94f6-26aa4b46edc8",
     "isFree": true
   },
   {
