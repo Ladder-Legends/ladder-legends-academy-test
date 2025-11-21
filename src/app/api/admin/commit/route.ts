@@ -401,13 +401,38 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Create commit message
-    const changeSummary = changes.map(c =>
-      `${c.operation} ${c.contentType}/${c.data.id}`
-    ).join(', ');
+    const operationVerbs: Record<Operation, string> = {
+      create: 'Add',
+      update: 'Edit',
+      delete: 'Delete'
+    };
+
+    const contentTypeLabels: Record<ContentType, string> = {
+      'build-orders': 'build order',
+      'replays': 'replay',
+      'masterclasses': 'masterclass',
+      'videos': 'video',
+      'coaches': 'coach',
+      'events': 'event',
+      'sponsorships': 'sponsorship',
+      'about': 'about page',
+      'privacy': 'privacy policy',
+      'terms': 'terms of service',
+      'file': 'file'
+    };
+
+    const changeSummary = changes.map(c => {
+      const verb = operationVerbs[c.operation];
+      const label = contentTypeLabels[c.contentType];
+      const id = c.id || (c.data.id as string) || 'unknown';
+      // For files, show the path; for others, show the ID
+      const identifier = c.contentType === 'file' ? (c.data.path as string) : id;
+      return `${verb} ${label}: ${identifier}`;
+    }).join('\n');
 
     const commitMessage = `CMS batch update by ${session.user.name || session.user.email}
 
-Changes: ${changeSummary}
+${changeSummary}
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 

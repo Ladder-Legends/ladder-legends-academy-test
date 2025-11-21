@@ -111,9 +111,18 @@ export function applyChanges(
           break;
 
         case 'update':
-          updatedContent = updatedContent.map((item: Record<string, unknown>) =>
-            item.id === change.data.id ? change.data : item
-          );
+          // Check if item exists
+          const itemExists = updatedContent.some((item: Record<string, unknown>) => item.id === change.data.id);
+          if (itemExists) {
+            // Update existing item
+            updatedContent = updatedContent.map((item: Record<string, unknown>) =>
+              item.id === change.data.id ? change.data : item
+            );
+          } else {
+            // Item doesn't exist - add it (upsert behavior)
+            console.warn(`[UPSERT] Item ${change.data.id} not found in ${contentType}, creating instead`);
+            updatedContent = [...updatedContent, change.data];
+          }
           break;
 
         case 'delete':
