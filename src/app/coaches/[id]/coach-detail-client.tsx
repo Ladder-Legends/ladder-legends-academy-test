@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Filter, Edit } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { Footer } from '@/components/footer';
 import { VideoCard } from '@/components/videos/video-card';
 import { ReplayCard } from '@/components/replays/replay-card';
@@ -34,6 +36,7 @@ interface CoachDetailClientProps {
 
 export function CoachDetailClient({ coach, videos, replays, buildOrders, masterclasses, events, allVideos }: CoachDetailClientProps) {
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const [isCoachEditModalOpen, setIsCoachEditModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [videoToEdit, setVideoToEdit] = useState<Video | null>(null);
@@ -77,8 +80,13 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
     if (!confirm(`Are you sure you want to delete "${video.title}"?`)) {
       return;
     }
-    // TODO: Implement delete functionality
-    console.log('Delete video:', video.id);
+    addChange({
+      id: video.id,
+      contentType: 'videos',
+      operation: 'delete',
+      data: video as unknown as Record<string, unknown>,
+    });
+    toast.success('Video marked for deletion (pending commit)');
   };
 
   // Display label for coach (always show as "Coach")

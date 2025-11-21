@@ -17,6 +17,8 @@ import { EventDateDisplay } from '@/components/events/event-date-display';
 import { useState } from 'react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 
 interface Coach {
   id: string;
@@ -37,6 +39,7 @@ interface EventDetailClientProps {
 export function EventDetailClient({ event, coach }: EventDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const status = getEventStatus(event);
 
@@ -57,8 +60,13 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${event.title}"?`)) {
-      console.log('Delete event:', event.id);
-      // The actual delete would be handled by the modal/CMS system
+      addChange({
+        id: event.id,
+        contentType: 'events',
+        operation: 'delete',
+        data: event as unknown as Record<string, unknown>,
+      });
+      toast.success('Event marked for deletion (pending commit)');
     }
   };
 

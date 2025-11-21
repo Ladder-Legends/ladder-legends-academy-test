@@ -14,6 +14,8 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { ShareDialog } from '@/components/social/share-dialog';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 import replaysData from '@/data/replays.json';
 import videosData from '@/data/videos.json';
 import { Replay, normalizeReplays } from '@/types/replay';
@@ -33,6 +35,7 @@ interface BuildOrderDetailClientProps {
 export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Determine if paywall should be shown
@@ -70,8 +73,13 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${buildOrder.name}"?`)) {
-      console.log('Delete build order:', buildOrder.id);
-      // The actual delete would be handled by the modal/CMS system
+      addChange({
+        id: buildOrder.id,
+        contentType: 'build-orders',
+        operation: 'delete',
+        data: buildOrder as unknown as Record<string, unknown>,
+      });
+      toast.success('Build order marked for deletion (pending commit)');
     }
   };
 

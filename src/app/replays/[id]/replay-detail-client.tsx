@@ -13,6 +13,8 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { ShareDialog } from '@/components/social/share-dialog';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 import videosData from '@/data/videos.json';
 import buildOrdersData from '@/data/build-orders.json';
 import { Video as VideoType } from '@/types/video';
@@ -31,6 +33,7 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const allBuildOrders = buildOrdersData as BuildOrder[];
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Determine if paywall should be shown
@@ -75,8 +78,13 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${replay.title}"?`)) {
-      console.log('Delete replay:', replay.id);
-      // The actual delete would be handled by the modal/CMS system
+      addChange({
+        id: replay.id,
+        contentType: 'replays',
+        operation: 'delete',
+        data: replay as unknown as Record<string, unknown>,
+      });
+      toast.success('Replay marked for deletion (pending commit)');
     }
   };
 

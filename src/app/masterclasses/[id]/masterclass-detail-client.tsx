@@ -13,6 +13,8 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { ShareDialog } from '@/components/social/share-dialog';
+import { toast } from 'sonner';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { Video } from '@/types/video';
 import videosData from '@/data/videos.json';
 import { Replay, normalizeReplays } from '@/types/replay';
@@ -31,6 +33,7 @@ interface MasterclassDetailClientProps {
 export function MasterclassDetailClient({ masterclass }: MasterclassDetailClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Determine if paywall should be shown
@@ -50,8 +53,13 @@ export function MasterclassDetailClient({ masterclass }: MasterclassDetailClient
 
   const handleDelete = () => {
     if (confirm(`Are you sure you want to delete "${masterclass.title}"?`)) {
-      console.log('Delete masterclass:', masterclass.id);
-      // The actual delete would be handled by the modal/CMS system
+      addChange({
+        id: masterclass.id,
+        contentType: 'masterclasses',
+        operation: 'delete',
+        data: masterclass as unknown as Record<string, unknown>,
+      });
+      toast.success('Masterclass marked for deletion (pending commit)');
     }
   };
 
