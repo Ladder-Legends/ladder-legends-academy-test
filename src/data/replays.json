@@ -843,5 +843,29 @@
     "patch": "5.0.15.95299",
     "isFree": false,
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Incorporeal%20LE%20%2893%29-kKVywyRTm4AQ9fJISAO2YeR9ENQkEC.SC2Replay"
+  },
+  {
+    "id": "replay-79e861e8-a15b-47c6-a841-df77be35539e",
+    "title": "The Nicosystem™ 2 base tank/viking push Replay",
+    "map": "Tourmaline LE",
+    "matchup": "TvT",
+    "player1": {
+      "name": "GamerNico",
+      "race": "terran",
+      "result": "win"
+    },
+    "player2": {
+      "name": "A.I. 1 (Very Easy)",
+      "race": "terran",
+      "result": "loss"
+    },
+    "duration": "10.06",
+    "gameDate": "2025-11-20",
+    "uploadDate": "2025-11-21",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "isFree": false,
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-ND7eqKXmpke9FNQEDFj8ekl2ctQFPt.SC2Replay"
   }
 ]
