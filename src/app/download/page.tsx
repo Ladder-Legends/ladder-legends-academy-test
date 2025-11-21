@@ -72,7 +72,7 @@ export default function DownloadPage() {
           <CardContent className="space-y-4">
             <Button asChild className="w-full" size="lg">
               <Link
-                href="https://github.com/ladder-legends/ladder-legends-uploader/releases/latest"
+                href="https://github.com/ladder-legends/ladder-legends-uploader/releases/latest/download/LadderLegendsUploader.dmg"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -109,7 +109,7 @@ export default function DownloadPage() {
           <CardContent className="space-y-4">
             <Button asChild className="w-full" size="lg">
               <Link
-                href="https://github.com/ladder-legends/ladder-legends-uploader/releases/latest"
+                href="https://github.com/ladder-legends/ladder-legends-uploader/releases/latest/download/LadderLegendsUploader.msi"
                 target="_blank"
                 rel="noopener noreferrer"
               >
