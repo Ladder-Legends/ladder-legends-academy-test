@@ -6475,7 +6475,7 @@
     "difficulty": "basic",
     "coach": "Nico",
     "coachId": "coach-nico",
-    "description": "AI version of the build for study. This build aims to punish standard players by hitting before they are ready, forcing them to lift off production buildings or pull workers to defend the push before they're ready before moving into a standard macro game. ",
+    "description": "AI version of the build for study that includes a macro followup. This build aims to punish standard players by hitting before they are ready, forcing them to lift off production buildings or pull workers to defend the push before they're ready before moving into a standard macro game. ",
     "videoIds": [],
     "steps": [
       {
@@ -7556,7 +7556,7 @@
     ],
     "tags": [],
     "patch": "5.0.15.95299",
-    "updatedAt": "2025-11-11",
+    "updatedAt": "2025-11-21",
     "isFree": false,
     "replayId": "replay-a5e86f0f-a7f2-4095-a181-936d06113d46"
   },
