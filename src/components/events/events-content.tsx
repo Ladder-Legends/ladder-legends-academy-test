@@ -297,6 +297,7 @@ export function EventsContent() {
       <EventEditModal
         event={editingEvent}
         isOpen={isModalOpen}
+        isNew={!editingEvent}
         onClose={() => {
           setIsModalOpen(false);
           setEditingEvent(null);
