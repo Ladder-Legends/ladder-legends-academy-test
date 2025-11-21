@@ -1693,5 +1693,24 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "ec20defc-a6e4-458b-b296-540bdea09232",
+    "title": "How to Deal with A proxy Hatchery as Protoss",
+    "description": "This video I go over the importance of not panicking and recognizing the danger level + how to get yourself into a good position for the midgame ",
+    "source": "mux",
+    "muxAssetId": "F3Ru62vjK013VLZq7tIWxDlauh00ac2ozhLIXeK8RY3ZM",
+    "muxPlaybackId": "ECUJK1pnVZg00bNSy00GjqPRvM8phMpU00BJO023KaHqlgc",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/ec20defc-a6e4-458b-b296-540bdea09232.jpg",
+    "date": "2025-11-21",
+    "categories": [
+      "strategy.early-game"
+    ],
+    "tags": [],
+    "race": "protoss",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
