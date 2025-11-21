@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import axios, { AxiosError } from 'axios';
 import {
   SC2ReplayAPIClient,
   formatReplayTime,
@@ -16,9 +17,41 @@ import {
 // Mock fetch globally
 global.fetch = vi.fn();
 
+// Helper to create a mock File with arrayBuffer support
+function createMockFile(content: string, name: string, type: string) {
+  const buffer = Buffer.from(content);
+  const file = new File([content], name, { type });
+  // Add arrayBuffer method to the mock File
+  (file as any).arrayBuffer = vi.fn().mockResolvedValue(buffer.buffer);
+  return file;
+}
+
+// Helper to create a mock AxiosError
+function createMockAxiosError(status: number, data: any, message?: string) {
+  const error = new AxiosError(
+    message || `Request failed with status code ${status}`,
+    status.toString(),
+    undefined,
+    undefined,
+    {
+      status,
+      statusText: '',
+      data,
+      headers: {},
+      config: {} as any,
+    }
+  );
+  return error;
+}
+
 describe('SC2ReplayAPIClient', () => {
   beforeEach(() => {
     (fetch as ReturnType<typeof vi.fn>).mockClear();
+    vi.spyOn(axios, 'post');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('constructor', () => {
@@ -43,7 +76,7 @@ describe('SC2ReplayAPIClient', () => {
     });
   });
 
-  describe.skip('analyzeReplay', () => {
+  describe('analyzeReplay', () => {
     it('should throw error for non-.SC2Replay files', async () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -55,7 +88,7 @@ describe('SC2ReplayAPIClient', () => {
 
     it('should successfully analyze a replay file', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
       const mockResponse = {
         filename: 'test.SC2Replay',
@@ -89,18 +122,17 @@ describe('SC2ReplayAPIClient', () => {
         },
       };
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
+      (axios.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: mockResponse,
       });
 
       const result = await client.analyzeReplay(file);
 
       expect(result).toEqual(mockResponse);
-      expect(fetch).toHaveBeenCalledWith(
+      expect(axios.post).toHaveBeenCalledWith(
         expect.stringContaining('/analyze'),
+        expect.any(Object),
         expect.objectContaining({
-          method: 'POST',
           headers: expect.objectContaining({
             'X-API-Key': expect.any(String),
           }),
@@ -110,13 +142,10 @@ describe('SC2ReplayAPIClient', () => {
 
     it('should handle 401 authentication error', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        json: async () => ({ error: 'Unauthorized' }),
-      });
+      const error = createMockAxiosError(401, { error: 'Unauthorized' });
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
       await expect(client.analyzeReplay(file)).rejects.toThrow(
         'Authentication failed. Invalid API key.'
@@ -125,13 +154,10 @@ describe('SC2ReplayAPIClient', () => {
 
     it('should handle 422 parse error', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 422,
-        json: async () => ({ error: 'Parse error', detail: 'Corrupted replay file' }),
-      });
+      const error = createMockAxiosError(422, { error: 'Parse error', detail: 'Corrupted replay file' });
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
       await expect(client.analyzeReplay(file)).rejects.toThrow(
         'Failed to parse replay file: Corrupted replay file'
@@ -140,56 +166,45 @@ describe('SC2ReplayAPIClient', () => {
 
     it('should handle 400 bad request error', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: async () => ({ error: 'Invalid request' }),
-      });
+      const error = createMockAxiosError(400, { error: 'Invalid request' });
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
       await expect(client.analyzeReplay(file)).rejects.toThrow('Invalid request');
     });
 
     it('should handle generic API errors', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: async () => ({ error: 'Internal server error' }),
-      });
+      const error = createMockAxiosError(500, { error: 'Internal server error' });
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
       await expect(client.analyzeReplay(file)).rejects.toThrow('Internal server error');
     });
 
     it('should handle network errors', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
       await expect(client.analyzeReplay(file)).rejects.toThrow('Network error');
     });
 
     it('should handle malformed error responses', async () => {
       const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.SC2Replay', { type: 'application/octet-stream' });
+      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: async () => {
-          throw new Error('Invalid JSON');
-        },
-      });
+      const error = createMockAxiosError(500, {}, 'Request failed');
+      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
-      await expect(client.analyzeReplay(file)).rejects.toThrow('Failed to analyze replay');
+      await expect(client.analyzeReplay(file)).rejects.toThrow('Request failed');
     });
   });
 
-  describe.skip('healthCheck', () => {
+  describe('healthCheck', () => {
     it('should return true when API is healthy', async () => {
       const client = new SC2ReplayAPIClient();
 
