@@ -11,11 +11,20 @@ export const metadata: Metadata = {
     siteName: 'Ladder Legends Academy',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://www.ladderlegendsacademy.com/og-fallback.png',
+        width: 1200,
+        height: 630,
+        alt: 'Download Ladder Legends Uploader',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Download Ladder Legends Uploader - Auto-Upload Your SC2 Replays',
     description: 'Automatic StarCraft 2 replay uploads for macOS and Windows. Get instant analysis and track your progress.',
+    images: ['https://www.ladderlegendsacademy.com/og-fallback.png'],
   },
 };
 

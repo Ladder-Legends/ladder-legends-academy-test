@@ -13,11 +13,20 @@ export const metadata: Metadata = {
     siteName: 'Ladder Legends Academy',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://www.ladderlegendsacademy.com/og-fallback.png',
+        width: 1200,
+        height: 630,
+        alt: 'My Replays - Ladder Legends Academy',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'My Replays - Track Your StarCraft 2 Games',
     description: 'Upload and analyze your StarCraft 2 replays. Get detailed statistics and AI-powered insights from Grandmaster coaches.',
+    images: ['https://www.ladderlegendsacademy.com/og-fallback.png'],
   },
 };
 
