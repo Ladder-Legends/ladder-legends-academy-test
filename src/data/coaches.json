@@ -108,5 +108,25 @@
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/80610394/calendar/12406470?locations=None",
     "isActive": false,
     "socialLinks": {}
+  },
+  {
+    "id": "d391998b-1c4e-4474-94f6-26aa4b46edc8",
+    "name": "fairespiter",
+    "displayName": "Fairespiter",
+    "race": "protoss",
+    "bio": "GM Macro Protoss\n\nAnalytical approach - I focus on all the small details of your gameplay to help you improve.\n\nDepth of gameplay - I explain the rationale behind each move, analyzing the game situations.\n\nFocused on macro play - With me, you will learn the basics of a solid game to face any situation in a match.\n\nAccuracy in builds - I will teach you and provide precise timings to punish every mistake of your opponents.",
+    "specialties": [
+      "Macro management",
+      "Build orders",
+      "protoss mechanics",
+      "Improvement strategies",
+      "Fundamentals",
+      "Ladder coaching",
+      "Advanced strategies"
+    ],
+    "bookingUrl": "https://app.acuityscheduling.com/schedule.php?owner=36208321&appointmentType=85655498",
+    "pricePerHour": "£10",
+    "isActive": true,
+    "socialLinks": {}
   }
 ]
