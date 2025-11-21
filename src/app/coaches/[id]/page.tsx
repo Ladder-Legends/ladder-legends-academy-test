@@ -48,18 +48,18 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       siteName: 'Ladder Legends Academy',
       images: [
         {
-          url: 'https://www.ladderlegendsacademy.com/LL_LOGO.png',
-          width: 512,
-          height: 512,
+          url: 'https://www.ladderlegendsacademy.com/og-fallback.png',
+          width: 1200,
+          height: 630,
           alt: `${coach.displayName} - Ladder Legends Academy Coach`,
         },
       ],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: `${title} | Ladder Legends Academy`,
       description,
-      images: ['https://www.ladderlegendsacademy.com/LL_LOGO.png'],
+      images: ['https://www.ladderlegendsacademy.com/og-fallback.png'],
     },
     alternates: {
       canonical: url,

@@ -223,7 +223,7 @@ describe('generatePlaylistMetadata', () => {
     const images = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images : [metadata.openGraph?.images];
     const firstImage = images[0];
     const imageUrl = typeof firstImage === 'string' ? firstImage : (firstImage instanceof URL ? firstImage.href : firstImage?.url);
-    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/LL_LOGO.png');
+    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/og-fallback.png');
   });
 
   it('should handle content with empty videoIds array', () => {
@@ -246,7 +246,7 @@ describe('generatePlaylistMetadata', () => {
     const images = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images : [metadata.openGraph?.images];
     const firstImage = images[0];
     const imageUrl = typeof firstImage === 'string' ? firstImage : (firstImage instanceof URL ? firstImage.href : firstImage?.url);
-    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/LL_LOGO.png');
+    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/og-fallback.png');
   });
 
   it('should generate absolute thumbnail URLs from relative paths', () => {
@@ -521,6 +521,6 @@ describe('generatePlaylistMetadata', () => {
     const images = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images : [metadata.openGraph?.images];
     const firstImage = images[0];
     const imageUrl = typeof firstImage === 'string' ? firstImage : (firstImage instanceof URL ? firstImage.href : firstImage?.url);
-    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/LL_LOGO.png');
+    expect(imageUrl).toBe('https://www.ladderlegendsacademy.com/og-fallback.png');
   });
 });

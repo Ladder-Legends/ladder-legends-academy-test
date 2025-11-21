@@ -51,11 +51,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: event.createdAt,
       modifiedTime: event.updatedAt,
       tags: event.tags,
+      images: [
+        {
+          url: 'https://www.ladderlegendsacademy.com/og-fallback.png',
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['https://www.ladderlegendsacademy.com/og-fallback.png'],
     },
     alternates: {
       canonical: url,

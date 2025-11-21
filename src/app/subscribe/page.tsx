@@ -1,6 +1,33 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Subscribe',
+  description: 'Join Ladder Legends Academy for exclusive coaching, premium content, and access to our community of StarCraft 2 players and coaches.',
+  openGraph: {
+    title: 'Subscribe | Ladder Legends Academy',
+    description: 'Join Ladder Legends Academy for exclusive coaching, premium content, and access to our community of StarCraft 2 players and coaches.',
+    url: 'https://www.ladderlegendsacademy.com/subscribe',
+    siteName: 'Ladder Legends Academy',
+    type: 'website',
+    images: [
+      {
+        url: 'https://www.ladderlegendsacademy.com/og-fallback.png',
+        width: 1200,
+        height: 630,
+        alt: 'Subscribe to Ladder Legends Academy',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Subscribe | Ladder Legends Academy',
+    description: 'Join Ladder Legends Academy for exclusive coaching, premium content, and access to our community of StarCraft 2 players and coaches.',
+    images: ['https://www.ladderlegendsacademy.com/og-fallback.png'],
+  },
+};
 
 export default function SubscribePage() {
   return (

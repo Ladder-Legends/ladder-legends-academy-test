@@ -118,7 +118,7 @@ export function generatePlaylistMetadata({
     ? (displayThumbnail.startsWith('http')
         ? displayThumbnail
         : `https://www.ladderlegendsacademy.com${displayThumbnail}`)
-    : 'https://www.ladderlegendsacademy.com/LL_LOGO.png'; // Fallback
+    : 'https://www.ladderlegendsacademy.com/og-fallback.png'; // Fallback
 
   // Build canonical URL with query param if applicable
   let canonicalUrl = `https://www.ladderlegendsacademy.com${basePath}/${content.id}`;
