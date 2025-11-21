@@ -1674,5 +1674,24 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "f7741399-f5a2-4d5c-b75c-a4e4a22e042d",
+    "title": "Mentality Coaching- How to Create A winning Position Ft. Classic Vs. Zoun",
+    "description": "In this video I go over how classic masterfully moves his army around a small stasis grab to turn a small advantage into a victory. Really think about zouns psychology in this and how something like the statis and vulnerable 4th base affects his positioning ",
+    "source": "mux",
+    "muxAssetId": "4SDRp1wm4Pdwnlyx75A01sao100AshvvRCVqC6TuiKatk",
+    "muxPlaybackId": "Jib8Idnfd02QetXW7FLffbMHLaVBQeSNMlP9noAL8xr8",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/f7741399-f5a2-4d5c-b75c-a4e4a22e042d.jpg",
+    "date": "2025-11-21",
+    "categories": [
+      "mindset.decision-making"
+    ],
+    "tags": [],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
