@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""
+Step 3: Test production Next.js API → production Python sc2reader
+Final verification that everything works in production.
+
+Requires .env.production.local to be present with AUTH_SECRET and SC2READER_API_KEY
+"""
+
+import jwt
+import requests
+import sys
+import os
+from datetime import datetime, timedelta
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env.production.local file
+env_path = Path(__file__).parent.parent / '.env.production.local'
+load_dotenv(env_path)
+
+# Configuration from environment
+PROD_JWT_SECRET = os.getenv('AUTH_SECRET')
+SC2READER_API_KEY = os.getenv('SC2READER_API_KEY')
+USER_ID = os.getenv('TEST_USER_ID', '161384451518103552')
+ROLE_ID = os.getenv('TEST_ROLE_ID', '1386739785283928124')
+
+if not PROD_JWT_SECRET:
+    print("❌ Error: AUTH_SECRET not found in .env.production.local")
+    sys.exit(1)
+
+if not SC2READER_API_KEY:
+    print("❌ Error: SC2READER_API_KEY not found in .env.production.local")
+    sys.exit(1)
+
+NEXT_API_URL = 'https://www.ladderlegendsacademy.com'
+SC2READER_API_URL = 'https://sc2-replay-analyzer-gold.vercel.app/'
+
+# Default replay file path
+DEFAULT_REPLAY = os.path.expanduser(
+    "~/Library/Application Support/Blizzard/StarCraft II/Accounts/766657/"
+    "1-S2-1-802768/Replays/Multiplayer/Tokamak LE (31).SC2Replay"
+)
+
+def generate_token():
+    """Generate JWT token for production environment"""
+    payload = {
+        'userId': USER_ID,
+        'type': 'uploader',
+        'roles': [ROLE_ID],
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(hours=1)
+    }
+    token = jwt.encode(payload, PROD_JWT_SECRET, algorithm='HS256')
+    return token
+
+def upload_replay(replay_path):
+    """Upload replay file to API"""
+    token = generate_token()
+
+    print(f"🔑 Generated production JWT token")
+    print(f"📤 Testing upload to {NEXT_API_URL}/api/my-replays")
+    print(f"📊 Using sc2reader at {SC2READER_API_URL}")
+    print(f"📁 File: {replay_path}")
+    print()
+
+    if not os.path.exists(replay_path):
+        print(f"❌ Error: Replay file not found: {replay_path}")
+        return False
+
+    with open(replay_path, 'rb') as f:
+        files = {'file': (os.path.basename(replay_path), f, 'application/octet-stream')}
+        headers = {'Authorization': f'Bearer {token}'}
+
+        try:
+            response = requests.post(
+                f'{NEXT_API_URL}/api/my-replays',
+                files=files,
+                headers=headers,
+                timeout=60
+            )
+
+            print(f"Status: {response.status_code}")
+
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    print("✅ SUCCESS! Replay uploaded and analyzed")
+                    print(f"   Replay ID: {data['replay']['id']}")
+                    if data['replay'].get('fingerprint'):
+                        fp = data['replay']['fingerprint']
+                        print(f"   Matchup: {fp.get('matchup')}")
+                        print(f"   Race: {fp.get('race')}")
+                        print(f"   Player: {fp.get('player_name')}")
+                        print(f"   Map: {fp.get('metadata', {}).get('map')}")
+                    print()
+                    print("🎉 Production deployment verified successful!")
+                    return True
+                else:
+                    print(f"❌ FAILED: {data}")
+                    return False
+            else:
+                print(f"❌ FAILED: HTTP {response.status_code}")
+                try:
+                    error = response.json()
+                    print(f"   Error: {error}")
+                    if 'error parsing the body' in str(error).lower():
+                        print()
+                        print("   ⚠️  Production sc2reader is still having parsing issues.")
+                        print("   The File() constructor fix may not be deployed yet.")
+                except:
+                    print(f"   Response: {response.text[:200]}")
+                return False
+
+        except requests.exceptions.ConnectionError as e:
+            print(f"❌ Connection Error: Could not connect to {NEXT_API_URL}")
+            print(f"   Check if production API is accessible")
+            return False
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return False
+
+if __name__ == '__main__':
+    print("=" * 60)
+    print("STEP 3: Production Next.js API → Production sc2reader")
+    print("=" * 60)
+    print()
+
+    replay_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_REPLAY
+
+    success = upload_replay(replay_path)
+    sys.exit(0 if success else 1)

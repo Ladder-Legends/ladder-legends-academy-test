@@ -1,56 +1,40 @@
-# Video Data Conversion Scripts
+# Testing Scripts
 
-These scripts allow you to convert between JSON and CSV formats for the video library data.
+Automated testing scripts for replay upload functionality.
 
-## JSON to CSV
+## Prerequisites
 
-Convert `videos.json` to `videos.csv` for easy editing in Excel or Google Sheets:
-
+**Node.js Scripts:**
 ```bash
-npm run json-to-csv
+npm install jsonwebtoken dotenv
 ```
 
-This will create `src/data/videos.csv` from `src/data/videos.json`.
-
-### Custom paths:
+**Python Scripts:**
 ```bash
-tsx scripts/json-to-csv.ts input.json output.csv
+pip3 install --break-system-packages pyjwt requests python-dotenv
 ```
 
-## CSV to JSON
+## Environment Configuration
 
-Convert `videos.csv` back to `videos.json` after editing:
+Scripts read from `.env.local` and `.env.production.local`:
 
+- `AUTH_SECRET`: JWT signing secret
+- `SC2READER_API_KEY`: API key for sc2reader service
+- `TEST_USER_ID` (optional): Override test user ID
+- `TEST_ROLE_ID` (optional): Override test role ID
+
+## Usage
+
+**Generate JWT tokens:**
 ```bash
-npm run csv-to-json
+node scripts/generate-token.mjs local   # or 'prod'
 ```
 
-This will create `src/data/videos.json` from `src/data/videos.csv`.
-
-### Custom paths:
+**Test replay uploads:**
 ```bash
-tsx scripts/csv-to-json.ts input.csv output.json
+python3 scripts/step1-local-api-local-sc2reader.py
+python3 scripts/step2-local-api-prod-sc2reader.py  
+python3 scripts/step3-prod-api-prod-sc2reader.py
 ```
 
-## CSV Format
-
-The CSV uses the following columns:
-- `id` - Unique identifier
-- `title` - Video title
-- `description` - Video description
-- `youtubeId` - YouTube video ID
-- `thumbnail` - Thumbnail URL
-- `tags` - Pipe-separated tags (e.g., `terran|groovy|build order`)
-- `addedAt` - ISO date string
-
-### Example CSV:
-```csv
-id,title,description,youtubeId,thumbnail,tags,addedAt
-1,Terran Basics,Learn the basics,abc123,https://...,terran|groovy|fundamentals,2024-01-01T00:00:00.000Z
-```
-
-## Notes
-
-- Tags are separated by `|` (pipe character) in CSV
-- Fields containing commas or quotes are automatically escaped
-- Empty tags are filtered out during conversion
+All scripts exit with 0 on success, 1 on failure.

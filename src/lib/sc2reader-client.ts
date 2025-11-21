@@ -179,9 +179,12 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
+    // Convert Blob to File for proper multipart encoding
+    const arrayBuffer = await blob.arrayBuffer();
+    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+
     const formData = new FormData();
-    // Provide filename explicitly for proper multipart encoding
-    formData.append('file', blob, filename);
+    formData.append('file', file);
     if (playerName) {
       formData.append('player_name', playerName);
     }
@@ -223,8 +226,12 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
+    // Convert Blob to File for proper multipart encoding
+    const arrayBuffer = await blob.arrayBuffer();
+    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+
     const formData = new FormData();
-    formData.append('file', blob, filename);
+    formData.append('file', file);
     if (playerName) {
       formData.append('player_name', playerName);
     }
@@ -272,8 +279,12 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
+    // Convert Blob to File for proper multipart encoding
+    const arrayBuffer = await blob.arrayBuffer();
+    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+
     const formData = new FormData();
-    formData.append('file', blob, filename);
+    formData.append('file', file);
     if (playerName) {
       formData.append('player_name', playerName);
     }
