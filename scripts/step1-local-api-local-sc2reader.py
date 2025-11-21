@@ -32,6 +32,10 @@ if not SC2READER_API_KEY:
     print("❌ Error: SC2READER_API_KEY not found in .env.local")
     sys.exit(1)
 
+# Python dotenv doesn't process escape sequences like Next.js does
+# So we need to manually unescape \$ to $
+LOCAL_JWT_SECRET = LOCAL_JWT_SECRET.replace('\\$', '$')
+
 NEXT_API_URL = 'http://localhost:3000'
 SC2READER_API_URL = 'http://localhost:8000'
 

@@ -5,6 +5,8 @@
  * Returns build orders, metadata, fingerprints, build detection, and comparisons.
  */
 
+import axios, { AxiosError } from 'axios';
+import FormData from 'form-data';
 import type {
   ReplayFingerprint,
   BuildDetection,
@@ -113,40 +115,33 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
-    // Create form data
+    // Convert File to Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Use form-data package (works properly with Next.js)
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', buffer, {
+      filename: file.name,
+      contentType: 'application/octet-stream',
+    });
 
     try {
-      const response = await fetch(`${this.config.apiUrl}/analyze`, {
-        method: 'POST',
+      const response = await axios.post(`${this.config.apiUrl}/analyze`, formData, {
         headers: {
+          ...formData.getHeaders(),
           'X-API-Key': this.config.apiKey,
         },
-        body: formData,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const error = errorData as SC2ReplayAPIError;
-
-        if (response.status === 401) {
-          throw new Error('Authentication failed. Invalid API key.');
-        } else if (response.status === 422) {
-          throw new Error(`Failed to parse replay file: ${error.detail || 'The replay may be corrupted'}`);
-        } else if (response.status === 400) {
-          throw new Error(error.error || 'Invalid request');
-        } else {
-          throw new Error(error.error || 'Failed to analyze replay');
-        }
-      }
-
-      const data: SC2AnalysisResponse = await response.json();
-      return data;
+      return response.data;
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
+      if (error instanceof AxiosError && error.response) {
+        throw await this.handleAxiosError(error);
       }
+      if (error instanceof Error) throw error;
       throw new Error('Failed to analyze replay. Please try again.');
     }
   }
@@ -179,36 +174,39 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
-    // Convert Blob to File for proper multipart encoding
+    // Convert Blob to Buffer
     const arrayBuffer = await blob.arrayBuffer();
-    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+    const buffer = Buffer.from(arrayBuffer);
 
+    // Use form-data package (works properly with Next.js)
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', buffer, {
+      filename,
+      contentType: 'application/octet-stream',
+    });
     if (playerName) {
       formData.append('player_name', playerName);
     }
 
     try {
       const response = await withTimeout(
-        fetch(`${this.config.apiUrl}/fingerprint`, {
-          method: 'POST',
+        axios.post(`${this.config.apiUrl}/fingerprint`, formData, {
           headers: {
+            ...formData.getHeaders(),
             'X-API-Key': this.config.apiKey,
           },
-          body: formData,
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
         }),
         API_TIMEOUT_MS,
         'Fingerprint extraction'
       );
 
-      if (!response.ok) {
-        throw await this.handleError(response);
-      }
-
-      const data = await response.json();
-      return data.fingerprint;
+      return response.data.fingerprint;
     } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        throw await this.handleAxiosError(error);
+      }
       if (error instanceof Error) throw error;
       throw new Error('Failed to extract fingerprint. Please try again.');
     }
@@ -226,36 +224,39 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
-    // Convert Blob to File for proper multipart encoding
+    // Convert Blob to Buffer
     const arrayBuffer = await blob.arrayBuffer();
-    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+    const buffer = Buffer.from(arrayBuffer);
 
+    // Use form-data package (works properly with Next.js)
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', buffer, {
+      filename,
+      contentType: 'application/octet-stream',
+    });
     if (playerName) {
       formData.append('player_name', playerName);
     }
 
     try {
       const response = await withTimeout(
-        fetch(`${this.config.apiUrl}/detect-build`, {
-          method: 'POST',
+        axios.post(`${this.config.apiUrl}/detect-build`, formData, {
           headers: {
+            ...formData.getHeaders(),
             'X-API-Key': this.config.apiKey,
           },
-          body: formData,
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
         }),
         API_TIMEOUT_MS,
         'Build detection'
       );
 
-      if (!response.ok) {
-        throw await this.handleError(response);
-      }
-
-      const data = await response.json();
-      return data.detection;
+      return response.data.detection;
     } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        throw await this.handleAxiosError(error);
+      }
       if (error instanceof Error) throw error;
       throw new Error('Failed to detect build. Please try again.');
     }
@@ -279,38 +280,43 @@ export class SC2ReplayAPIClient {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
-    // Convert Blob to File for proper multipart encoding
+    // Convert Blob to Buffer
     const arrayBuffer = await blob.arrayBuffer();
-    const file = new File([arrayBuffer], filename, { type: 'application/octet-stream' });
+    const buffer = Buffer.from(arrayBuffer);
 
+    // Use form-data package (works properly with Next.js)
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', buffer, {
+      filename,
+      contentType: 'application/octet-stream',
+    });
     if (playerName) {
       formData.append('player_name', playerName);
     }
 
     try {
       const response = await withTimeout(
-        fetch(
+        axios.post(
           `${this.config.apiUrl}/compare?build_id=${encodeURIComponent(buildId)}`,
+          formData,
           {
-            method: 'POST',
             headers: {
+              ...formData.getHeaders(),
               'X-API-Key': this.config.apiKey,
             },
-            body: formData,
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
           }
         ),
         API_TIMEOUT_MS,
         'Build comparison'
       );
 
-      if (!response.ok) {
-        throw await this.handleError(response);
-      }
-
-      return await response.json();
+      return response.data;
     } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        throw await this.handleAxiosError(error);
+      }
       if (error instanceof Error) throw error;
       throw new Error('Failed to compare replay. Please try again.');
     }
@@ -342,7 +348,7 @@ export class SC2ReplayAPIClient {
   }
 
   /**
-   * Handle API errors consistently
+   * Handle API errors consistently (legacy fetch-based method, kept for backward compatibility)
    */
   private async handleError(response: Response): Promise<Error> {
     const errorData = await response.json().catch(() => ({}));
@@ -358,6 +364,25 @@ export class SC2ReplayAPIClient {
       return new Error(error.detail || 'Resource not found');
     } else {
       return new Error(error.error || error.detail || 'An error occurred');
+    }
+  }
+
+  /**
+   * Handle Axios API errors consistently
+   */
+  private async handleAxiosError(error: AxiosError): Promise<Error> {
+    const errorData = error.response?.data as SC2ReplayAPIError | undefined;
+
+    if (error.response?.status === 401) {
+      return new Error('Authentication failed. Invalid API key.');
+    } else if (error.response?.status === 422) {
+      return new Error(`Failed to parse replay file: ${errorData?.detail || 'The replay may be corrupted'}`);
+    } else if (error.response?.status === 400) {
+      return new Error(errorData?.error || errorData?.detail || 'Invalid request');
+    } else if (error.response?.status === 404) {
+      return new Error(errorData?.detail || 'Resource not found');
+    } else {
+      return new Error(errorData?.error || errorData?.detail || error.message || 'An error occurred');
     }
   }
 }

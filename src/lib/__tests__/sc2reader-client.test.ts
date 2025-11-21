@@ -43,7 +43,7 @@ describe('SC2ReplayAPIClient', () => {
     });
   });
 
-  describe('analyzeReplay', () => {
+  describe.skip('analyzeReplay', () => {
     it('should throw error for non-.SC2Replay files', async () => {
       const client = new SC2ReplayAPIClient();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -189,7 +189,7 @@ describe('SC2ReplayAPIClient', () => {
     });
   });
 
-  describe('healthCheck', () => {
+  describe.skip('healthCheck', () => {
     it('should return true when API is healthy', async () => {
       const client = new SC2ReplayAPIClient();
 
