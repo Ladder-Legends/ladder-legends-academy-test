@@ -404,10 +404,11 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           <div>
             <label className="block text-sm font-medium mb-1">Race</label>
             <select
-              value={formData.race || 'terran'}
+              value={formData.race || 'none'}
               onChange={(e) => setFormData({ ...formData, race: e.target.value as VideoRace })}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
             >
+              <option value="none">None / Not Applicable</option>
               <option value="terran">Terran</option>
               <option value="zerg">Zerg</option>
               <option value="protoss">Protoss</option>

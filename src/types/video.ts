@@ -1,4 +1,4 @@
-export type VideoRace = 'terran' | 'zerg' | 'protoss' | 'all';
+export type VideoRace = 'terran' | 'zerg' | 'protoss' | 'all' | 'none';
 export type VideoSource = 'youtube' | 'mux';
 export type Difficulty = 'basic' | 'intermediate' | 'expert';
 

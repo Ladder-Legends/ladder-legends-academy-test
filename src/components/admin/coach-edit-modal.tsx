@@ -143,10 +143,11 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
         <div>
           <label className="block text-sm font-medium mb-1">Race *</label>
           <select
-            value={formData.race || 'terran'}
-            onChange={(e) => setFormData({ ...formData, race: e.target.value as 'terran' | 'zerg' | 'protoss' | 'all' })}
+            value={formData.race || 'none'}
+            onChange={(e) => setFormData({ ...formData, race: e.target.value as 'terran' | 'zerg' | 'protoss' | 'all' | 'none' })}
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
           >
+            <option value="none">None / General Coach</option>
             <option value="terran">Terran</option>
             <option value="zerg">Zerg</option>
             <option value="protoss">Protoss</option>

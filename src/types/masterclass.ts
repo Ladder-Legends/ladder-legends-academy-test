@@ -1,6 +1,6 @@
 import { Video, getVideoThumbnailUrl, Difficulty } from './video';
 
-export type Race = 'terran' | 'zerg' | 'protoss' | 'all';
+export type Race = 'terran' | 'zerg' | 'protoss' | 'all' | 'none';
 
 export interface Masterclass {
   id: string;

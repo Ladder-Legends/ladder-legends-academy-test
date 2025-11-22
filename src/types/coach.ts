@@ -2,7 +2,7 @@ export interface Coach {
   id: string;
   name: string;
   displayName: string;
-  race: 'terran' | 'zerg' | 'protoss' | 'all';
+  race: 'terran' | 'zerg' | 'protoss' | 'all' | 'none';
   bio: string;
   rank?: string;
   specialties: string[];
