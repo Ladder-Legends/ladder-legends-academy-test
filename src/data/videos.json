@@ -1713,5 +1713,21 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "59cfc29a-915f-4df1-b26a-5ebffc2c3294",
+    "title": "ZvT Handling Chaos and Chaotic situations",
+    "description": "What to look for when builds are gone, damage is done on both sides, how to proceed, and pull out that victory screen.",
+    "source": "mux",
+    "muxAssetId": "XkGm6NeUVjedl7CxWe1DxgDBQAGW3a9OaeHa6gmw8ws",
+    "muxPlaybackId": "802whBmFCgOYY02GYuYP02gNI5tFWq525Hiz9uWyrKQOmA",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/59cfc29a-915f-4df1-b26a-5ebffc2c3294.jpg",
+    "date": "2025-11-22",
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
