@@ -1729,5 +1729,22 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "5639ca87-5d25-4426-bfbb-4c3fd315ea14",
+    "title": "ZvT Roach shot count",
+    "description": "How many shots does a roach to kill a tank? Find out here for all the ground possibilities a roach can fight.",
+    "source": "mux",
+    "muxAssetId": "yNI8xretTLtYQ3rYVFMIBU7QTnbk4uyzBtbfJe4QoLg",
+    "muxPlaybackId": "ClsYcjjc8tojwlz01gFACF8xstH973HuPglq5F8Benb8",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/5639ca87-5d25-4426-bfbb-4c3fd315ea14.jpg",
+    "date": "2025-11-22",
+    "categories": [],
+    "tags": [],
+    "race": "zerg",
+    "coach": "Eon",
+    "coachId": "eon",
+    "isFree": false
   }
 ]
