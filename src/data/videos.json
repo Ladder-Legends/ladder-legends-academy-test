@@ -1724,6 +1724,16 @@
     "muxAssetStatus": "ready",
     "thumbnail": "/thumbnails/59cfc29a-915f-4df1-b26a-5ebffc2c3294.jpg",
     "date": "2025-11-22",
+    "categories": [
+      "mechanics.army-control",
+      "mindset.game-sense",
+      "mindset.decision-making",
+      "strategy.transitions",
+      "strategy.scouting",
+      "strategy.mid-game",
+      "matchups.zvt",
+      "mechanics.multitasking"
+    ],
     "tags": [],
     "race": "zerg",
     "coach": "Eon",
