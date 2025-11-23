@@ -1774,5 +1774,24 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "8e9ca18e-eb62-4dc9-a992-00053c1a1348",
+    "title": "1 Protoss Opener for Each Matchup. Recommended for Platinum-Master 3",
+    "description": "basic simple progression designed at winning you games while playing Protoss. If you want a more standard progression of PVZ PM! this is specifically for skytoss gameplay!",
+    "source": "mux",
+    "muxAssetId": "5lpJOVuWTI3optR9e01AduuatwjLkOBtYoh7JAQ5cHu00",
+    "muxPlaybackId": "EGGFyS2mjFYGNXIvcAeuCQaJ9tEICBjN86T00ZhTMgI00",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/8e9ca18e-eb62-4dc9-a992-00053c1a1348.jpg",
+    "date": "2025-11-23",
+    "categories": [
+      "builds.macro"
+    ],
+    "tags": [],
+    "race": "protoss",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
