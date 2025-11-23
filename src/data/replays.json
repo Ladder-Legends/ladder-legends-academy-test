@@ -891,5 +891,34 @@
     "patch": "5.0.15.95299",
     "isFree": false,
     "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-8UQUnUfdFQqZgWfrhP6g5g8CYW1z4J.SC2Replay"
+  },
+  {
+    "id": "d6683cce-f2e9-4c80-b510-aa83ef1e3d03",
+    "title": "Lategame TvP against Heaven (Mass Gateway style) ",
+    "description": "A lategame TvP on ladder after a weird early game, showing key terran fundamental principles required to win TvP",
+    "map": "Winter Madness LE",
+    "matchup": "PvT",
+    "player1": {
+      "name": "Heaven",
+      "race": "protoss",
+      "result": "loss",
+      "mmr": 5318
+    },
+    "player2": {
+      "name": "GamerNico",
+      "race": "terran",
+      "result": "win",
+      "mmr": 5189
+    },
+    "duration": "23:39",
+    "gameDate": "2025-11-23",
+    "uploadDate": "2025-11-23",
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Lategame%20TvP%20vs%20Heaven-2jbXcdKTUqoXApgmct1O62qiEFhBcx.SC2Replay",
+    "videoIds": [],
+    "coach": "coach nico",
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "notes": "",
+    "isFree": false
   }
 ]
