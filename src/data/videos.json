@@ -1816,5 +1816,28 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false
+  },
+  {
+    "id": "a82ec95f-a8e5-4fd2-a6ed-b4b7e1bca950",
+    "title": "TVZ - THE FORBIDDEN GASLESS TERRAN OPENER ",
+    "description": "Learn to play gasless expand in TVZ!\n\nWarning: Zerg players will hate you for this.",
+    "source": "mux",
+    "muxAssetId": "J18K2GV6Osmm3gVdpXXk02VPc7UHBg02AooO76jOy1OmA",
+    "muxPlaybackId": "HQQ5QzWAWeRItK01dnAs402VKLry4XxLqpx005IKUpEbcc",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/a82ec95f-a8e5-4fd2-a6ed-b4b7e1bca950.jpg",
+    "date": "2025-11-23",
+    "categories": [
+      "builds.macro",
+      "matchups.tvz",
+      "analysis.replay-reviews",
+      "strategy.transitions",
+      "strategy.scouting"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "GamerRichy",
+    "coachId": "gamerrichy",
+    "isFree": false
   }
 ]
