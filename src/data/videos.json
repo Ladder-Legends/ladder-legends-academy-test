@@ -251,13 +251,14 @@
     "youtubeId": "iYzl-AYAOr0",
     "thumbnail": "https://img.youtube.com/vi/iYzl-AYAOr0/hqdefault.jpg",
     "date": "2025-10-04",
+    "categories": [],
     "tags": [
       "terran",
       "zerg",
       "protoss",
       "macro"
     ],
-    "race": "all",
+    "race": "none",
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true
