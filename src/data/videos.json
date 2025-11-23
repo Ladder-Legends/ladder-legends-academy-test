@@ -1793,5 +1793,28 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "6235b1ee-1add-481e-9fce-c0fab8f40b5b",
+    "title": "TVZ - How to play vs gasless openings?!",
+    "description": "How to play vs Gasless - What can I do to get an advantage!?",
+    "source": "mux",
+    "muxAssetId": "sUc021pGkKxSLYgJjt01Yd9gDAEx7xZL026WGcOIKGXLdA",
+    "muxPlaybackId": "qvCm00HX2qVh7SfGbQQvQQN6PKyljIt8p7oBhlcE8w2U",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/6235b1ee-1add-481e-9fce-c0fab8f40b5b.jpg",
+    "date": "2025-11-23",
+    "categories": [
+      "builds.timing-attack",
+      "strategy.early-game",
+      "analysis.replay-reviews",
+      "mechanics.army-control",
+      "mindset.decision-making"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "GamerRichy",
+    "coachId": "gamerrichy",
+    "isFree": false
   }
 ]
