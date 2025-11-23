@@ -2536,7 +2536,9 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "description": "A smoother vs AI replay for studying timings for TvP 5-1-1",
-    "videoIds": [],
+    "videoIds": [
+      "fce29407-cde6-42d1-8ca1-8011712bbe4e"
+    ],
     "steps": [
       {
         "supply": 13,
@@ -3096,7 +3098,7 @@
     ],
     "tags": [],
     "patch": "5.0.14.94137",
-    "updatedAt": "2025-11-11",
+    "updatedAt": "2025-11-23",
     "isFree": false,
     "replayId": "replay-7df54317-f263-42db-830e-7ccd854cde76"
   },
