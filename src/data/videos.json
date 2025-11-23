@@ -1757,5 +1757,22 @@
     "coach": "Eon",
     "coachId": "eon",
     "isFree": false
+  },
+  {
+    "id": "009bb191-c423-460b-8863-8d3ec7a62db0",
+    "title": "Creating a Win Condition Mid match- TvZ Coaching Segment ",
+    "description": "In this part of my session with imperator I go over how he could turn semi useless hellions for the situation into a game winning condition and how to do so ",
+    "source": "mux",
+    "muxAssetId": "dA6GCtOxUX5HsloOlJXJKSPqJJu5CaNx9wnl4CaBlX00",
+    "muxPlaybackId": "AxlDFPgLDWxtI9xdtaalwcR5ZKQr9BEBj5Mgd4HBkmc",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/009bb191-c423-460b-8863-8d3ec7a62db0.jpg",
+    "date": "2025-11-23",
+    "categories": [],
+    "tags": [],
+    "race": "terran",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
