@@ -1786,7 +1786,10 @@
     "thumbnail": "/thumbnails/8e9ca18e-eb62-4dc9-a992-00053c1a1348.jpg",
     "date": "2025-11-23",
     "categories": [
-      "builds.macro"
+      "builds.macro",
+      "matchups.pvt",
+      "matchups.pvz",
+      "matchups.pvp"
     ],
     "tags": [],
     "race": "protoss",
