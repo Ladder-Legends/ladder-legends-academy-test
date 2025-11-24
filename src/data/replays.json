@@ -920,5 +920,29 @@
     "patch": "5.0.15.95299",
     "notes": "",
     "isFree": false
+  },
+  {
+    "id": "replay-6afb7cd8-9c44-430e-ae5e-903e120d42b1",
+    "title": "TVZ - THE FORBIDDEN GASLESS TERRAN OPENER Replay",
+    "map": "Ruby Rock LE",
+    "matchup": "TvZ",
+    "player1": {
+      "name": "Mengsk",
+      "race": "terran",
+      "result": "win"
+    },
+    "player2": {
+      "name": "Rescue",
+      "race": "zerg",
+      "result": "loss"
+    },
+    "duration": "09.04",
+    "gameDate": "2025-11-16",
+    "uploadDate": "2025-11-24",
+    "videoIds": [],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "isFree": false,
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Ruby%20Rock%20LE%20%283%29-AaNBVDVz8GfhbYYDaLb5vsqJYsewBl.SC2Replay"
   }
 ]

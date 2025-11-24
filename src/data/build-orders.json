@@ -7847,5 +7847,520 @@
     "updatedAt": "2025-11-21",
     "isFree": false,
     "replayId": "replay-692aab23-85dd-4a59-9ee3-eed28d8b5423"
+  },
+  {
+    "id": "0c95be0e-0244-4602-9c63-765d53f96aa4",
+    "name": "TVZ - THE FORBIDDEN GASLESS TERRAN OPENER",
+    "race": "terran",
+    "vsRace": "zerg",
+    "difficulty": "intermediate",
+    "coach": "GamerRichy",
+    "coachId": "gamerrichy",
+    "description": "Mech Build: Learn to play gasless expand in TVZ! Warning: Zerg players will hate you for this.",
+    "videoIds": [
+      "a82ec95f-a8e5-4fd2-a6ed-b4b7e1bca950"
+    ],
+    "steps": [
+      {
+        "supply": 13,
+        "time": "0:17",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 15,
+        "time": "0:40",
+        "action": "Barracks"
+      },
+      {
+        "supply": 17,
+        "time": "1:13",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 19,
+        "time": "1:36",
+        "action": "Refinery"
+      },
+      {
+        "supply": 19,
+        "time": "1:44",
+        "action": "Marine"
+      },
+      {
+        "supply": 20,
+        "time": "1:46",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 20,
+        "time": "2:00",
+        "action": "Bunker"
+      },
+      {
+        "supply": 20,
+        "time": "2:02",
+        "action": "Marine"
+      },
+      {
+        "supply": 21,
+        "time": "2:09",
+        "action": "Refinery"
+      },
+      {
+        "supply": 22,
+        "time": "2:20",
+        "action": "Marine"
+      },
+      {
+        "supply": 24,
+        "time": "2:25",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 25,
+        "time": "2:37",
+        "action": "Marine"
+      },
+      {
+        "supply": 26,
+        "time": "2:38",
+        "action": "Factory"
+      },
+      {
+        "supply": 26,
+        "time": "2:46",
+        "action": "BarracksReactor"
+      },
+      {
+        "supply": 30,
+        "time": "3:17",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 32,
+        "time": "3:29",
+        "action": "Starport"
+      },
+      {
+        "supply": 32,
+        "time": "3:30",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 34,
+        "time": "3:39",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 35,
+        "time": "3:45",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 36,
+        "time": "3:50",
+        "action": "Hellion"
+      },
+      {
+        "supply": 38,
+        "time": "3:50",
+        "action": "Hellion"
+      },
+      {
+        "supply": 43,
+        "time": "4:11",
+        "action": "Hellion"
+      },
+      {
+        "supply": 47,
+        "time": "4:20",
+        "action": "Factory"
+      },
+      {
+        "supply": 47,
+        "time": "4:22",
+        "action": "Hellion"
+      },
+      {
+        "supply": 50,
+        "time": "4:28",
+        "action": "BarracksTechLab"
+      },
+      {
+        "supply": 50,
+        "time": "4:29",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 50,
+        "time": "4:29",
+        "action": "Factory"
+      },
+      {
+        "supply": 51,
+        "time": "4:34",
+        "action": "Hellion"
+      },
+      {
+        "supply": 53,
+        "time": "4:35",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 56,
+        "time": "4:38",
+        "action": "Refinery"
+      },
+      {
+        "supply": 56,
+        "time": "4:38",
+        "action": "Refinery"
+      },
+      {
+        "supply": 56,
+        "time": "4:39",
+        "action": "StarportReactor"
+      },
+      {
+        "supply": 57,
+        "time": "4:47",
+        "action": "Hellion"
+      },
+      {
+        "supply": 60,
+        "time": "4:50",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 60,
+        "time": "4:55",
+        "action": "Armory"
+      },
+      {
+        "supply": 60,
+        "time": "5:10",
+        "action": "Hellion"
+      },
+      {
+        "supply": 63,
+        "time": "5:13",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 62,
+        "time": "5:27",
+        "action": "Hellion"
+      },
+      {
+        "supply": 60,
+        "time": "5:37",
+        "action": "Hellion"
+      },
+      {
+        "supply": 62,
+        "time": "5:37",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 65,
+        "time": "5:40",
+        "action": "Factory"
+      },
+      {
+        "supply": 65,
+        "time": "5:42",
+        "action": "Factory"
+      },
+      {
+        "supply": 67,
+        "time": "5:49",
+        "action": "Hellion"
+      },
+      {
+        "supply": 69,
+        "time": "5:52",
+        "action": "Refinery"
+      },
+      {
+        "supply": 71,
+        "time": "5:58",
+        "action": "Refinery"
+      },
+      {
+        "supply": 71,
+        "time": "6:02",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 71,
+        "time": "6:06",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 73,
+        "time": "6:06",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 76,
+        "time": "6:07",
+        "action": "EngineeringBay"
+      },
+      {
+        "supply": 78,
+        "time": "6:18",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 79,
+        "time": "6:19",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 81,
+        "time": "6:25",
+        "action": "Hellion"
+      },
+      {
+        "supply": 83,
+        "time": "6:26",
+        "action": "Hellion"
+      },
+      {
+        "supply": 85,
+        "time": "6:42",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 85,
+        "time": "6:44",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 85,
+        "time": "6:45",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 89,
+        "time": "6:54",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 92,
+        "time": "6:55",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 92,
+        "time": "6:55",
+        "action": "FactoryTechLab"
+      },
+      {
+        "supply": 92,
+        "time": "6:55",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 92,
+        "time": "6:55",
+        "action": "FactoryTechLab"
+      },
+      {
+        "supply": 93,
+        "time": "7:01",
+        "action": "Hellion"
+      },
+      {
+        "supply": 95,
+        "time": "7:01",
+        "action": "Hellion"
+      },
+      {
+        "supply": 99,
+        "time": "7:10",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 101,
+        "time": "7:10",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 103,
+        "time": "7:14",
+        "action": "OrbitalCommand"
+      },
+      {
+        "supply": 103,
+        "time": "7:17",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 104,
+        "time": "7:20",
+        "action": "Upgrade: HighCapacityBarrels"
+      },
+      {
+        "supply": 104,
+        "time": "7:20",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 104,
+        "time": "7:20",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 96,
+        "time": "7:26",
+        "action": "SiegeTank"
+      },
+      {
+        "supply": 99,
+        "time": "7:30",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 100,
+        "time": "7:37",
+        "action": "Hellion"
+      },
+      {
+        "supply": 102,
+        "time": "7:37",
+        "action": "Hellion"
+      },
+      {
+        "supply": 104,
+        "time": "7:45",
+        "action": "CommandCenter"
+      },
+      {
+        "supply": 104,
+        "time": "7:47",
+        "action": "Cyclone"
+      },
+      {
+        "supply": 107,
+        "time": "7:48",
+        "action": "Cyclone"
+      },
+      {
+        "supply": 110,
+        "time": "7:48",
+        "action": "MissileTurret"
+      },
+      {
+        "supply": 110,
+        "time": "7:48",
+        "action": "Cyclone"
+      },
+      {
+        "supply": 116,
+        "time": "7:54",
+        "action": "Upgrade: TerranVehicleWeaponsLevel1"
+      },
+      {
+        "supply": 109,
+        "time": "8:08",
+        "action": "Starport"
+      },
+      {
+        "supply": 109,
+        "time": "8:09",
+        "action": "Thor"
+      },
+      {
+        "supply": 115,
+        "time": "8:10",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 115,
+        "time": "8:14",
+        "action": "Hellion"
+      },
+      {
+        "supply": 117,
+        "time": "8:14",
+        "action": "Hellion"
+      },
+      {
+        "supply": 119,
+        "time": "8:23",
+        "action": "Cyclone"
+      },
+      {
+        "supply": 122,
+        "time": "8:24",
+        "action": "Cyclone"
+      },
+      {
+        "supply": 125,
+        "time": "8:27",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 125,
+        "time": "8:27",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 129,
+        "time": "8:34",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 131,
+        "time": "8:34",
+        "action": "VikingFighter"
+      },
+      {
+        "supply": 133,
+        "time": "8:36",
+        "action": "Refinery"
+      },
+      {
+        "supply": 133,
+        "time": "8:37",
+        "action": "SupplyDepot"
+      },
+      {
+        "supply": 133,
+        "time": "8:39",
+        "action": "Upgrade: CycloneLockOnDamageUpgrade"
+      },
+      {
+        "supply": 133,
+        "time": "8:39",
+        "action": "Refinery"
+      },
+      {
+        "supply": 136,
+        "time": "8:43",
+        "action": "Hellion"
+      },
+      {
+        "supply": 138,
+        "time": "8:44",
+        "action": "Hellion"
+      },
+      {
+        "supply": 140,
+        "time": "8:46",
+        "action": "Thor"
+      },
+      {
+        "supply": 147,
+        "time": "8:52",
+        "action": "SupplyDepot"
+      }
+    ],
+    "tags": [],
+    "patch": "5.0.15.95299",
+    "updatedAt": "2025-11-24",
+    "isFree": false,
+    "replayId": "replay-6afb7cd8-9c44-430e-ae5e-903e120d42b1"
   }
 ]
