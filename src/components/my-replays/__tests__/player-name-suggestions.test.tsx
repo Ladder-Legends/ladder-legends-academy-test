@@ -1,364 +1,163 @@
 /**
- * Tests for player name suggestion feature
- * Verifies player names are suggested after 3+ replays
+ * Tests for PlayerNameSuggestionCard component
+ * Verifies player name confirmation/rejection UI works correctly
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MyReplaysContent } from '../my-replays-content';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { PlayerNameSuggestionCard } from '../player-name-suggestion-card';
 
-// Mock next-auth
-vi.mock('next-auth/react');
-const mockUseSession = useSession as any;
+describe('PlayerNameSuggestionCard', () => {
+  it('should display the player name and count', () => {
+    const onConfirm = vi.fn();
+    const onReject = vi.fn();
 
-// Mock next/navigation
-vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(),
-}));
-const mockUseRouter = useRouter as any;
+    render(
+      <PlayerNameSuggestionCard
+        playerName="Lotus"
+        count={5}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
 
-// Mock fetch globally
-global.fetch = vi.fn() as any;
-
-// TODO: Implement player name suggestion UI component
-describe.skip('Player Name Suggestions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-
-    // Mock session
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          discordId: 'test-user',
-          role: 'Coach',
-        },
-      },
-      status: 'authenticated',
-      update: vi.fn(),
-    } as any);
-
-    // Mock router
-    mockUseRouter.mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      refresh: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      prefetch: vi.fn(),
-    } as any);
+    expect(screen.getByText('Is this your player name?')).toBeInTheDocument();
+    expect(screen.getByText('Lotus')).toBeInTheDocument();
+    expect(screen.getByText(/5 of your uploaded replays/)).toBeInTheDocument();
   });
 
-  it('should show player name suggestion after 3 replays from same player', async () => {
-    // Mock API responses
-    (global.fetch as any)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          replays: [
-            { id: '1', filename: 'replay1.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-            { id: '2', filename: 'replay2.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-            { id: '3', filename: 'replay3.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          settings: {
-            discord_user_id: 'test-user',
-            possible_player_names: {
-              'PlayerOne': 3,
-            },
-            confirmed_player_names: [],
-            default_race: null,
-            favorite_builds: [],
-            created_at: '2025-11-19',
-            updated_at: '2025-11-19',
-          },
-        }),
-      });
+  it('should call onConfirm when check button is clicked', async () => {
+    const onConfirm = vi.fn().mockResolvedValue(undefined);
+    const onReject = vi.fn();
 
-    render(<MyReplaysContent />);
+    render(
+      <PlayerNameSuggestionCard
+        playerName="Lotus"
+        count={3}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
 
-    // Wait for the suggestion card to appear
+    // Find the confirm button (green background with Check icon)
+    const confirmButton = screen.getAllByRole('button')[1]; // Second button is confirm
+    fireEvent.click(confirmButton);
+
     await waitFor(() => {
-      expect(screen.getByText(/Is this your player name\?/i)).toBeInTheDocument();
+      expect(onConfirm).toHaveBeenCalledWith('Lotus');
+    });
+    expect(onReject).not.toHaveBeenCalled();
+  });
+
+  it('should call onReject when X button is clicked', async () => {
+    const onConfirm = vi.fn();
+    const onReject = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <PlayerNameSuggestionCard
+        playerName="WrongName"
+        count={4}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
+
+    // Find the reject button (first button with X icon)
+    const rejectButton = screen.getAllByRole('button')[0];
+    fireEvent.click(rejectButton);
+
+    await waitFor(() => {
+      expect(onReject).toHaveBeenCalledWith('WrongName');
+    });
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('should disable buttons while processing', async () => {
+    // Create a promise that we can resolve manually
+    let resolvePromise: () => void;
+    const onConfirm = vi.fn().mockImplementation(() => new Promise<void>(resolve => {
+      resolvePromise = resolve;
+    }));
+    const onReject = vi.fn();
+
+    render(
+      <PlayerNameSuggestionCard
+        playerName="Lotus"
+        count={3}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
+
+    const buttons = screen.getAllByRole('button');
+    const rejectButton = buttons[0];
+    const confirmButton = buttons[1];
+
+    // Initially buttons should be enabled
+    expect(rejectButton).not.toBeDisabled();
+    expect(confirmButton).not.toBeDisabled();
+
+    // Click confirm to start processing
+    fireEvent.click(confirmButton);
+
+    // Buttons should be disabled during processing
+    await waitFor(() => {
+      expect(rejectButton).toBeDisabled();
+      expect(confirmButton).toBeDisabled();
     });
 
-    // Should show the player name
-    expect(screen.getByText('PlayerOne')).toBeInTheDocument();
+    // Resolve the promise
+    resolvePromise!();
 
-    // Should show the count
-    expect(screen.getByText(/seen 3 times/i)).toBeInTheDocument();
-  });
-
-  it('should not show suggestion for player names with less than 3 occurrences', async () => {
-    (global.fetch as any)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          replays: [
-            { id: '1', filename: 'replay1.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-            { id: '2', filename: 'replay2.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          settings: {
-            discord_user_id: 'test-user',
-            possible_player_names: {
-              'PlayerOne': 2, // Only 2 occurrences
-            },
-            confirmed_player_names: [],
-            default_race: null,
-            favorite_builds: [],
-            created_at: '2025-11-19',
-            updated_at: '2025-11-19',
-          },
-        }),
-      });
-
-    render(<MyReplaysContent />);
-
-    // Wait for content to load
+    // After processing, buttons should be enabled again
     await waitFor(() => {
-      expect(screen.queryByText(/Is this your player name\?/i)).not.toBeInTheDocument();
+      expect(rejectButton).not.toBeDisabled();
+      expect(confirmButton).not.toBeDisabled();
     });
   });
 
-  it('should not show suggestion for already confirmed player names', async () => {
-    (global.fetch as any)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          replays: [
-            { id: '1', filename: 'replay1.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-            { id: '2', filename: 'replay2.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-            { id: '3', filename: 'replay3.SC2Replay', player_name: 'PlayerOne', fingerprint: { race: 'Terran', matchup: 'TvZ', metadata: {} } },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          settings: {
-            discord_user_id: 'test-user',
-            possible_player_names: {
-              'PlayerOne': 3,
-            },
-            confirmed_player_names: ['PlayerOne'], // Already confirmed
-            default_race: null,
-            favorite_builds: [],
-            created_at: '2025-11-19',
-            updated_at: '2025-11-19',
-          },
-        }),
-      });
+  it('should handle different player names correctly', () => {
+    const onConfirm = vi.fn();
+    const onReject = vi.fn();
 
-    render(<MyReplaysContent />);
+    const { rerender } = render(
+      <PlayerNameSuggestionCard
+        playerName="Player1"
+        count={10}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
 
-    // Wait for content to load
-    await waitFor(() => {
-      expect(screen.queryByText(/Is this your player name\?/i)).not.toBeInTheDocument();
-    });
+    expect(screen.getByText('Player1')).toBeInTheDocument();
+    expect(screen.getByText(/10 of your uploaded replays/)).toBeInTheDocument();
+
+    // Rerender with different props
+    rerender(
+      <PlayerNameSuggestionCard
+        playerName="DifferentPlayer"
+        count={25}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
+
+    expect(screen.getByText('DifferentPlayer')).toBeInTheDocument();
+    expect(screen.getByText(/25 of your uploaded replays/)).toBeInTheDocument();
   });
 
-  it('should show suggestion with highest count when multiple candidates exist', async () => {
-    (global.fetch as any)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          replays: [],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          settings: {
-            discord_user_id: 'test-user',
-            possible_player_names: {
-              'PlayerOne': 3,
-              'PlayerTwo': 5, // This should be suggested first
-              'PlayerThree': 4,
-            },
-            confirmed_player_names: [],
-            default_race: null,
-            favorite_builds: [],
-            created_at: '2025-11-19',
-            updated_at: '2025-11-19',
-          },
-        }),
-      });
+  it('should handle special characters in player names', () => {
+    const onConfirm = vi.fn();
+    const onReject = vi.fn();
 
-    render(<MyReplaysContent />);
+    render(
+      <PlayerNameSuggestionCard
+        playerName="[TAG]Player<123>"
+        count={7}
+        onConfirm={onConfirm}
+        onReject={onReject}
+      />
+    );
 
-    // Should show the player with highest count
-    await waitFor(() => {
-      expect(screen.getByText('PlayerTwo')).toBeInTheDocument();
-    });
-
-    // Should show the count for highest
-    expect(screen.getByText(/seen 5 times/i)).toBeInTheDocument();
-  });
-
-  it('should allow confirming a player name', async () => {
-    const user = userEvent.setup();
-    let fetchCallCount = 0;
-
-    (global.fetch as any).mockImplementation(() => {
-      fetchCallCount++;
-
-      // First two calls: initial load (replays + settings)
-      if (fetchCallCount === 1) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({ replays: [] }),
-        });
-      }
-      if (fetchCallCount === 2) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            settings: {
-              discord_user_id: 'test-user',
-              possible_player_names: { 'PlayerOne': 3 },
-              confirmed_player_names: [],
-              default_race: null,
-              favorite_builds: [],
-              created_at: '2025-11-19',
-              updated_at: '2025-11-19',
-            },
-          }),
-        });
-      }
-      // Third call: PATCH to confirm
-      if (fetchCallCount === 3) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({ success: true }),
-        });
-      }
-      // Fourth call: refresh settings after confirm
-      if (fetchCallCount === 4) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            settings: {
-              discord_user_id: 'test-user',
-              possible_player_names: {},
-              confirmed_player_names: ['PlayerOne'], // Now confirmed
-              default_race: null,
-              favorite_builds: [],
-              created_at: '2025-11-19',
-              updated_at: '2025-11-19',
-            },
-          }),
-        });
-      }
-      return Promise.resolve({ ok: false });
-    });
-
-    render(<MyReplaysContent />);
-
-    // Wait for suggestion to appear
-    await waitFor(() => {
-      expect(screen.getByText(/Is this your player name\?/i)).toBeInTheDocument();
-    });
-
-    // Click confirm button
-    const confirmButton = screen.getByText(/Yes, this is me/i);
-    await user.click(confirmButton);
-
-    // Verify API was called to confirm
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/settings',
-        expect.objectContaining({
-          method: 'PATCH',
-          body: expect.stringContaining('confirm_player_name'),
-        })
-      );
-    });
-  });
-
-  it('should allow rejecting a player name', async () => {
-    const user = userEvent.setup();
-    let fetchCallCount = 0;
-
-    (global.fetch as any).mockImplementation(() => {
-      fetchCallCount++;
-
-      if (fetchCallCount === 1) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({ replays: [] }),
-        });
-      }
-      if (fetchCallCount === 2) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            settings: {
-              discord_user_id: 'test-user',
-              possible_player_names: { 'OpponentName': 3 },
-              confirmed_player_names: [],
-              default_race: null,
-              favorite_builds: [],
-              created_at: '2025-11-19',
-              updated_at: '2025-11-19',
-            },
-          }),
-        });
-      }
-      if (fetchCallCount === 3) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({ success: true }),
-        });
-      }
-      if (fetchCallCount === 4) {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            settings: {
-              discord_user_id: 'test-user',
-              possible_player_names: {}, // Removed after rejection
-              confirmed_player_names: [],
-              default_race: null,
-              favorite_builds: [],
-              created_at: '2025-11-19',
-              updated_at: '2025-11-19',
-            },
-          }),
-        });
-      }
-      return Promise.resolve({ ok: false });
-    });
-
-    render(<MyReplaysContent />);
-
-    // Wait for suggestion to appear
-    await waitFor(() => {
-      expect(screen.getByText(/Is this your player name\?/i)).toBeInTheDocument();
-    });
-
-    // Click reject button
-    const rejectButton = screen.getByText(/No, not me/i);
-    await user.click(rejectButton);
-
-    // Verify API was called to reject
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/settings',
-        expect.objectContaining({
-          method: 'PATCH',
-          body: expect.stringContaining('reject_player_name'),
-        })
-      );
-    });
+    expect(screen.getByText('[TAG]Player<123>')).toBeInTheDocument();
   });
 });

@@ -82,26 +82,40 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
   // EXECUTE MODE - Actually delete
   console.log('\n⚠️  EXECUTE MODE - Deleting data...');
 
-  // Delete from Blob storage first
+  // Delete from Blob storage first (using blob_url stored in replay data)
   console.log('\n🗑️  Deleting replay files from Blob storage...');
   let blobDeleteCount = 0;
   for (const { id, replay } of replays) {
-    if (replay?.filename) {
+    // Use the actual blob_url from replay data (new format)
+    if (replay?.blob_url) {
       try {
-        // Blob URLs are typically stored in a format like:
-        // https://xxx.public.blob.vercel-storage.com/replays/user-id/filename
-        const blobUrl = `https://xxxxx.public.blob.vercel-storage.com/replays/${discordUserId}/${replay.filename}`;
-        console.log(`  Deleting: ${replay.filename}`);
-        await del(blobUrl);
+        console.log(`  Deleting: ${replay.filename} (${replay.blob_url})`);
+        await del(replay.blob_url);
         blobDeleteCount++;
       } catch (error) {
-        // Blob might not exist, that's okay
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.log(`  ⚠️  Could not delete blob for ${replay.filename}: ${message}`);
       }
     }
   }
   console.log(`✅ Deleted ${blobDeleteCount} files from Blob storage`);
+
+  // Also delete by listing the user's replay files prefix (catches any orphaned files)
+  console.log('\n🗑️  Checking for orphaned replay files...');
+  try {
+    const { blobs } = await list({ prefix: `user-replays/${discordUserId}/` });
+    for (const blob of blobs) {
+      try {
+        await del(blob.url);
+        console.log(`  Deleted orphaned: ${blob.pathname}`);
+        blobDeleteCount++;
+      } catch {
+        // Ignore errors
+      }
+    }
+  } catch {
+    // Ignore errors when listing
+  }
 
   // Delete from KV
   console.log('\n🗑️  Deleting replay data from KV...');

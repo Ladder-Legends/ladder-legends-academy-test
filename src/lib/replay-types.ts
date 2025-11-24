@@ -140,6 +140,24 @@ export interface LearnedBuild {
   num_examples: number;
 }
 
+// Response from /fingerprint-all endpoint (all players)
+export interface AllPlayersFingerprint {
+  filename: string;
+  player_fingerprints: Record<string, ReplayFingerprint>; // player_name -> full fingerprint
+  suggested_player: string | null; // Who we think uploaded this
+  all_players: ReplayPlayer[]; // Basic info for all players
+  game_metadata: {
+    map: string;
+    duration: number | null;
+    game_date: string | null;
+    game_type: string | null;
+    category: string | null;
+    patch: string | null;
+    winner: string | null;
+    loser: string | null;
+  };
+}
+
 // KV Storage Types
 export interface UserReplayData {
   id: string; // Unique replay ID
@@ -147,8 +165,14 @@ export interface UserReplayData {
   uploaded_at: string; // ISO timestamp
   filename: string;
 
+  // Replay file URL in Vercel Blob (for download)
+  blob_url?: string;
+
   // Game type from uploader (1v1-ladder, 1v1-private, 2v2-ladder, etc.)
   game_type?: string;
+
+  // Region from folder path (NA, EU, KR, CN)
+  region?: string;
 
   // Player name from uploader (user's SC2 player name in this replay)
   player_name?: string;
@@ -162,8 +186,17 @@ export interface UserReplayData {
   // Comparison result (if target_build_id is set)
   comparison: ComparisonResult | null;
 
-  // Full fingerprint
+  // Full fingerprints for ALL players (new structure)
+  player_fingerprints?: Record<string, ReplayFingerprint>;
+
+  // Suggested player (who we think is the uploader)
+  suggested_player?: string | null;
+
+  // Legacy: Single player fingerprint (for backwards compatibility)
   fingerprint: ReplayFingerprint;
+
+  // Shared game metadata
+  game_metadata?: AllPlayersFingerprint['game_metadata'];
 
   // User notes
   notes?: string;

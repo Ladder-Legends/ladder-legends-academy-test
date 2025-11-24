@@ -65,8 +65,7 @@ function createMockReplayWithPlayerName(
   } as UserReplayData;
 }
 
-// TODO: Fix test data - missing all_players array causes opponent column to render "—"
-describe.skip('MyReplaysTable - Opponent Column with player_name', () => {
+describe('MyReplaysTable - Opponent Column with player_name', () => {
   it('should display opponent name when player_name is set', () => {
     const replays = [createMockReplayWithPlayerName('Player1', 'Opponent1')];
     render(<MyReplaysTable replays={replays} onDelete={vi.fn()} />);
@@ -224,7 +223,8 @@ describe.skip('MyReplaysTable - Opponent Column with player_name', () => {
 
     render(<MyReplaysTable replays={[replay]} onDelete={vi.fn()} />);
 
-    // Should show em dash when data is missing
-    expect(screen.getByText('—')).toBeInTheDocument();
+    // Should show em dash when data is missing (multiple columns show dashes)
+    const dashes = screen.getAllByText('—');
+    expect(dashes.length).toBeGreaterThan(0);
   });
 });

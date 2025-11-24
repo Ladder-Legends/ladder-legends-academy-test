@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
 import { hashManifestManager } from '@/lib/replay-hash-manifest';
+import { storeReplayFile, deleteReplayFile } from '@/lib/replay-file-storage';
 import crypto from 'crypto';
 import type { Session } from 'next-auth';
 
@@ -161,6 +162,7 @@ export async function POST(request: NextRequest) {
     const targetBuildId = searchParams.get('target_build_id');
     const playerName = searchParams.get('player_name');
     const gameType = searchParams.get('game_type');
+    const region = searchParams.get('region'); // NA, EU, KR, CN
 
     // Get file from form data
     const formData = await request.formData();
@@ -186,16 +188,37 @@ export async function POST(request: NextRequest) {
     const replayFilename = file.name;
 
     // Create a reusable Blob from buffer for sc2reader API calls
-    // Note: In Node.js, we use Blob instead of File for proper multipart encoding
-    // The filename will be provided when appending to FormData in the client
     const createReplayBlob = () => new Blob([buffer], { type: 'application/octet-stream' });
 
-    // Extract fingerprint
-    console.log('📊 Extracting fingerprint...');
-    const fingerprint = await sc2readerClient.extractFingerprint(createReplayBlob(), playerName || undefined, replayFilename);
+    // Generate unique replay ID first (needed for file storage path)
+    const replayId = nanoid();
+
+    // Store replay file in Vercel Blob (so users can download later)
+    console.log('📦 Storing replay file...');
+    let blobUrl: string | undefined;
+    try {
+      blobUrl = await storeReplayFile(discordId, replayId, replayFilename, buffer);
+    } catch (err) {
+      console.warn('⚠️ Failed to store replay file (continuing without):', err);
+    }
+
+    // Extract fingerprints for ALL players
+    console.log('📊 Extracting fingerprints for all players...');
+    const allPlayersData = await sc2readerClient.extractAllPlayersFingerprints(
+      createReplayBlob(),
+      playerName || undefined,
+      replayFilename
+    );
+
+    // Determine which player is the uploader
+    const suggestedPlayer = allPlayersData.suggested_player || playerName || null;
+
+    // Get the fingerprint for the suggested player (for backwards compatibility)
+    const fingerprint = suggestedPlayer && allPlayersData.player_fingerprints[suggestedPlayer]
+      ? allPlayersData.player_fingerprints[suggestedPlayer]
+      : Object.values(allPlayersData.player_fingerprints)[0];
 
     // Track player names for detection
-    // Use the playerName from uploader (grouped name) not fingerprint.player_name (extracted from replay)
     if (playerName) {
       let settings = await getUserSettings(discordId);
       if (!settings) {
@@ -205,7 +228,6 @@ export async function POST(request: NextRequest) {
       const isConfirmed = (settings.confirmed_player_names || []).includes(playerName);
 
       if (!isConfirmed) {
-        // Add or increment possible player name count
         const possibleNames = settings.possible_player_names || {};
         possibleNames[playerName] = (possibleNames[playerName] || 0) + 1;
         settings.possible_player_names = possibleNames;
@@ -214,9 +236,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Detect build
+    // Detect build (using suggested player)
     console.log('🔍 Detecting build...');
-    const detection = await sc2readerClient.detectBuild(createReplayBlob(), playerName || undefined, replayFilename);
+    const detection = await sc2readerClient.detectBuild(
+      createReplayBlob(),
+      suggestedPlayer || undefined,
+      replayFilename
+    );
 
     // Compare to target build (use detected build if no target specified)
     let comparison = null;
@@ -224,20 +250,32 @@ export async function POST(request: NextRequest) {
 
     if (buildToCompare) {
       console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
-      comparison = await sc2readerClient.compareReplay(createReplayBlob(), buildToCompare, playerName || undefined, replayFilename);
+      comparison = await sc2readerClient.compareReplay(
+        createReplayBlob(),
+        buildToCompare,
+        suggestedPlayer || undefined,
+        replayFilename
+      );
     }
 
-    // Create replay data object
+    // Create replay data object with all players' data
     const replayData: UserReplayData = {
-      id: nanoid(),
+      id: replayId,
       discord_user_id: discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
+      blob_url: blobUrl,
       game_type: gameType || undefined,
-      player_name: playerName || undefined,
-      target_build_id: targetBuildId || detection?.build_id,
+      region: region || undefined,
+      player_name: suggestedPlayer || undefined,
+      target_build_id: buildToCompare || undefined,
       detection,
       comparison,
+      // New: All players' fingerprints
+      player_fingerprints: allPlayersData.player_fingerprints,
+      suggested_player: suggestedPlayer,
+      game_metadata: allPlayersData.game_metadata,
+      // Legacy: Single player fingerprint (backwards compatibility)
       fingerprint,
     };
 
@@ -321,7 +359,7 @@ export async function PATCH(request: NextRequest) {
 /**
  * DELETE /api/my-replays
  * Delete a replay
- * 
+ *
  * Query params:
  * - replay_id: ID of replay to delete
  */
@@ -341,6 +379,19 @@ export async function DELETE(request: NextRequest) {
         { error: 'replay_id is required' },
         { status: 400 }
       );
+    }
+
+    // Get replay first to check for blob URL
+    const { getReplay } = kvModule;
+    const replay = await getReplay(session.user.discordId, replayId);
+
+    // Delete the blob file if it exists
+    if (replay?.blob_url) {
+      try {
+        await deleteReplayFile(replay.blob_url);
+      } catch (err) {
+        console.warn('⚠️ Failed to delete replay file:', err);
+      }
     }
 
     await deleteReplay(session.user.discordId, replayId);

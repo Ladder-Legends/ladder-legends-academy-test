@@ -28,7 +28,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { UserReplayData, TimingComparison } from '@/lib/replay-types';
+import type { UserReplayData, TimingComparison, ReplayFingerprint } from '@/lib/replay-types';
 
 // Helper function to calculate top issues
 interface Issue {
@@ -144,6 +144,9 @@ export default function ReplayDetailPage() {
   // Active tab state with URL sync
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'overview');
 
+  // Selected player for viewing fingerprint (null = use legacy fingerprint)
+  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+
   const replayId = params.id as string;
 
   // Sync tab changes to URL
@@ -160,6 +163,17 @@ export default function ReplayDetailPage() {
       setIsLoading(false);
     }
   }, [status, replayId]);
+
+  // Set initial selected player when replay loads
+  useEffect(() => {
+    if (replay) {
+      // If we have player_fingerprints, default to suggested_player
+      if (replay.player_fingerprints && Object.keys(replay.player_fingerprints).length > 0) {
+        const initialPlayer = replay.suggested_player || Object.keys(replay.player_fingerprints)[0];
+        setSelectedPlayer(initialPlayer);
+      }
+    }
+  }, [replay]);
 
   const fetchReplay = async () => {
     try {
@@ -220,9 +234,29 @@ export default function ReplayDetailPage() {
     );
   }
 
-  const { fingerprint, detection, comparison } = replay;
+  // Get the active fingerprint - either selected player's or legacy
+  const getActiveFingerprint = (): ReplayFingerprint => {
+    if (selectedPlayer && replay.player_fingerprints && replay.player_fingerprints[selectedPlayer]) {
+      return replay.player_fingerprints[selectedPlayer];
+    }
+    return replay.fingerprint;
+  };
+
+  const fingerprint = getActiveFingerprint();
+  const { detection, comparison } = replay;
   const result = fingerprint.metadata.result;
-  const topIssues = calculateTopIssues(replay);
+
+  // Get all available players from player_fingerprints
+  const availablePlayers = replay.player_fingerprints
+    ? Object.keys(replay.player_fingerprints)
+    : [];
+  const hasMultiplePlayers = availablePlayers.length > 1;
+
+  // Recalculate issues based on active fingerprint
+  const topIssues = calculateTopIssues({
+    ...replay,
+    fingerprint: fingerprint,
+  });
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -278,7 +312,51 @@ export default function ReplayDetailPage() {
                 <div className="font-medium">{new Date(replay.uploaded_at).toLocaleDateString()}</div>
               </div>
             </div>
-            {fingerprint.all_players && (
+            {/* Player Selection - show when we have fingerprints for multiple players */}
+            {hasMultiplePlayers && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="text-xs text-muted-foreground mb-2">
+                  Select Player to View Stats
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {availablePlayers.map((playerName) => {
+                    const playerFingerprint = replay.player_fingerprints![playerName];
+                    const isSelected = selectedPlayer === playerName;
+                    const isSuggested = replay.suggested_player === playerName;
+                    const playerInfo = playerFingerprint?.all_players?.find(p => p.name === playerName);
+
+                    return (
+                      <button
+                        key={playerName}
+                        onClick={() => setSelectedPlayer(playerName)}
+                        className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all text-left ${
+                          isSelected
+                            ? 'border-orange-500 bg-orange-500/10'
+                            : 'border-transparent bg-muted/30 hover:bg-muted/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{playerName}</span>
+                          {playerInfo?.race && (
+                            <Badge variant="outline" className="text-xs">{playerInfo.race}</Badge>
+                          )}
+                          {isSuggested && (
+                            <Badge variant="default" className="text-xs bg-orange-500">You</Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-sm">
+                          {playerInfo?.mmr && <span className="text-muted-foreground">MMR: {playerInfo.mmr}</span>}
+                          {playerInfo?.apm && <span className="text-muted-foreground">APM: {playerInfo.apm}</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback: Show all players from fingerprint when no player_fingerprints */}
+            {!hasMultiplePlayers && fingerprint.all_players && (
               <div className="mt-4 pt-4 border-t">
                 <div className="text-xs text-muted-foreground mb-2">Players</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

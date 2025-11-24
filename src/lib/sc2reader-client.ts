@@ -12,6 +12,7 @@ import type {
   BuildDetection,
   ComparisonResult,
   LearnedBuild,
+  AllPlayersFingerprint,
 } from './replay-types';
 
 // API Response Types
@@ -209,6 +210,58 @@ export class SC2ReplayAPIClient {
       }
       if (error instanceof Error) throw error;
       throw new Error('Failed to extract fingerprint. Please try again.');
+    }
+  }
+
+  /**
+   * Extract comprehensive fingerprints for ALL players in the replay
+   * @param blob - The .SC2Replay file as a Blob
+   * @param suggestedPlayerName - Optional player name hint for uploader detection
+   * @param filename - Filename for the blob (defaults to 'replay.SC2Replay')
+   * @returns Promise with fingerprints for all players
+   */
+  async extractAllPlayersFingerprints(
+    blob: Blob,
+    suggestedPlayerName?: string,
+    filename: string = 'replay.SC2Replay'
+  ): Promise<AllPlayersFingerprint> {
+    if (!filename.endsWith('.SC2Replay')) {
+      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
+    }
+
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const formData = new FormData();
+    formData.append('file', buffer, {
+      filename,
+      contentType: 'application/octet-stream',
+    });
+    if (suggestedPlayerName) {
+      formData.append('player_name', suggestedPlayerName);
+    }
+
+    try {
+      const response = await withTimeout(
+        axios.post(`${this.config.apiUrl}/fingerprint-all`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            'X-API-Key': this.config.apiKey,
+          },
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        }),
+        API_TIMEOUT_MS,
+        'All players fingerprint extraction'
+      );
+
+      return response.data as AllPlayersFingerprint;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        throw await this.handleAxiosError(error);
+      }
+      if (error instanceof Error) throw error;
+      throw new Error('Failed to extract fingerprints. Please try again.');
     }
   }
 
