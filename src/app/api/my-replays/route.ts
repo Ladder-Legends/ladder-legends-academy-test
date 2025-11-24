@@ -36,15 +36,104 @@ const {
 import type { UserReplayData } from '@/lib/replay-types';
 import { nanoid } from 'nanoid';
 
-// Log which KV implementation is being used
-if (USE_MOCK_KV) {
-  console.log('🔧 [DEV] Using mock in-memory KV storage');
-} else {
-  console.log('✅ [PROD] Using Vercel KV storage');
+// Log which KV implementation is being used (only once at startup)
+if (typeof global !== 'undefined') {
+  const globalWithFlag = global as typeof globalThis & { __kvLogShown?: boolean };
+  if (!globalWithFlag.__kvLogShown) {
+    console.log(USE_MOCK_KV
+      ? '🔧 [DEV] Using mock in-memory KV storage'
+      : '✅ [PROD] Using Vercel KV storage');
+    globalWithFlag.__kvLogShown = true;
+  }
 }
 
 // Initialize sc2reader client
 const sc2readerClient = new SC2ReplayAPIClient();
+
+/**
+ * Store replay with transaction-like semantics
+ * If any storage step fails, roll back previous steps
+ */
+async function storeReplayWithRollback(
+  discordId: string,
+  replayId: string,
+  filename: string,
+  buffer: Buffer,
+  hash: string,
+  fileSize: number,
+  replayData: UserReplayData
+): Promise<{ blobUrl?: string }> {
+  let blobUrl: string | undefined;
+  let kvSaved = false;
+
+  try {
+    // Step 1: Store blob file
+    console.log('📦 [STORE] Step 1/3: Storing replay file in Blob...');
+    try {
+      blobUrl = await storeReplayFile(discordId, replayId, filename, buffer);
+      replayData.blob_url = blobUrl;
+    } catch (err) {
+      // Blob storage is optional - continue without it
+      console.warn('⚠️ [STORE] Blob storage failed (continuing):', err);
+    }
+
+    // Step 2: Save to KV
+    console.log('💾 [STORE] Step 2/3: Saving replay metadata to KV...');
+    await saveReplay(replayData);
+    kvSaved = true;
+
+    // Step 3: Save hash to manifest
+    console.log('💾 [STORE] Step 3/3: Saving hash to manifest...');
+    await hashManifestManager.addHash(discordId, hash, filename, fileSize, replayId);
+
+    console.log('✅ [STORE] All storage steps completed successfully');
+    return { blobUrl };
+
+  } catch (error) {
+    console.error('❌ [STORE] Storage failed, initiating rollback...', error);
+
+    // Rollback Step 2: Delete KV entry if it was saved
+    if (kvSaved) {
+      try {
+        console.log('🔄 [ROLLBACK] Deleting KV entry...');
+        await deleteReplay(discordId, replayId);
+      } catch (rollbackErr) {
+        console.error('⚠️ [ROLLBACK] Failed to delete KV entry:', rollbackErr);
+      }
+    }
+
+    // Rollback Step 1: Delete blob if it was stored
+    if (blobUrl) {
+      try {
+        console.log('🔄 [ROLLBACK] Deleting blob file...');
+        await deleteReplayFile(blobUrl);
+      } catch (rollbackErr) {
+        console.error('⚠️ [ROLLBACK] Failed to delete blob:', rollbackErr);
+      }
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Track player name for auto-detection (only after successful upload)
+ */
+async function trackPlayerName(discordId: string, playerName: string): Promise<void> {
+  let settings = await getUserSettings(discordId);
+  if (!settings) {
+    settings = await createUserSettings(discordId);
+  }
+
+  const isConfirmed = (settings.confirmed_player_names || []).includes(playerName);
+  if (isConfirmed) return;
+
+  const possibleNames = settings.possible_player_names || {};
+  possibleNames[playerName] = (possibleNames[playerName] || 0) + 1;
+  settings.possible_player_names = possibleNames;
+  await updateUserSettings(settings);
+  console.log(`📝 Tracked possible player name: ${playerName} (count: ${possibleNames[playerName]})`);
+}
 
 /**
  * GET /api/my-replays
@@ -77,6 +166,8 @@ export async function GET(request: NextRequest) {
  * Query params:
  * - target_build_id: Optional build ID to compare against
  * - player_name: Optional player name to analyze
+ * - game_type: Game type classification
+ * - region: Player region (NA, EU, KR, CN)
  *
  * SECURITY: Requires subscriber role - replay uploads are a premium feature
  */
@@ -84,7 +175,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[MY-REPLAYS] POST request received');
 
-    // Authenticate request (supports both bearer token and session)
+    // === AUTHENTICATION ===
     const authResult = await authenticateRequest(request.headers.get('authorization'));
     if (isAuthError(authResult)) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
@@ -92,168 +183,115 @@ export async function POST(request: NextRequest) {
 
     const { discordId, roles } = authResult;
 
-    // Verify subscriber permission (replay uploads are premium)
     if (!await checkPermission(roles, 'subscribers')) {
-      return NextResponse.json(
-        {
-          error: 'Subscription required',
-          message: 'Replay uploads require an active Ladder Legends subscription. Visit https://ladderlegends.academy/subscribe to upgrade.'
-        },
-        { status: 403 }
-      );
+      return NextResponse.json({
+        error: 'Subscription required',
+        message: 'Replay uploads require an active Ladder Legends subscription.'
+      }, { status: 403 });
     }
 
-    // Get query params
+    // === PARSE REQUEST ===
     const { searchParams } = new URL(request.url);
     const targetBuildId = searchParams.get('target_build_id');
     const playerName = searchParams.get('player_name');
     const gameType = searchParams.get('game_type');
-    const region = searchParams.get('region'); // NA, EU, KR, CN
+    const region = searchParams.get('region');
 
-    // Get file from form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-
     if (!file.name.endsWith('.SC2Replay')) {
-      return NextResponse.json(
-        { error: 'Invalid file type. Only .SC2Replay files are allowed.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid file type. Only .SC2Replay files are allowed.' }, { status: 400 });
     }
 
-    // Read file once into buffer for reuse (file streams can only be consumed once)
+    // === PREPARE DATA ===
     const buffer = Buffer.from(await file.arrayBuffer());
     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-    console.log('📊 Calculated hash:', hash);
-
-    // Store filename for later use
-    const replayFilename = file.name;
-
-    // Create a reusable Blob from buffer for sc2reader API calls
+    const replayId = nanoid();
     const createReplayBlob = () => new Blob([buffer], { type: 'application/octet-stream' });
 
-    // Generate unique replay ID first (needed for file storage path)
-    const replayId = nanoid();
+    console.log(`📊 [ANALYZE] Starting analysis for ${file.name} (hash: ${hash.substring(0, 8)}...)`);
 
-    // Store replay file in Vercel Blob (so users can download later)
-    console.log('📦 Storing replay file...');
-    let blobUrl: string | undefined;
-    try {
-      blobUrl = await storeReplayFile(discordId, replayId, replayFilename, buffer);
-    } catch (err) {
-      console.warn('⚠️ Failed to store replay file (continuing without):', err);
-    }
-
-    // Extract fingerprints for ALL players
-    console.log('📊 Extracting fingerprints for all players...');
+    // === ANALYSIS PHASE (read-only, no side effects) ===
     const allPlayersData = await sc2readerClient.extractAllPlayersFingerprints(
       createReplayBlob(),
       playerName || undefined,
-      replayFilename
+      file.name
     );
 
-    // Determine which player is the uploader
     const suggestedPlayer = allPlayersData.suggested_player || playerName || null;
-
-    // Get the fingerprint for the suggested player (for backwards compatibility)
     const fingerprint = suggestedPlayer && allPlayersData.player_fingerprints[suggestedPlayer]
       ? allPlayersData.player_fingerprints[suggestedPlayer]
       : Object.values(allPlayersData.player_fingerprints)[0];
 
-    // Track player names for detection
-    if (playerName) {
-      let settings = await getUserSettings(discordId);
-      if (!settings) {
-        settings = await createUserSettings(discordId);
-      }
-
-      const isConfirmed = (settings.confirmed_player_names || []).includes(playerName);
-
-      if (!isConfirmed) {
-        const possibleNames = settings.possible_player_names || {};
-        possibleNames[playerName] = (possibleNames[playerName] || 0) + 1;
-        settings.possible_player_names = possibleNames;
-        await updateUserSettings(settings);
-        console.log(`📝 Tracked possible player name: ${playerName} (count: ${possibleNames[playerName]})`);
-      }
-    }
-
-    // Detect build (using suggested player)
-    console.log('🔍 Detecting build...');
     const detection = await sc2readerClient.detectBuild(
       createReplayBlob(),
       suggestedPlayer || undefined,
-      replayFilename
+      file.name
     );
 
-    // Compare to target build (use detected build if no target specified)
-    let comparison = null;
     const buildToCompare = targetBuildId || detection?.build_id;
-
+    let comparison = null;
     if (buildToCompare) {
-      console.log(`📈 Comparing to build: ${buildToCompare}${!targetBuildId ? ' (auto-detected)' : ''}...`);
+      console.log(`📈 [ANALYZE] Comparing to build: ${buildToCompare}`);
       comparison = await sc2readerClient.compareReplay(
         createReplayBlob(),
         buildToCompare,
         suggestedPlayer || undefined,
-        replayFilename
+        file.name
       );
     }
 
-    // Create replay data object with all players' data
+    // === BUILD REPLAY DATA ===
     const replayData: UserReplayData = {
       id: replayId,
       discord_user_id: discordId,
       uploaded_at: new Date().toISOString(),
       filename: file.name,
-      blob_url: blobUrl,
       game_type: gameType || undefined,
       region: region || undefined,
       player_name: suggestedPlayer || undefined,
       target_build_id: buildToCompare || undefined,
       detection,
       comparison,
-      // New: All players' fingerprints
       player_fingerprints: allPlayersData.player_fingerprints,
       suggested_player: suggestedPlayer,
       game_metadata: allPlayersData.game_metadata,
-      // Legacy: Single player fingerprint (backwards compatibility)
       fingerprint,
     };
 
-    // Save to KV
-    console.log('💾 Saving to KV...');
-    await saveReplay(replayData);
-
-    // Save hash to manifest
-    console.log('💾 Saving hash to manifest...');
-    await hashManifestManager.addHash(
+    // === STORAGE PHASE (with transaction rollback) ===
+    await storeReplayWithRollback(
       discordId,
-      hash,
+      replayId,
       file.name,
+      buffer,
+      hash,
       file.size,
-      replayData.id
+      replayData
     );
 
-    console.log('✅ Replay uploaded, analyzed, and hash saved successfully');
+    // === POST-SUCCESS SIDE EFFECTS ===
+    // Track player name only after successful storage
+    if (playerName) {
+      try {
+        await trackPlayerName(discordId, playerName);
+      } catch (err) {
+        // Non-critical - log but don't fail the request
+        console.warn('⚠️ Failed to track player name:', err);
+      }
+    }
 
-    return NextResponse.json({
-      success: true,
-      replay: replayData,
-    });
+    console.log('✅ [MY-REPLAYS] Upload complete');
+    return NextResponse.json({ success: true, replay: replayData });
+
   } catch (error) {
-    console.error('Error uploading replay:', error);
-
+    console.error('❌ [MY-REPLAYS] Upload failed:', error);
     const message = error instanceof Error ? error.message : 'Failed to upload replay';
-
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
