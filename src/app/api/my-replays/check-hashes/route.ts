@@ -4,80 +4,37 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { hashManifestManager } from '@/lib/replay-hash-manifest';
-import { verify } from 'jsonwebtoken';
-import type { Session } from 'next-auth';
+import { authenticateRequest, isAuthError, checkPermission } from '@/lib/api-auth';
+
+interface HashInput {
+  hash: string;
+  filename: string;
+  filesize: number;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Log ALL headers to debug
-    console.log('📋 [CHECK-HASHES] All headers:', Object.fromEntries(request.headers.entries()));
-
-    // Extract bearer token from Authorization header
-    const authHeader = request.headers.get('authorization');
-    console.log('🔐 [CHECK-HASHES] Auth header:', authHeader ? `${authHeader.substring(0, 30)}...` : 'MISSING');
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ [CHECK-HASHES] Missing or invalid bearer token');
-      console.log('🔍 [CHECK-HASHES] Header value:', authHeader);
-      return NextResponse.json({ error: 'Unauthorized: Missing bearer token' }, { status: 401 });
+    // Authenticate request (bearer token only for this endpoint, but helper handles both)
+    const authResult = await authenticateRequest(request.headers.get('authorization'));
+    if (isAuthError(authResult)) {
+      console.log('❌ [CHECK-HASHES] Auth failed:', authResult.error);
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
+    const { discordId, roles } = authResult;
+    console.log('✅ [CHECK-HASHES] Authenticated:', { discordId, authMethod: authResult.authMethod });
 
-    let discordId: string;
-    let userRoles: string[] = [];
-    try {
-      const decoded = verify(token, jwtSecret) as {
-        userId: string;
-        type: string;
-        roles?: string[];
-      };
-
-      if (decoded.type !== 'uploader') {
-        return NextResponse.json({ error: 'Unauthorized: Invalid token type' }, { status: 401 });
-      }
-
-      discordId = decoded.userId;
-      userRoles = decoded.roles || [];
-      console.log('✅ [CHECK-HASHES] JWT decoded successfully:', { discordId, userRoles, type: decoded.type });
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === 'TokenExpiredError') {
-          return NextResponse.json({ error: 'Unauthorized: Token expired' }, { status: 401 });
-        }
-        if (error.name === 'JsonWebTokenError') {
-          return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
-        }
-      }
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // CRITICAL SECURITY CHECK: Verify subscriber role
-    // Checking replay hashes requires subscription (part of replay upload feature)
-    const { hasPermission } = await import('@/lib/permissions');
-
-    const permissionCheck: Session = {
-      user: {
-        roles: userRoles
-      }
-    } as Session;
-
-    const hasSubscriberPermission = hasPermission(permissionCheck, 'subscribers');
-    console.log('🔒 [CHECK-HASHES] Permission check:', { hasSubscriberPermission, userRoles });
-
-    if (!hasSubscriberPermission) {
+    // Verify subscriber permission
+    if (!await checkPermission(roles, 'subscribers')) {
       console.log('❌ [CHECK-HASHES] Permission denied - no subscriber role');
       return NextResponse.json(
         {
           error: 'Subscription required',
-          message: 'Replay uploads require an active Ladder Legends subscription. Visit https://ladderlegends.academy/subscribe to upgrade.'
+          message: 'Replay uploads require an active Ladder Legends subscription.'
         },
         { status: 403 }
       );
     }
-
-    console.log('✅ [CHECK-HASHES] Permission granted - proceeding with hash check');
 
     const body = await request.json();
     const { hashes } = body;
@@ -90,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate hash format
-    for (const h of hashes) {
+    for (const h of hashes as HashInput[]) {
       if (!h.hash || typeof h.hash !== 'string') {
         return NextResponse.json(
           { error: 'Each hash object must have a "hash" string field' },
@@ -113,10 +70,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 [CHECK-HASHES] User ${discordId} checking ${hashes.length} hashes`);
 
-    const newHashes = await hashManifestManager.checkHashes(
-      discordId,
-      hashes
-    );
+    const newHashes = await hashManifestManager.checkHashes(discordId, hashes);
 
     const response = {
       new_hashes: newHashes,

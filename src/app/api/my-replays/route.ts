@@ -2,14 +2,13 @@
  * API Route: /api/my-replays
  * Handles replay upload, analysis, and storage for logged-in users
  */
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { authenticateRequest, isAuthError, checkPermission } from '@/lib/api-auth';
 import { SC2ReplayAPIClient } from '@/lib/sc2reader-client';
 import { hashManifestManager } from '@/lib/replay-hash-manifest';
 import { storeReplayFile, deleteReplayFile } from '@/lib/replay-file-storage';
 import crypto from 'crypto';
-import type { Session } from 'next-auth';
 
 // Configure route to handle file uploads
 export const runtime = 'nodejs';
@@ -84,70 +83,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log('[MY-REPLAYS] POST request received');
-    console.log('[MY-REPLAYS] Content-Type:', request.headers.get('content-type'));
-    console.log('[MY-REPLAYS] Content-Length:', request.headers.get('content-length'));
 
-    // Check for bearer token first (for desktop app), fall back to session (for web)
-    let discordId: string | undefined;
-    let userRoles: string[] = [];
-
-    const authHeader = request.headers.get('authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Desktop app with bearer token
-      const token = authHeader.substring(7);
-      const jwtSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
-
-      try {
-        const { verify } = await import('jsonwebtoken');
-        const decoded = verify(token, jwtSecret) as {
-          userId: string;
-          type: string;
-          roles?: string[];
-        };
-
-        if (decoded.type !== 'uploader') {
-          return NextResponse.json({ error: 'Unauthorized: Invalid token type' }, { status: 401 });
-        }
-
-        discordId = decoded.userId;
-        userRoles = decoded.roles || [];
-      } catch (error) {
-        console.error('[MY-REPLAYS] JWT verification error:', error);
-        if (error instanceof Error) {
-          console.error('[MY-REPLAYS] Error name:', error.name);
-          console.error('[MY-REPLAYS] Error message:', error.message);
-          if (error.name === 'TokenExpiredError') {
-            return NextResponse.json({ error: 'Unauthorized: Token expired' }, { status: 401 });
-          }
-          if (error.name === 'JsonWebTokenError') {
-            return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
-          }
-        }
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-    } else {
-      // Web app with session cookie
-      const session = await auth();
-      if (!session?.user?.discordId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      discordId = session.user.discordId;
-      userRoles = session.user.roles || [];
+    // Authenticate request (supports both bearer token and session)
+    const authResult = await authenticateRequest(request.headers.get('authorization'));
+    if (isAuthError(authResult)) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    // CRITICAL SECURITY CHECK: Verify subscriber role
-    // Replay uploads are a premium feature requiring subscription
-    const { hasPermission } = await import('@/lib/permissions');
+    const { discordId, roles } = authResult;
 
-    // Create a minimal session object for permission check
-    // Type assertion is safe here because hasPermission only reads user.roles
-    const permissionCheck: Session = {
-      user: {
-        roles: userRoles
-      }
-    } as Session;
-
-    if (!hasPermission(permissionCheck, 'subscribers')) {
+    // Verify subscriber permission (replay uploads are premium)
+    if (!await checkPermission(roles, 'subscribers')) {
       return NextResponse.json(
         {
           error: 'Subscription required',
