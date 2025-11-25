@@ -73,10 +73,13 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - `src/components/search/omnisearch-client.tsx:417` - removed unnecessary dep
 
 #### sc2reader - Code Organization
-- [ ] **Refactor scripts to reusable modules**
-  - Convert 13 standalone scripts to importable modules
-  - Create `cli.py` for command-line entry points
-  - Files: check_upgrades.py, debug_replay.py, explore_events.py, analyze_benchmarks.py, compare_replay.py, detect_build.py, learn_build.py, analyze_spam_patterns.py, advanced_spam_analysis.py, poc_proxy_detection.py, fractional_spam_filter.py, benchmark_extraction.py, extract_benchmark_replay.py
+- [x] **Organize into proper package structure** ✅ DONE 2025-11-25
+  - Created `sc2analysis` package with clean import interface
+  - Moved tests to `tests/` directory (11 test files)
+  - Moved debug tools to `tools/` directory (4 scripts)
+  - Moved analysis scripts to `analysis_scripts/` directory (7 scripts)
+  - Core modules remain in root for Vercel deployment compatibility
+  - All 171 unit tests pass
 
 - [ ] **Extract event processing logic**
   - Create `replay_event_processor.py` module
@@ -87,12 +90,14 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - Replace `Any` in: apm.py, player_utils.py, replay_extractor.py, fingerprint.py
 
 #### Uploader - Organization
-- [ ] **Split lib.rs (1332 lines) into modules**
-  - Create `commands/folder_detection.rs`
-  - Create `commands/auth.rs`
-  - Create `commands/config.rs`
-  - Create `commands/upload.rs`
-  - Create `setup.rs`
+- [x] **Split lib.rs into modules** ✅ DONE 2025-11-25
+  - Reduced lib.rs from 1,348 to 332 lines (76% reduction)
+  - Created `commands/` directory with 10 focused modules:
+    - auth.rs, browser.rs, debug.rs, detection.rs, folders.rs
+    - settings.rs, state_cmd.rs, tokens.rs, upload.rs, version.rs
+  - Created `state/` directory with AppState and AppStateManager
+  - Created `types.rs` with UserData and AuthTokens
+  - All 110 Rust tests pass, no compilation warnings
 
 - [x] **Fix clippy warnings (6 warnings)** ✅ DONE 2025-11-24
   - `config_utils.rs:93` - unused import (tempfile::TempDir)
