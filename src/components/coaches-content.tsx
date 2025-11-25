@@ -46,7 +46,7 @@ export function CoachesContent() {
         id: coach.id,
         contentType: 'coaches',
         operation: 'delete',
-        data: coach as unknown as Record<string, unknown>,
+        data: coach,
       });
       toast.success(`Coach deleted (pending commit)`);
     }

@@ -75,7 +75,7 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
         id: buildOrder.id,
         contentType: 'build-orders',
         operation: 'delete',
-        data: buildOrder as unknown as Record<string, unknown>,
+        data: buildOrder,
       });
       toast.success('Build order marked for deletion (pending commit)');
     }

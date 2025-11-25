@@ -301,7 +301,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       id: videoData.id,
       contentType: 'videos',
       operation: isNew ? 'create' : 'update',
-      data: videoData as unknown as Record<string, unknown>,
+      data: videoData,
     });
 
     // If custom thumbnail uploaded for Mux video, add it as a file change

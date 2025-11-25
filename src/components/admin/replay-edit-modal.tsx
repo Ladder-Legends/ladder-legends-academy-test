@@ -430,7 +430,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       id: replayData.id,
       contentType: 'replays',
       operation: isNew ? 'create' : 'update',
-      data: replayData as unknown as Record<string, unknown>,
+      data: replayData,
     });
 
 

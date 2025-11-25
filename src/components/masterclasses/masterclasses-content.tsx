@@ -98,7 +98,7 @@ export function MasterclassesContent() {
         id: masterclass.id,
         contentType: 'masterclasses',
         operation: 'delete',
-        data: masterclass as unknown as Record<string, unknown>,
+        data: masterclass,
       });
       toast.success(`Masterclass deleted (pending commit)`);
     }

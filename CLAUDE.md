@@ -11,30 +11,19 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
 ### PHASE 1: CRITICAL FIXES (Do First)
 
 #### Academy - Type Safety Critical
-- [ ] **Remove all `as unknown as Record<string, unknown>` casts in admin modals**
-  - `src/components/admin/video-selector.tsx:100,146`
-  - `src/components/admin/replay-edit-modal.tsx:464`
-  - `src/components/admin/video-edit-modal.tsx:301`
-  - `src/components/admin/build-order-edit-modal.tsx:290,560`
-  - `src/components/admin/masterclass-edit-modal.tsx:208`
-  - `src/components/admin/coach-edit-modal.tsx:110`
-  - `src/components/admin/event-edit-modal.tsx:140`
-  - Fix: Create FormData wrapper types for each content type
+- [x] **Remove all `as unknown as Record<string, unknown>` casts** ✅ DONE 2025-11-24
+  - Created `ContentData` union type in `use-pending-changes.ts`
+  - Added proper type imports for Video, Coach, Replay, BuildOrder, etc.
+  - Removed 22 unsafe type casts across admin modals, content components, and detail pages
+  - All content types now type-safe when passed to `addChange()`
 
-- [ ] **Remove `as any` from content components**
-  - `src/components/videos/video-library-content.tsx:116`
-  - `src/components/build-orders/build-orders-content.tsx:111`
-  - `src/components/masterclasses/masterclasses-content.tsx:111`
-  - `src/components/replays/replays-content.tsx:116`
-  - `src/components/coaches-content.tsx:49`
+- [x] **Remove type casts from content components** ✅ DONE 2025-11-24
+  - Fixed video-library-content.tsx, build-orders-content.tsx, masterclasses-content.tsx
+  - Fixed replays-content.tsx, coaches-content.tsx
 
-- [ ] **Remove `as any` from detail client pages**
-  - `src/app/library/[id]/video-detail-client.tsx:124,145`
-  - `src/app/replays/[id]/replay-detail-client.tsx:85`
-  - `src/app/build-orders/[id]/build-order-detail-client.tsx:78`
-  - `src/app/masterclasses/[id]/masterclass-detail-client.tsx:59`
-  - `src/app/coaches/[id]/coach-detail-client.tsx:80`
-  - `src/app/events/[id]/event-detail-client.tsx:66`
+- [x] **Remove type casts from detail client pages** ✅ DONE 2025-11-24
+  - Fixed video-detail-client.tsx, replay-detail-client.tsx, build-order-detail-client.tsx
+  - Fixed masterclass-detail-client.tsx, coach-detail-client.tsx, event-detail-client.tsx
 
 #### sc2reader - Error Handling Critical
 - [x] **Fix bare except clauses (silent failures)** ✅ DONE 2025-11-24
@@ -346,6 +335,10 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - Converted img elements to Next.js Image components
   - Updated ESLint config with underscore ignore patterns
   - Added Discord/Mux CDN to image remote patterns
+- ✅ Removed all `as unknown as Record<string, unknown>` type casts
+  - Created `ContentData` union type with all content types
+  - Type-safe pending changes across entire codebase
+  - 22 unsafe casts removed from production code
 
 ### Previous Changes (2025-11-10)
 - ✅ Added comprehensive SEO improvements

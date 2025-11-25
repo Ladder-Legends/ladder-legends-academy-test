@@ -82,7 +82,7 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
       id: video.id,
       contentType: 'videos',
       operation: 'delete',
-      data: video as unknown as Record<string, unknown>,
+      data: video,
     });
     toast.success('Video marked for deletion (pending commit)');
   };

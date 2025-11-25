@@ -103,7 +103,7 @@ export function ReplaysContent() {
       id: replay.id,
       contentType: 'replays',
       operation: 'delete',
-      data: replay as unknown as Record<string, unknown>,
+      data: replay,
     });
   };
 

@@ -121,7 +121,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
         id: video.id,
         contentType: 'videos',
         operation: 'delete',
-        data: video as unknown as Record<string, unknown>,
+        data: video,
       });
       toast.success('Video marked for deletion (pending commit)');
     }
@@ -142,7 +142,7 @@ export function VideoDetailClient({ video }: VideoDetailClientProps) {
       id: video.id,
       contentType: 'videos',
       operation: 'update',
-      data: updatedVideo as unknown as Record<string, unknown>,
+      data: updatedVideo,
     });
 
     toast.success('Video removed from playlist (pending commit)');

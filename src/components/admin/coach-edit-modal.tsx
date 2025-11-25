@@ -107,7 +107,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       id: coachData.id,
       contentType: 'coaches',
       operation: isNew ? 'create' : 'update',
-      data: coachData as unknown as Record<string, unknown>,
+      data: coachData,
     });
 
     toast.success(`Coach ${isNew ? 'created' : 'updated'} (pending commit)`);

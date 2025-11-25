@@ -97,7 +97,7 @@ export function VideoSelector({
       id: newVideo.id,
       contentType: 'videos',
       operation: 'create',
-      data: newVideo as unknown as Record<string, unknown>,
+      data: newVideo,
     });
 
     // Select the new video
@@ -143,7 +143,7 @@ export function VideoSelector({
       id: newVideo.id,
       contentType: 'videos',
       operation: 'create',
-      data: newVideo as unknown as Record<string, unknown>,
+      data: newVideo,
     });
 
     // Select the new video

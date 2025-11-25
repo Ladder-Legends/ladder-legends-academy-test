@@ -63,7 +63,7 @@ export function EventDetailClient({ event, coach }: EventDetailClientProps) {
         id: event.id,
         contentType: 'events',
         operation: 'delete',
-        data: event as unknown as Record<string, unknown>,
+        data: event,
       });
       toast.success('Event marked for deletion (pending commit)');
     }

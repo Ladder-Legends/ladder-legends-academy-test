@@ -137,7 +137,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
       id: eventData.id,
       contentType: 'events',
       operation: isNew ? 'create' : 'update',
-      data: eventData as unknown as Record<string, unknown>,
+      data: eventData,
     });
 
     toast.success(isNew ? 'Event created' : 'Event updated');

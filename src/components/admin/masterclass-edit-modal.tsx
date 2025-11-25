@@ -205,7 +205,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       id: masterclassData.id,
       contentType: 'masterclasses',
       operation: isNew ? 'create' : 'update',
-      data: masterclassData as unknown as Record<string, unknown>,
+      data: masterclassData,
     });
 
     toast.success(`Masterclass ${isNew ? 'created' : 'updated'} (pending commit)`);

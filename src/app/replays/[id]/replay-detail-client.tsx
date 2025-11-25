@@ -81,7 +81,7 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
         id: replay.id,
         contentType: 'replays',
         operation: 'delete',
-        data: replay as unknown as Record<string, unknown>,
+        data: replay,
       });
       toast.success('Replay marked for deletion (pending commit)');
     }

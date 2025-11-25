@@ -2,14 +2,51 @@
 
 import { useState, useEffect } from 'react';
 import { posthog } from '@/lib/posthog';
+import type { Video } from '@/types/video';
+import type { Coach } from '@/types/coach';
+import type { Replay } from '@/types/replay';
+import type { BuildOrder } from '@/types/build-order';
+import type { Masterclass } from '@/types/masterclass';
+import type { Event } from '@/types/event';
+import type { Sponsorship } from '@/types/sponsorship';
 
 export type ContentType = 'videos' | 'build-orders' | 'replays' | 'masterclasses' | 'coaches' | 'events' | 'file' | 'about' | 'privacy' | 'terms' | 'sponsorships';
+
+/**
+ * File content type for static pages (about, privacy, terms)
+ */
+export interface FileContent {
+  path: string;
+  content: string;
+}
+
+/**
+ * Union of all content types that can be stored as pending changes.
+ * This allows type-safe usage without requiring `as unknown as Record<string, unknown>` casts.
+ */
+export type ContentData =
+  | Video
+  | Partial<Video>
+  | Coach
+  | Partial<Coach>
+  | Replay
+  | Partial<Replay>
+  | BuildOrder
+  | Partial<BuildOrder>
+  | Masterclass
+  | Partial<Masterclass>
+  | Event
+  | Partial<Event>
+  | Sponsorship
+  | Partial<Sponsorship>
+  | FileContent
+  | Record<string, unknown>; // Fallback for edge cases
 
 export interface PendingChange {
   id: string;
   contentType: ContentType;
   operation: 'create' | 'update' | 'delete';
-  data: Record<string, unknown>;
+  data: ContentData;
   timestamp: number;
 }
 
@@ -84,11 +121,12 @@ export function usePendingChanges() {
       const newChange = { ...change, timestamp: Date.now() };
 
       // Track CMS action in PostHog
+      const title = 'title' in change.data ? (change.data.title as string | undefined) : undefined;
       posthog.capture('cms_action', {
         content_type: change.contentType,
         operation: change.operation,
         content_id: change.id,
-        content_title: (change.data as { title?: string }).title || undefined,
+        content_title: title,
       });
 
       return [...filtered, newChange];

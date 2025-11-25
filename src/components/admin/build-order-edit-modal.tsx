@@ -286,7 +286,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         id: newReplay.id,
         contentType: 'replays',
         operation: 'create',
-        data: newReplay as unknown as Record<string, unknown>,
+        data: newReplay,
       });
 
       // Link this replay to the build order (use functional setState to preserve changes)
@@ -556,7 +556,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
       id: buildOrderData.id,
       contentType: 'build-orders',
       operation: isNew ? 'create' : 'update',
-      data: buildOrderData as unknown as Record<string, unknown>,
+      data: buildOrderData,
     });
 
     toast.success(`Build order ${isNew ? 'created' : 'updated'} (pending commit)`);

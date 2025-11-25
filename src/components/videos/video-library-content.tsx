@@ -103,7 +103,7 @@ export function VideoLibraryContent() {
         id: video.id,
         contentType: 'videos',
         operation: 'delete',
-        data: video as unknown as Record<string, unknown>,
+        data: video,
       });
       toast.success(`Video deleted (pending commit)`);
     }

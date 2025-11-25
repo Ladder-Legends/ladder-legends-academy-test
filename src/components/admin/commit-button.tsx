@@ -113,7 +113,7 @@ export function CommitButton() {
         <div className="space-y-2 mb-3 max-h-[200px] overflow-y-auto">
           {changes.map((change, i) => {
             // For file changes, show the path; for others, show the id
-            const displayName = change.contentType === 'file'
+            const displayName = change.contentType === 'file' && 'path' in change.data
               ? String(change.data.path)
               : change.id;
 
