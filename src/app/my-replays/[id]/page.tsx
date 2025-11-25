@@ -24,7 +24,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { UserReplayData, TimingComparison, ReplayFingerprint } from '@/lib/replay-types';
+import type { UserReplayData, ReplayFingerprint } from '@/lib/replay-types';
 
 // Helper function to calculate top issues
 interface Issue {

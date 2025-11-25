@@ -10,7 +10,7 @@
  * - Dynamic discovery (no hard-coded lists)
  */
 
-import { readdir, readFile, stat } from 'fs/promises';
+import { readdir, readFile } from 'fs/promises';
 import { join, relative } from 'path';
 import { existsSync } from 'fs';
 import { execSync } from 'child_process';
