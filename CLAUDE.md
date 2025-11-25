@@ -32,20 +32,21 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - `explore_events.py:72,111` - bare `except: pass`
   - Fixed: Replaced with `except Exception as e: logger.debug(str(e))`
 
-- [ ] **Add file size limits to API endpoints**
-  - `api/index.py` - No upload size validation
-  - Fix: Add MAX_FILE_SIZE check (500MB limit)
+- [x] **Add file size limits to API endpoints** ✅ DONE 2025-11-24
+  - Added MAX_FILE_SIZE = 100MB (appropriate for SC2 replays)
+  - validate_file_size() helper function returns 413 for oversized files
+  - Applied to all 5 upload endpoints: /analyze, /fingerprint, /fingerprint-all, /detect-build, /compare
 
 #### Uploader - Rust Safety Critical
-- [ ] **Remove unwrap() from production code**
-  - `lib.rs:312,631,942` - JSON serialization unwrap
-  - `replay_uploader.rs:106` - HTTP client build unwrap
-  - `replay_uploader.rs:133,207` - Response text unwrap
-  - Fix: Use `map_err()` and propagate errors
+- [x] **Remove unwrap() from production code** ✅ DONE 2025-11-24
+  - Replaced JSON serialization unwrap() with map_err() in lib.rs
+  - Auth tokens and config serialization now properly propagate errors
+  - Tray icon uses expect() with descriptive message
 
-- [ ] **Remove `as any` from TypeScript**
-  - `src/config.ts:9,10` - import.meta and window casts
-  - Fix: Create proper Window interface extension
+- [x] **Remove `as any` from TypeScript** ✅ DONE 2025-11-24
+  - Added vite/client types via triple-slash reference
+  - Extended Window interface for LADDER_LEGENDS_API_HOST
+  - Removed all as any casts from config.ts
 
 ---
 
@@ -99,9 +100,9 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - `device_auth.rs:363,376` - assert_eq!(x, true) → assert!(x)
   - `lib.rs:210,232` - use .inspect_err() instead of .map_err()
 
-- [ ] **Fix TypeScript duplication**
-  - `upload-progress.ts:26-40,55-68` - duplicate state initialization
-  - Extract DEFAULT_UPLOAD_STATE constant
+- [x] **Fix TypeScript duplication** ✅ DONE 2025-11-24
+  - Extracted DEFAULT_UPLOAD_STATE constant in upload-progress.ts
+  - Used spread operator for state initialization and reset
 
 ---
 
@@ -288,8 +289,8 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
   - Add bandit for code security
 
 #### Uploader
-- [ ] **Remove duplicate dependency**
-  - Cargo.toml:44 - tauri-plugin-shell listed twice
+- [x] **Remove duplicate dependency** ✅ DONE 2025-11-24
+  - Removed duplicate tauri-plugin-shell from platform-specific dependencies
 
 - [ ] **Add #[allow(dead_code)] documentation**
   - Several methods marked dead but are used
