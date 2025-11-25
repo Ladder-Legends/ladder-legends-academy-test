@@ -2,7 +2,6 @@
 
 import { Video, isMuxVideo } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
-import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface VideoPlayerProps {

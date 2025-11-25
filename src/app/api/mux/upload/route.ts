@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Get video metadata from request
     const body = await request.json();
-    const { title, description } = body;
+    const { title } = body;
 
     console.log('[MUX UPLOAD] Creating upload URL for:', {
       title: title || 'Untitled Video',

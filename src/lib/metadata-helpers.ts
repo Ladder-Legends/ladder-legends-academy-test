@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Video, getVideoThumbnailUrl, isPlaylist } from '@/types/video';
+import { Video, getVideoThumbnailUrl } from '@/types/video';
 
 interface GeneratePlaylistMetadataOptions {
   /**

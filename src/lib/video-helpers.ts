@@ -63,7 +63,7 @@ export function getFirstVideoId(content: VideoReference): string | undefined {
  * getVideoUrl('abc123', true) // '/library/abc123' (PaywallLink will handle /free prefix)
  * getVideoUrl('abc123', false) // '/library/abc123'
  */
-export function getVideoUrl(videoId: string, isFree: boolean): string {
+export function getVideoUrl(videoId: string, _isFree: boolean): string {
   return `/library/${videoId}`;
 }
 

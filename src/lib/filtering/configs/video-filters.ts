@@ -5,16 +5,15 @@
 
 import type { Video } from '@/types/video';
 import type { Coach } from '@/types/coach';
-import type { FilterConfig, FilterFieldConfig, FilterSectionConfig, FilterState } from '../types';
+import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
-import { createTagPredicate, createFieldMatchPredicate, createBooleanPredicate, createCategoryPredicate, validateFilterConfig } from '../filter-engine';
+import { createTagPredicate, createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
 import { isOwner } from '@/lib/permissions';
 import { getCategoryFilterOptions } from '@/lib/taxonomy';
 import coachesData from '@/data/coaches.json';
 
 const allCoaches = coachesData as Coach[];
 const activeCoachIds = allCoaches.filter(c => c.isActive !== false).map(c => c.id);
-const inactiveCoachIds = allCoaches.filter(c => c.isActive === false).map(c => c.id);
 
 /**
  * Filter field configurations
@@ -137,7 +136,7 @@ const sections: FilterSectionConfig<Video>[] = [
     id: 'coaches',
     title: 'Coaches',
     type: 'checkbox',
-    getOptions: (videos, filters) => {
+    getOptions: (videos) => {
       const formatCoachName = (coachId: string): string => {
         const video = videos.find(v => v.coachId === coachId);
         return video?.coach || coachId;

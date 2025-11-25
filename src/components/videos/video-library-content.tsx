@@ -36,7 +36,6 @@ export function VideoLibraryContent() {
     setSearchQuery,
     selectedTags,
     toggleTag,
-    clearTags,
     sections: filterSections,
   } = useContentFiltering(videos, videoFilterConfig);
 
@@ -63,15 +62,6 @@ export function VideoLibraryContent() {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewVideo, setIsNewVideo] = useState(false);
-
-  // Extract all unique tags from videos
-  const allTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    videos.forEach(video => {
-      video.tags.forEach(tag => tagSet.add(tag));
-    });
-    return Array.from(tagSet).sort();
-  }, []);
 
   // Convert filters object to selectedItems format for FilterSidebar
   const selectedItems = useMemo(() => {

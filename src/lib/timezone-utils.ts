@@ -132,23 +132,6 @@ export function convertEventTime(
     const [year, month, day] = eventDate.split('-').map(Number);
     const [hours, minutes] = eventTime.split(':').map(Number);
 
-    // Create date string in event timezone
-    const eventDateTimeStr = `${eventDate}T${eventTime}:00`;
-
-    // Parse as if in event timezone
-    const eventDateTime = new Date(eventDateTimeStr);
-
-    // Get offset difference between event timezone and user timezone
-    const eventFormatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: eventTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-
     const userFormatter = new Intl.DateTimeFormat('en-US', {
       timeZone: userTimezone,
       year: 'numeric',
@@ -222,7 +205,7 @@ export function formatTimeForDisplay(time24h: string): string {
     const period = hours >= 12 ? 'PM' : 'AM';
     const hours12 = hours % 12 || 12;
     return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
-  } catch (error) {
+  } catch {
     return time24h;
   }
 }
@@ -247,7 +230,7 @@ export function isValidTimezone(timezone: string): boolean {
   try {
     Intl.DateTimeFormat(undefined, { timeZone: timezone });
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

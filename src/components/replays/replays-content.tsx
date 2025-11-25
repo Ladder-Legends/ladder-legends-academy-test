@@ -34,7 +34,6 @@ export function ReplaysContent() {
     setSearchQuery,
     selectedTags,
     toggleTag,
-    clearTags,
     sections: filterSections,
   } = useContentFiltering(allReplays, replayFilterConfig);
 
@@ -59,15 +58,6 @@ export function ReplaysContent() {
 
   const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-
-  // Get all unique tags
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    allReplays.forEach(replay => {
-      replay.tags?.forEach(tag => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, []);
 
   // Convert filters object to selectedItems format for FilterSidebar
   const selectedItems = useMemo(() => {

@@ -34,7 +34,6 @@ export function BuildOrdersContent() {
     setSearchQuery,
     selectedTags,
     toggleTag,
-    clearTags,
     sections: filterSections,
   } = useContentFiltering(allBuildOrders, buildOrderFilterConfig);
 
@@ -60,15 +59,6 @@ export function BuildOrdersContent() {
   const [editingBuildOrder, setEditingBuildOrder] = useState<BuildOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewBuildOrder, setIsNewBuildOrder] = useState(false);
-
-  // Get all unique tags
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    allBuildOrders.forEach(bo => {
-      bo.tags.forEach(tag => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, []);
 
   // Convert filters object to selectedItems format for FilterSidebar
   const selectedItems = useMemo(() => {

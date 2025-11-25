@@ -1,10 +1,10 @@
 'use client';
 
 import { UserReplayData } from '@/lib/replay-types';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, Trophy, Calendar, MapPin, Clock, Target } from 'lucide-react';
+import { Trash2, MapPin, Clock, Target } from 'lucide-react';
 
 interface MyReplayCardProps {
   replay: UserReplayData;

@@ -8,7 +8,6 @@ import type {
   UserReplayData,
   AllPlayersFingerprint,
   ReplayFingerprint,
-  ReplayPlayer,
 } from '@/lib/replay-types';
 
 // Helper to create a mock ReplayFingerprint

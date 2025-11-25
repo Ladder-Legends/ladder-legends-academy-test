@@ -134,7 +134,7 @@ export function MuxVideoPlayer({
         try {
           const cacheKey = `mux-token-${playbackId}`;
           localStorage.removeItem(cacheKey);
-        } catch (e) {
+        } catch {
           // Ignore cleanup errors
         }
       }
@@ -204,7 +204,7 @@ export function MuxVideoPlayer({
         try {
           const cacheKey = `mux-token-${playbackId}`;
           localStorage.removeItem(cacheKey);
-        } catch (e) {
+        } catch {
           // Ignore cleanup errors
         }
 

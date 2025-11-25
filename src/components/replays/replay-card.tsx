@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Replay, getReplayThumbnailUrl } from "@/types/replay";
 import { CalendarDays, Download, Video as VideoIcon, Pencil, Trash2, Lock } from "lucide-react";

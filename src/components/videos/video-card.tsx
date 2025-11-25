@@ -1,9 +1,8 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Video, isPlaylist, getThumbnailYoutubeId, isMuxVideo, getVideoThumbnailUrl } from "@/types/video";
+import { Video, isPlaylist, getVideoThumbnailUrl } from "@/types/video";
 import { CalendarDays, Play, Pencil, Trash2, ListVideo, Lock } from "lucide-react";
 import Image from "next/image";
 import { PaywallLink } from "@/components/auth/paywall-link";
@@ -28,11 +27,6 @@ export function VideoCard({ video, onEdit, onDelete, allVideos }: VideoCardProps
       day: 'numeric',
       year: 'numeric'
     });
-  };
-
-  // Monochrome tags - no color coding
-  const getTagColor = (): string => {
-    return 'bg-muted hover:bg-muted/80 text-foreground';
   };
 
   const videoIsPlaylist = isPlaylist(video);

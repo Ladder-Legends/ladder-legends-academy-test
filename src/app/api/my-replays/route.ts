@@ -139,7 +139,7 @@ async function trackPlayerName(discordId: string, playerName: string): Promise<v
  * GET /api/my-replays
  * Fetch all replays for the logged-in user
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await auth();
 

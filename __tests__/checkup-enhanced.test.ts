@@ -8,7 +8,6 @@ import {
   detectConflicts,
   type LocalEvent,
   type DiscordEvent,
-  type EventConflict,
 } from '../scripts/checkup-enhanced';
 
 describe('transformDiscordToLocal', () => {

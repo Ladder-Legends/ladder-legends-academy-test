@@ -380,7 +380,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     // Auto-analyze the replay
     try {
       await analyzeReplayFile(file);
-    } catch (error) {
+    } catch {
       setUploadedReplayFile(null);
     }
   };

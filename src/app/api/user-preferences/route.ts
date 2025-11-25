@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(preferences);
       }
-    } catch (error) {
+    } catch {
       // Blob doesn't exist, return defaults
       console.log('No existing preferences found, returning defaults');
     }

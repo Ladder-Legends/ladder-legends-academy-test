@@ -28,7 +28,7 @@ export function ShareButtons({ url, title, description, className = '' }: ShareB
     try {
       await navigator.clipboard.writeText(fullUrl);
       toast.success('Link copied to clipboard!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to copy link');
     }
   };

@@ -34,7 +34,6 @@ export function MasterclassesContent() {
     setSearchQuery,
     selectedTags,
     toggleTag,
-    clearTags,
     sections: filterSections,
   } = useContentFiltering(allMasterclasses, masterclassFilterConfig);
 
@@ -60,15 +59,6 @@ export function MasterclassesContent() {
   const [editingMasterclass, setEditingMasterclass] = useState<Masterclass | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewMasterclass, setIsNewMasterclass] = useState(false);
-
-  // Get all unique tags
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    allMasterclasses.forEach(mc => {
-      mc.tags?.forEach(tag => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, []);
 
   // Convert filters object to selectedItems format for FilterSidebar
   const selectedItems = useMemo(() => {

@@ -179,7 +179,7 @@ describe('Settings API - Backwards Compatibility', () => {
     });
 
     const response = await PATCH(request);
-    const data = await response.json();
+    await response.json(); // Consume response body
 
     expect(response.status).toBe(200);
 
@@ -213,7 +213,7 @@ describe('Settings API - Backwards Compatibility', () => {
     });
 
     const response = await PATCH(request);
-    const data = await response.json();
+    await response.json(); // Consume response body
 
     expect(response.status).toBe(200);
     expect(mockCreateUserSettings).toHaveBeenCalled();

@@ -22,8 +22,6 @@ import {
   transformDiscordToLocal,
   createDiscordEvent,
   updateDiscordEvent,
-  type LocalEvent,
-  type DiscordEvent,
   type EventConflict,
 } from '../src/services/discord-sync.service';
 

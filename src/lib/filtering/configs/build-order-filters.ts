@@ -5,7 +5,7 @@
 import type { BuildOrder } from '@/types/build-order';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
-import { createTagPredicate, createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
+import { createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
 import { getCategoryFilterOptions } from '@/lib/taxonomy';
 
 /**

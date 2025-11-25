@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
-import { LogOut, User, LogIn, Activity, CreditCard, Settings, Download, FileText } from "lucide-react";
+import { LogOut, User, Activity, CreditCard, Settings, Download, FileText } from "lucide-react";
 import Link from "next/link";
 import { isOwner, isCoach } from "@/lib/permissions";
 import {
