@@ -160,7 +160,7 @@ interface CoachStructuredDataProps {
     race: string;
     bio: string;
     specialties: string[];
-    bookingUrl: string;
+    bookingUrl?: string; // Optional - not all coaches have booking URLs
   };
 }
 

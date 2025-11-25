@@ -16,12 +16,8 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
-  Trophy,
   Target,
   TrendingUp,
-  Clock,
-  Map,
-  Swords,
   CheckCircle2,
   XCircle,
   AlertCircle,

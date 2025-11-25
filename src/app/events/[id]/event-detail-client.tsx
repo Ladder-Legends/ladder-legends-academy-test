@@ -5,7 +5,6 @@ import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
 import { ShareDialog } from '@/components/social/share-dialog';
 import { Footer } from '@/components/footer';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Event, getEventStatus } from '@/types/event';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Repeat, Edit, Trash2 } from 'lucide-react';

@@ -3,7 +3,6 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { Footer } from '@/components/footer';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Video, isPlaylist } from '@/types/video';
 import videos from '@/data/videos.json';

@@ -3,7 +3,6 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { Footer } from '@/components/footer';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Masterclass } from '@/types/masterclass';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';

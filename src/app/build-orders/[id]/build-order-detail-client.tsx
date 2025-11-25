@@ -3,11 +3,9 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { BuildOrderEditModal } from '@/components/admin/build-order-edit-modal';
 import { Footer } from '@/components/footer';
-import Image from 'next/image';
 import Link from 'next/link';
 import { BuildOrder } from '@/types/build-order';
 import { ArrowLeft, Edit, Trash2, Download, Lock } from 'lucide-react';
-import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -53,7 +51,7 @@ export function BuildOrderDetailClient({ buildOrder }: BuildOrderDetailClientPro
   const hasMultipleVideos = buildOrderVideos.length > 1;
 
   // Use shared playlist navigation hook
-  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+  const { currentVideoIndex, handleVideoSelect } = usePlaylistNavigation({
     videos: buildOrderVideos,
     parentTitle: buildOrder.name,
     isPlaylist: hasMultipleVideos,

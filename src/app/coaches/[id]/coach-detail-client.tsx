@@ -38,8 +38,6 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
   const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const [isCoachEditModalOpen, setIsCoachEditModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [videoToEdit, setVideoToEdit] = useState<Video | null>(null);
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Generic sort function for content
@@ -70,11 +68,6 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
 
   // Calculate total content count
   const totalContent = sortedVideos.length + sortedReplays.length + sortedBuildOrders.length + sortedMasterclasses.length + sortedEvents.length;
-
-  const handleEdit = (video: Video) => {
-    setVideoToEdit(video);
-    setIsEditModalOpen(true);
-  };
 
   const handleDelete = async (video: Video) => {
     if (!confirm(`Are you sure you want to delete "${video.title}"?`)) {
@@ -188,7 +181,6 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
                         <VideoCard
                           key={video.id}
                           video={video}
-                          onEdit={handleEdit}
                           onDelete={handleDelete}
                           allVideos={allVideos}
                         />
@@ -277,8 +269,7 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
       <CoachEditModal
         isOpen={isCoachEditModalOpen}
         onClose={() => setIsCoachEditModalOpen(false)}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        coach={coach as any}
+        coach={coach}
       />
     </div>
   );

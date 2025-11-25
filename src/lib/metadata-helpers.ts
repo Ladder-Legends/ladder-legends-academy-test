@@ -13,6 +13,10 @@ interface GeneratePlaylistMetadataOptions {
     videoIds?: string[];
     tags?: string[];
     isFree?: boolean;
+    // Video-specific properties (when content itself is a video)
+    youtubeId?: string;
+    muxPlaybackId?: string;
+    thumbnail?: string;
   };
   /**
    * All available videos to look up from
@@ -76,12 +80,19 @@ export function generatePlaylistMetadata({
   let playlistContext = '';
 
   // Check if the content itself is a Video (has youtubeId or muxPlaybackId)
-  const contentAsVideo = content as unknown as Video;
-  const isVideoContent = contentAsVideo.youtubeId || contentAsVideo.muxPlaybackId;
+  const isVideoContent = content.youtubeId || content.muxPlaybackId;
 
   // If the content itself is a video, use its thumbnail
   if (isVideoContent) {
-    displayThumbnail = getVideoThumbnailUrl(contentAsVideo, 'high');
+    // Create a minimal Video-compatible object for thumbnail generation
+    const videoForThumbnail = {
+      id: content.id,
+      youtubeId: content.youtubeId,
+      muxPlaybackId: content.muxPlaybackId,
+      thumbnail: content.thumbnail || '',
+      source: content.muxPlaybackId ? 'mux' : 'youtube',
+    } as Video;
+    displayThumbnail = getVideoThumbnailUrl(videoForThumbnail, 'high');
   }
   // For content with videos, check if a specific video is requested via ?v= query param
   else if (hasVideos && content.videoIds) {

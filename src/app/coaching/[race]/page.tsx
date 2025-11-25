@@ -6,6 +6,8 @@ import replaysData from '@/data/replays.json';
 import buildOrdersData from '@/data/build-orders.json';
 import { RaceCoachingClient } from './race-coaching-client';
 import { Video } from '@/types/video';
+import { Coach } from '@/types/coach';
+import { BuildOrder } from '@/types/build-order';
 import { Replay, normalizeReplays } from '@/types/replay';
 
 type Race = 'terran' | 'zerg' | 'protoss' | 'random';
@@ -109,17 +111,20 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     notFound();
   }
 
+  // Type the JSON data imports
+  const coaches = coachesData as Coach[];
+  const videos = videosData as Video[];
+  const buildOrders = buildOrdersData as BuildOrder[];
+
   // Filter coaches by race (random coaches appear on all pages)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raceCoaches = (coachesData as any[]).filter((coach) => {
+  const raceCoaches = coaches.filter((coach) => {
     if (coach.isActive === false) return false;
     if (race === 'random') return coach.race === 'all';
     return coach.race === race || coach.race === 'all';
   });
 
   // Filter videos by race
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raceVideos = (videosData as any[]).filter((video) => {
+  const raceVideos = videos.filter((video) => {
     if (race === 'random') return true; // Show all for random
     return video.race === race || video.race === 'all' || video.race === race.charAt(0).toUpperCase() + race.slice(1);
   });
@@ -135,14 +140,13 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
   });
 
   // Filter build orders - only show where the build order's race matches the target race
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raceBuildOrders = (buildOrdersData as any[]).filter((buildOrder) => {
+  const raceBuildOrders = buildOrders.filter((buildOrder) => {
     if (race === 'random') return true;
     const buildOrderRace = buildOrder.race?.toLowerCase() || '';
     return buildOrderRace === race;
   });
 
-  const allVideos = videosData as Video[];
+  const allVideos = videos;
 
   return (
     <RaceCoachingClient
