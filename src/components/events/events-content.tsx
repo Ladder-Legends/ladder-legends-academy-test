@@ -43,14 +43,15 @@ export function EventsContent() {
     endDate: endDate,
   });
 
-  // Get all unique tags
-  const allTags = useMemo(() => {
+  // Get all unique tags (unused until tag filter UI is implemented)
+  const _allTags = useMemo(() => {
     const tags = new Set<string>();
     allEvents.forEach(event => {
       event.tags?.forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
   }, []);
+  void _allTags;
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>

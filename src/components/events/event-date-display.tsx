@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Event, formatEventDateTime, getNextOccurrence } from '@/types/event';
+import { Event, getNextOccurrence } from '@/types/event';
 import { useUserTimezone } from '@/hooks/use-user-timezone';
 import { getTimezoneAbbreviation } from '@/lib/timezone-utils';
 

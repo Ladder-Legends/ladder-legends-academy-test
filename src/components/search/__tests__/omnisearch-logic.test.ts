@@ -18,7 +18,7 @@ describe('Omnisearch Logic', () => {
         { id: '3', title: 'Default Premium Video' }, // undefined isFree = premium
       ];
 
-      const hasSubscription = false;
+      const _hasSubscription = false; // Not used in this test but shows intent
 
       // Simulate the mapping logic from omnisearch
       const results = videos.map(video => ({

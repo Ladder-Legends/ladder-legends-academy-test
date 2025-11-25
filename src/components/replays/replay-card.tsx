@@ -32,7 +32,7 @@ export function ReplayCard({ replay, onEdit, onDelete }: ReplayCardProps) {
     });
   };
 
-  const getRaceColor = (race: string) => {
+  const getRaceColor = (_race: string) => {
     // Using theme foreground color instead of race-specific colors
     return 'text-foreground';
   };

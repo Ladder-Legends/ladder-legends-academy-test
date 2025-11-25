@@ -24,7 +24,7 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
   };
 
   // Helper to get race color
-  const getRaceColor = (race: string) => {
+  const getRaceColor = (_race: string) => {
     return 'text-foreground';
   };
 

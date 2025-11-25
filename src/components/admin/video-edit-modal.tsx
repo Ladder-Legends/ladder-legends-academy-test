@@ -31,7 +31,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [, setShowTagDropdown] = useState(false); // showTagDropdown unused until tag autocomplete UI is added
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
   const [customThumbnail, setCustomThumbnail] = useState<string | null>(null); // base64 or URL
   const [isPlaylistMode, setIsPlaylistMode] = useState(false);
@@ -67,14 +67,15 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     };
   }, [isPlaylistMode, formData.isFree, formData.videoIds]);
 
-  // Filter tags based on input
-  const filteredTags = useMemo(() => {
+  // Filter tags based on input (unused until tag autocomplete UI is added)
+  const _filteredTags = useMemo(() => {
     if (!tagInput.trim()) return [];
     const input = tagInput.toLowerCase();
     return allExistingTags
       .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
       .slice(0, 5);
   }, [tagInput, allExistingTags, formData.tags]);
+  void _filteredTags;
 
   // Filter coaches based on search input (only active coaches)
   const filteredCoaches = useMemo(() => {
@@ -138,14 +139,15 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     setTagInput('');
   };
 
-  const removeTag = (tagToRemove: string) => {
+  // Tag handlers - prepared for future tag autocomplete UI
+  const _removeTag = (tagToRemove: string) => {
     setFormData({
       ...formData,
       tags: formData.tags?.filter(tag => tag !== tagToRemove) || []
     });
   };
 
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const _handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (tagInput.trim()) {
@@ -153,6 +155,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       }
     }
   };
+  void _removeTag; void _handleTagInputKeyDown;
 
   const selectCoach = (coachId: string) => {
     const coach = coaches.find(c => c.id === coachId);

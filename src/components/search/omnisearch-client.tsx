@@ -83,7 +83,8 @@ const TYPE_LABELS: Record<SearchResult['type'], string> = {
   video: 'Videos',
 };
 
-const TYPE_SINGULAR: Record<SearchResult['type'], string> = {
+// Singular type names for future use in result display
+const _TYPE_SINGULAR: Record<SearchResult['type'], string> = {
   coach: 'Coach',
   masterclass: 'Masterclass',
   event: 'Event',
@@ -91,6 +92,7 @@ const TYPE_SINGULAR: Record<SearchResult['type'], string> = {
   replay: 'Replay',
   video: 'Video',
 };
+void _TYPE_SINGULAR;
 
 const TYPE_COLORS: Record<SearchResult['type'], string> = {
   coach: 'text-foreground',

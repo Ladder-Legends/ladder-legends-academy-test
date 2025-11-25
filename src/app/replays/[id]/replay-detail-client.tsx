@@ -57,7 +57,7 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const hasMultipleVideos = replayVideos.length > 1;
 
   // Use shared playlist navigation hook
-  const { currentVideoIndex, currentVideo: _currentVideo, handleVideoSelect } = usePlaylistNavigation({
+  const { currentVideoIndex, handleVideoSelect } = usePlaylistNavigation({
     videos: replayVideos,
     parentTitle: replay.title,
     isPlaylist: hasMultipleVideos,

@@ -34,7 +34,7 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
   };
 
   // Helper to get race color
-  const getRaceColor = (race: string) => {
+  const getRaceColor = (_race: string) => {
     // Using theme foreground color instead of race-specific colors
     return 'text-foreground';
   };

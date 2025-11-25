@@ -118,7 +118,7 @@ function analyzeContent(title, description, tags) {
   return Array.from(categories);
 }
 
-function getMatchupFromRace(race, vsRace) {
+function _getMatchupFromRace(race, vsRace) {
   if (!race || !vsRace) return null;
   const r = race[0].toLowerCase();
   const vs = vsRace[0].toLowerCase();

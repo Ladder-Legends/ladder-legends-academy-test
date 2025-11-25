@@ -15,12 +15,12 @@ interface MasterclassesTableProps {
 }
 
 export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, onDelete }: MasterclassesTableProps) {
-  const getRaceColor = (race: string) => {
+  const getRaceColor = (_race: string) => {
     // Using theme foreground color instead of race-specific colors
     return 'text-foreground';
   };
 
-  const getDifficultyColor = (difficulty?: string) => {
+  const getDifficultyColor = (_difficulty?: string) => {
     // Using theme colors instead of difficulty-specific colors
     return 'bg-muted text-foreground border-border';
   };

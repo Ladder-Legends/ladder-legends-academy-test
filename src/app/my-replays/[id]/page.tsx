@@ -651,8 +651,6 @@ export default function ReplayDetailPage() {
                   });
 
                   const efficiency = totalUnits > 0 ? (onTargetUnits / totalUnits) * 100 : 0;
-                  const grade = efficiency >= 90 ? 'A' : efficiency >= 80 ? 'B' :
-                               efficiency >= 70 ? 'C' : 'D';
                   const gradeColor = efficiency >= 80 ? 'text-green-600 dark:text-green-400' :
                                     efficiency >= 70 ? 'text-yellow-600 dark:text-yellow-400' :
                                     'text-red-600 dark:text-red-400';
@@ -1141,8 +1139,8 @@ export default function ReplayDetailPage() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(fingerprint.timings)
-                    .filter(([_, time]) => time !== null)
-                    .sort(([_, a], [__, b]) => (a as number) - (b as number))
+                    .filter(([, time]) => time !== null)
+                    .sort(([, a], [, b]) => (a as number) - (b as number))
                     .map(([key, time]) => (
                       <div key={key} className="p-2 border rounded text-sm">
                         <div className="font-medium capitalize mb-1">

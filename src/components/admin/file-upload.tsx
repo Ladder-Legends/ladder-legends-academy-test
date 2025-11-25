@@ -29,7 +29,7 @@ export function FileUpload({
   className = '',
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [_dragCounter, setDragCounter] = useState(0);
+  const [, setDragCounter] = useState(0);
 
   const validateAndProcess = async (file: File) => {
     // Validate file size

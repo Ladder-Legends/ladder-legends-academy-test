@@ -36,7 +36,8 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
     return acc;
   }, {} as Record<string, number>);
 
-  const playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
+  const _playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
+  void _playerRace; // Currently unused - prepared for player race display feature
 
   // Matchup stats - normalize to show player's race first (using confirmed/suggested player name)
   const matchupStats = activeReplays.reduce((acc, r) => {
@@ -202,7 +203,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
 
   // Matchup-specific tips
   const worstMatchup = Object.entries(matchupStats)
-    .filter(([_, stats]) => stats.total >= 3)
+    .filter(([, stats]) => stats.total >= 3)
     .sort((a, b) => (a[1].wins / a[1].total) - (b[1].wins / b[1].total))[0];
   if (worstMatchup) {
     const matchupWinRate = (worstMatchup[1].wins / worstMatchup[1].total) * 100;
@@ -234,7 +235,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
 
   // Best matchup by win rate
   const bestMatchup = Object.entries(matchupStats)
-    .filter(([_, stats]) => stats.total >= 3) // Minimum 3 games
+    .filter(([, stats]) => stats.total >= 3) // Minimum 3 games
     .map(([matchup, stats]) => ({
       matchup,
       winRate: (stats.wins / stats.total) * 100,

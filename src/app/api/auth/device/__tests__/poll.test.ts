@@ -12,7 +12,7 @@ vi.mock('@/lib/device-code-store', () => ({
 }));
 
 vi.mock('jsonwebtoken', () => ({
-  sign: vi.fn((payload, secret, options) => `mock-jwt-token-${payload.type}`),
+  sign: vi.fn((payload, _secret, _options) => `mock-jwt-token-${payload.type}`),
 }));
 
 describe('GET /api/auth/device/poll', () => {

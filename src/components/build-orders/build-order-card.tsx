@@ -25,12 +25,12 @@ export function BuildOrderCard({ buildOrder, onEdit, onDelete }: BuildOrderCardP
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const thumbnailUrl = getBuildOrderThumbnailUrl(buildOrder, videos);
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyColor = (_difficulty: string) => {
     // Using theme colors instead of difficulty-specific colors
     return 'bg-muted text-foreground border-border';
   };
 
-  const getTypeColor = (type: string) => {
+  const getTypeColor = (_type: string) => {
     // Using theme colors instead of type-specific colors
     return 'bg-muted text-foreground border-border';
   };

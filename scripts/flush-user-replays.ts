@@ -85,7 +85,7 @@ async function flushUserReplays(discordUserId: string, dryRun: boolean) {
   // Delete from Blob storage first (using blob_url stored in replay data)
   console.log('\n🗑️  Deleting replay files from Blob storage...');
   let blobDeleteCount = 0;
-  for (const { id, replay } of replays) {
+  for (const { replay } of replays) {
     // Use the actual blob_url from replay data (new format)
     if (replay?.blob_url) {
       try {

@@ -288,7 +288,7 @@ async function getTestCoverage(): Promise<TestCoverage> {
     if (passMatch) passing = parseInt(passMatch[1]);
     if (totalMatch) total = parseInt(totalMatch[1]);
     if (coverageMatch) coverage = parseFloat(coverageMatch[1]);
-  } catch (error) {
+  } catch {
     console.warn('⚠️  Could not run coverage report');
   }
 
@@ -314,7 +314,7 @@ async function getTestCoverage(): Promise<TestCoverage> {
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Directory might not exist
     }
   }

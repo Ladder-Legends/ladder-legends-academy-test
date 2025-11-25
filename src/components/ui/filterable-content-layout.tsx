@@ -85,7 +85,7 @@ export function FilterableContentLayout({
     if (!filters || Object.keys(filters).length === 0) return;
 
     // Count active filters
-    const activeFilterCount = Object.entries(filters).filter(([_, value]) => {
+    const activeFilterCount = Object.entries(filters).filter(([, value]) => {
       if (Array.isArray(value)) return value.length > 0;
       if (typeof value === 'boolean') return value;
       return value !== undefined && value !== '';

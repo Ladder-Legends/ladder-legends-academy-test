@@ -18,7 +18,7 @@ export function MyReplaysContent() {
   const [replays, setReplays] = useState<UserReplayData[]>([]);
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [, setError] = useState(''); // error display UI not yet implemented
 
   // Filters and search
   const [searchQuery, setSearchQuery] = useState('');

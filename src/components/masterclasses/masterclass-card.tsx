@@ -25,7 +25,7 @@ export function MasterclassCard({ masterclass, onEdit, onDelete }: MasterclassCa
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
   const thumbnailUrl = getMasterclassThumbnailUrl(masterclass, videos);
 
-  const getRaceBadgeColor = (race: string) => {
+  const getRaceBadgeColor = (_race: string) => {
     // Using theme colors instead of race-specific colors
     return 'bg-muted text-foreground border-border';
   };

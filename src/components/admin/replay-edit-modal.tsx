@@ -29,7 +29,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const { addChange } = usePendingChanges();
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Replay>>({});
-  const [tagInput, setTagInput] = useState('');
+  const [, setTagInput] = useState(''); // tagInput unused until tag autocomplete UI is added
   const [mapSearch, setMapSearch] = useState('');
   const [player1Search, setPlayer1Search] = useState('');
   const [player2Search, setPlayer2Search] = useState('');
@@ -42,12 +42,13 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [analyzedReplayFile, setAnalyzedReplayFile] = useState<File | null>(null);
   const [analysisData, setAnalysisData] = useState<SC2AnalysisResponse | null>(null);
 
-  // Get all unique tags from existing replays for autocomplete
-  const allExistingTags = useMemo(() => {
+  // Get all unique tags from existing replays for autocomplete (unused until tag autocomplete UI is added)
+  const _allExistingTags = useMemo(() => {
     const tagSet = new Set<string>();
     replays.forEach(r => r.tags.forEach(tag => tagSet.add(tag)));
     return Array.from(tagSet).sort();
   }, []);
+  void _allExistingTags;
 
 
   // Get all unique maps from existing replays
@@ -161,13 +162,15 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     setTagInput('');
   }, [replay, isNew, isOpen, getLatestPatch]);
 
-  const addTag = (tag: string) => {
+  // Tag handler - prepared for future tag autocomplete UI
+  const _addTag = (tag: string) => {
     const trimmedTag = tag.trim().toLowerCase();
     if (trimmedTag && !formData.tags?.includes(trimmedTag)) {
       setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
     }
     setTagInput('');
   };
+  void _addTag;
 
   const updatePlayer = (playerNum: 1 | 2, field: keyof ReplayPlayer, value: string | number) => {
     const playerKey = `player${playerNum}` as 'player1' | 'player2';
@@ -310,15 +313,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
   const checkAndUpdateLinkedBuildOrders = async (replayId: string, analysisData: SC2AnalysisResponse) => {
     try {
-      // Import build orders data to check for links
-      const response = await fetch('/api/admin/commit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          changes: [] // Empty request just to check current data
-        }),
-      });
-
       // This is a hack - we should have a proper GET endpoint for build orders
       // For now, we'll just import the build orders client-side
       const buildOrdersModule = await import('@/data/build-orders.json');

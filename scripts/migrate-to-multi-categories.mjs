@@ -41,7 +41,7 @@ function migrateItem(item) {
   }
 
   // Remove old fields
-  const { primaryCategory, secondaryCategory, ...rest } = item;
+  const { primaryCategory: _primaryCategory, secondaryCategory: _secondaryCategory, ...rest } = item;
 
   // Add new categories field (empty array if none)
   return {

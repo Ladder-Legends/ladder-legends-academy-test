@@ -144,7 +144,8 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
     onClose();
   };
 
-  const handleAddTag = () => {
+  // Tag handlers - prepared for future tag UI implementation
+  const _handleAddTag = () => {
     if (newTag.trim() && !formData.tags?.includes(newTag.trim())) {
       setFormData({
         ...formData,
@@ -154,12 +155,13 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
+  const _handleRemoveTag = (tagToRemove: string) => {
     setFormData({
       ...formData,
       tags: formData.tags?.filter((tag) => tag !== tagToRemove) || [],
     });
   };
+  void _handleAddTag; void _handleRemoveTag; // Suppress unused warnings until tag UI is added
 
   return (
     <Modal
