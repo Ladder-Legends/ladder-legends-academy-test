@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useSession, signIn } from 'next-auth/react';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
 function ActivateContent() {
@@ -145,10 +146,12 @@ function ActivateContent() {
               </div>
               <div className="pt-4 border-t flex items-center justify-center gap-3">
                 {session.user?.image && (
-                  <img
+                  <Image
                     src={session.user.image}
                     alt={session.user.name || 'User'}
-                    className="w-8 h-8 rounded-full"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
                   />
                 )}
                 <p className="text-xs text-muted-foreground">
@@ -232,10 +235,12 @@ function ActivateContent() {
             <div className="pt-4 border-t text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
                 {session.user?.image && (
-                  <img
+                  <Image
                     src={session.user.image}
                     alt={session.user.name || 'User'}
-                    className="w-8 h-8 rounded-full"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
                   />
                 )}
                 <p className="text-xs text-muted-foreground">

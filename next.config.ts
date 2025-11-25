@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_BUILD_DIR || '.next',
 
   images: {
-    // Remote patterns for YouTube thumbnails (will use unoptimized prop on components)
+    // Remote patterns for external images
     remotePatterns: [
       {
         protocol: 'https',
@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i.ytimg.com',
         pathname: '/vi/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'image.mux.com',
+        pathname: '/**',
       },
     ],
 

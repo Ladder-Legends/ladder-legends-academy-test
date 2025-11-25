@@ -31,7 +31,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   const [tagInput, setTagInput] = useState('');
   const [coachSearch, setCoachSearch] = useState('');
   const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  const [, setShowTagDropdown] = useState(false); // showTagDropdown unused until tag autocomplete UI is added
+  // Note: tag dropdown autocomplete UI not yet implemented
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
   const [customThumbnail, setCustomThumbnail] = useState<string | null>(null); // base64 or URL
   const [isPlaylistMode, setIsPlaylistMode] = useState(false);

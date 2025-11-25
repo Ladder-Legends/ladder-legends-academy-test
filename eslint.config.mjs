@@ -19,8 +19,21 @@ const eslintConfig = [
       ".next-pre-push/**",
       "out/**",
       "build/**",
+      "coverage/**",
       "next-env.d.ts",
     ],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
   {
     files: ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "jest.config.js", "jest.setup.js"],

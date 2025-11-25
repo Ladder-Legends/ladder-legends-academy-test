@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
 
 interface MuxVideoPlayerProps {
@@ -222,10 +223,11 @@ export function MuxVideoPlayer({
     return (
       <div className={`relative w-full aspect-video overflow-hidden bg-muted ${className}`}>
         {posterUrl ? (
-          <img
+          <Image
             src={posterUrl}
             alt={title || 'Video thumbnail'}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />

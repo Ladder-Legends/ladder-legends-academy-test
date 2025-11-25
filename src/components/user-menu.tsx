@@ -4,6 +4,7 @@ import React from 'react';
 import { useSession, signOut as clientSignOut } from 'next-auth/react';
 import { LogOut, User, Activity, CreditCard, Settings, Download, FileText } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { isOwner, isCoach } from "@/lib/permissions";
 import {
   DropdownMenu,
@@ -18,10 +19,12 @@ function UserAvatar({ name, email, image }: { name?: string | null; email?: stri
 
   if (image) {
     return (
-      <img
+      <Image
         src={image}
         alt={displayName}
-        className="w-9 h-9 rounded-full hover:opacity-90 transition-opacity"
+        width={36}
+        height={36}
+        className="rounded-full hover:opacity-90 transition-opacity"
       />
     );
   }
