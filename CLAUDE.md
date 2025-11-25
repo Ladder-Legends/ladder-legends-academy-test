@@ -2,217 +2,354 @@
 
 This file tracks technical debt, improvements, and future work for the Ladder Legends Academy platform.
 
-## High Priority
+---
 
-### Code Quality & Type Safety
+## COMPREHENSIVE CLEANUP PLAN (Updated 2025-11-24)
 
-- [ ] **Remove all type casts (`as any`, `as unknown`, etc.)**
-  - [ ] `src/app/coaching/[race]/page.tsx` - Lines 108, 115, 121, 127 (coach/video/replay/buildOrder filtering)
-  - [ ] `src/app/coaches/[id]/page.tsx` - Line 36 (video filtering cast)
-  - [ ] Review all other files for explicit `any` usage
-  - [ ] Configure ESLint to block `@typescript-eslint/no-explicit-any` as error instead of warning
-  - [ ] Create proper type definitions for:
-    - Coach data with proper race union type
-    - Video data with proper type safety
-    - Replay data structure
-    - Build order data structure
-    - Events data structure
-  - [ ] Update JSON imports to use proper TypeScript types
-  - [ ] Add Zod schemas for runtime validation of JSON data
+This plan covers all three interconnected codebases: Academy (Next.js), sc2reader (Python), and Uploader (Tauri/Rust).
 
-### Testing & Quality Assurance
+### PHASE 1: CRITICAL FIXES (Do First)
 
-- [ ] **Set up testing framework**
-  - [ ] Install and configure Jest + React Testing Library
-  - [ ] Install and configure Playwright for E2E tests
-  - [ ] Set up test coverage reporting (aim for >80% coverage)
+#### Academy - Type Safety Critical
+- [ ] **Remove all `as unknown as Record<string, unknown>` casts in admin modals**
+  - `src/components/admin/video-selector.tsx:100,146`
+  - `src/components/admin/replay-edit-modal.tsx:464`
+  - `src/components/admin/video-edit-modal.tsx:301`
+  - `src/components/admin/build-order-edit-modal.tsx:290,560`
+  - `src/components/admin/masterclass-edit-modal.tsx:208`
+  - `src/components/admin/coach-edit-modal.tsx:110`
+  - `src/components/admin/event-edit-modal.tsx:140`
+  - Fix: Create FormData wrapper types for each content type
 
-- [ ] **Critical Feature Tests**
-  - [ ] **Paywall Tests**
-    - [ ] Coach booking links redirect to /subscribe for non-subscribers
-    - [ ] Coach booking links open externally for subscribers
-    - [ ] Premium content is hidden/locked for non-subscribers
-    - [ ] Video playback is restricted properly
-  - [ ] **Admin Functionality Tests**
-    - [ ] Commit button works correctly (git add, commit, push)
-    - [ ] Video edit modal saves changes correctly
-    - [ ] Replay edit modal saves changes correctly
-    - [ ] Build order edit modal saves changes correctly
-    - [ ] Event edit modal saves changes correctly
-    - [ ] Coach edit functionality (if exists)
-    - [ ] Delete confirmations work and actually delete
-  - [ ] **Content Management Tests**
-    - [ ] Mux video upload flow works end-to-end
-    - [ ] Replay file upload and download works
-    - [ ] Category assignments save correctly
-    - [ ] Metadata updates persist correctly
-  - [ ] **Navigation & Routing Tests**
-    - [ ] All navigation dropdown links work
-    - [ ] Race-specific coaching pages load correctly
-    - [ ] Individual coach pages load and show correct content
-    - [ ] Video detail pages work with and without ?v= param
-    - [ ] 404 pages show for invalid IDs
-  - [ ] **Filtering Tests**
-    - [ ] Active filters display correctly
-    - [ ] URL params sync with filter state
-    - [ ] Clear filters works
-    - [ ] Individual filter removal works
-    - [ ] Race filter works on coaching pages
-    - [ ] Coach filter works from URL params
-  - [ ] **Authentication Tests**
-    - [ ] Login flow works correctly
-    - [ ] Session persistence works
-    - [ ] Subscriber role detection works
-    - [ ] Protected routes redirect properly
+- [ ] **Remove `as any` from content components**
+  - `src/components/videos/video-library-content.tsx:116`
+  - `src/components/build-orders/build-orders-content.tsx:111`
+  - `src/components/masterclasses/masterclasses-content.tsx:111`
+  - `src/components/replays/replays-content.tsx:116`
+  - `src/components/coaches-content.tsx:49`
 
-- [ ] **Integration Tests**
-  - [ ] Discord auth integration
-  - [ ] Mux video playback
-  - [ ] Replay download endpoints
-  - [ ] NextAuth session management
+- [ ] **Remove `as any` from detail client pages**
+  - `src/app/library/[id]/video-detail-client.tsx:124,145`
+  - `src/app/replays/[id]/replay-detail-client.tsx:85`
+  - `src/app/build-orders/[id]/build-order-detail-client.tsx:78`
+  - `src/app/masterclasses/[id]/masterclass-detail-client.tsx:59`
+  - `src/app/coaches/[id]/coach-detail-client.tsx:80`
+  - `src/app/events/[id]/event-detail-client.tsx:66`
 
-- [ ] **Performance Tests**
-  - [ ] Lighthouse CI for performance monitoring
-  - [ ] Bundle size analysis and optimization
-  - [ ] Image optimization verification
-  - [ ] Core Web Vitals monitoring
+#### sc2reader - Error Handling Critical
+- [ ] **Fix bare except clauses (silent failures)**
+  - `check_upgrades.py:38` - bare `except: pass`
+  - `debug_replay.py:25,85` - bare `except: pass`
+  - `explore_events.py:72,111` - bare `except: pass`
+  - Fix: Replace with `except Exception as e: logger.debug(str(e))`
 
-## Medium Priority
+- [ ] **Add file size limits to API endpoints**
+  - `api/index.py` - No upload size validation
+  - Fix: Add MAX_FILE_SIZE check (500MB limit)
 
-### Code Cleanup
+#### Uploader - Rust Safety Critical
+- [ ] **Remove unwrap() from production code**
+  - `lib.rs:312,631,942` - JSON serialization unwrap
+  - `replay_uploader.rs:106` - HTTP client build unwrap
+  - `replay_uploader.rs:133,207` - Response text unwrap
+  - Fix: Use `map_err()` and propagate errors
 
-- [ ] **Remove unused imports and variables**
-  - Review all ESLint warnings (currently 46 warnings)
-  - [ ] `ErrorCodes` in commit route
-  - [ ] `description` in mux upload route
-  - [ ] `PaywallLink` in multiple files
-  - [ ] `currentVideo` in detail pages
-  - [ ] `isEditModalOpen`, `videoToEdit` in coach detail client
-  - [ ] Badge imports in card components
-  - [ ] Unused filter helper functions
-  - [ ] Clean up all unused variables systematically
+- [ ] **Remove `as any` from TypeScript**
+  - `src/config.ts:9,10` - import.meta and window casts
+  - Fix: Create proper Window interface extension
 
-- [ ] **React Hooks Cleanup**
-  - [ ] Fix missing dependencies in useEffect/useMemo hooks
-  - [ ] Remove unnecessary dependencies from hooks
-  - [ ] Review exhaustive-deps warnings
+---
 
-- [ ] **Component Refactoring**
-  - [ ] Extract reusable coach video counting logic
-  - [ ] Consolidate duplicate filter logic
-  - [ ] Create shared types file for common interfaces
-  - [ ] Standardize error handling patterns
+### PHASE 2: HIGH-PRIORITY CODE QUALITY
 
-### SEO & Marketing
+#### Academy - Code Duplication (5,170+ lines)
+- [ ] **Extract generic useEditModalForm hook**
+  - Consolidate duplicate patterns from all 7 edit modals
+  - Handle: formData state, useEffect initialization, tag management, validation
+  - Estimated savings: 2,000+ lines
 
-- [ ] **Create custom OpenGraph image** (1200x630px)
-  - Design branded image with "Master StarCraft 2 | Grandmaster Coaching"
-  - Save as `/public/og-image.png`
-  - Update root layout to use this image
-  - Consider creating race-specific OG images for coaching pages
+- [ ] **Create GenericTable component**
+  - Consolidate 6 table components with similar patterns
+  - Configurable columns, sort handlers, row rendering
 
-- [ ] **Submit to search engines**
-  - [ ] Google Search Console setup and sitemap submission
-  - [ ] Bing Webmaster Tools setup
-  - [ ] Monitor indexing status
+- [ ] **Create type-safe JSON data loaders**
+  - Replace 30+ untyped JSON imports
+  - Create `lib/data-loader.ts` with proper typing
 
-- [ ] **Add structured data**
-  - [ ] BreadcrumbList schema for better navigation display
-  - [ ] FAQPage schema (create FAQ page first)
-  - [ ] Review/Rating schema when testimonials are available
+- [ ] **Fix React hooks issues (15+ warnings)**
+  - `src/app/coaches/[id]/coach-detail-client.tsx:63-67` - missing sortContent dependency
+  - `src/app/my-replays/[id]/page.tsx:161` - missing fetchReplay dependency
+  - `src/components/ui/horizontal-scroll-container.tsx:50` - missing checkScroll
+  - `src/components/search/omnisearch-client.tsx:417` - unnecessary hasSubscription
 
-- [ ] **Content additions**
-  - [ ] Create blog section for regular content updates
-  - [ ] Add FAQ page with common questions
-  - [ ] Add testimonials/reviews section
+#### sc2reader - Code Organization
+- [ ] **Refactor scripts to reusable modules**
+  - Convert 13 standalone scripts to importable modules
+  - Create `cli.py` for command-line entry points
+  - Files: check_upgrades.py, debug_replay.py, explore_events.py, analyze_benchmarks.py, compare_replay.py, detect_build.py, learn_build.py, analyze_spam_patterns.py, advanced_spam_analysis.py, poc_proxy_detection.py, fractional_spam_filter.py, benchmark_extraction.py, extract_benchmark_replay.py
 
-### UI/UX Improvements
+- [ ] **Extract event processing logic**
+  - Create `replay_event_processor.py` module
+  - Eliminate duplicate event loops in fingerprint.py, replay_extractor.py, detect_build.py
 
-- [ ] **Image Optimization**
-  - [ ] Add proper alt text to all video thumbnails
-  - [ ] Add proper alt text to coach avatars (when added)
-  - [ ] Optimize image loading with blur placeholders
-  - [ ] Add loading="lazy" to below-the-fold images
+- [ ] **Add type hints (replace Any)**
+  - Create `types.py` with Protocol definitions for sc2reader objects
+  - Replace `Any` in: apm.py, player_utils.py, replay_extractor.py, fingerprint.py
 
-- [ ] **Accessibility**
-  - [ ] Run accessibility audit with axe DevTools
-  - [ ] Ensure all interactive elements are keyboard accessible
-  - [ ] Add proper ARIA labels where needed
-  - [ ] Test with screen readers
+#### Uploader - Organization
+- [ ] **Split lib.rs (1332 lines) into modules**
+  - Create `commands/folder_detection.rs`
+  - Create `commands/auth.rs`
+  - Create `commands/config.rs`
+  - Create `commands/upload.rs`
+  - Create `setup.rs`
 
-- [ ] **Mobile Optimization**
-  - [ ] Test all pages on various mobile devices
-  - [ ] Optimize touch targets (minimum 44x44px)
-  - [ ] Test navigation dropdowns on mobile
-  - [ ] Verify video player works on mobile
+- [ ] **Fix clippy warnings (6 warnings)**
+  - `config_utils.rs:93` - unused import (tempfile::TempDir)
+  - `config_utils.rs:84` - dead code (config_file_exists)
+  - `device_auth.rs:363,376` - assert_eq!(x, true) → assert!(x)
+  - `lib.rs:210,232` - use .inspect_err() instead of .map_err()
 
-## Low Priority
+- [ ] **Fix TypeScript duplication**
+  - `upload-progress.ts:26-40,55-68` - duplicate state initialization
+  - Extract DEFAULT_UPLOAD_STATE constant
 
-### Features & Enhancements
+---
 
-- [ ] **Video Player Enhancements**
-  - [ ] Add playback speed controls
-  - [ ] Add keyboard shortcuts
-  - [ ] Add picture-in-picture support
-  - [ ] Add chapter markers for long videos
+### PHASE 3: MEDIUM-PRIORITY CLEANUP
 
-- [ ] **Filter Enhancements**
-  - [ ] Add filter presets ("Beginner Terran", "Advanced Zerg", etc.)
-  - [ ] Add "Save Filter" functionality for logged-in users
-  - [ ] Add filter count badges
-  - [ ] Add "Recently Viewed" section
+#### Academy - Unused Code Removal (117 ESLint warnings)
+- [ ] **Remove unused imports**
+  - CardFooter - build-order-edit-modal.tsx
+  - Trophy, Calendar - event-edit-modal.tsx
+  - Badge - replay-card.tsx, video-card.tsx
+  - LogIn - user-menu.tsx
+  - useEffect - video-player.tsx, use-view-preference.ts
+  - useMemo - omnisearch-client.tsx
+  - getThumbnailYoutubeId, isMuxVideo - video-card.tsx
 
-- [ ] **Social Features**
-  - [ ] Add share buttons on content pages
-  - [ ] Add "Copy Link" functionality
-  - [ ] Track popular content
-  - [ ] Add "Trending" section
+- [ ] **Remove unused variables**
+  - dragCounter - file-upload.tsx, mux-upload.tsx
+  - grade - my-replays/[id]/page.tsx
+  - currentVideo - replay-detail-client.tsx
+  - showTagDropdown, filteredTags, removeTag, handleTagInputKeyDown - replay-edit-modal.tsx
+  - description - api/mux/upload/route.ts
+  - Multiple error variables used but not logged
+  - clearTags, allTags - video-library-content.tsx
+  - EventConflict, LocalEvent - api/admin/discord-sync/route.ts
 
-- [ ] **Analytics**
-  - [ ] Set up custom PostHog events
-  - [ ] Track video watch time
-  - [ ] Track popular search terms
-  - [ ] Track conversion funnels
+- [ ] **Remove unused function exports**
+  - createFieldMatchPredicate, validateFilterConfig - video-filters.ts
+  - createTagPredicate - build-order-filters.ts
+  - isPlaylist parameter - metadata-helpers.ts
+  - isFree parameter - video-helpers.ts
 
-### Infrastructure
+- [ ] **Break down large components (>600 lines)**
+  - `build-order-edit-modal.tsx` - 1036 lines → extract form sections
+  - `replay-edit-modal.tsx` - 868 lines → extract form sections
+  - `video-edit-modal.tsx` - 690 lines → extract form sections
+  - `my-replays/[id]/page.tsx` - 1144 lines → extract replay analysis components
 
-- [ ] **Monitoring**
-  - [ ] Set up error tracking (Sentry)
-  - [ ] Set up uptime monitoring
-  - [ ] Set up performance monitoring
-  - [ ] Create alerting for critical issues
+#### sc2reader - Dependencies & Config
+- [ ] **Update dependencies**
+  - fastapi: 0.109.0 → latest
+  - uvicorn: 0.27.0 → latest
+  - pydantic: 2.5.3 → latest
+  - numpy: 1.26.4 → 2.x (test carefully)
 
-- [ ] **CI/CD**
-  - [ ] Add automated testing to GitHub Actions
-  - [ ] Add automated deployment checks
-  - [ ] Add bundle size monitoring
-  - [ ] Add visual regression testing
+- [ ] **Fix mypy configuration**
+  - Set `ignore_missing_imports = false`
+  - Set `warn_return_any = true`
+  - Create stub files for sc2reader if needed
 
-- [ ] **Documentation**
-  - [ ] Document component architecture
-  - [ ] Document data flow and state management
-  - [ ] Document deployment process
-  - [ ] Create contributing guide
+- [ ] **Add pre-commit hooks**
+  - Create `.pre-commit-config.yaml`
+  - Include: black, flake8, mypy, isort
+
+- [ ] **Add logging to core functions**
+  - replay_extractor.py - no logging
+  - constants.py - no logging
+  - player_utils.py - no logging
+  - supply_block.py - no logging
+  - tactical_analyzer.py - no logging
+
+#### Uploader - Patterns & Memory
+- [ ] **Consolidate mutex lock patterns**
+  - Create MutexExt trait for consistent lock handling
+  - Replace inconsistent .unwrap_or_else patterns
+
+- [ ] **Fix memory leaks in TypeScript**
+  - `upload-progress.ts:43` - timeout never cleared
+  - `state.ts:55-67` - interval/timeout not tracked
+  - Add cleanup functions for timeouts
+
+- [ ] **Standardize element access pattern**
+  - Enforce use of getElement() helper
+  - Remove direct document.getElementById calls
+
+- [ ] **Standardize error handling**
+  - Some use showError(), others console.error()
+  - Create single error reporting pattern
+
+---
+
+### PHASE 4: TESTING IMPROVEMENTS
+
+#### Academy - Critical Test Coverage
+- [ ] **Paywall Tests**
+  - Coach booking links redirect for non-subscribers
+  - Premium content locked for non-subscribers
+  - Video playback restrictions
+
+- [ ] **Admin CMS Tests**
+  - Commit button (git add, commit, push)
+  - All edit modals save correctly
+  - Delete confirmations work
+
+- [ ] **Content Management Tests**
+  - Mux video upload flow
+  - Replay file upload/download
+  - Category assignments persist
+
+- [ ] **Remove `as any` from test files**
+  - 20+ test files with excessive `as any` mocking
+  - Create mock factory functions
+  - Files: permissions.test.ts, paywall-link.test.tsx, access-control.test.tsx, coach-card.test.tsx, device tests, etc.
+
+#### sc2reader - Test Cleanup
+- [ ] **Remove duplicate test files**
+  - Keep test_game_date_pytest.py, remove test_game_date.py
+  - Merge test_api.py into test_api_comprehensive.py
+
+- [ ] **Fix API tests requiring real files**
+  - Tests expect lotus_vs_guigui_1.SC2Replay on disk
+  - Create fixtures or mock sc2reader
+
+#### Uploader - Test Organization
+- [ ] **Move tests to separate directory**
+  - lib.rs has 296 lines of tests at end
+  - Move to tests/ directory
+  - Create tests/auth_tests.rs, tests/config_tests.rs, etc.
+
+---
+
+### PHASE 5: PATTERN STANDARDIZATION
+
+#### Academy - API & State Patterns
+- [ ] **Standardize API error handling**
+  - Some routes use handleGitHubError(), others inline
+  - Some use createErrorResponse(), others NextResponse.json()
+  - Create unified error handling middleware
+
+- [ ] **Standardize state management**
+  - Currently: localStorage + PostHog, Vercel KV, React state
+  - Document when to use each pattern
+
+- [ ] **Standardize modal implementation**
+  - Some modals use isNew prop, others infer
+  - Some use onClose, others different naming
+  - Create ModalBase component
+
+#### sc2reader - API & Code Patterns
+- [ ] **Standardize query parameter handling**
+  - Use explicit Query() parameters everywhere
+  - Add parameter documentation
+
+- [ ] **Add OpenAPI documentation**
+  - Create Pydantic models for requests/responses
+  - Generate proper OpenAPI spec
+
+- [ ] **Standardize null/None handling**
+  - Create has_valid_attr() helper
+  - Use consistently across codebase
+
+- [ ] **Extract magic numbers to constants**
+  - Expansion units, worker units in fingerprint.py
+  - Time intervals (30, 60, 10 seconds)
+  - Tactical thresholds
+
+#### Uploader - Command & State Patterns
+- [ ] **Document command naming conventions**
+  - load_* for reads, save_* for writes
+  - Document multi-arg vs single-arg commands
+
+- [ ] **Consider state management refactor**
+  - Global mutable state in TypeScript modules
+  - Consider AppState singleton pattern
+
+---
+
+### PHASE 6: LOW PRIORITY / NICE TO HAVE
+
+#### Academy
+- [ ] **Image optimization (3 ESLint warnings)**
+  - activate/page.tsx:148,235 - use Next.js Image
+  - user-menu.tsx:21 - use Next.js Image
+  - mux-video-player.tsx:225 - use Next.js Image
+
+- [ ] **Configure ESLint to error on `as any`**
+  - Currently warnings only
+  - Elevate to errors after fixing existing issues
+
+#### sc2reader
+- [ ] **Generate dependency lock file**
+  - Create requirements.lock with pip-tools
+  - Keep requirements.txt for humans
+
+- [ ] **Add security scanning**
+  - Add safety check to CI
+  - Add bandit for code security
+
+#### Uploader
+- [ ] **Remove duplicate dependency**
+  - Cargo.toml:44 - tauri-plugin-shell listed twice
+
+- [ ] **Add #[allow(dead_code)] documentation**
+  - Several methods marked dead but are used
+  - Either use or document why kept
+
+---
+
+## SUMMARY METRICS
+
+| Codebase | Critical | High | Medium | Low | Total |
+|----------|----------|------|--------|-----|-------|
+| Academy | 8 | 47 | 89 | 36 | 180+ |
+| sc2reader | 3 | 7 | 8 | 2 | 20 |
+| Uploader | 4 | 6 | 10 | 4 | 24 |
+| **Total** | **15** | **60** | **107** | **42** | **224+** |
+
+## ESTIMATED EFFORT
+
+- **Phase 1 (Critical):** 8-12 hours
+- **Phase 2 (High):** 20-30 hours
+- **Phase 3 (Medium):** 15-20 hours
+- **Phase 4 (Testing):** 20-30 hours
+- **Phase 5 (Patterns):** 10-15 hours
+- **Phase 6 (Low):** 5-10 hours
+
+**Total: 78-117 hours** (2-3 weeks focused effort)
+
+---
 
 ## Notes
 
-### Recent Changes (2025-11-10)
-- ✅ Added comprehensive SEO improvements (sitemap, metadata, structured data)
-- ✅ Fixed robots.txt to allow Googlebot to crawl static assets
-- ✅ Created race-specific coaching landing pages (Terran, Zerg, Protoss, Random)
-- ✅ Added event pages to sitemap
+### Recent Changes (2025-11-24)
+- ✅ Comprehensive audit of all three codebases
+- ✅ Identified 224+ issues across Academy, sc2reader, Uploader
+- ✅ Prioritized cleanup tasks by impact and effort
+- ✅ Created actionable remediation plan
+
+### Previous Changes (2025-11-10)
+- ✅ Added comprehensive SEO improvements
+- ✅ Fixed robots.txt for Googlebot
+- ✅ Created race-specific coaching landing pages
 - ✅ Paywalled coach booking links
-- ✅ Removed specialties display from coach pages
 - ✅ Added Discord CTA to homepage
 
-### Known Issues
-- Type safety: Multiple `as any` casts need to be removed
-- ESLint warnings: 46 warnings need to be addressed
-- No test coverage: Critical features untested
-- Missing types for JSON data imports
-
-### Technical Debt
-- Consider migrating from JSON files to a proper database (Postgres/Supabase)
-- Consider adding Redis for caching
-- Consider adding search functionality (Algolia/MeiliSearch)
-- Consider adding user profiles and progress tracking
+### Technical Debt Overview
+- **Type Safety:** 67+ explicit type casts in Academy, excessive Any in sc2reader
+- **Code Duplication:** 5,170+ lines of duplicate modal code, repeated patterns everywhere
+- **Test Coverage:** Critical paths untested, tests use `as any` extensively
+- **Code Organization:** Large files (1000+ lines), scripts not modules
+- **Error Handling:** Silent failures, inconsistent patterns

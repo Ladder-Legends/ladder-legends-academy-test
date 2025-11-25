@@ -36,7 +36,7 @@ export function MuxUpload({
   const [uploadedAssetId, setUploadedAssetId] = useState<string | null>(null);
   const [uploadedPlaybackId, setUploadedPlaybackId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragCounter, setDragCounter] = useState(0);
+  const [_dragCounter, setDragCounter] = useState(0);
 
   const processFile = async (file: File) => {
     // Validate file type - check both MIME type and extension

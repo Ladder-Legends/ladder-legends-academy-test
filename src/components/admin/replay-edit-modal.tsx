@@ -7,7 +7,7 @@ import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Replay, Race, Matchup, ReplayPlayer } from '@/types/replay';
 import { Video } from '@/types/video';
-import { BuildOrder, BuildOrderStep } from '@/types/build-order';
+import { BuildOrder } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import replays from '@/data/replays.json';
@@ -33,7 +33,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   const [mapSearch, setMapSearch] = useState('');
   const [player1Search, setPlayer1Search] = useState('');
   const [player2Search, setPlayer2Search] = useState('');
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [showMapDropdown, setShowMapDropdown] = useState(false);
   const [showPlayer1Dropdown, setShowPlayer1Dropdown] = useState(false);
   const [showPlayer2Dropdown, setShowPlayer2Dropdown] = useState(false);
@@ -50,14 +49,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     return Array.from(tagSet).sort();
   }, []);
 
-  // Filter tags based on input
-  const filteredTags = useMemo(() => {
-    if (!tagInput.trim()) return [];
-    const input = tagInput.toLowerCase();
-    return allExistingTags
-      .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
-      .slice(0, 5);
-  }, [tagInput, allExistingTags, formData.tags]);
 
   // Get all unique maps from existing replays
   const allMaps = useMemo(() => {
@@ -176,22 +167,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
     }
     setTagInput('');
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter(tag => tag !== tagToRemove) || []
-    });
-  };
-
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        addTag(tagInput);
-      }
-    }
   };
 
   const updatePlayer = (playerNum: 1 | 2, field: keyof ReplayPlayer, value: string | number) => {

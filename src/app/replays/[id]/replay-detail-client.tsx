@@ -3,7 +3,6 @@
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
 import { Footer } from '@/components/footer';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Replay } from '@/types/replay';
 import { Download, ArrowLeft, Calendar, Clock, Map, Edit, Trash2, FileText, Lock } from 'lucide-react';
@@ -58,7 +57,7 @@ export function ReplayDetailClient({ replay }: ReplayDetailClientProps) {
   const hasMultipleVideos = replayVideos.length > 1;
 
   // Use shared playlist navigation hook
-  const { currentVideoIndex, currentVideo, handleVideoSelect } = usePlaylistNavigation({
+  const { currentVideoIndex, currentVideo: _currentVideo, handleVideoSelect } = usePlaylistNavigation({
     videos: replayVideos,
     parentTitle: replay.title,
     isPlaylist: hasMultipleVideos,

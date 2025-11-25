@@ -20,8 +20,6 @@ import {
   createDiscordEvent,
   updateDiscordEvent,
   autoSync,
-  type EventConflict,
-  type LocalEvent,
 } from '@/services/discord-sync.service';
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN!;
