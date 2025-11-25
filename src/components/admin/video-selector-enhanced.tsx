@@ -91,6 +91,7 @@ export function VideoSelector({
       return getVideoById(selectedVideoId);
     }
     return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- getVideoById just searches allVideos which is included
   }, [mode, selectedVideoId, allVideos]);
 
   // Playlist mode: selected videos
@@ -99,6 +100,7 @@ export function VideoSelector({
       return selectedVideoIds.map(id => getVideoById(id)).filter(Boolean) as Video[];
     }
     return [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, selectedVideoIds, allVideos]);
 
   const filteredVideos = useMemo(() => {

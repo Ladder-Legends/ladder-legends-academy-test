@@ -416,7 +416,7 @@ export function OmnisearchClient({ className, placeholder = 'Search...', onClose
       },
     });
     setIsOpen(true);
-  }, [hasSubscription]);
+  }, []);
 
   // Debounced search
   useEffect(() => {

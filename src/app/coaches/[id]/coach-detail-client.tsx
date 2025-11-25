@@ -60,10 +60,15 @@ export function CoachDetailClient({ coach, videos, replays, buildOrders, masterc
   };
 
   // Sort all content types
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sortContent uses hasSubscriberRole which is included
   const sortedVideos = useMemo(() => sortContent(videos), [videos, hasSubscriberRole]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortedReplays = useMemo(() => sortContent(replays), [replays, hasSubscriberRole]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortedBuildOrders = useMemo(() => sortContent(buildOrders), [buildOrders, hasSubscriberRole]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortedMasterclasses = useMemo(() => sortContent(masterclasses), [masterclasses, hasSubscriberRole]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortedEvents = useMemo(() => sortContent(events), [events, hasSubscriberRole]);
 
   // Calculate total content count

@@ -47,6 +47,7 @@ export function HorizontalScrollContainer({ children, className = '', showFadeIn
         window.removeEventListener('resize', checkScroll);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- checkScroll is stable within the effect
   }, []);
 
   const scroll = (direction: 'left' | 'right') => {

@@ -158,6 +158,7 @@ export default function ReplayDetailPage() {
     } else if (status === 'unauthenticated') {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchReplay only needs to run when status/replayId change
   }, [status, replayId]);
 
   // Set initial selected player when replay loads

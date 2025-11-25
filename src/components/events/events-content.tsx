@@ -136,7 +136,7 @@ export function EventsContent() {
       // Past: most recent first (descending)
       return statusA === 'upcoming' ? dateA - dateB : dateB - dateA;
     });
-  }, [allEvents, selectedItems, startDate, endDate, selectedTags, searchQuery]);
+  }, [selectedItems, startDate, endDate, selectedTags, searchQuery]);
 
   // Filter sections
   const filterSections: FilterSection[] = [
