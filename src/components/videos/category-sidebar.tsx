@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight, Search, X, Lock } from 'lucide-react';
 import type { Video } from '@/types/video';
 import type { Coach } from '@/types/coach';
-import coachesData from '@/data/coaches.json';
+import { coaches as coachesData } from '@/lib/data';
 import { useSession } from 'next-auth/react';
 import { isOwner } from '@/lib/permissions';
 

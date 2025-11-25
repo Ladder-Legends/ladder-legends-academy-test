@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useTheme } from '@/hooks/use-theme';
 import { useUserTimezone } from '@/hooks/use-user-timezone';
 import { Event, EventType } from '@/types/event';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import eventsData from '@/data/events.json';
+import { events as eventsData } from '@/lib/data';
 import { CoachSelector } from '@/components/shared/coach-selector';
 import { VideoSelector } from '@/components/admin/video-selector';
 import { MultiCategorySelector } from './multi-category-selector';
+import { FormField } from './form-field';
+import { EditModalFooter } from './edit-modal-footer';
 import { TIMEZONES, getTimezoneDisplayName } from '@/lib/timezone-utils';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the markdown editor (client-side only)
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface EventEditModalProps {
@@ -28,14 +28,36 @@ interface EventEditModalProps {
 
 const allEvents = eventsData as Event[];
 
-const eventTypes: EventType[] = [
-  'tournament',
-  'coaching',
-  'casting',
-  'streaming',
-  'replay-analysis',
-  'arcade',
-  'other',
+const eventTypeOptions: { value: EventType; label: string }[] = [
+  { value: 'tournament', label: 'Tournament' },
+  { value: 'coaching', label: 'Coaching' },
+  { value: 'casting', label: 'Casting' },
+  { value: 'streaming', label: 'Streaming' },
+  { value: 'replay-analysis', label: 'Replay analysis' },
+  { value: 'arcade', label: 'Arcade' },
+  { value: 'other', label: 'Other' },
+];
+
+const accessLevelOptions = [
+  { value: 'free', label: 'Free' },
+  { value: 'premium', label: 'Premium' },
+];
+
+const frequencyOptions = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+];
+
+const dayOfWeekOptions = [
+  { value: '', label: 'Select day' },
+  { value: '0', label: 'Sunday' },
+  { value: '1', label: 'Monday' },
+  { value: '2', label: 'Tuesday' },
+  { value: '3', label: 'Wednesday' },
+  { value: '4', label: 'Thursday' },
+  { value: '5', label: 'Friday' },
+  { value: '6', label: 'Saturday' },
 ];
 
 export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventEditModalProps) {
@@ -43,33 +65,19 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
   const { theme } = useTheme();
   const { timezone: userTimezone, isLoading: timezoneLoading } = useUserTimezone();
 
-  const [formData, setFormData] = useState<Partial<Event>>({
-    title: '',
-    description: '',
-    type: 'tournament',
-    date: '',
-    time: '18:00',
-    timezone: userTimezone,
-    duration: 60,
-    coach: '',
-    isFree: false,
-    tags: [],
-    recurring: {
-      enabled: false,
-      frequency: 'weekly',
-    },
-  });
+  const [formData, setFormData] = useState<Partial<Event>>({});
 
-  const [newTag, setNewTag] = useState('');
+  const timezoneOptions = TIMEZONES.map(tz => ({
+    value: tz,
+    label: getTimezoneDisplayName(tz),
+  }));
 
   useEffect(() => {
-    if (!isOpen) return; // Only reset when opening the modal
+    if (!isOpen) return;
 
     if (event) {
       setFormData(event);
     } else if (isNew && !timezoneLoading) {
-      // Reset form data when opening in "add new" mode
-      // Default timezone to user's detected timezone
       setFormData({
         title: '',
         description: '',
@@ -89,8 +97,11 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
     }
   }, [event, isNew, isOpen, userTimezone, timezoneLoading]);
 
+  const updateField = <K extends keyof Event>(field: K, value: Event[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSave = () => {
-    // Validation
     if (!formData.title?.trim()) {
       toast.error('Event title is required');
       return;
@@ -122,7 +133,6 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
       updatedAt: new Date().toISOString(),
     };
 
-    // Check for duplicate ID
     const isDuplicate = allEvents.some(
       (e) => e.id === eventData.id && e.id !== event?.id
     );
@@ -132,7 +142,6 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
       return;
     }
 
-    // Add to pending changes
     addChange({
       id: eventData.id,
       contentType: 'events',
@@ -144,25 +153,6 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
     onClose();
   };
 
-  // Tag handlers - prepared for future tag UI implementation
-  const _handleAddTag = () => {
-    if (newTag.trim() && !formData.tags?.includes(newTag.trim())) {
-      setFormData({
-        ...formData,
-        tags: [...(formData.tags || []), newTag.trim()],
-      });
-      setNewTag('');
-    }
-  };
-
-  const _handleRemoveTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter((tag) => tag !== tagToRemove) || [],
-    });
-  };
-  void _handleAddTag; void _handleRemoveTag; // Suppress unused warnings until tag UI is added
-
   return (
     <Modal
       isOpen={isOpen}
@@ -171,101 +161,85 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
       size="xl"
     >
       <div className="space-y-6">
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Title *</label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Weekly Team Games Night"
+        <FormField
+          label="Title"
+          required
+          type="text"
+          inputProps={{
+            value: formData.title || '',
+            onChange: (e) => updateField('title', e.target.value),
+            placeholder: 'Weekly Team Games Night',
+          }}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Event Type"
+            required
+            type="select"
+            options={eventTypeOptions}
+            inputProps={{
+              value: formData.type || 'tournament',
+              onChange: (e) => updateField('type', e.target.value as EventType),
+            }}
+          />
+          <FormField
+            label="Access Level"
+            type="select"
+            options={accessLevelOptions}
+            inputProps={{
+              value: formData.isFree ? 'free' : 'premium',
+              onChange: (e) => updateField('isFree', e.target.value === 'free'),
+            }}
           />
         </div>
 
-        {/* Type & Free/Premium */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Event Type *</label>
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as EventType })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              {eventTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Access Level</label>
-            <select
-              value={formData.isFree ? 'free' : 'premium'}
-              onChange={(e) => setFormData({ ...formData, isFree: e.target.value === 'free' })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="free">Free</option>
-              <option value="premium">Premium</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Date, Time, Timezone */}
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Date *</label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Time *</label>
-            <input
-              type="time"
-              value={formData.time}
-              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Timezone</label>
-            <select
-              value={formData.timezone}
-              onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              {TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>
-                  {getTimezoneDisplayName(tz)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FormField
+            label="Date"
+            required
+            type="date"
+            inputProps={{
+              value: formData.date || '',
+              onChange: (e) => updateField('date', e.target.value),
+            }}
+          />
+          <FormField
+            label="Time"
+            required
+            type="time"
+            inputProps={{
+              value: formData.time || '',
+              onChange: (e) => updateField('time', e.target.value),
+            }}
+          />
+          <FormField
+            label="Timezone"
+            type="select"
+            options={timezoneOptions}
+            inputProps={{
+              value: formData.timezone || '',
+              onChange: (e) => updateField('timezone', e.target.value),
+            }}
+          />
         </div>
 
-        {/* Duration & Coach */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Duration (minutes)</label>
-            <input
-              type="number"
-              value={formData.duration || ''}
-              onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || undefined })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="60"
-              min="1"
-            />
-          </div>
+          <FormField
+            label="Duration (minutes)"
+            type="number"
+            inputProps={{
+              value: formData.duration || '',
+              onChange: (e) => updateField('duration', parseInt(e.target.value) || undefined),
+              placeholder: '60',
+              min: 1,
+            }}
+          />
           <div>
             <label className="block text-sm font-medium mb-2">Coach (Optional)</label>
             <CoachSelector
               value={formData.coach || ''}
-              onChange={(coachId) => setFormData({ ...formData, coach: coachId })}
+              onChange={(coachId) => updateField('coach', coachId)}
             />
           </div>
         </div>
@@ -274,7 +248,6 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         <div className="border border-border rounded-lg p-4 bg-muted/30">
           <h3 className="text-sm font-medium mb-3">Associated Videos (Optional)</h3>
           <div className="space-y-3">
-            {/* Display selected videos */}
             {formData.videoIds && formData.videoIds.length > 0 && (
               <div className="space-y-2">
                 {formData.videoIds.map((videoId, index) => (
@@ -289,10 +262,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({
-                          ...formData,
-                          videoIds: formData.videoIds?.filter(id => id !== videoId)
-                        });
+                        updateField('videoIds', formData.videoIds?.filter(id => id !== videoId) || []);
                       }}
                       className="text-destructive hover:text-destructive/70"
                     >
@@ -303,15 +273,11 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
               </div>
             )}
 
-            {/* Add Video Selector */}
             <VideoSelector
               selectedVideoId={undefined}
               onVideoSelect={(videoId) => {
                 if (videoId && !formData.videoIds?.includes(videoId)) {
-                  setFormData({
-                    ...formData,
-                    videoIds: [...(formData.videoIds || []), videoId]
-                  });
+                  updateField('videoIds', [...(formData.videoIds || []), videoId]);
                 }
               }}
               label="Add Video"
@@ -331,13 +297,10 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
               id="recurring-enabled"
               checked={formData.recurring?.enabled || false}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  recurring: {
-                    ...(formData.recurring || {}),
-                    enabled: e.target.checked,
-                    frequency: formData.recurring?.frequency || 'weekly',
-                  },
+                updateField('recurring', {
+                  ...(formData.recurring || {}),
+                  enabled: e.target.checked,
+                  frequency: formData.recurring?.frequency || 'weekly',
                 })
               }
               className="w-4 h-4 text-primary focus:ring-primary border-border rounded"
@@ -349,95 +312,66 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
 
           {formData.recurring?.enabled && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Frequency</label>
-                <select
-                  value={formData.recurring?.frequency}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      recurring: {
-                        ...formData.recurring!,
-                        frequency: e.target.value as 'daily' | 'weekly' | 'monthly',
-                      },
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
+              <FormField
+                label="Frequency"
+                type="select"
+                options={frequencyOptions}
+                inputProps={{
+                  value: formData.recurring?.frequency || 'weekly',
+                  onChange: (e) =>
+                    updateField('recurring', {
+                      ...formData.recurring!,
+                      frequency: e.target.value as 'daily' | 'weekly' | 'monthly',
+                    }),
+                }}
+              />
 
               {formData.recurring?.frequency === 'weekly' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Day of Week</label>
-                  <select
-                    value={formData.recurring?.dayOfWeek ?? ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        recurring: {
-                          ...formData.recurring!,
-                          dayOfWeek: parseInt(e.target.value),
-                        },
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value="">Select day</option>
-                    <option value="0">Sunday</option>
-                    <option value="1">Monday</option>
-                    <option value="2">Tuesday</option>
-                    <option value="3">Wednesday</option>
-                    <option value="4">Thursday</option>
-                    <option value="5">Friday</option>
-                    <option value="6">Saturday</option>
-                  </select>
-                </div>
+                <FormField
+                  label="Day of Week"
+                  type="select"
+                  options={dayOfWeekOptions}
+                  inputProps={{
+                    value: formData.recurring?.dayOfWeek?.toString() ?? '',
+                    onChange: (e) =>
+                      updateField('recurring', {
+                        ...formData.recurring!,
+                        dayOfWeek: parseInt(e.target.value),
+                      }),
+                  }}
+                />
               )}
 
               {formData.recurring?.frequency === 'monthly' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Day of Month</label>
-                  <input
-                    type="number"
-                    value={formData.recurring?.dayOfMonth ?? ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        recurring: {
-                          ...formData.recurring!,
-                          dayOfMonth: parseInt(e.target.value),
-                        },
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="1-31"
-                    min="1"
-                    max="31"
-                  />
-                </div>
+                <FormField
+                  label="Day of Month"
+                  type="number"
+                  inputProps={{
+                    value: formData.recurring?.dayOfMonth ?? '',
+                    onChange: (e) =>
+                      updateField('recurring', {
+                        ...formData.recurring!,
+                        dayOfMonth: parseInt(e.target.value),
+                      }),
+                    placeholder: '1-31',
+                    min: 1,
+                    max: 31,
+                  }}
+                />
               )}
 
-              <div>
-                <label className="block text-sm font-medium mb-2">End Date (Optional)</label>
-                <input
-                  type="date"
-                  value={formData.recurring?.endDate || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      recurring: {
-                        ...formData.recurring!,
-                        endDate: e.target.value || undefined,
-                      },
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
+              <FormField
+                label="End Date (Optional)"
+                type="date"
+                inputProps={{
+                  value: formData.recurring?.endDate || '',
+                  onChange: (e) =>
+                    updateField('recurring', {
+                      ...formData.recurring!,
+                      endDate: e.target.value || undefined,
+                    }),
+                }}
+              />
             </div>
           )}
         </div>
@@ -448,7 +382,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
           <div data-color-mode={theme}>
             <MDEditor
               value={formData.description}
-              onChange={(value) => setFormData({ ...formData, description: value || '' })}
+              onChange={(value) => updateField('description', value || '')}
               preview="edit"
               height={300}
             />
@@ -457,18 +391,16 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
 
         <MultiCategorySelector
           categories={formData.categories || []}
-          onChange={(categories) => setFormData({ ...formData, categories })}
+          onChange={(categories) => updateField('categories', categories)}
         />
 
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-4 border-t border-border">
-          <Button onClick={handleSave} className="flex-1">
-            {isNew ? 'Create Event' : 'Save Changes'}
-          </Button>
-          <Button onClick={onClose} variant="outline">
-            Cancel
-          </Button>
-        </div>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+          saveText={isNew ? 'Create Event' : 'Save Changes'}
+          showHelpText={false}
+        />
       </div>
     </Modal>
   );

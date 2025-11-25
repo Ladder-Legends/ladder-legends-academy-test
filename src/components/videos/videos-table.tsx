@@ -2,12 +2,13 @@
 
 import { Video } from '@/types/video';
 import Link from 'next/link';
-import { Lock, Edit, Trash2, Play } from 'lucide-react';
+import { Lock, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PermissionGate } from '@/components/auth/permission-gate';
 import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
-import coachesData from '@/data/coaches.json';
+import { PremiumBadge } from '@/components/shared/premium-badge';
+import { AdminActions } from '@/components/shared/admin-actions';
+import { coaches as coachesData } from '@/lib/data';
 
 interface VideosTableProps {
   videos: Video[];
@@ -70,22 +71,15 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
       sortable: true,
       getValue: (video) => video.title.toLowerCase(),
       render: (video) => (
-        <>
+        <div>
           <Link
             href={`/library/${video.id}`}
             className="text-base font-medium hover:text-primary transition-colors block"
           >
             {video.title}
           </Link>
-          {!video.isFree && !hasSubscriberRole && (
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                <Lock className="w-2.5 h-2.5" />
-                Premium
-              </span>
-            </div>
-          )}
-        </>
+          <PremiumBadge isFree={video.isFree ?? false} hasSubscriberRole={hasSubscriberRole} />
+        </div>
       ),
     },
     {
@@ -146,36 +140,7 @@ export function VideosTable({ videos, hasSubscriberRole, onEdit, onDelete }: Vid
               <Play className="h-4 w-4" />
             </Button>
           </Link>
-          <PermissionGate require="coaches">
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onEdit(video);
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete(video);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </PermissionGate>
+          <AdminActions item={video} onEdit={onEdit} onDelete={onDelete} />
         </div>
       ),
     },

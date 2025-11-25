@@ -4,15 +4,12 @@
  */
 
 import type { Video } from '@/types/video';
-import type { Coach } from '@/types/coach';
 import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../types';
 import { createFilterField } from '../types';
 import { createTagPredicate, createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
 import { isOwner } from '@/lib/permissions';
 import { getCategoryFilterOptions } from '@/lib/taxonomy';
-import coachesData from '@/data/coaches.json';
-
-const allCoaches = coachesData as Coach[];
+import { coaches as allCoaches } from '@/lib/data';
 const activeCoachIds = allCoaches.filter(c => c.isActive !== false).map(c => c.id);
 
 /**

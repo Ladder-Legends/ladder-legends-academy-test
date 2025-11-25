@@ -2,10 +2,12 @@
 
 import { Masterclass } from '@/types/masterclass';
 import Link from 'next/link';
-import { Play, Lock, Edit, Trash2 } from 'lucide-react';
-import { PermissionGate } from '@/components/auth/permission-gate';
+import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
+import { PremiumBadge } from '@/components/shared/premium-badge';
+import { AdminActions } from '@/components/shared/admin-actions';
 
 interface MasterclassesTableProps {
   masterclasses: Masterclass[];
@@ -15,112 +17,87 @@ interface MasterclassesTableProps {
 }
 
 export function MasterclassesTable({ masterclasses, hasSubscriberRole, onEdit, onDelete }: MasterclassesTableProps) {
-  const getRaceColor = (_race: string) => {
-    // Using theme foreground color instead of race-specific colors
-    return 'text-foreground';
-  };
-
-  const getDifficultyColor = (_difficulty?: string) => {
-    // Using theme colors instead of difficulty-specific colors
-    return 'bg-muted text-foreground border-border';
-  };
+  const columns: ColumnConfig<Masterclass>[] = [
+    {
+      id: 'title',
+      label: 'Title',
+      sortable: true,
+      getValue: (item) => item.title.toLowerCase(),
+      render: (item) => (
+        <div>
+          <Link
+            href={`/masterclasses/${item.id}`}
+            className="text-base font-medium hover:text-primary transition-colors block"
+          >
+            {item.title}
+          </Link>
+          <PremiumBadge isFree={item.isFree ?? false} hasSubscriberRole={hasSubscriberRole} />
+        </div>
+      ),
+    },
+    {
+      id: 'coach',
+      label: 'Coach',
+      sortable: true,
+      getValue: (item) => item.coach?.toLowerCase() || '',
+      render: (item) => (
+        <span className="text-sm text-muted-foreground">{item.coach}</span>
+      ),
+    },
+    {
+      id: 'race',
+      label: 'Race',
+      sortable: true,
+      getValue: (item) => item.race?.toLowerCase() || '',
+      render: (item) => (
+        item.race && (
+          <span className="text-sm font-medium text-foreground">
+            {item.race}
+          </span>
+        )
+      ),
+    },
+    {
+      id: 'difficulty',
+      label: 'Difficulty',
+      sortable: true,
+      sortFn: (a, b, direction) => {
+        const difficultyOrder: Record<string, number> = { basic: 1, intermediate: 2, expert: 3 };
+        const aValue = difficultyOrder[a.difficulty?.toLowerCase() || ''] || 0;
+        const bValue = difficultyOrder[b.difficulty?.toLowerCase() || ''] || 0;
+        const comparison = aValue - bValue;
+        return direction === 'asc' ? comparison : -comparison;
+      },
+      render: (item) => (
+        item.difficulty && (
+          <Badge variant="outline" className="bg-muted text-foreground border-border">
+            {item.difficulty}
+          </Badge>
+        )
+      ),
+    },
+    {
+      id: 'actions',
+      label: 'Actions',
+      sortable: false,
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/masterclasses/${item.id}`}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Play className="h-4 w-4" />
+            </Button>
+          </Link>
+          <AdminActions item={item} onEdit={onEdit} onDelete={onDelete} />
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden inline-block min-w-full">
-      <table className="w-full min-w-[800px]">
-        <thead className="bg-muted/50">
-          <tr>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Title</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Coach</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Race</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Difficulty</th>
-            <th className="text-left px-6 py-4 text-sm font-semibold">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {masterclasses.map((masterclass, index) => (
-            <tr
-              key={masterclass.id}
-              className={`border-t border-border hover:bg-muted/30 transition-colors ${
-                index % 2 === 0 ? 'bg-card' : 'bg-muted/10'
-              }`}
-            >
-              <td className="px-6 py-4">
-                <Link
-                  href={`/masterclasses/${masterclass.id}`}
-                  className="text-base font-medium hover:text-primary transition-colors block"
-                >
-                  {masterclass.title}
-                </Link>
-                {!masterclass.isFree && !hasSubscriberRole && (
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                      <Lock className="w-2.5 h-2.5" />
-                      Premium
-                    </span>
-                  </div>
-                )}
-              </td>
-              <td className="px-6 py-4">
-                <span className="text-sm text-muted-foreground">{masterclass.coach}</span>
-              </td>
-              <td className="px-6 py-4">
-                {masterclass.race && (
-                  <span className={`text-sm font-medium ${getRaceColor(masterclass.race)}`}>
-                    {masterclass.race}
-                  </span>
-                )}
-              </td>
-              <td className="px-6 py-4">
-                {masterclass.difficulty && (
-                  <Badge variant="outline" className={getDifficultyColor(masterclass.difficulty)}>
-                    {masterclass.difficulty}
-                  </Badge>
-                )}
-              </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <Link href={`/masterclasses/${masterclass.id}`}>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Play className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <PermissionGate require="coaches">
-                    {onEdit && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onEdit(masterclass);
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {onDelete && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onDelete(masterclass);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </PermissionGate>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <SortableTable
+      items={masterclasses}
+      columns={columns}
+      getRowKey={(item) => item.id}
+    />
   );
 }

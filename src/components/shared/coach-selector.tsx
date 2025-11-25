@@ -1,6 +1,6 @@
 'use client';
 
-import coachesData from '@/data/coaches.json';
+import { coaches as coachesData } from '@/lib/data';
 
 interface CoachSelectorProps {
   value: string;

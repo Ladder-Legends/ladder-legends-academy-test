@@ -3,19 +3,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Video, VideoRace } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import videos from '@/data/videos.json';
-import coaches from '@/data/coaches.json';
+import { videos } from '@/lib/data';
 import { MuxUpload } from './mux-upload';
 import { VideoSelector } from './video-selector-enhanced';
 import { extractYouTubeId } from '@/lib/youtube-parser';
 import { MultiCategorySelector } from './multi-category-selector';
 import { FileUpload } from './file-upload';
+import { FormField } from './form-field';
+import { EditModalFooter } from './edit-modal-footer';
+import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -24,26 +25,22 @@ interface VideoEditModalProps {
   isNew?: boolean;
 }
 
+const raceOptions = [
+  { value: 'none', label: 'None / Not Applicable' },
+  { value: 'terran', label: 'Terran' },
+  { value: 'zerg', label: 'Zerg' },
+  { value: 'protoss', label: 'Protoss' },
+  { value: 'all', label: 'All Races' },
+];
+
 export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoEditModalProps) {
   const { addChange } = usePendingChanges();
   const mergedVideos = useMergedContent(videos as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Video>>({});
-  const [tagInput, setTagInput] = useState('');
-  const [coachSearch, setCoachSearch] = useState('');
-  const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  // Note: tag dropdown autocomplete UI not yet implemented
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
-  const [customThumbnail, setCustomThumbnail] = useState<string | null>(null); // base64 or URL
+  const [customThumbnail, setCustomThumbnail] = useState<string | null>(null);
   const [isPlaylistMode, setIsPlaylistMode] = useState(false);
 
-  // Get all unique tags from existing videos for autocomplete
-  const allExistingTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    videos.forEach(v => v.tags.forEach(tag => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
-  }, []);
-
-  // Check if this is a free playlist containing non-free videos
   const freePlaylistWarning = useMemo(() => {
     if (!isPlaylistMode || !formData.isFree || !formData.videoIds || formData.videoIds.length === 0) {
       return null;
@@ -67,132 +64,62 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     };
   }, [isPlaylistMode, formData.isFree, formData.videoIds]);
 
-  // Filter tags based on input (unused until tag autocomplete UI is added)
-  const _filteredTags = useMemo(() => {
-    if (!tagInput.trim()) return [];
-    const input = tagInput.toLowerCase();
-    return allExistingTags
-      .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
-      .slice(0, 5);
-  }, [tagInput, allExistingTags, formData.tags]);
-  void _filteredTags;
-
-  // Filter coaches based on search input (only active coaches)
-  const filteredCoaches = useMemo(() => {
-    const activeCoaches = coaches.filter(coach => coach.isActive !== false);
-    if (!coachSearch.trim()) return activeCoaches;
-    const search = coachSearch.toLowerCase();
-    return activeCoaches.filter(coach =>
-      coach.name.toLowerCase().includes(search) ||
-      coach.displayName.toLowerCase().includes(search)
-    );
-  }, [coachSearch]);
-
-
   useEffect(() => {
-    if (!isOpen) return; // Only reset when opening the modal
+    if (!isOpen) return;
 
     if (video) {
       setFormData(video);
-      setCoachSearch(video.coach || '');
       setIsPlaylistMode(video.source === 'playlist');
     } else if (isNew) {
-      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',
         description: '',
-        source: 'youtube', // Default to YouTube
+        source: 'youtube',
         date: new Date().toISOString().split('T')[0],
         tags: [],
         race: 'terran',
         coach: '',
         coachId: '',
-        isFree: false, // Default to premium
+        isFree: false,
       });
-      setCoachSearch('');
       setIsPlaylistMode(false);
     }
-    setTagInput('');
     setYoutubeIdInput('');
   }, [video, isNew, isOpen]);
 
+  const updateField = <K extends keyof Video>(field: K, value: Video[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleMuxUploadComplete = (assetId: string, playbackId: string) => {
-    // Use functional setState to preserve any changes made during upload
     setFormData(prev => ({
       ...prev,
       source: 'mux',
       muxAssetId: assetId,
       muxPlaybackId: playbackId,
       muxAssetStatus: 'ready',
-      // Use static thumbnail file path (downloaded at build time)
       thumbnail: `/thumbnails/${prev.id}.jpg`,
     }));
     toast.success('Mux video linked successfully');
   };
 
-  const addTag = (tag: string) => {
-    const trimmedTag = tag.trim().toLowerCase();
-    if (trimmedTag && !formData.tags?.includes(trimmedTag)) {
-      setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
-    }
-    setTagInput('');
-  };
-
-  // Tag handlers - prepared for future tag autocomplete UI
-  const _removeTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter(tag => tag !== tagToRemove) || []
-    });
-  };
-
-  const _handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        addTag(tagInput);
-      }
-    }
-  };
-  void _removeTag; void _handleTagInputKeyDown;
-
-  const selectCoach = (coachId: string) => {
-    const coach = coaches.find(c => c.id === coachId);
-    if (coach) {
-      setFormData({
-        ...formData,
-        coach: coach.displayName,
-        coachId: coach.id,
-      });
-      setCoachSearch(coach.displayName);
-      setShowCoachDropdown(false);
-    }
-  };
-
-  const clearCoach = () => {
-    setFormData({
-      ...formData,
-      coach: '',
-      coachId: '',
-    });
-    setCoachSearch('');
-    setShowCoachDropdown(true);
-  };
-
   const handleYoutubeIdKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const extractedId = extractYouTubeId(youtubeIdInput);
-      if (extractedId) {
-        setFormData({ ...formData, youtubeId: extractedId });
-        setYoutubeIdInput('');
-      }
+      addYoutubeId();
+    }
+  };
+
+  const addYoutubeId = () => {
+    const extractedId = extractYouTubeId(youtubeIdInput);
+    if (extractedId) {
+      updateField('youtubeId', extractedId);
+      setYoutubeIdInput('');
     }
   };
 
   const handleThumbnailUpload = async (file: File) => {
-    // Convert to base64
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
@@ -211,13 +138,11 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     const hasMuxVideo = formData.muxPlaybackId && formData.muxAssetId;
     const hasPlaylistVideos = isPlaylistMode && formData.videoIds && formData.videoIds.length > 0;
 
-    // Validate required fields based on source
     if (!formData.id || !formData.title) {
       toast.error('Please fill in all required fields (Title)');
       return;
     }
 
-    // Validate video source
     if (isPlaylistMode && !hasPlaylistVideos) {
       toast.error('Please add at least one video to the playlist');
       return;
@@ -229,7 +154,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       return;
     }
 
-    // For playlists, validate that all videoIds reference existing videos
     if (formData.source === 'playlist' && formData.videoIds && formData.videoIds.length > 0) {
       const invalidVideoIds = formData.videoIds.filter(
         id => !mergedVideos.find(v => v.id === id)
@@ -243,7 +167,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
     let videoData: Video;
 
     if (isPlaylistMode) {
-      // Playlist video - references other videos
       videoData = {
         id: formData.id,
         title: formData.title,
@@ -260,7 +183,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         isFree: formData.isFree || false,
       };
     } else if (isMuxVideo) {
-      // Mux video - ALWAYS premium content
       videoData = {
         id: formData.id,
         title: formData.title,
@@ -276,10 +198,9 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         race: formData.race || 'terran',
         coach: formData.coach || '',
         coachId: formData.coachId || '',
-        isFree: false, // ALWAYS false for Mux videos - enforced by API
+        isFree: false,
       };
     } else {
-      // Single YouTube video
       videoData = {
         id: formData.id,
         title: formData.title,
@@ -304,7 +225,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       data: videoData,
     });
 
-    // If custom thumbnail uploaded for Mux video, add it as a file change
     if (isMuxVideo && customThumbnail) {
       addChange({
         id: `thumbnail-${videoData.id}`,
@@ -312,7 +232,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         operation: 'create',
         data: {
           path: `public/thumbnails/${videoData.id}.jpg`,
-          content: customThumbnail, // base64
+          content: customThumbnail,
         },
       });
     }
@@ -324,28 +244,28 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Video' : 'Edit Video'} size="lg">
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Title *</label>
-          <input
-            type="text"
-            value={formData.title || ''}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Hino Ladder VOD - ZvT Masterclass"
-            autoFocus
-          />
-        </div>
+        <FormField
+          label="Title"
+          required
+          type="text"
+          inputProps={{
+            value: formData.title || '',
+            onChange: (e) => updateField('title', e.target.value),
+            placeholder: 'Hino Ladder VOD - ZvT Masterclass',
+            autoFocus: true,
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={3}
-            placeholder="Description of the video content..."
-          />
-        </div>
+        <FormField
+          label="Description"
+          type="textarea"
+          rows={3}
+          inputProps={{
+            value: formData.description || '',
+            onChange: (e) => updateField('description', e.target.value),
+            placeholder: 'Description of the video content...',
+          }}
+        />
 
         {/* Video Type Selector */}
         <div>
@@ -355,7 +275,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(false);
-                setFormData({ ...formData, source: 'youtube' });
+                updateField('source', 'youtube');
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 !isPlaylistMode && (formData.source || 'youtube') === 'youtube'
@@ -369,7 +289,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(false);
-                setFormData({ ...formData, source: 'mux' });
+                updateField('source', 'mux');
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 !isPlaylistMode && formData.source === 'mux'
@@ -383,7 +303,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               type="button"
               onClick={() => {
                 setIsPlaylistMode(true);
-                setFormData({ ...formData, source: 'playlist' });
+                updateField('source', 'playlist');
               }}
               className={`px-4 py-2 border rounded-md transition-colors ${
                 isPlaylistMode
@@ -404,79 +324,36 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Race</label>
-            <select
-              value={formData.race || 'none'}
-              onChange={(e) => setFormData({ ...formData, race: e.target.value as VideoRace })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="none">None / Not Applicable</option>
-              <option value="terran">Terran</option>
-              <option value="zerg">Zerg</option>
-              <option value="protoss">Protoss</option>
-              <option value="all">All Races</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Coach</label>
-            <div className="relative">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={coachSearch}
-                  onChange={(e) => {
-                    setCoachSearch(e.target.value);
-                    setShowCoachDropdown(true);
-                  }}
-                  onFocus={() => setShowCoachDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
-                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-                  placeholder="Type to search coaches..."
-                />
-                {formData.coach && formData.coachId && (
-                  <button
-                    type="button"
-                    onClick={clearCoach}
-                    className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Coach dropdown */}
-              {showCoachDropdown && filteredCoaches.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {filteredCoaches.map((coach) => (
-                    <button
-                      key={coach.id}
-                      type="button"
-                      onClick={() => selectCoach(coach.id)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
-                    >
-                      <div className="font-medium">{coach.displayName}</div>
-                      <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            {formData.coach && formData.coachId && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
-              </p>
-            )}
-          </div>
+          <FormField
+            label="Race"
+            type="select"
+            options={raceOptions}
+            inputProps={{
+              value: formData.race || 'none',
+              onChange: (e) => updateField('race', e.target.value as VideoRace),
+            }}
+          />
+          <CoachSearchDropdown
+            label="Coach"
+            value={formData.coach || ''}
+            coachId={formData.coachId || ''}
+            onSelect={(name, id) => {
+              updateField('coach', name);
+              updateField('coachId', id);
+            }}
+            onClear={() => {
+              updateField('coach', '');
+              updateField('coachId', '');
+            }}
+          />
         </div>
 
-        {/* Conditional Video Input - YouTube, Mux, or Playlist */}
+        {/* Conditional Video Input */}
         {isPlaylistMode ? (
           <VideoSelector
             mode="playlist"
             selectedVideoIds={formData.videoIds || []}
-            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+            onVideoIdsChange={(videoIds) => updateField('videoIds', videoIds)}
             label="Playlist Videos"
             suggestedTitle={formData.title}
             allowCreate={false}
@@ -515,7 +392,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
               />
             )}
 
-            {/* Custom Thumbnail Upload for Mux Videos */}
             {formData.muxPlaybackId && (
               <div className="mt-4">
                 <label className="block text-sm font-medium mb-2">Custom Thumbnail (Optional)</label>
@@ -561,14 +437,13 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           <div>
             <label className="block text-sm font-medium mb-1">YouTube Video ID *</label>
             <div className="space-y-2">
-              {/* Display current YouTube ID */}
               {formData.youtubeId && (
                 <div className="px-3 py-2 border border-border rounded-md bg-muted/50">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-mono">{formData.youtubeId}</span>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, youtubeId: undefined })}
+                      onClick={() => updateField('youtubeId', undefined)}
                       className="text-destructive hover:text-destructive/70"
                     >
                       ×
@@ -577,7 +452,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                 </div>
               )}
 
-              {/* Input for YouTube ID */}
               {!formData.youtubeId && (
                 <div className="flex gap-2">
                   <input
@@ -590,13 +464,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      const extractedId = extractYouTubeId(youtubeIdInput);
-                      if (extractedId) {
-                        setFormData({ ...formData, youtubeId: extractedId });
-                        setYoutubeIdInput('');
-                      }
-                    }}
+                    onClick={addYoutubeId}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                   >
                     Add
@@ -611,22 +479,21 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Date</label>
-          <input
-            type="date"
-            value={formData.date || ''}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-          />
-        </div>
+        <FormField
+          label="Date"
+          type="date"
+          inputProps={{
+            value: formData.date || '',
+            onChange: (e) => updateField('date', e.target.value),
+          }}
+        />
 
         <div>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.isFree || false}
-              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
+              onChange={(e) => updateField('isFree', e.target.checked)}
               disabled={!!formData.muxPlaybackId}
               className="w-4 h-4 rounded border-border disabled:opacity-50 disabled:cursor-not-allowed"
             />
@@ -634,7 +501,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
           </label>
           {formData.muxPlaybackId ? (
             <p className="text-xs text-muted-foreground mt-1 font-medium">
-              ⚠️ Mux videos are ALWAYS premium content. This cannot be changed.
+              Mux videos are ALWAYS premium content. This cannot be changed.
             </p>
           ) : (
             <p className="text-xs text-muted-foreground mt-1">
@@ -642,7 +509,6 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             </p>
           )}
 
-          {/* Warning for free playlists with non-free videos */}
           {freePlaylistWarning && (
             <div className="mt-3 border border-border bg-muted rounded-lg p-3">
               <div className="flex items-start gap-2">
@@ -650,9 +516,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    Free Playlist Warning
-                  </p>
+                  <p className="text-sm font-medium text-foreground">Free Playlist Warning</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     This playlist is marked as <strong>free</strong> but contains <strong>{freePlaylistWarning.count} premium video{freePlaylistWarning.count > 1 ? 's' : ''}</strong> out of {freePlaylistWarning.total} total.
                     Premium videos will not show in a free playlist.
@@ -672,21 +536,14 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
 
         <MultiCategorySelector
           categories={formData.categories || []}
-          onChange={(categories) => setFormData({ ...formData, categories })}
+          onChange={(categories) => updateField('categories', categories)}
         />
 
-        <div className="flex gap-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Save to Local Storage
-          </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          Changes are saved to browser storage. Click the commit button to push to GitHub.
-        </p>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+        />
       </div>
     </Modal>
   );

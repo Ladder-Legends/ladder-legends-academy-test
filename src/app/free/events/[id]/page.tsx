@@ -1,16 +1,13 @@
 import { Footer } from '@/components/footer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import eventsData from '@/data/events.json';
-import coachesData from '@/data/coaches.json';
-import { Event, getEventStatus } from '@/types/event';
+import { events as allEvents, coaches as coachesData } from '@/lib/data';
+import { getEventStatus } from '@/types/event';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Repeat } from 'lucide-react';
 import { MarkdownContent } from '@/components/ui/markdown-content';
 import { Badge } from '@/components/ui/badge';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { EventDateDisplay } from '@/components/events/event-date-display';
-
-const allEvents = eventsData as Event[];
 
 // Generate static paths for all FREE events at build time
 export async function generateStaticParams() {

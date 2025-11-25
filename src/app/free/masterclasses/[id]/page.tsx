@@ -4,21 +4,20 @@ import { Footer } from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
-import masterclassesData from '@/data/masterclasses.json';
-import { Masterclass } from '@/types/masterclass';
+import {
+  masterclasses as allMasterclasses,
+  videos as videosData,
+  replays as replaysData,
+  buildOrders as buildOrdersData,
+} from '@/lib/data';
 import { ArrowLeft } from 'lucide-react';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { Video, isMuxVideo, getVideoThumbnailUrl } from '@/types/video';
 import { MuxVideoPlayer } from '@/components/videos/mux-video-player';
-import videosData from '@/data/videos.json';
 import { use, useState, useEffect } from 'react';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
 import { useSession } from 'next-auth/react';
-
-const allMasterclasses = masterclassesData as Masterclass[];
 
 interface PageProps {
   params: Promise<{ id: string }>;

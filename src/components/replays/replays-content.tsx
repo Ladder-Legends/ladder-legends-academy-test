@@ -6,7 +6,7 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
 import { replayFilterConfig } from '@/lib/filtering/configs/replay-filters';
-import replaysData from '@/data/replays.json';
+import { replays } from '@/lib/data';
 import { Replay, normalizeReplays } from '@/types/replay';
 import { ReplayCard } from './replay-card';
 import { ReplaysTable } from './replays-table';
@@ -17,7 +17,7 @@ import { ReplayEditModal } from '@/components/admin/replay-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 
 // Filter out replays without downloadUrl and normalize so winner is always player1
-const allReplays = normalizeReplays((replaysData as Replay[]).filter(replay => replay.downloadUrl));
+const allReplays = normalizeReplays(replays.filter(replay => replay.downloadUrl));
 
 export function ReplaysContent() {
   const { data: session } = useSession();

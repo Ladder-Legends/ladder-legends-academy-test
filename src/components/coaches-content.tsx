@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { CoachCard } from '@/components/coaches/coach-card';
 import { DidYouKnow } from '@/components/coaches/did-you-know';
 import type { Coach } from '@/types/coach';
-import coachesData from '@/data/coaches.json';
-import videos from '@/data/videos.json';
+import { coaches, videos } from '@/lib/data';
 import { CoachEditModal } from '@/components/admin/coach-edit-modal';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
@@ -14,8 +13,6 @@ import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { isOwner } from '@/lib/permissions';
-
-const coaches = coachesData as Coach[];
 
 export function CoachesContent() {
   const { addChange } = usePendingChanges();

@@ -1,13 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import videosData from '@/data/videos.json';
-import { Video } from '@/types/video';
+import { videos as allVideos } from '@/lib/data';
 import { VideoDetailClient } from './video-detail-client';
 import { VideoStructuredData } from '@/components/seo/structured-data';
 import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
-
-const allVideos = videosData as Video[];
 
 // Generate static paths for all videos at build time
 export async function generateStaticParams() {

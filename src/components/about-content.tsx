@@ -10,9 +10,9 @@ import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { Edit, Save, X } from 'lucide-react';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
-import aboutData from '@/data/about.json';
+import { about } from '@/lib/data';
 
-const aboutContent = aboutData.content;
+const aboutContent = about.content;
 
 export function AboutContent() {
   const { addChange } = usePendingChanges();

@@ -1,21 +1,12 @@
 import { MetadataRoute } from 'next';
-import videosData from '@/data/videos.json';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
-import masterclassesData from '@/data/masterclasses.json';
-import coachesData from '@/data/coaches.json';
-import eventsData from '@/data/events.json';
-import { Video } from '@/types/video';
-import { Replay } from '@/types/replay';
-import { BuildOrder } from '@/types/build-order';
-import { Masterclass } from '@/types/masterclass';
-
-const allVideos = videosData as Video[];
-const allReplays = replaysData as Replay[];
-const allBuildOrders = buildOrdersData as BuildOrder[];
-const allMasterclasses = masterclassesData as Masterclass[];
-const allCoaches = coachesData;
-const allEvents = eventsData;
+import {
+  videos as allVideos,
+  replays as allReplays,
+  buildOrders as allBuildOrders,
+  masterclasses as allMasterclasses,
+  coaches as allCoaches,
+  events as allEvents,
+} from '@/lib/data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.ladderlegendsacademy.com';

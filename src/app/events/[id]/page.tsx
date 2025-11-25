@@ -1,11 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import eventsData from '@/data/events.json';
-import coachesData from '@/data/coaches.json';
-import { Event, formatEventDateTime } from '@/types/event';
+import { events as allEvents, coaches as coachesData } from '@/lib/data';
+import { formatEventDateTime } from '@/types/event';
 import { EventDetailClient } from './event-detail-client';
-
-const allEvents = eventsData as Event[];
 
 // Generate static paths for all events at build time
 export async function generateStaticParams() {

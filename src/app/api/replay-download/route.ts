@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import replaysData from '@/data/replays.json';
+import { replays as replaysData } from '@/lib/data';
 import { hasPermission } from '@/lib/permissions';
 
 /**

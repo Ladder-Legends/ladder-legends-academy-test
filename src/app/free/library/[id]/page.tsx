@@ -1,11 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import videosData from '@/data/videos.json';
-import { Video, getVideoThumbnailUrl, isPlaylist } from '@/types/video';
+import { videos as allVideos } from '@/lib/data';
+import { getVideoThumbnailUrl, isPlaylist } from '@/types/video';
 import { VideoDetailClient } from '@/app/library/[id]/video-detail-client';
-
-const allVideos = videosData as Video[];
 
 // Generate static paths for all FREE videos at build time
 export async function generateStaticParams() {

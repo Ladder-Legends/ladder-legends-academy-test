@@ -6,7 +6,7 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
 import { buildOrderFilterConfig } from '@/lib/filtering/configs/build-order-filters';
-import buildOrdersData from '@/data/build-orders.json';
+import { buildOrders as allBuildOrders } from '@/lib/data';
 import { BuildOrder } from '@/types/build-order';
 import { BuildOrderCard } from './build-order-card';
 import { BuildOrdersTable } from './build-orders-table';
@@ -16,8 +16,6 @@ import { PermissionGate } from '@/components/auth/permission-gate';
 import { BuildOrderEditModal } from '@/components/admin/build-order-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
-
-const allBuildOrders = buildOrdersData as BuildOrder[];
 
 export function BuildOrdersContent() {
   const { data: session } = useSession();

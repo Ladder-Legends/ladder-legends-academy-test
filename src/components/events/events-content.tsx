@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useUrlState } from '@/hooks/use-url-state';
 import { FilterSidebar, type FilterSection } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
-import eventsData from '@/data/events.json';
+import { events as allEvents } from '@/lib/data';
 import { Event, getEventStatus } from '@/types/event';
 import { EventCard } from './event-card';
 import { EventsTable } from './events-table';
@@ -14,8 +14,6 @@ import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { useSession } from 'next-auth/react';
-
-const allEvents = eventsData as Event[];
 
 export function EventsContent() {
   const searchParams = useSearchParams();

@@ -53,14 +53,28 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
 ### PHASE 2: HIGH-PRIORITY CODE QUALITY
 
 #### Academy - Code Duplication (5,170+ lines)
-- [ ] **Extract generic useEditModalForm hook**
-  - Consolidate duplicate patterns from all 7 edit modals
-  - Handle: formData state, useEffect initialization, tag management, validation
-  - Estimated savings: 2,000+ lines
+- [x] **Extract reusable edit modal abstractions** ✅ DONE 2025-11-25
+  - ✅ Created `src/hooks/use-autocomplete-search.ts` - Generic autocomplete search hook
+  - ✅ Created `src/hooks/use-tag-manager.ts` - Tag/specialty management hook
+  - ✅ Created `src/components/shared/coach-search-dropdown.tsx` - Searchable coach selector
+  - ✅ Created `src/components/admin/form-field.tsx` - Generic form field component
+  - ✅ Created `src/components/admin/tag-input.tsx` - Reusable tag input with autocomplete
+  - ✅ Created `src/components/admin/edit-modal-footer.tsx` - Modal footer with save/cancel
+  - ✅ Refactored all 6 modals:
+    - `coach-edit-modal.tsx` (273→187 lines, 31% reduction)
+    - `event-edit-modal.tsx` (476→408 lines, 14% reduction)
+    - `masterclass-edit-modal.tsx` (596→413 lines, 31% reduction)
+    - `video-edit-modal.tsx` (693→551 lines, 20% reduction)
+    - `replay-edit-modal.tsx` (837→730 lines, 13% reduction)
+    - `build-order-edit-modal.tsx` (1,035→958 lines, 7% reduction)
+  - Total reduction: 663 lines (3,910→3,247 lines, 17% overall reduction)
 
-- [ ] **Create GenericTable component**
-  - Consolidate 6 table components with similar patterns
-  - Configurable columns, sort handlers, row rendering
+- [x] **Extract shared table components** ✅ DONE 2025-11-25
+  - ✅ Migrated MasterclassesTable to use SortableTable (now has sorting!)
+  - ✅ Created `PremiumBadge` component (31 lines) - used by 5 tables
+  - ✅ Created `AdminActions` component (63 lines) - used by 5 tables
+  - Tables reduced: 904 → 743 lines (18% reduction)
+  - Net reduction: 67 lines (tables + shared components)
 
 - [ ] **Create type-safe JSON data loaders**
   - Replace 30+ untyped JSON imports
@@ -327,7 +341,46 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
 
 ## Notes
 
-### Recent Changes (2025-11-24)
+### Recent Changes (2025-11-25)
+- ✅ **Uploader lib.rs module refactor**
+  - Reduced lib.rs from 1,348 to 332 lines (76% reduction)
+  - Created `commands/` directory with 10 focused modules
+  - Created `state/` directory with AppState and AppStateManager
+  - Created `types.rs` with UserData and AuthTokens
+  - All 110 Rust tests pass
+
+- ✅ **sc2reader package organization**
+  - Created `sc2analysis` package with clean import interface
+  - Moved tests to `tests/` directory (11 test files)
+  - Moved debug tools to `tools/` directory (4 scripts)
+  - Moved analysis scripts to `analysis_scripts/` directory (7 scripts)
+  - All 171 unit tests pass
+
+- ✅ **Academy CMS pattern standardization (Complete)**
+  - Created reusable hooks:
+    - `use-autocomplete-search.ts` - Generic autocomplete search
+    - `use-tag-manager.ts` - Tag/specialty management
+  - Created reusable components:
+    - `coach-search-dropdown.tsx` - Searchable coach selector
+    - `form-field.tsx` - Generic form field component
+    - `tag-input.tsx` - Reusable tag input with autocomplete
+    - `edit-modal-footer.tsx` - Modal footer with save/cancel
+  - Refactored all 6 edit modals:
+    - coach-edit-modal (31% reduction)
+    - event-edit-modal (14% reduction)
+    - masterclass-edit-modal (31% reduction)
+    - video-edit-modal (20% reduction)
+    - replay-edit-modal (13% reduction)
+    - build-order-edit-modal (7% reduction)
+  - Total: 663 lines removed (3,910→3,247 lines, 17% reduction)
+
+- ✅ **Table component standardization (Complete)**
+  - Migrated MasterclassesTable to use SortableTable (adds sorting)
+  - Created `PremiumBadge` shared component (31 lines)
+  - Created `AdminActions` shared component (63 lines)
+  - Table code reduced: 904→743 lines (18% reduction)
+
+### Previous Changes (2025-11-24)
 - ✅ Comprehensive audit of all three codebases
 - ✅ Identified 224+ issues across Academy, sc2reader, Uploader
 - ✅ Prioritized cleanup tasks by impact and effort

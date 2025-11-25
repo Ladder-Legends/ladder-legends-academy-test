@@ -1,16 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import masterclassesData from '@/data/masterclasses.json';
-import videosData from '@/data/videos.json';
-import { Masterclass } from '@/types/masterclass';
-import { Video } from '@/types/video';
+import { masterclasses as allMasterclasses, videos as allVideos } from '@/lib/data';
 import { MasterclassDetailClient } from './masterclass-detail-client';
 import { MasterclassStructuredData } from '@/components/seo/structured-data';
 import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
-
-const allMasterclasses = masterclassesData as Masterclass[];
-const allVideos = videosData as Video[];
 
 export async function generateStaticParams() {
   return allMasterclasses.map((masterclass) => ({

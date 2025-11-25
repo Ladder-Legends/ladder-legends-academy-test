@@ -2,14 +2,15 @@
 
 import { Event, getEventStatus } from '@/types/event';
 import Link from 'next/link';
-import { Lock, Repeat, Edit, Trash2 } from 'lucide-react';
+import { Repeat } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EventDateDisplay } from './event-date-display';
-import { PermissionGate } from '@/components/auth/permission-gate';
 import { AddToCalendarButton } from './add-to-calendar-button';
 import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
-import coachesData from '@/data/coaches.json';
+import { PremiumBadge } from '@/components/shared/premium-badge';
+import { AdminActions } from '@/components/shared/admin-actions';
+import { coaches as coachesData } from '@/lib/data';
 
 interface EventsTableProps {
   events: Event[];
@@ -50,7 +51,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
       sortable: true,
       getValue: (event) => event.title.toLowerCase(),
       render: (event) => (
-        <>
+        <div>
           <Link
             href={`/events/${event.id}`}
             className="text-base font-medium hover:text-primary transition-colors block"
@@ -58,12 +59,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
             {event.title}
           </Link>
           <div className="flex items-center gap-2 mt-1.5">
-            {!event.isFree && !hasSubscriberRole && (
-              <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                <Lock className="w-2.5 h-2.5" />
-                Premium
-              </span>
-            )}
+            <PremiumBadge isFree={event.isFree} hasSubscriberRole={hasSubscriberRole} className="mt-0" />
             {event.recurring && (
               <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                 <Repeat className="w-3 h-3" />
@@ -71,7 +67,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
               </span>
             )}
           </div>
-        </>
+        </div>
       ),
     },
     {
@@ -164,36 +160,7 @@ export function EventsTable({ events, hasSubscriberRole = false, onEdit, onDelet
               View
             </Button>
           </Link>
-          <PermissionGate require="coaches">
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onEdit(event);
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete(event);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </PermissionGate>
+          <AdminActions item={event} onEdit={onEdit} onDelete={onDelete} />
         </div>
       ),
     },

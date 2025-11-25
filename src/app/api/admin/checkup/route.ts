@@ -5,12 +5,14 @@ import { list as listBlobs, del as deleteBlob } from '@vercel/blob';
 import Mux from '@mux/mux-node';
 
 // Import data files
-import videosData from '@/data/videos.json';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
-import masterclassesData from '@/data/masterclasses.json';
-import eventsData from '@/data/events.json';
-import coachesData from '@/data/coaches.json';
+import {
+  videos as videosData,
+  replays as replaysData,
+  buildOrders as buildOrdersData,
+  masterclasses as masterclassesData,
+  events as eventsData,
+  coaches as coachesData,
+} from '@/lib/data';
 
 interface StaleAssets {
   muxAssets: Array<{ playbackId: string; assetId: string }>;

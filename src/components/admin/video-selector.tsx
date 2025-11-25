@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Video } from '@/types/video';
-import videos from '@/data/videos.json';
+import { videos } from '@/lib/data';
 import { MuxUpload } from './mux-upload';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Video as VideoIcon } from 'lucide-react';

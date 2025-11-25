@@ -4,7 +4,7 @@ import { Coach } from '@/types/coach';
 import { CoachCard } from '@/components/coaches/coach-card';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import videos from '@/data/videos.json';
+import { videos } from '@/lib/data';
 import { HorizontalScrollContainer } from '@/components/ui/horizontal-scroll-container';
 
 interface HorizontalCoachScrollerProps {

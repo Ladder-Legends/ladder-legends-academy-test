@@ -1,20 +1,15 @@
 import { Footer } from '@/components/footer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import buildOrdersData from '@/data/build-orders.json';
-import { BuildOrder } from '@/types/build-order';
+import {
+  buildOrders as allBuildOrders,
+  replays as allReplays,
+  videos as allVideos,
+} from '@/lib/data';
 import { Video, ArrowLeft, Download } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { getContentVideoUrl } from '@/lib/video-helpers';
-import replaysData from '@/data/replays.json';
-import { Replay } from '@/types/replay';
-import videosData from '@/data/videos.json';
-import { Video as VideoType } from '@/types/video';
-
-const allBuildOrders = buildOrdersData as BuildOrder[];
-const allReplays = replaysData as Replay[];
-const allVideos = videosData as VideoType[];
 
 // Generate static paths for all FREE build orders at build time
 export async function generateStaticParams() {

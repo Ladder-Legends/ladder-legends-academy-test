@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import coachesData from '@/data/coaches.json';
+import { coaches as coachesData } from '@/lib/data';
 
 function DiscordIcon({ className }: { className?: string }) {
   return (

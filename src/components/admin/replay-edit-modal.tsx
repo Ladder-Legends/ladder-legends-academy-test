@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Replay, Race, Matchup, ReplayPlayer } from '@/types/replay';
@@ -10,13 +9,14 @@ import { Video } from '@/types/video';
 import { BuildOrder } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import replays from '@/data/replays.json';
-import coaches from '@/data/coaches.json';
-import videosJson from '@/data/videos.json';
+import { replays, coaches, videos as videosJson } from '@/lib/data';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
 import { FileUpload } from './file-upload';
+import { FormField } from './form-field';
+import { EditModalFooter } from './edit-modal-footer';
+import { useAutocompleteSearch } from '@/hooks/use-autocomplete-search';
 
 interface ReplayEditModalProps {
   replay: Replay | null;
@@ -25,31 +25,38 @@ interface ReplayEditModalProps {
   isNew?: boolean;
 }
 
+const matchupOptions = [
+  { value: 'TvT', label: 'TvT' },
+  { value: 'TvZ', label: 'TvZ' },
+  { value: 'TvP', label: 'TvP' },
+  { value: 'ZvT', label: 'ZvT' },
+  { value: 'ZvZ', label: 'ZvZ' },
+  { value: 'ZvP', label: 'ZvP' },
+  { value: 'PvT', label: 'PvT' },
+  { value: 'PvZ', label: 'PvZ' },
+  { value: 'PvP', label: 'PvP' },
+];
+
+const raceOptions = [
+  { value: 'terran', label: 'Terran' },
+  { value: 'zerg', label: 'Zerg' },
+  { value: 'protoss', label: 'Protoss' },
+];
+
+const resultOptions = [
+  { value: 'win', label: 'Win' },
+  { value: 'loss', label: 'Loss' },
+];
+
 export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: ReplayEditModalProps) {
   const { addChange } = usePendingChanges();
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Replay>>({});
-  const [, setTagInput] = useState(''); // tagInput unused until tag autocomplete UI is added
-  const [mapSearch, setMapSearch] = useState('');
-  const [player1Search, setPlayer1Search] = useState('');
-  const [player2Search, setPlayer2Search] = useState('');
-  const [showMapDropdown, setShowMapDropdown] = useState(false);
-  const [showPlayer1Dropdown, setShowPlayer1Dropdown] = useState(false);
-  const [showPlayer2Dropdown, setShowPlayer2Dropdown] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzedReplayFile, setAnalyzedReplayFile] = useState<File | null>(null);
   const [analysisData, setAnalysisData] = useState<SC2AnalysisResponse | null>(null);
-
-  // Get all unique tags from existing replays for autocomplete (unused until tag autocomplete UI is added)
-  const _allExistingTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    replays.forEach(r => r.tags.forEach(tag => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
-  }, []);
-  void _allExistingTags;
-
 
   // Get all unique maps from existing replays
   const allMaps = useMemo(() => {
@@ -57,15 +64,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     replays.forEach(r => mapSet.add(r.map));
     return Array.from(mapSet).sort();
   }, []);
-
-  // Filter maps based on search input
-  const filteredMaps = useMemo(() => {
-    if (!mapSearch.trim()) return [];
-    const search = mapSearch.toLowerCase();
-    return allMaps
-      .filter(map => map.toLowerCase().includes(search))
-      .slice(0, 5);
-  }, [mapSearch, allMaps]);
 
   // Get all unique player names from existing replays
   const allPlayerNames = useMemo(() => {
@@ -77,33 +75,39 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     return Array.from(nameSet).sort();
   }, []);
 
-  // Filter player names based on search input
-  const filteredPlayer1Names = useMemo(() => {
-    if (!player1Search.trim()) return [];
-    const search = player1Search.toLowerCase();
-    return allPlayerNames
-      .filter(name => name.toLowerCase().includes(search))
-      .slice(0, 5);
-  }, [player1Search, allPlayerNames]);
+  // Map autocomplete
+  const mapSearch = useAutocompleteSearch<string>({
+    options: allMaps,
+    getSearchText: (m) => m,
+    toOption: (m) => ({ id: m, label: m, data: m }),
+    maxResults: 5,
+  });
 
-  const filteredPlayer2Names = useMemo(() => {
-    if (!player2Search.trim()) return [];
-    const search = player2Search.toLowerCase();
-    return allPlayerNames
-      .filter(name => name.toLowerCase().includes(search))
-      .slice(0, 5);
-  }, [player2Search, allPlayerNames]);
+  // Player 1 autocomplete
+  const player1Search = useAutocompleteSearch<string>({
+    options: allPlayerNames,
+    getSearchText: (n) => n,
+    toOption: (n) => ({ id: n, label: n, data: n }),
+    maxResults: 5,
+  });
+
+  // Player 2 autocomplete
+  const player2Search = useAutocompleteSearch<string>({
+    options: allPlayerNames,
+    getSearchText: (n) => n,
+    toOption: (n) => ({ id: n, label: n, data: n }),
+    maxResults: 5,
+  });
 
   // Get latest patch version
   const getLatestPatch = useMemo(() => {
     const patches = replays
       .map(r => r.patch)
-      .filter(p => p && p.trim())
+      .filter((p): p is string => Boolean(p && p.trim()))
       .map(p => p.trim());
 
     if (patches.length === 0) return '';
 
-    // Sort patches by semantic versioning (5.0.14 > 5.0.12, 5.1.2 > 5.0.2)
     const sortedPatches = patches.sort((a, b) => {
       const aParts = a.split('.').map(Number);
       const bParts = b.split('.').map(Number);
@@ -111,7 +115,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
         const aVal = aParts[i] || 0;
         const bVal = bParts[i] || 0;
-        if (aVal !== bVal) return bVal - aVal; // Descending order
+        if (aVal !== bVal) return bVal - aVal;
       }
       return 0;
     });
@@ -120,30 +124,21 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
   }, []);
 
   useEffect(() => {
-    if (!isOpen) return; // Only reset when opening the modal
+    if (!isOpen) return;
 
     if (replay) {
       setFormData(replay);
-      setMapSearch(replay.map || '');
-      setPlayer1Search(replay.player1?.name || '');
-      setPlayer2Search(replay.player2?.name || '');
+      mapSearch.setSearch(replay.map || '');
+      player1Search.setSearch(replay.player1?.name || '');
+      player2Search.setSearch(replay.player2?.name || '');
     } else if (isNew) {
-      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',
         map: '',
         matchup: 'TvT',
-        player1: {
-          name: '',
-          race: 'terran',
-          result: 'win',
-        },
-        player2: {
-          name: '',
-          race: 'terran',
-          result: 'loss',
-        },
+        player1: { name: '', race: 'terran', result: 'win' },
+        player2: { name: '', race: 'terran', result: 'loss' },
         duration: '',
         gameDate: new Date().toISOString().split('T')[0],
         uploadDate: new Date().toISOString().split('T')[0],
@@ -155,42 +150,29 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         notes: '',
         isFree: false,
       });
-      setMapSearch('');
-      setPlayer1Search('');
-      setPlayer2Search('');
+      mapSearch.setSearch('');
+      player1Search.setSearch('');
+      player2Search.setSearch('');
     }
-    setTagInput('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replay, isNew, isOpen, getLatestPatch]);
 
-  // Tag handler - prepared for future tag autocomplete UI
-  const _addTag = (tag: string) => {
-    const trimmedTag = tag.trim().toLowerCase();
-    if (trimmedTag && !formData.tags?.includes(trimmedTag)) {
-      setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
-    }
-    setTagInput('');
+  const updateField = <K extends keyof Replay>(field: K, value: Replay[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-  void _addTag;
 
   const updatePlayer = (playerNum: 1 | 2, field: keyof ReplayPlayer, value: string | number) => {
     const playerKey = `player${playerNum}` as 'player1' | 'player2';
-    setFormData({
-      ...formData,
-      [playerKey]: {
-        ...formData[playerKey],
-        [field]: value,
-      }
-    });
+    setFormData(prev => ({
+      ...prev,
+      [playerKey]: { ...prev[playerKey], [field]: value }
+    }));
   };
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
 
     try {
-      // Note: Old blob files are not deleted here to keep operations reversible
-      // The checkup script will clean up orphaned blobs
-
-      // Upload new file
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
@@ -205,8 +187,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       }
 
       const { url, filename } = await response.json();
-
-      // Use functional setState to preserve any changes made during upload
       setFormData(prev => ({ ...prev, downloadUrl: url }));
       setUploadedFileName(filename);
       setAnalyzedReplayFile(file);
@@ -246,20 +226,13 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       const data = await response.json();
       setAnalysisData(data);
 
-      // Auto-populate form fields from analysis
       const { metadata } = data;
-
-      // Normalize race names (Terran -> terran)
       const normalizeRace = (race: string) => race.toLowerCase() as Race;
-
-      // Determine matchup (e.g., "TvP")
       const determineMatchup = (r1: string, r2: string) => {
         const race1 = r1.charAt(0).toUpperCase();
         const race2 = r2.charAt(0).toUpperCase();
         return `${race1}v${race2}` as Matchup;
       };
-
-      // Format duration from seconds to MM:SS
       const formatDuration = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
@@ -269,7 +242,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       const player1Data = metadata.players[0];
       const player2Data = metadata.players[1];
 
-      // Use functional setState to preserve any changes made during analysis
       setFormData(prev => ({
         ...prev,
         title: prev.title || `${player1Data.name} vs ${player2Data.name}`,
@@ -292,14 +264,12 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         patch: metadata.release_string || prev.patch,
       }));
 
-      // Update search fields
-      setMapSearch(metadata.map_name);
-      setPlayer1Search(player1Data.name);
-      setPlayer2Search(player2Data.name);
+      mapSearch.setSearch(metadata.map_name);
+      player1Search.setSearch(player1Data.name);
+      player2Search.setSearch(player2Data.name);
 
       toast.success('Replay analyzed successfully! Form fields have been populated.');
 
-      // Check if this replay is linked to any build orders and offer to update them
       if (replay?.id && data.build_orders) {
         await checkAndUpdateLinkedBuildOrders(replay.id, data);
       }
@@ -313,31 +283,20 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
 
   const checkAndUpdateLinkedBuildOrders = async (replayId: string, analysisData: SC2AnalysisResponse) => {
     try {
-      // This is a hack - we should have a proper GET endpoint for build orders
-      // For now, we'll just import the build orders client-side
       const buildOrdersModule = await import('@/data/build-orders.json');
       const buildOrders = buildOrdersModule.default as BuildOrder[];
-
-      // Find build orders that reference this replay
       const linkedBuildOrders = buildOrders.filter(bo => bo.replayId === replayId);
 
-      if (linkedBuildOrders.length === 0) {
-        return; // No linked build orders
-      }
+      if (linkedBuildOrders.length === 0) return;
 
-      // Ask user if they want to update the linked build orders
       const playerNames = Object.keys(analysisData.build_orders);
-      if (playerNames.length === 0) {
-        return;
-      }
+      if (playerNames.length === 0) return;
 
-      // Show confirmation with player selection
       const message = `Found ${linkedBuildOrders.length} build order(s) linked to this replay:\n\n` +
         linkedBuildOrders.map(bo => `• ${bo.name}`).join('\n') +
         `\n\nWould you like to update them with the new replay analysis?`;
 
       if (confirm(message)) {
-        // Ask which player's build order to use
         let selectedPlayer = playerNames[0];
         if (playerNames.length > 1) {
           const playerChoice = prompt(
@@ -350,42 +309,17 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           }
         }
 
-        // Convert SC2 events to build order steps
         const { convertToBuildOrderSteps } = await import('@/lib/sc2reader-client');
         const buildOrderEvents = analysisData.build_orders[selectedPlayer];
         const newSteps = convertToBuildOrderSteps(buildOrderEvents);
 
-        // Update each linked build order
-        const updatePromises = linkedBuildOrders.map(async bo => {
-          return {
-            id: bo.id,
-            contentType: 'build-orders' as const,
-            operation: 'update' as const,
-            data: {
-              ...bo,
-              steps: newSteps,
-              updatedAt: new Date().toISOString().split('T')[0],
-            },
-          };
-        });
-
-        const changes = await Promise.all(updatePromises);
-
-        // Show summary
         toast.success(
           `Updated ${linkedBuildOrders.length} build order(s) with ${newSteps.length} steps from ${selectedPlayer}'s replay analysis.`,
           { duration: 5000 }
         );
-
-        // Store changes for commit (parent component should handle this)
-        console.log('Build order updates ready:', changes);
-
-        // You may want to emit these changes to parent or auto-commit
-        // For now, just log them - the admin will need to commit manually
       }
     } catch (error) {
       console.error('Error updating linked build orders:', error);
-      // Don't show error toast - this is optional functionality
     }
   };
 
@@ -395,11 +329,8 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       return;
     }
 
-    // Validate that all videoIds reference existing videos (if any videoIds present)
     if (formData.videoIds && formData.videoIds.length > 0) {
-      const invalidVideoIds = formData.videoIds.filter(
-        id => !allVideos.find(v => v.id === id)
-      );
+      const invalidVideoIds = formData.videoIds.filter(id => !allVideos.find(v => v.id === id));
       if (invalidVideoIds.length > 0) {
         toast.error(`Invalid video references found: ${invalidVideoIds.join(', ')}. Please remove them before saving.`);
         return;
@@ -433,93 +364,90 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       data: replayData,
     });
 
-
     toast.success(`Replay ${isNew ? 'created' : 'updated'} (pending commit)`);
     onClose();
   };
 
+  const coachOptions = [
+    { value: '', label: '-- No Coach --' },
+    ...coaches
+      .filter(coach => coach.isActive !== false)
+      .map(coach => ({ value: coach.name, label: `${coach.displayName} (${coach.race})` })),
+  ];
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Replay' : 'Edit Replay'} size="xl">
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Title *</label>
-          <input
-            type="text"
-            value={formData.title || ''}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Epic ZvT on Altitude"
-            autoFocus
-          />
-        </div>
+        <FormField
+          label="Title"
+          required
+          type="text"
+          inputProps={{
+            value: formData.title || '',
+            onChange: (e) => updateField('title', e.target.value),
+            placeholder: 'Epic ZvT on Altitude',
+            autoFocus: true,
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Description (Optional)</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Brief description of the replay..."
-            rows={3}
-          />
-        </div>
+        <FormField
+          label="Description (Optional)"
+          type="textarea"
+          rows={3}
+          inputProps={{
+            value: formData.description || '',
+            onChange: (e) => updateField('description', e.target.value),
+            placeholder: 'Brief description of the replay...',
+          }}
+        />
 
         <div className="grid grid-cols-2 gap-4">
+          {/* Map autocomplete */}
           <div>
             <label className="block text-sm font-medium mb-1">Map *</label>
             <div className="relative">
               <input
                 type="text"
-                value={mapSearch}
+                value={mapSearch.search}
                 onChange={(e) => {
-                  setMapSearch(e.target.value);
-                  setFormData({ ...formData, map: e.target.value });
+                  mapSearch.setSearch(e.target.value);
+                  updateField('map', e.target.value);
                 }}
-                onFocus={() => setShowMapDropdown(true)}
-                onBlur={() => setTimeout(() => setShowMapDropdown(false), 200)}
+                onFocus={mapSearch.handleFocus}
+                onBlur={mapSearch.handleBlur}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 placeholder="Type to search maps..."
               />
-
-              {/* Map autocomplete dropdown */}
-              {showMapDropdown && filteredMaps.length > 0 && (
+              {mapSearch.showDropdown && mapSearch.filteredOptions.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredMaps.map((map) => (
+                  {mapSearch.filteredOptions.map((option) => (
                     <button
-                      key={map}
+                      key={option.id}
                       type="button"
                       onClick={() => {
-                        setMapSearch(map);
-                        setFormData({ ...formData, map });
+                        mapSearch.setSearch(option.label);
+                        updateField('map', option.label);
                       }}
                       className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
                     >
-                      {map}
+                      {option.label}
                     </button>
                   ))}
                 </div>
               )}
             </div>
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Matchup *</label>
-          <select
-            value={formData.matchup || 'TvT'}
-            onChange={(e) => setFormData({ ...formData, matchup: e.target.value as Matchup })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-          >
-            <option value="TvT">TvT</option>
-            <option value="TvZ">TvZ</option>
-            <option value="TvP">TvP</option>
-            <option value="ZvT">ZvT</option>
-            <option value="ZvZ">ZvZ</option>
-            <option value="ZvP">ZvP</option>
-            <option value="PvT">PvT</option>
-            <option value="PvZ">PvZ</option>
-            <option value="PvP">PvP</option>
-          </select>
+          <FormField
+            label="Matchup"
+            required
+            type="select"
+            options={matchupOptions}
+            inputProps={{
+              value: formData.matchup || 'TvT',
+              onChange: (e) => updateField('matchup', e.target.value as Matchup),
+            }}
+          />
         </div>
 
         {/* Player 1 */}
@@ -531,69 +459,67 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
               <div className="relative">
                 <input
                   type="text"
-                  value={player1Search}
+                  value={player1Search.search}
                   onChange={(e) => {
-                    setPlayer1Search(e.target.value);
+                    player1Search.setSearch(e.target.value);
                     updatePlayer(1, 'name', e.target.value);
                   }}
-                  onFocus={() => setShowPlayer1Dropdown(true)}
-                  onBlur={() => setTimeout(() => setShowPlayer1Dropdown(false), 200)}
+                  onFocus={player1Search.handleFocus}
+                  onBlur={player1Search.handleBlur}
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder="Type to search player names..."
                 />
-
-                {/* Player 1 autocomplete dropdown */}
-                {showPlayer1Dropdown && filteredPlayer1Names.length > 0 && (
+                {player1Search.showDropdown && player1Search.filteredOptions.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                    {filteredPlayer1Names.map((name) => (
+                    {player1Search.filteredOptions.map((option) => (
                       <button
-                        key={name}
+                        key={option.id}
                         type="button"
                         onClick={() => {
-                          setPlayer1Search(name);
-                          updatePlayer(1, 'name', name);
+                          player1Search.setSearch(option.label);
+                          updatePlayer(1, 'name', option.label);
                         }}
                         className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
                       >
-                        {name}
+                        {option.label}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Race *</label>
-              <select
-                value={formData.player1?.race || 'terran'}
-                onChange={(e) => updatePlayer(1, 'race', e.target.value as Race)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              >
-                <option value="terran">Terran</option>
-                <option value="zerg">Zerg</option>
-                <option value="protoss">Protoss</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Result *</label>
-              <select
-                value={formData.player1?.result || 'win'}
-                onChange={(e) => updatePlayer(1, 'result', e.target.value as 'win' | 'loss')}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              >
-                <option value="win">Win</option>
-                <option value="loss">Loss</option>
-              </select>
-            </div>
+            <FormField
+              label="Race"
+              required
+              type="select"
+              options={raceOptions}
+              inputProps={{
+                value: formData.player1?.race || 'terran',
+                onChange: (e) => updatePlayer(1, 'race', e.target.value as Race),
+                className: 'text-sm',
+              }}
+            />
+            <FormField
+              label="Result"
+              required
+              type="select"
+              options={resultOptions}
+              inputProps={{
+                value: formData.player1?.result || 'win',
+                onChange: (e) => updatePlayer(1, 'result', e.target.value as 'win' | 'loss'),
+                className: 'text-sm',
+              }}
+            />
           </div>
           <div className="mt-3">
-            <label className="block text-xs font-medium mb-1">MMR</label>
-            <input
+            <FormField
+              label="MMR"
               type="number"
-              value={formData.player1?.mmr || ''}
-              onChange={(e) => updatePlayer(1, 'mmr', e.target.value ? parseInt(e.target.value) : 0)}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              placeholder="5000"
+              inputProps={{
+                value: formData.player1?.mmr || '',
+                onChange: (e) => updatePlayer(1, 'mmr', e.target.value ? parseInt(e.target.value) : 0),
+                placeholder: '5000',
+              }}
             />
           </div>
         </div>
@@ -607,145 +533,125 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
               <div className="relative">
                 <input
                   type="text"
-                  value={player2Search}
+                  value={player2Search.search}
                   onChange={(e) => {
-                    setPlayer2Search(e.target.value);
+                    player2Search.setSearch(e.target.value);
                     updatePlayer(2, 'name', e.target.value);
                   }}
-                  onFocus={() => setShowPlayer2Dropdown(true)}
-                  onBlur={() => setTimeout(() => setShowPlayer2Dropdown(false), 200)}
+                  onFocus={player2Search.handleFocus}
+                  onBlur={player2Search.handleBlur}
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder="Type to search player names..."
                 />
-
-                {/* Player 2 autocomplete dropdown */}
-                {showPlayer2Dropdown && filteredPlayer2Names.length > 0 && (
+                {player2Search.showDropdown && player2Search.filteredOptions.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                    {filteredPlayer2Names.map((name) => (
+                    {player2Search.filteredOptions.map((option) => (
                       <button
-                        key={name}
+                        key={option.id}
                         type="button"
                         onClick={() => {
-                          setPlayer2Search(name);
-                          updatePlayer(2, 'name', name);
+                          player2Search.setSearch(option.label);
+                          updatePlayer(2, 'name', option.label);
                         }}
                         className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
                       >
-                        {name}
+                        {option.label}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Race *</label>
-              <select
-                value={formData.player2?.race || 'terran'}
-                onChange={(e) => updatePlayer(2, 'race', e.target.value as Race)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              >
-                <option value="terran">Terran</option>
-                <option value="zerg">Zerg</option>
-                <option value="protoss">Protoss</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Result *</label>
-              <select
-                value={formData.player2?.result || 'loss'}
-                onChange={(e) => updatePlayer(2, 'result', e.target.value as 'win' | 'loss')}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              >
-                <option value="win">Win</option>
-                <option value="loss">Loss</option>
-              </select>
-            </div>
+            <FormField
+              label="Race"
+              required
+              type="select"
+              options={raceOptions}
+              inputProps={{
+                value: formData.player2?.race || 'terran',
+                onChange: (e) => updatePlayer(2, 'race', e.target.value as Race),
+                className: 'text-sm',
+              }}
+            />
+            <FormField
+              label="Result"
+              required
+              type="select"
+              options={resultOptions}
+              inputProps={{
+                value: formData.player2?.result || 'loss',
+                onChange: (e) => updatePlayer(2, 'result', e.target.value as 'win' | 'loss'),
+                className: 'text-sm',
+              }}
+            />
           </div>
           <div className="mt-3">
-            <label className="block text-xs font-medium mb-1">MMR</label>
-            <input
+            <FormField
+              label="MMR"
               type="number"
-              value={formData.player2?.mmr || ''}
-              onChange={(e) => updatePlayer(2, 'mmr', e.target.value ? parseInt(e.target.value) : 0)}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              placeholder="4800"
+              inputProps={{
+                value: formData.player2?.mmr || '',
+                onChange: (e) => updatePlayer(2, 'mmr', e.target.value ? parseInt(e.target.value) : 0),
+                placeholder: '4800',
+              }}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Duration</label>
-            <input
-              type="text"
-              value={formData.duration || ''}
-              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="12:34"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Game Date</label>
-            <input
-              type="date"
-              value={formData.gameDate || ''}
-              onChange={(e) => setFormData({ ...formData, gameDate: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Patch</label>
-            <input
-              type="text"
-              value={formData.patch || ''}
-              onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="5.0.14"
-            />
-          </div>
+          <FormField
+            label="Duration"
+            type="text"
+            inputProps={{
+              value: formData.duration || '',
+              onChange: (e) => updateField('duration', e.target.value),
+              placeholder: '12:34',
+            }}
+          />
+          <FormField
+            label="Game Date"
+            type="date"
+            inputProps={{
+              value: formData.gameDate || '',
+              onChange: (e) => updateField('gameDate', e.target.value),
+            }}
+          />
+          <FormField
+            label="Patch"
+            type="text"
+            inputProps={{
+              value: formData.patch || '',
+              onChange: (e) => updateField('patch', e.target.value),
+              placeholder: '5.0.14',
+            }}
+          />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Coach (Optional)</label>
-          <select
-            value={formData.coach || ''}
-            onChange={(e) => setFormData({ ...formData, coach: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-          >
-            <option value="">-- No Coach --</option>
-            {coaches.filter(coach => coach.isActive !== false).map((coach) => (
-              <option key={coach.id} value={coach.name}>
-                {coach.displayName} ({coach.race})
-              </option>
-            ))}
-          </select>
-        </div>
+        <FormField
+          label="Coach (Optional)"
+          type="select"
+          options={coachOptions}
+          inputProps={{
+            value: formData.coach || '',
+            onChange: (e) => updateField('coach', e.target.value),
+          }}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Replay File (.SC2Replay)</label>
             <div className="space-y-2">
-              {/* Current file display */}
               {formData.downloadUrl && (
                 <div className="flex items-center gap-2 p-2 bg-muted rounded-md text-sm">
                   <span className="flex-1 truncate">
                     {uploadedFileName || formData.downloadUrl.split('/').pop()}
                   </span>
-                  <a
-                    href={formData.downloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
+                  <a href={formData.downloadUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                     View
                   </a>
                 </div>
               )}
 
-              {/* File upload */}
               <FileUpload
                 onFileSelect={handleFileUpload}
                 accept=".SC2Replay"
@@ -755,7 +661,6 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
                 uploading={isUploading}
               />
 
-              {/* Analyze Replay Button */}
               {analyzedReplayFile && (
                 <button
                   type="button"
@@ -776,61 +681,46 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
           <VideoSelector
             mode="playlist"
             selectedVideoIds={formData.videoIds || []}
-            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+            onVideoIdsChange={(videoIds) => updateField('videoIds', videoIds)}
             label="Videos"
             suggestedTitle={formData.title}
-            suggestedRace={
-              formData.player1?.result === 'win'
-                ? formData.player1.race
-                : formData.player2?.race
-            }
+            suggestedRace={formData.player1?.result === 'win' ? formData.player1.race : formData.player2?.race}
             suggestedCoach={formData.coach}
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Notes</label>
-          <textarea
-            value={formData.notes || ''}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={3}
-            placeholder="Additional notes about this replay..."
-          />
-        </div>
+        <FormField
+          label="Notes"
+          type="textarea"
+          rows={3}
+          inputProps={{
+            value: formData.notes || '',
+            onChange: (e) => updateField('notes', e.target.value),
+            placeholder: 'Additional notes about this replay...',
+          }}
+        />
 
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isFree || false}
-              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
-              className="w-4 h-4 rounded border-border"
-            />
-            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
-          </label>
-          <p className="text-xs text-muted-foreground mt-1">
-            Leave unchecked for premium content (subscribers only). Defaults to premium.
-          </p>
-        </div>
+        <FormField
+          label="Free Content"
+          type="checkbox"
+          checkboxLabel="Free Content (accessible to all users)"
+          inputProps={{
+            checked: formData.isFree || false,
+            onChange: (e) => updateField('isFree', (e.target as HTMLInputElement).checked),
+          }}
+          helpText="Leave unchecked for premium content (subscribers only). Defaults to premium."
+        />
 
         <MultiCategorySelector
           categories={formData.categories || []}
-          onChange={(categories) => setFormData({ ...formData, categories })}
+          onChange={(categories) => updateField('categories', categories)}
         />
 
-        <div className="flex gap-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Save to Local Storage
-          </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          Changes are saved to browser storage. Click the commit button to push to GitHub.
-        </p>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+        />
       </div>
     </Modal>
   );

@@ -26,8 +26,8 @@ interface Coach {
   race: string;
   bio: string;
   specialties: string[];
-  bookingUrl: string;
-  socialLinks: Record<string, unknown>;
+  bookingUrl?: string;
+  socialLinks?: Record<string, unknown>;
 }
 
 interface EventDetailClientProps {

@@ -5,10 +5,12 @@ import { VideoEditModal } from '@/components/admin/video-edit-modal';
 import { Footer } from '@/components/footer';
 import Link from 'next/link';
 import { Video, isPlaylist } from '@/types/video';
-import videos from '@/data/videos.json';
-import buildOrdersData from '@/data/build-orders.json';
-import replaysData from '@/data/replays.json';
-import masterclassesData from '@/data/masterclasses.json';
+import {
+  videos,
+  buildOrders as buildOrdersData,
+  replays as replaysData,
+  masterclasses as masterclassesData,
+} from '@/lib/data';
 import { normalizeReplays } from '@/types/replay';
 import { ArrowLeft, CalendarDays, Edit, Trash2, FileText, PlayCircle, GraduationCap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';

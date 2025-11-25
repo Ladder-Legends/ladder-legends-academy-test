@@ -1,17 +1,11 @@
 import { Footer } from '@/components/footer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import replaysData from '@/data/replays.json';
-import { Replay } from '@/types/replay';
+import { replays as allReplays, videos as allVideos } from '@/lib/data';
 import { Download, Video, ArrowLeft, Calendar, Clock, Map } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
 import { SubscriberBadge } from '@/components/subscriber-badge';
 import { getContentVideoUrl } from '@/lib/video-helpers';
-import videosData from '@/data/videos.json';
-import { Video as VideoType } from '@/types/video';
-
-const allReplays = replaysData as Replay[];
-const allVideos = videosData as VideoType[];
 
 // Generate static paths for all FREE replays at build time
 export async function generateStaticParams() {

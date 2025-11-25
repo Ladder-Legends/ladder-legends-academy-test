@@ -2,16 +2,8 @@
 
 import { HorizontalVideoScroller } from './horizontal-video-scroller';
 import { HorizontalCoachScroller } from './horizontal-coach-scroller';
-import videos from '@/data/videos.json';
-import coaches from '@/data/coaches.json';
-import masterclassesData from '@/data/masterclasses.json';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
-import { Video } from '@/types/video';
-import { Coach } from '@/types/coach';
-import { Masterclass } from '@/types/masterclass';
-import { Replay, normalizeReplays } from '@/types/replay';
-import { BuildOrder } from '@/types/build-order';
+import { videos, coaches, masterclasses, replays, buildOrders, sponsorships } from '@/lib/data';
+import { normalizeReplays } from '@/types/replay';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -26,10 +18,6 @@ import { PermissionGate } from '@/components/auth/permission-gate';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import sponsorshipData from '@/data/sponsorships.json';
-import { SponsorshipData } from '@/types/sponsorship';
-
-const sponsorships = sponsorshipData as SponsorshipData;
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -44,11 +32,11 @@ function DiscordIcon({ className }: { className?: string }) {
   );
 }
 
-const allVideos = videos as Video[];
-const allCoaches = coaches as Coach[];
-const allMasterclasses = masterclassesData as Masterclass[];
-const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
-const allBuildOrders = buildOrdersData as BuildOrder[];
+const allVideos = videos;
+const allCoaches = coaches;
+const allMasterclasses = masterclasses;
+const allReplays = normalizeReplays(replays); // Normalize so winner is always player1
+const allBuildOrders = buildOrders;
 
 export function DashboardContent() {
   const { data: session } = useSession();

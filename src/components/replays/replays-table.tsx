@@ -2,13 +2,14 @@
 
 import { Replay } from '@/types/replay';
 import Link from 'next/link';
-import { Download, Video, Edit, Trash2, Lock } from 'lucide-react';
+import { Download, Video } from 'lucide-react';
 import { PaywallLink } from '@/components/auth/paywall-link';
-import { PermissionGate } from '@/components/auth/permission-gate';
 import { Button } from '@/components/ui/button';
 import { getContentVideoUrl } from '@/lib/video-helpers';
 import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
-import videosData from '@/data/videos.json';
+import { PremiumBadge } from '@/components/shared/premium-badge';
+import { AdminActions } from '@/components/shared/admin-actions';
+import { videos as videosData } from '@/lib/data';
 import { Video as VideoType } from '@/types/video';
 
 interface ReplaysTableProps {
@@ -46,22 +47,15 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       sortable: true,
       getValue: (replay) => replay.title.toLowerCase(),
       render: (replay) => (
-        <>
+        <div>
           <Link
             href={`/replays/${replay.id}`}
             className="text-base font-medium hover:text-primary transition-colors block"
           >
             {replay.title}
           </Link>
-          {!replay.isFree && !hasSubscriberRole && (
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="bg-primary/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-primary-foreground flex items-center gap-0.5 font-medium whitespace-nowrap flex-shrink-0">
-                <Lock className="w-2.5 h-2.5" />
-                Premium
-              </span>
-            </div>
-          )}
-        </>
+          <PremiumBadge isFree={replay.isFree ?? false} hasSubscriberRole={hasSubscriberRole} />
+        </div>
       ),
     },
     {
@@ -157,36 +151,7 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
               </Button>
             </PaywallLink>
           )}
-          <PermissionGate require="coaches">
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onEdit(replay);
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete(replay);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </PermissionGate>
+          <AdminActions item={replay} onEdit={onEdit} onDelete={onDelete} />
         </div>
       ),
     },

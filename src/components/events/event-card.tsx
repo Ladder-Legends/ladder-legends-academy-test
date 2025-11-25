@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Event, getEventStatus, formatEventDateTime, getNextOccurrence } from "@/types/event";
 import { Calendar, Clock, MapPin, User, Repeat, Lock } from "lucide-react";
 import { PaywallLink } from "@/components/auth/paywall-link";
-import coachesData from '@/data/coaches.json';
+import { coaches as coachesData } from '@/lib/data';
 
 interface EventCardProps {
   event: Event;

@@ -1,16 +1,10 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import buildOrdersData from '@/data/build-orders.json';
-import videosData from '@/data/videos.json';
-import { BuildOrder } from '@/types/build-order';
-import { Video } from '@/types/video';
+import { buildOrders as allBuildOrders, videos as allVideos } from '@/lib/data';
 import { BuildOrderDetailClient } from './build-order-detail-client';
 import { BuildOrderStructuredData } from '@/components/seo/structured-data';
 import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
-
-const allBuildOrders = buildOrdersData as BuildOrder[];
-const allVideos = videosData as Video[];
 
 export async function generateStaticParams() {
   return allBuildOrders.map((buildOrder) => ({

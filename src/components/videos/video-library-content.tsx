@@ -11,15 +11,12 @@ import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
 import { videoFilterConfig } from '@/lib/filtering/configs/video-filters';
-import videosData from '@/data/videos.json';
+import { videos } from '@/lib/data';
 import { Video } from '@/types/video';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-
-// Cast imported JSON to Video[] to ensure proper typing
-const videos = videosData as Video[];
 
 export function VideoLibraryContent() {
   const { addChange } = usePendingChanges();

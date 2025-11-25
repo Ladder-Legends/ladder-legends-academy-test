@@ -14,17 +14,16 @@ import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { ShareDialog } from '@/components/social/share-dialog';
 import { toast } from 'sonner';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
-import replaysData from '@/data/replays.json';
-import videosData from '@/data/videos.json';
-import { Replay, normalizeReplays } from '@/types/replay';
+import { replays, videos } from '@/lib/data';
+import { normalizeReplays } from '@/types/replay';
 import { Video } from '@/types/video';
 import { usePlaylistNavigation } from '@/hooks/use-playlist-navigation';
 import { VideoPlayer } from '@/components/videos/video-player';
 import { PlaylistSidebar } from '@/components/videos/playlist-sidebar';
 import { SoftPaywallOverlay } from '@/components/paywall/soft-paywall-overlay';
 
-const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
-const allVideos = videosData as Video[];
+const allReplays = normalizeReplays(replays); // Normalize so winner is always player1
+const allVideos = videos;
 
 interface BuildOrderDetailClientProps {
   buildOrder: BuildOrder;

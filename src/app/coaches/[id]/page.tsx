@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import coachesData from '@/data/coaches.json';
-import videosData from '@/data/videos.json';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
-import masterclassesData from '@/data/masterclasses.json';
-import eventsData from '@/data/events.json';
+import {
+  coaches as coachesData,
+  videos as videosData,
+  replays as replaysData,
+  buildOrders as buildOrdersData,
+  masterclasses as masterclassesData,
+  events as eventsData,
+} from '@/lib/data';
 import { CoachDetailClient } from './coach-detail-client';
 import { CoachStructuredData } from '@/components/seo/structured-data';
 import { Coach } from '@/types/coach';

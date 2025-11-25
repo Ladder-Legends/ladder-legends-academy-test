@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { Coach } from '@/types/coach';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import coaches from '@/data/coaches.json';
+import { coaches } from '@/lib/data';
+import { FormField } from './form-field';
+import { TagInput } from './tag-input';
+import { EditModalFooter } from './edit-modal-footer';
 
 interface CoachEditModalProps {
   coach: Coach | null;
@@ -16,11 +18,17 @@ interface CoachEditModalProps {
   isNew?: boolean;
 }
 
+const raceOptions = [
+  { value: 'none', label: 'None / General Coach' },
+  { value: 'terran', label: 'Terran' },
+  { value: 'zerg', label: 'Zerg' },
+  { value: 'protoss', label: 'Protoss' },
+  { value: 'all', label: 'All Races' },
+];
+
 export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachEditModalProps) {
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Coach>>({});
-  const [specialtyInput, setSpecialtyInput] = useState('');
-  const [showSpecialtyDropdown, setShowSpecialtyDropdown] = useState(false);
 
   // Get all unique specialties from existing coaches for autocomplete
   const allExistingSpecialties = useMemo(() => {
@@ -29,22 +37,12 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
     return Array.from(specialtySet).sort();
   }, []);
 
-  // Filter specialties based on input
-  const filteredSpecialties = useMemo(() => {
-    if (!specialtyInput.trim()) return [];
-    const input = specialtyInput.toLowerCase();
-    return allExistingSpecialties
-      .filter(s => s.toLowerCase().includes(input) && !formData.specialties?.includes(s))
-      .slice(0, 5);
-  }, [specialtyInput, allExistingSpecialties, formData.specialties]);
-
   useEffect(() => {
-    if (!isOpen) return; // Only reset when opening the modal
+    if (!isOpen) return;
 
     if (coach) {
       setFormData(coach);
     } else if (isNew) {
-      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         name: '',
@@ -53,34 +51,13 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
         bio: '',
         specialties: [],
         socialLinks: {},
-        isActive: true, // New coaches are active by default
+        isActive: true,
       });
     }
-    setSpecialtyInput('');
   }, [coach, isNew, isOpen]);
 
-  const addSpecialty = (specialty: string) => {
-    const trimmedSpecialty = specialty.trim();
-    if (trimmedSpecialty && !formData.specialties?.includes(trimmedSpecialty)) {
-      setFormData({ ...formData, specialties: [...(formData.specialties || []), trimmedSpecialty] });
-    }
-    setSpecialtyInput('');
-  };
-
-  const removeSpecialty = (specialtyToRemove: string) => {
-    setFormData({
-      ...formData,
-      specialties: formData.specialties?.filter(s => s !== specialtyToRemove) || []
-    });
-  };
-
-  const handleSpecialtyInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (specialtyInput.trim()) {
-        addSpecialty(specialtyInput);
-      }
-    }
+  const updateField = <K extends keyof Coach>(field: K, value: Coach[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
@@ -89,7 +66,6 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       return;
     }
 
-    // Use displayName for both name and displayName to maintain backward compatibility
     const coachData: Coach = {
       id: formData.id,
       name: formData.displayName.toLowerCase().replace(/\s+/g, ''),
@@ -99,7 +75,7 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
       specialties: formData.specialties || [],
       bookingUrl: formData.bookingUrl,
       pricePerHour: formData.pricePerHour,
-      isActive: formData.isActive !== false, // Default to true if undefined
+      isActive: formData.isActive !== false,
       socialLinks: {},
     };
 
@@ -117,134 +93,78 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Coach' : 'Edit Coach'} size="lg">
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Coach Name *</label>
-          <input
-            type="text"
-            value={formData.displayName || ''}
-            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Hino"
-            autoFocus
-          />
-        </div>
+        <FormField
+          label="Coach Name"
+          required
+          type="text"
+          inputProps={{
+            value: formData.displayName || '',
+            onChange: (e) => updateField('displayName', e.target.value),
+            placeholder: 'Hino',
+            autoFocus: true,
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Bio *</label>
-          <textarea
-            value={formData.bio || ''}
-            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={4}
-            placeholder="Top 80 GM Zerg since 2015 with semi-pro tournament experience..."
-          />
-        </div>
+        <FormField
+          label="Bio"
+          required
+          type="textarea"
+          rows={4}
+          inputProps={{
+            value: formData.bio || '',
+            onChange: (e) => updateField('bio', e.target.value),
+            placeholder: 'Top 80 GM Zerg since 2015 with semi-pro tournament experience...',
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Race *</label>
-          <select
-            value={formData.race || 'none'}
-            onChange={(e) => setFormData({ ...formData, race: e.target.value as 'terran' | 'zerg' | 'protoss' | 'all' | 'none' })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-          >
-            <option value="none">None / General Coach</option>
-            <option value="terran">Terran</option>
-            <option value="zerg">Zerg</option>
-            <option value="protoss">Protoss</option>
-            <option value="all">All Races</option>
-          </select>
-        </div>
+        <FormField
+          label="Race"
+          required
+          type="select"
+          options={raceOptions}
+          inputProps={{
+            value: formData.race || 'none',
+            onChange: (e) => updateField('race', e.target.value as Coach['race']),
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Specialties</label>
-          <div className="space-y-2">
-            {/* Selected specialties */}
-            {formData.specialties && formData.specialties.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.specialties.map((specialty) => (
-                  <span
-                    key={specialty}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                  >
-                    {specialty}
-                    <button
-                      type="button"
-                      onClick={() => removeSpecialty(specialty)}
-                      className="hover:text-primary/70"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+        <TagInput
+          tags={formData.specialties || []}
+          onChange={(specialties) => updateField('specialties', specialties)}
+          existingTags={allExistingSpecialties}
+          label="Specialties"
+          placeholder="Type to add specialties (press Enter)"
+          helpText="Common specialties: Ladder coaching, Build orders, Game fundamentals, etc."
+          lowercase={false}
+        />
 
-            {/* Specialty input with autocomplete */}
-            <div className="relative">
-              <input
-                type="text"
-                value={specialtyInput}
-                onChange={(e) => setSpecialtyInput(e.target.value)}
-                onKeyDown={handleSpecialtyInputKeyDown}
-                onFocus={() => setShowSpecialtyDropdown(true)}
-                onBlur={() => setTimeout(() => setShowSpecialtyDropdown(false), 200)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to add specialties (press Enter)"
-              />
+        <FormField
+          label="Booking URL"
+          type="text"
+          inputProps={{
+            value: formData.bookingUrl || '',
+            onChange: (e) => updateField('bookingUrl', e.target.value),
+            placeholder: 'https://app.acuityscheduling.com/...',
+          }}
+        />
 
-              {/* Autocomplete dropdown */}
-              {showSpecialtyDropdown && filteredSpecialties.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredSpecialties.map((specialty) => (
-                    <button
-                      key={specialty}
-                      type="button"
-                      onClick={() => addSpecialty(specialty)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                    >
-                      {specialty}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Common specialties: Ladder coaching, Build orders, Game fundamentals, etc.
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Booking URL</label>
-          <input
-            type="text"
-            value={formData.bookingUrl || ''}
-            onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="https://app.acuityscheduling.com/..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Price Per Hour</label>
-          <input
-            type="text"
-            value={formData.pricePerHour || ''}
-            onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="£25/hr or $30/hr"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Display format for coaching session pricing (e.g., £25/hr, $30/hr)
-          </p>
-        </div>
+        <FormField
+          label="Price Per Hour"
+          type="text"
+          inputProps={{
+            value: formData.pricePerHour || '',
+            onChange: (e) => updateField('pricePerHour', e.target.value),
+            placeholder: '£25/hr or $30/hr',
+          }}
+          helpText="Display format for coaching session pricing (e.g., £25/hr, $30/hr)"
+        />
 
         <div className="flex items-center gap-2 p-3 border border-border rounded-md bg-card/50">
           <input
             type="checkbox"
             id="isActive"
             checked={formData.isActive !== false}
-            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+            onChange={(e) => updateField('isActive', e.target.checked)}
             className="w-4 h-4 text-primary border-border rounded focus:ring-primary focus:ring-2"
           />
           <label htmlFor="isActive" className="text-sm font-medium cursor-pointer flex-1">
@@ -255,18 +175,11 @@ export function CoachEditModal({ coach, isOpen, onClose, isNew = false }: CoachE
           </label>
         </div>
 
-        <div className="flex gap-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Save to Local Storage
-          </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          Changes are saved to browser storage. Click the commit button to push to GitHub.
-        </p>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+        />
       </div>
     </Modal>
   );

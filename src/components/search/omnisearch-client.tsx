@@ -7,18 +7,15 @@ import { Search, X, ExternalLink, ChevronRight, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import buildOrdersData from '@/data/build-orders.json';
-import replaysData from '@/data/replays.json';
-import videosData from '@/data/videos.json';
-import masterclassesData from '@/data/masterclasses.json';
-import eventsData from '@/data/events.json';
-import coachesData from '@/data/coaches.json';
-import { BuildOrder } from '@/types/build-order';
-import { Replay, normalizeReplays } from '@/types/replay';
-import { Video } from '@/types/video';
-import { Masterclass } from '@/types/masterclass';
-import { Event } from '@/types/event';
-import { Coach } from '@/types/coach';
+import {
+  buildOrders as buildOrdersData,
+  replays as replaysData,
+  videos as videosData,
+  masterclasses as masterclassesData,
+  events as eventsData,
+  coaches as coachesData,
+} from '@/lib/data';
+import { normalizeReplays } from '@/types/replay';
 import {
   enrichBuildOrder,
   enrichReplay,
@@ -29,12 +26,12 @@ import {
   ContentCollections,
 } from '@/lib/content-enrichment';
 
-const buildOrders = buildOrdersData as BuildOrder[];
-const replays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
-const videos = videosData as Video[];
-const masterclasses = masterclassesData as Masterclass[];
-const events = eventsData as Event[];
-const coaches = coachesData as Coach[];
+const buildOrders = buildOrdersData;
+const replays = normalizeReplays(replaysData); // Normalize so winner is always player1
+const videos = videosData;
+const masterclasses = masterclassesData;
+const events = eventsData;
+const coaches = coachesData;
 
 const collections: ContentCollections = {
   buildOrders,

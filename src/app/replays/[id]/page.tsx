@@ -1,16 +1,14 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import replaysData from '@/data/replays.json';
-import videosData from '@/data/videos.json';
-import { Replay, normalizeReplays } from '@/types/replay';
-import { Video } from '@/types/video';
+import { replays, videos } from '@/lib/data';
+import { normalizeReplays } from '@/types/replay';
 import { ReplayDetailClient } from './replay-detail-client';
 import { ReplayStructuredData } from '@/components/seo/structured-data';
 import { generatePlaylistMetadata } from '@/lib/metadata-helpers';
 
-const allReplays = normalizeReplays(replaysData as Replay[]); // Normalize so winner is always player1
-const allVideos = videosData as Video[];
+const allReplays = normalizeReplays(replays); // Normalize so winner is always player1
+const allVideos = videos;
 
 export async function generateStaticParams() {
   return allReplays.map((replay) => ({

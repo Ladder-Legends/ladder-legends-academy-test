@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Video } from '@/types/video';
-import videosJson from '@/data/videos.json';
+import { videos as videosJson } from '@/lib/data';
 import { MuxUpload } from './mux-upload';
 import { VideoEditModal } from './video-edit-modal';
 import { Button } from '@/components/ui/button';

@@ -2,23 +2,28 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
 import { Masterclass, Race } from '@/types/masterclass';
 import { Difficulty } from '@/types/video';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import masterclasses from '@/data/masterclasses.json';
-import coaches from '@/data/coaches.json';
-import videosJson from '@/data/videos.json';
-import replaysJson from '@/data/replays.json';
-import buildOrdersJson from '@/data/build-orders.json';
+import {
+  masterclasses,
+  videos as videosJson,
+  replays as replaysJson,
+  buildOrders as buildOrdersJson,
+} from '@/lib/data';
 import { Video } from '@/types/video';
 import { Replay } from '@/types/replay';
 import { BuildOrder } from '@/types/build-order';
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
+import { FormField } from './form-field';
+import { TagInput } from './tag-input';
+import { EditModalFooter } from './edit-modal-footer';
+import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
+import { useAutocompleteSearch } from '@/hooks/use-autocomplete-search';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -27,79 +32,66 @@ interface MasterclassEditModalProps {
   isNew?: boolean;
 }
 
+const raceOptions = [
+  { value: 'none', label: 'None / Not Applicable' },
+  { value: 'terran', label: 'Terran' },
+  { value: 'zerg', label: 'Zerg' },
+  { value: 'protoss', label: 'Protoss' },
+  { value: 'all', label: 'All Races' },
+];
+
+const difficultyOptions = [
+  { value: 'basic', label: 'Basic' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'expert', label: 'Expert' },
+];
+
 export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = false }: MasterclassEditModalProps) {
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Masterclass>>({});
-  const [tagInput, setTagInput] = useState('');
-  const [coachSearch, setCoachSearch] = useState('');
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
-  const [showCoachDropdown, setShowCoachDropdown] = useState(false);
-  const [replaySearch, setReplaySearch] = useState('');
-  const [showReplayDropdown, setShowReplayDropdown] = useState(false);
-  const [buildOrderSearch, setBuildOrderSearch] = useState('');
-  const [showBuildOrderDropdown, setShowBuildOrderDropdown] = useState(false);
 
-  // Merge static content with pending changes
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const allReplays = useMergedContent(replaysJson as Replay[], 'replays');
   const allBuildOrders = useMergedContent(buildOrdersJson as BuildOrder[], 'build-orders');
 
-  // Get all unique tags from existing masterclasses for autocomplete
   const allExistingTags = useMemo(() => {
     const tagSet = new Set<string>();
     masterclasses.forEach(mc => mc.tags.forEach(tag => tagSet.add(tag)));
     return Array.from(tagSet).sort();
   }, []);
 
-  // Filter tags based on input
-  const filteredTags = useMemo(() => {
-    if (!tagInput.trim()) return [];
-    const input = tagInput.toLowerCase();
-    return allExistingTags
-      .filter(tag => tag.toLowerCase().includes(input) && !formData.tags?.includes(tag))
-      .slice(0, 5);
-  }, [tagInput, allExistingTags, formData.tags]);
+  // Replay search
+  const replaySearch = useAutocompleteSearch<Replay>({
+    options: allReplays,
+    getSearchText: (r) => r.title,
+    getSecondarySearchText: (r) => `${r.matchup} ${r.map}`,
+    toOption: (r) => ({
+      id: r.id,
+      label: r.title,
+      sublabel: `${r.matchup} • ${r.map} • ${r.duration}`,
+      data: r,
+    }),
+  });
 
-  // Filter coaches based on search input (only active coaches)
-  const filteredCoaches = useMemo(() => {
-    const activeCoaches = coaches.filter(coach => coach.isActive !== false);
-    if (!coachSearch.trim()) return activeCoaches;
-    const search = coachSearch.toLowerCase();
-    return activeCoaches.filter(coach =>
-      coach.name.toLowerCase().includes(search) ||
-      coach.displayName.toLowerCase().includes(search)
-    );
-  }, [coachSearch]);
-
-  // Filter replays based on search input
-  const filteredReplays = useMemo(() => {
-    if (!replaySearch.trim()) return allReplays.slice(0, 10);
-    const search = replaySearch.toLowerCase();
-    return allReplays.filter(replay =>
-      replay.title.toLowerCase().includes(search) ||
-      replay.matchup.toLowerCase().includes(search) ||
-      replay.map.toLowerCase().includes(search)
-    ).slice(0, 10);
-  }, [replaySearch, allReplays]);
-
-  // Filter build orders based on search input
-  const filteredBuildOrders = useMemo(() => {
-    if (!buildOrderSearch.trim()) return allBuildOrders.slice(0, 10);
-    const search = buildOrderSearch.toLowerCase();
-    return allBuildOrders.filter(buildOrder =>
-      buildOrder.name.toLowerCase().includes(search) ||
-      buildOrder.race.toLowerCase().includes(search)
-    ).slice(0, 10);
-  }, [buildOrderSearch, allBuildOrders]);
+  // Build order search
+  const buildOrderSearch = useAutocompleteSearch<BuildOrder>({
+    options: allBuildOrders,
+    getSearchText: (bo) => bo.name,
+    getSecondarySearchText: (bo) => bo.race,
+    toOption: (bo) => ({
+      id: bo.id,
+      label: bo.name,
+      sublabel: `${bo.race} vs ${bo.vsRace} • ${bo.difficulty}`,
+      data: bo,
+    }),
+  });
 
   useEffect(() => {
-    if (!isOpen) return; // Only reset when opening the modal
+    if (!isOpen) return;
 
     if (masterclass) {
       setFormData(masterclass);
-      setCoachSearch(masterclass.coach || '');
     } else if (isNew) {
-      // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
         id: uuidv4(),
         title: '',
@@ -114,45 +106,11 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         updatedAt: new Date().toISOString().split('T')[0],
         isFree: false,
       });
-      setCoachSearch('');
     }
-    setTagInput('');
   }, [masterclass, isNew, isOpen]);
 
-  const addTag = (tag: string) => {
-    const trimmedTag = tag.trim().toLowerCase();
-    if (trimmedTag && !formData.tags?.includes(trimmedTag)) {
-      setFormData({ ...formData, tags: [...(formData.tags || []), trimmedTag] });
-    }
-    setTagInput('');
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter(tag => tag !== tagToRemove) || []
-    });
-  };
-
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        addTag(tagInput);
-      }
-    }
-  };
-
-  const selectCoach = (coachId: string) => {
-    const coach = coaches.find(c => c.id === coachId);
-    if (coach) {
-      setFormData({
-        ...formData,
-        coach: coach.name,
-        coachId: coach.id,
-      });
-      setCoachSearch(coach.name);
-    }
+  const updateField = <K extends keyof Masterclass>(field: K, value: Masterclass[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
@@ -161,13 +119,11 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       return;
     }
 
-    // Validate that masterclass has at least one video
     if (!formData.videoIds || formData.videoIds.length === 0) {
       toast.error('Please add at least one video to the masterclass');
       return;
     }
 
-    // Validate that all videoIds reference existing videos
     const invalidVideoIds = formData.videoIds.filter(
       id => !allVideos.find(v => v.id === id)
     );
@@ -176,7 +132,6 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
       return;
     }
 
-    // Get thumbnail from the first video if available
     let thumbnail = formData.thumbnail;
     if (!thumbnail && formData.videoIds && formData.videoIds.length > 0) {
       const firstVideo = allVideos.find(v => v.id === formData.videoIds![0]);
@@ -212,103 +167,93 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
     onClose();
   };
 
+  const addReplay = (replayId: string) => {
+    if (!formData.replayIds?.includes(replayId)) {
+      updateField('replayIds', [...(formData.replayIds || []), replayId]);
+    }
+    replaySearch.clear();
+  };
+
+  const removeReplay = (replayId: string) => {
+    updateField('replayIds', formData.replayIds?.filter(id => id !== replayId) || []);
+  };
+
+  const addBuildOrder = (buildOrderId: string) => {
+    if (!formData.buildOrderIds?.includes(buildOrderId)) {
+      updateField('buildOrderIds', [...(formData.buildOrderIds || []), buildOrderId]);
+    }
+    buildOrderSearch.clear();
+  };
+
+  const removeBuildOrder = (buildOrderId: string) => {
+    updateField('buildOrderIds', formData.buildOrderIds?.filter(id => id !== buildOrderId) || []);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Masterclass' : 'Edit Masterclass'} size="lg">
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Title *</label>
-          <input
-            type="text"
-            value={formData.title || ''}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            placeholder="Hino&apos;s Complete Zerg Fundamentals"
-            autoFocus
-          />
-        </div>
+        <FormField
+          label="Title"
+          required
+          type="text"
+          inputProps={{
+            value: formData.title || '',
+            onChange: (e) => updateField('title', e.target.value),
+            placeholder: "Hino's Complete Zerg Fundamentals",
+            autoFocus: true,
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={3}
-            placeholder="Comprehensive series covering everything from injects to late-game compositions..."
-          />
-        </div>
+        <FormField
+          label="Description"
+          type="textarea"
+          rows={3}
+          inputProps={{
+            value: formData.description || '',
+            onChange: (e) => updateField('description', e.target.value),
+            placeholder: 'Comprehensive series covering everything from injects to late-game compositions...',
+          }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Coach</label>
-          <div className="relative">
-            <input
-              type="text"
-              value={coachSearch}
-              onChange={(e) => setCoachSearch(e.target.value)}
-              onFocus={() => setShowCoachDropdown(true)}
-              onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="Type to search coaches..."
-            />
-
-            {/* Coach dropdown */}
-            {showCoachDropdown && filteredCoaches.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {filteredCoaches.map((coach) => (
-                  <button
-                    key={coach.id}
-                    type="button"
-                    onClick={() => selectCoach(coach.id)}
-                    className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
-                  >
-                    <div className="font-medium">{coach.displayName}</div>
-                    <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          {formData.coach && formData.coachId && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
-            </p>
-          )}
-        </div>
+        <CoachSearchDropdown
+          label="Coach"
+          value={formData.coach || ''}
+          coachId={formData.coachId || ''}
+          onSelect={(name, id) => {
+            updateField('coach', name);
+            updateField('coachId', id);
+          }}
+          onClear={() => {
+            updateField('coach', '');
+            updateField('coachId', '');
+          }}
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Race</label>
-            <select
-              value={formData.race || 'none'}
-              onChange={(e) => setFormData({ ...formData, race: e.target.value as Race })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="none">None / Not Applicable</option>
-              <option value="terran">Terran</option>
-              <option value="zerg">Zerg</option>
-              <option value="protoss">Protoss</option>
-              <option value="all">All Races</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Difficulty</label>
-            <select
-              value={formData.difficulty || 'basic'}
-              onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            >
-              <option value="basic">Basic</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="expert">Expert</option>
-            </select>
-          </div>
+          <FormField
+            label="Race"
+            type="select"
+            options={raceOptions}
+            inputProps={{
+              value: formData.race || 'none',
+              onChange: (e) => updateField('race', e.target.value as Race),
+            }}
+          />
+          <FormField
+            label="Difficulty"
+            type="select"
+            options={difficultyOptions}
+            inputProps={{
+              value: formData.difficulty || 'basic',
+              onChange: (e) => updateField('difficulty', e.target.value as Difficulty),
+            }}
+          />
         </div>
 
         <VideoSelector
           mode="playlist"
           selectedVideoIds={formData.videoIds || []}
-          onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
+          onVideoIdsChange={(videoIds) => updateField('videoIds', videoIds)}
           label="Videos"
           suggestedTitle={formData.title ? `${formData.title}${formData.coach ? ` - ${formData.coach}` : ''}` : ''}
           suggestedRace={formData.race}
@@ -320,7 +265,6 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         <div>
           <label className="block text-sm font-medium mb-2">Linked Replays (Optional)</label>
 
-          {/* Selected Replays */}
           {formData.replayIds && formData.replayIds.length > 0 && (
             <div className="mb-2 space-y-2">
               {formData.replayIds.map((replayId) => {
@@ -332,67 +276,37 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
                       <p className="text-sm font-medium">{replay.title}</p>
                       <p className="text-xs text-muted-foreground">{replay.matchup} • {replay.map}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          replayIds: formData.replayIds?.filter(id => id !== replayId) || []
-                        });
-                      }}
-                      className="text-destructive hover:text-destructive/70"
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => removeReplay(replayId)} className="text-destructive hover:text-destructive/70">×</button>
                   </div>
                 );
               })}
             </div>
           )}
 
-          {/* Replay Search Input */}
           <div className="relative">
             <input
               type="text"
-              value={replaySearch}
-              onChange={(e) => {
-                setReplaySearch(e.target.value);
-                setShowReplayDropdown(true);
-              }}
-              onFocus={() => setShowReplayDropdown(true)}
-              onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
+              value={replaySearch.search}
+              onChange={(e) => replaySearch.setSearch(e.target.value)}
+              onFocus={replaySearch.handleFocus}
+              onBlur={replaySearch.handleBlur}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
               placeholder="Search replays by title, matchup, or map..."
             />
-
-            {/* Replay Dropdown */}
-            {showReplayDropdown && filteredReplays.length > 0 && (
+            {replaySearch.showDropdown && replaySearch.filteredOptions.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {filteredReplays.map((replay) => {
-                  const isSelected = formData.replayIds?.includes(replay.id);
+                {replaySearch.filteredOptions.map((option) => {
+                  const isSelected = formData.replayIds?.includes(option.id);
                   return (
                     <button
-                      key={replay.id}
+                      key={option.id}
                       type="button"
-                      onClick={() => {
-                        if (!isSelected) {
-                          setFormData({
-                            ...formData,
-                            replayIds: [...(formData.replayIds || []), replay.id]
-                          });
-                        }
-                        setReplaySearch('');
-                        setShowReplayDropdown(false);
-                      }}
+                      onClick={() => !isSelected && addReplay(option.id)}
                       disabled={isSelected}
-                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${
-                        isSelected ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${isSelected ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <div className="font-medium text-sm">{replay.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {replay.matchup} • {replay.map} • {replay.duration}
-                      </div>
+                      <div className="font-medium text-sm">{option.label}</div>
+                      <div className="text-xs text-muted-foreground">{option.sublabel}</div>
                     </button>
                   );
                 })}
@@ -405,7 +319,6 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         <div>
           <label className="block text-sm font-medium mb-2">Linked Build Orders (Optional)</label>
 
-          {/* Selected Build Orders */}
           {formData.buildOrderIds && formData.buildOrderIds.length > 0 && (
             <div className="mb-2 space-y-2">
               {formData.buildOrderIds.map((buildOrderId) => {
@@ -415,71 +328,39 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
                   <div key={buildOrderId} className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-md border border-border">
                     <div>
                       <p className="text-sm font-medium">{buildOrder.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {buildOrder.race} vs {buildOrder.vsRace} • {buildOrder.difficulty}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{buildOrder.race} vs {buildOrder.vsRace} • {buildOrder.difficulty}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          buildOrderIds: formData.buildOrderIds?.filter(id => id !== buildOrderId) || []
-                        });
-                      }}
-                      className="text-destructive hover:text-destructive/70"
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => removeBuildOrder(buildOrderId)} className="text-destructive hover:text-destructive/70">×</button>
                   </div>
                 );
               })}
             </div>
           )}
 
-          {/* Build Order Search Input */}
           <div className="relative">
             <input
               type="text"
-              value={buildOrderSearch}
-              onChange={(e) => {
-                setBuildOrderSearch(e.target.value);
-                setShowBuildOrderDropdown(true);
-              }}
-              onFocus={() => setShowBuildOrderDropdown(true)}
-              onBlur={() => setTimeout(() => setShowBuildOrderDropdown(false), 200)}
+              value={buildOrderSearch.search}
+              onChange={(e) => buildOrderSearch.setSearch(e.target.value)}
+              onFocus={buildOrderSearch.handleFocus}
+              onBlur={buildOrderSearch.handleBlur}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
               placeholder="Search build orders by name or race..."
             />
-
-            {/* Build Order Dropdown */}
-            {showBuildOrderDropdown && filteredBuildOrders.length > 0 && (
+            {buildOrderSearch.showDropdown && buildOrderSearch.filteredOptions.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {filteredBuildOrders.map((buildOrder) => {
-                  const isSelected = formData.buildOrderIds?.includes(buildOrder.id);
+                {buildOrderSearch.filteredOptions.map((option) => {
+                  const isSelected = formData.buildOrderIds?.includes(option.id);
                   return (
                     <button
-                      key={buildOrder.id}
+                      key={option.id}
                       type="button"
-                      onClick={() => {
-                        if (!isSelected) {
-                          setFormData({
-                            ...formData,
-                            buildOrderIds: [...(formData.buildOrderIds || []), buildOrder.id]
-                          });
-                        }
-                        setBuildOrderSearch('');
-                        setShowBuildOrderDropdown(false);
-                      }}
+                      onClick={() => !isSelected && addBuildOrder(option.id)}
                       disabled={isSelected}
-                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${
-                        isSelected ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 ${isSelected ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <div className="font-medium text-sm">{buildOrder.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {buildOrder.race} vs {buildOrder.vsRace} • {buildOrder.difficulty}
-                      </div>
+                      <div className="font-medium text-sm">{option.label}</div>
+                      <div className="text-xs text-muted-foreground">{option.sublabel}</div>
                     </button>
                   );
                 })}
@@ -488,107 +369,45 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Date</label>
-          <input
-            type="date"
-            value={formData.createdAt || ''}
-            onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-          />
-        </div>
+        <FormField
+          label="Date"
+          type="date"
+          inputProps={{
+            value: formData.createdAt || '',
+            onChange: (e) => updateField('createdAt', e.target.value),
+          }}
+        />
 
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isFree || false}
-              onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
-              className="w-4 h-4 rounded border-border"
-            />
-            <span className="text-sm font-medium">Free Content (accessible to all users)</span>
-          </label>
-          <p className="text-xs text-muted-foreground mt-1">
-            Leave unchecked for premium content (subscribers only). Defaults to premium.
-          </p>
-        </div>
+        <FormField
+          label="Free Content"
+          type="checkbox"
+          checkboxLabel="Free Content (accessible to all users)"
+          inputProps={{
+            checked: formData.isFree || false,
+            onChange: (e) => updateField('isFree', (e.target as HTMLInputElement).checked),
+          }}
+          helpText="Leave unchecked for premium content (subscribers only). Defaults to premium."
+        />
 
         <MultiCategorySelector
           categories={formData.categories || []}
-          onChange={(categories) => setFormData({ ...formData, categories })}
+          onChange={(categories) => updateField('categories', categories)}
         />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Tags (legacy - use categories instead)</label>
-          <div className="space-y-2">
-            {/* Selected tags */}
-            {formData.tags && formData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="hover:text-primary/70"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+        <TagInput
+          tags={formData.tags || []}
+          onChange={(tags) => updateField('tags', tags)}
+          existingTags={allExistingTags}
+          label="Tags (legacy - use categories instead)"
+          placeholder="Type to add tags (press Enter)"
+          helpText="Common tags: fundamentals, zerg, terran, protoss, macro, micro, strategy, etc."
+        />
 
-            {/* Tag input with autocomplete */}
-            <div className="relative">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                onFocus={() => setShowTagDropdown(true)}
-                onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="Type to add tags (press Enter)"
-              />
-
-              {/* Autocomplete dropdown */}
-              {showTagDropdown && filteredTags.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => addTag(tag)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors text-sm"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Common tags: fundamentals, zerg, terran, protoss, macro, micro, strategy, etc.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Save to Local Storage
-          </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          Changes are saved to browser storage. Click the commit button to push to GitHub.
-        </p>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+        />
       </div>
     </Modal>
   );

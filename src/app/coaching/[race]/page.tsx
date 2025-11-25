@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import coachesData from '@/data/coaches.json';
-import videosData from '@/data/videos.json';
-import replaysData from '@/data/replays.json';
-import buildOrdersData from '@/data/build-orders.json';
+import {
+  coaches as coachesData,
+  videos as videosData,
+  replays as replaysData,
+  buildOrders as buildOrdersData,
+} from '@/lib/data';
 import { RaceCoachingClient } from './race-coaching-client';
-import { Video } from '@/types/video';
-import { Coach } from '@/types/coach';
-import { BuildOrder } from '@/types/build-order';
-import { Replay, normalizeReplays } from '@/types/replay';
+import { normalizeReplays } from '@/types/replay';
 
 type Race = 'terran' | 'zerg' | 'protoss' | 'random';
 
@@ -111,10 +110,10 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
     notFound();
   }
 
-  // Type the JSON data imports
-  const coaches = coachesData as Coach[];
-  const videos = videosData as Video[];
-  const buildOrders = buildOrdersData as BuildOrder[];
+  // Already typed from @/lib/data
+  const coaches = coachesData;
+  const videos = videosData;
+  const buildOrders = buildOrdersData;
 
   // Filter coaches by race (random coaches appear on all pages)
   const raceCoaches = coaches.filter((coach) => {
@@ -131,7 +130,7 @@ export default function RaceCoachingPage({ params }: { params: { race: string } 
 
   // Normalize replays so winner is always player1, then filter by race
   // After normalization, player1 is always the winner, so we just check player1.race
-  const normalizedReplays = normalizeReplays(replaysData as Replay[]);
+  const normalizedReplays = normalizeReplays(replaysData);
   const raceReplays = normalizedReplays.filter((replay) => {
     if (race === 'random') return true;
     // Player1 is always the winner after normalization

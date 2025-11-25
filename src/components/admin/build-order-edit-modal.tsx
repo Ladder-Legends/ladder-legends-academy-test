@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
+import { useAutocompleteSearch } from '@/hooks/use-autocomplete-search';
 import { BuildOrder, BuildOrderStep, Race, VsRace, Difficulty } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import coaches from '@/data/coaches.json';
-import replays from '@/data/replays.json';
-import videosJson from '@/data/videos.json';
+import { replays, videos as videosJson } from '@/lib/data';
 import { Replay, Matchup, Race as ReplayRace } from '@/types/replay';
 import { Video } from '@/types/video';
 import { Plus, Trash2, MoveUp, MoveDown } from 'lucide-react';
@@ -18,6 +17,9 @@ import type { SC2AnalysisResponse, SC2ReplayPlayer, SC2BuildOrderEvent } from '@
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
 import { FileUpload } from './file-upload';
+import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
+import { FormField } from './form-field';
+import { EditModalFooter } from './edit-modal-footer';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -29,43 +31,31 @@ interface BuildOrderEditModalProps {
 export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false }: BuildOrderEditModalProps) {
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<BuildOrder>>({});
-  const [coachSearch, setCoachSearch] = useState('');
-  const [showCoachDropdown, setShowCoachDropdown] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [replayAnalysisData, setReplayAnalysisData] = useState<SC2AnalysisResponse | null>(null);
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
-  const [replaySearch, setReplaySearch] = useState('');
-  const [showReplayDropdown, setShowReplayDropdown] = useState(false);
   const [uploadedReplayFile, setUploadedReplayFile] = useState<File | null>(null);
   const [replayLinkMode, setReplayLinkMode] = useState<'existing' | 'upload'>('existing');
 
   // Merge static videos with pending changes for validation
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
 
-  // Filter coaches based on search input (only active coaches)
-  const filteredCoaches = useMemo(() => {
-    const activeCoaches = coaches.filter(coach => coach.isActive !== false);
-    if (!coachSearch.trim()) return activeCoaches;
-    const search = coachSearch.toLowerCase();
-    return activeCoaches.filter(coach =>
-      coach.name.toLowerCase().includes(search) ||
-      coach.displayName.toLowerCase().includes(search)
-    );
-  }, [coachSearch]);
-
   // Merge static replays with pending changes
   const allReplays = useMergedContent(replays as Replay[], 'replays');
 
-  // Filter replays based on search input
-  const filteredReplays = useMemo(() => {
-    if (!replaySearch.trim()) return allReplays.slice(0, 10); // Show first 10 by default
-    const search = replaySearch.toLowerCase();
-    return allReplays.filter(replay =>
-      replay.title.toLowerCase().includes(search) ||
-      replay.matchup.toLowerCase().includes(search) ||
-      replay.map.toLowerCase().includes(search)
-    ).slice(0, 10);
-  }, [replaySearch, allReplays]);
+  // Replay search using autocomplete hook
+  const replaySearch = useAutocompleteSearch<Replay>({
+    options: allReplays,
+    getSearchText: (r) => r.title,
+    getSecondarySearchText: (r) => `${r.matchup} ${r.map}`,
+    toOption: (r) => ({
+      id: r.id,
+      label: r.title,
+      sublabel: `${r.matchup} • ${r.map} • ${r.duration}`,
+      data: r,
+    }),
+    maxResults: 10,
+  });
 
   useEffect(() => {
     if (!isOpen) return; // Only reset when opening the modal
@@ -86,7 +76,6 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         ...buildOrder,
         videoIds: validVideoIds,
       });
-      setCoachSearch(buildOrder.coach || '');
     } else if (isNew) {
       // Always generate a fresh UUID when opening in "add new" mode
       setFormData({
@@ -105,42 +94,21 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         updatedAt: new Date().toISOString().split('T')[0],
         isFree: false,
       });
-      setCoachSearch('');
     }
   }, [buildOrder, isNew, isOpen, allVideos]);
 
-  const selectCoach = (coachId: string) => {
-    const coach = coaches.find(c => c.id === coachId);
-    if (coach) {
-      setFormData({
-        ...formData,
-        coach: coach.displayName,
-        coachId: coach.id,
-      });
-      setCoachSearch(coach.displayName);
-      setShowCoachDropdown(false);
-    }
-  };
-
-  const clearCoach = () => {
-    setFormData({
-      ...formData,
-      coach: undefined,
-      coachId: undefined,
-    });
-    setCoachSearch('');
-    setShowCoachDropdown(false);
+  const updateField = <K extends keyof BuildOrder>(field: K, value: BuildOrder[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const selectReplay = (replayId: string) => {
     const replay = allReplays.find(r => r.id === replayId);
     if (replay) {
-      setFormData({
-        ...formData,
+      setFormData(prev => ({
+        ...prev,
         replayId: replay.id,
-      });
-      setReplaySearch(replay.title);
-      setShowReplayDropdown(false);
+      }));
+      replaySearch.setSearch(replay.title);
       toast.success(`Linked to replay: ${replay.title}`);
     }
   };
@@ -210,12 +178,11 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   };
 
   const clearReplay = () => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       replayId: undefined,
-    });
-    setReplaySearch('');
-    setShowReplayDropdown(false);
+    }));
+    replaySearch.clear();
   };
 
   const saveUploadedReplayToDatabase = async (): Promise<string | null> => {
@@ -294,7 +261,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         ...prev,
         replayId: newReplay.id,
       }));
-      setReplaySearch(newReplay.title);
+      replaySearch.setSearch(newReplay.title);
 
       toast.success(`Replay auto-saved: ${replayTitle}`);
 
@@ -567,80 +534,43 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Build Order' : 'Edit Build Order'} size="xl">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name *</label>
-            <input
-              type="text"
-              value={formData.name || ''}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              placeholder="3 Hatch Roach Timing"
-              autoFocus
-            />
-          </div>
+          <FormField
+            label="Name"
+            required
+            type="text"
+            inputProps={{
+              value: formData.name || '',
+              onChange: (e) => updateField('name', e.target.value),
+              placeholder: '3 Hatch Roach Timing',
+              autoFocus: true,
+            }}
+          />
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Coach</label>
-            <div className="relative">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={coachSearch}
-                  onChange={(e) => {
-                    setCoachSearch(e.target.value);
-                    setShowCoachDropdown(true);
-                  }}
-                  onFocus={() => setShowCoachDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowCoachDropdown(false), 200)}
-                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-                  placeholder="Type to search coaches..."
-                />
-                {formData.coach && formData.coachId && (
-                  <button
-                    type="button"
-                    onClick={clearCoach}
-                    className="px-3 py-2 border border-border hover:bg-muted rounded-md transition-colors text-sm"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Coach dropdown */}
-              {showCoachDropdown && filteredCoaches.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {filteredCoaches.map((coach) => (
-                    <button
-                      key={coach.id}
-                      type="button"
-                      onClick={() => selectCoach(coach.id)}
-                      className="w-full px-3 py-2 text-left hover:bg-muted transition-colors"
-                    >
-                      <div className="font-medium">{coach.displayName}</div>
-                      <div className="text-sm text-muted-foreground">{coach.name} • {coach.race}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            {formData.coach && formData.coachId && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Selected: <strong>{formData.coach}</strong> (ID: {formData.coachId})
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            rows={2}
-            placeholder="Description of the build order..."
+          <CoachSearchDropdown
+            label="Coach"
+            value={formData.coach || ''}
+            coachId={formData.coachId || ''}
+            onSelect={(displayName, coachId) => {
+              updateField('coach', displayName);
+              updateField('coachId', coachId);
+            }}
+            onClear={() => {
+              updateField('coach', '');
+              updateField('coachId', '');
+            }}
           />
         </div>
+
+        <FormField
+          label="Description"
+          type="textarea"
+          rows={2}
+          inputProps={{
+            value: formData.description || '',
+            onChange: (e) => updateField('description', e.target.value),
+            placeholder: 'Description of the build order...',
+          }}
+        />
 
         {/* Replay Link Section */}
         <div>
@@ -653,7 +583,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-foreground">Replay linked successfully</p>
                   <p className="text-xs text-muted-foreground">
-                    {replaySearch || `Replay ID: ${formData.replayId}`}
+                    {replaySearch.search || `Replay ID: ${formData.replayId}`}
                   </p>
                 </div>
                 <button
@@ -698,30 +628,27 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
                 <div className="relative">
                   <input
                     type="text"
-                    value={replaySearch}
-                    onChange={(e) => {
-                      setReplaySearch(e.target.value);
-                      setShowReplayDropdown(true);
-                    }}
-                    onFocus={() => setShowReplayDropdown(true)}
-                    onBlur={() => setTimeout(() => setShowReplayDropdown(false), 200)}
+                    value={replaySearch.search}
+                    onChange={(e) => replaySearch.setSearch(e.target.value)}
+                    onFocus={replaySearch.handleFocus}
+                    onBlur={replaySearch.handleBlur}
                     className="w-full px-3 py-2 border border-border rounded-md bg-background"
                     placeholder="Search for an existing replay..."
                   />
 
                   {/* Replay dropdown */}
-                  {showReplayDropdown && filteredReplays.length > 0 && (
+                  {replaySearch.showDropdown && replaySearch.filteredOptions.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                      {filteredReplays.map((replay) => (
+                      {replaySearch.filteredOptions.map((option) => (
                         <button
-                          key={replay.id}
+                          key={option.id}
                           type="button"
-                          onClick={() => selectReplay(replay.id)}
+                          onClick={() => selectReplay(option.id)}
                           className="w-full px-3 py-2 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0"
                         >
-                          <div className="font-medium text-sm">{replay.title}</div>
+                          <div className="font-medium text-sm">{option.label}</div>
                           <div className="text-xs text-muted-foreground">
-                            {replay.matchup} • {replay.map} • {replay.duration}
+                            {option.sublabel}
                           </div>
                         </button>
                       ))}
@@ -922,113 +849,108 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         <div>
           <label className="block text-sm font-medium mb-2">Additional Metadata</label>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Race *</label>
-              <select
-                value={formData.race || 'terran'}
-                onChange={(e) => setFormData({ ...formData, race: e.target.value as Race })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              >
-                <option value="terran">Terran</option>
-                <option value="zerg">Zerg</option>
-                <option value="protoss">Protoss</option>
-              </select>
-            </div>
+            <FormField
+              label="Race"
+              required
+              type="select"
+              options={[
+                { value: 'terran', label: 'Terran' },
+                { value: 'zerg', label: 'Zerg' },
+                { value: 'protoss', label: 'Protoss' },
+              ]}
+              inputProps={{
+                value: formData.race || 'terran',
+                onChange: (e) => updateField('race', e.target.value as Race),
+              }}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1">vs Race *</label>
-              <select
-                value={formData.vsRace || 'terran'}
-                onChange={(e) => setFormData({ ...formData, vsRace: e.target.value as VsRace })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              >
-                <option value="terran">Terran</option>
-                <option value="zerg">Zerg</option>
-                <option value="protoss">Protoss</option>
-                <option value="all">All</option>
-              </select>
-            </div>
+            <FormField
+              label="vs Race"
+              required
+              type="select"
+              options={[
+                { value: 'terran', label: 'Terran' },
+                { value: 'zerg', label: 'Zerg' },
+                { value: 'protoss', label: 'Protoss' },
+                { value: 'all', label: 'All' },
+              ]}
+              inputProps={{
+                value: formData.vsRace || 'terran',
+                onChange: (e) => updateField('vsRace', e.target.value as VsRace),
+              }}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Difficulty *</label>
-              <select
-                value={formData.difficulty || 'basic'}
-                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Difficulty })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              >
-                <option value="basic">Basic</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="expert">Expert</option>
-              </select>
-            </div>
+            <FormField
+              label="Difficulty"
+              required
+              type="select"
+              options={[
+                { value: 'basic', label: 'Basic' },
+                { value: 'intermediate', label: 'Intermediate' },
+                { value: 'expert', label: 'Expert' },
+              ]}
+              inputProps={{
+                value: formData.difficulty || 'basic',
+                onChange: (e) => updateField('difficulty', e.target.value as Difficulty),
+              }}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Patch</label>
-              <input
-                type="text"
-                value={formData.patch || ''}
-                onChange={(e) => setFormData({ ...formData, patch: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                placeholder="5.0.14"
-              />
-            </div>
+            <FormField
+              label="Patch"
+              type="text"
+              inputProps={{
+                value: formData.patch || '',
+                onChange: (e) => updateField('patch', e.target.value),
+                placeholder: '5.0.14',
+              }}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Date</label>
-              <input
-                type="date"
-                value={formData.updatedAt || ''}
-                onChange={(e) => setFormData({ ...formData, updatedAt: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              />
-            </div>
+            <FormField
+              label="Date"
+              type="date"
+              inputProps={{
+                value: formData.updatedAt || '',
+                onChange: (e) => updateField('updatedAt', e.target.value),
+              }}
+            />
           </div>
 
           <MultiCategorySelector
             categories={formData.categories || []}
-            onChange={(categories) => setFormData({ ...formData, categories })}
+            onChange={(categories) => updateField('categories', categories)}
             className="mt-4"
           />
 
-          <div className="mt-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isFree || false}
-                onChange={(e) => setFormData({ ...formData, isFree: e.target.checked })}
-                className="w-4 h-4 border-border rounded"
-              />
-              <span className="text-sm font-medium">Free Content</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Video Selector */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Linked Videos</label>
-          <VideoSelector
-            mode="playlist"
-            selectedVideoIds={formData.videoIds || []}
-            onVideoIdsChange={(videoIds) => setFormData({ ...formData, videoIds })}
-            suggestedTitle={formData.name ? `${formData.name}${formData.coach ? ` - ${formData.coach}` : ''}` : ''}
-            suggestedRace={formData.race}
-            suggestedCoach={formData.coach}
-            suggestedCoachId={formData.coachId}
+          <FormField
+            label="Free Content"
+            type="checkbox"
+            checkboxLabel="Free Content (accessible to all users)"
+            inputProps={{
+              checked: formData.isFree || false,
+              onChange: (e) => updateField('isFree', (e.target as HTMLInputElement).checked),
+            }}
+            helpText="Leave unchecked for premium content (subscribers only). Defaults to premium."
+            className="mt-4"
           />
         </div>
 
-        <div className="flex gap-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Save to Local Storage
-          </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1">
-            Cancel
-          </Button>
-        </div>
+        {/* Video Selector */}
+        <VideoSelector
+          mode="playlist"
+          selectedVideoIds={formData.videoIds || []}
+          onVideoIdsChange={(videoIds) => updateField('videoIds', videoIds)}
+          label="Linked Videos"
+          suggestedTitle={formData.name ? `${formData.name}${formData.coach ? ` - ${formData.coach}` : ''}` : ''}
+          suggestedRace={formData.race}
+          suggestedCoach={formData.coach}
+          suggestedCoachId={formData.coachId}
+        />
 
-        <p className="text-xs text-muted-foreground text-center">
-          Changes are saved to browser storage. Click the commit button to push to GitHub.
-        </p>
+        <EditModalFooter
+          onSave={handleSave}
+          onCancel={onClose}
+          isNew={isNew}
+        />
       </div>
     </Modal>
   );

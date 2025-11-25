@@ -6,7 +6,7 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { useContentFiltering } from '@/lib/filtering/hooks/use-content-filtering';
 import { masterclassFilterConfig } from '@/lib/filtering/configs/masterclass-filters';
-import masterclassesData from '@/data/masterclasses.json';
+import { masterclasses as allMasterclasses } from '@/lib/data';
 import { Masterclass } from '@/types/masterclass';
 import { MasterclassCard } from './masterclass-card';
 import { MasterclassesTable } from './masterclasses-table';
@@ -16,8 +16,6 @@ import { PermissionGate } from '@/components/auth/permission-gate';
 import { MasterclassEditModal } from '@/components/admin/masterclass-edit-modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { toast } from 'sonner';
-
-const allMasterclasses = masterclassesData as Masterclass[];
 
 export function MasterclassesContent() {
   const { data: session } = useSession();

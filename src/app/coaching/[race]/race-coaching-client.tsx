@@ -9,14 +9,11 @@ import { BuildOrderCard } from '@/components/build-orders/build-order-card';
 import { ChevronRight } from 'lucide-react';
 import { MarketingHero } from '@/components/ui/marketing-hero';
 import { SponsorshipSection } from '@/components/sponsorships/sponsorship-section';
-import sponsorshipData from '@/data/sponsorships.json';
-import { SponsorshipData } from '@/types/sponsorship';
+import { sponsorships } from '@/lib/data';
 import type { Coach } from '@/types/coach';
 import type { Video } from '@/types/video';
 import type { Replay } from '@/types/replay';
 import type { BuildOrder } from '@/types/build-order';
-
-const sponsorships = sponsorshipData as SponsorshipData;
 
 interface RaceConfig {
   title: string;

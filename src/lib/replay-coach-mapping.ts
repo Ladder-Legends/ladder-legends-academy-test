@@ -3,10 +3,7 @@
  */
 
 import type { Replay } from '@/types/replay';
-import type { Coach } from '@/types/coach';
-import coachesData from '@/data/coaches.json';
-
-const coaches = coachesData as Coach[];
+import { coaches } from '@/lib/data';
 
 /**
  * Get the coach ID for a replay based on battle tag matching
