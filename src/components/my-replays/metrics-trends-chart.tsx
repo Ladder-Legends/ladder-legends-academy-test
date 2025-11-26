@@ -24,6 +24,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { ReplayIndexEntry } from '@/lib/replay-types';
 import {
@@ -36,6 +43,7 @@ import {
   loadTimeSeriesWithCache,
   isIndexedDBAvailable,
 } from '@/lib/replay-cache';
+import { useMetricsTrendsPreferences } from '@/hooks/use-chart-preferences';
 
 // ============================================================================
 // Types
@@ -44,6 +52,8 @@ import {
 interface MetricsTrendsChartProps {
   replays: ReplayIndexEntry[];
   userId: string;
+  availableMatchups?: string[];  // List of available matchups for filtering
+  availableBuilds?: string[];    // List of available build names for filtering
   className?: string;
   title?: string;
   showWinRate?: boolean;
@@ -168,25 +178,62 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 export function MetricsTrendsChart({
   replays,
   userId,
+  availableMatchups,
+  availableBuilds,
   className,
   title = 'Performance Trends',
   showWinRate = true,
   showSupplyBlockTime = true,
   showProductionIdleTime = true,
 }: MetricsTrendsChartProps) {
-  const [period, setPeriod] = useState<TimePeriod>('weekly');
+  // Use persisted preferences
+  const {
+    period,
+    setPeriod,
+    matchup: selectedMatchup,
+    setMatchup: setSelectedMatchup,
+    build: selectedBuild,
+    setBuild: setSelectedBuild,
+  } = useMetricsTrendsPreferences();
+
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fromCache, setFromCache] = useState(false);
 
+  // Derive available matchups from replays if not provided
+  const matchups = useMemo(() => {
+    if (availableMatchups) return availableMatchups;
+    const unique = new Set(replays.map(r => r.matchup).filter(Boolean));
+    return Array.from(unique).sort();
+  }, [replays, availableMatchups]);
+
+  // Derive available builds from replays if not provided
+  const builds = useMemo(() => {
+    if (availableBuilds) return availableBuilds;
+    const unique = new Set(replays.map(r => r.detected_build).filter(Boolean) as string[]);
+    return Array.from(unique).sort();
+  }, [replays, availableBuilds]);
+
+  // Filter replays based on selection
+  const filteredReplays = useMemo(() => {
+    let result = replays;
+    if (selectedMatchup) {
+      result = result.filter(r => r.matchup === selectedMatchup);
+    }
+    if (selectedBuild) {
+      result = result.filter(r => r.detected_build === selectedBuild);
+    }
+    return result;
+  }, [replays, selectedMatchup, selectedBuild]);
+
   // Extract replay IDs for cache validation
-  const replayIds = useMemo(() => replays.map((r) => r.id), [replays]);
+  const replayIds = useMemo(() => filteredReplays.map((r) => r.id), [filteredReplays]);
 
   // Load data with caching
   const loadData = useCallback(async () => {
     setLoading(true);
 
-    if (replays.length === 0) {
+    if (filteredReplays.length === 0) {
       setTimeSeriesData(null);
       setLoading(false);
       return;
@@ -198,9 +245,9 @@ export function MetricsTrendsChart({
         const result = await loadTimeSeriesWithCache(
           userId,
           period,
-          null, // All matchups
+          selectedMatchup, // Filter by matchup for cache key
           replayIds,
-          () => buildTimeSeriesData(replays, period)
+          () => buildTimeSeriesData(filteredReplays, period)
         );
         setTimeSeriesData(result.data);
         setFromCache(result.fromCache);
@@ -213,7 +260,7 @@ export function MetricsTrendsChart({
 
     // Fallback: compute asynchronously
     buildTimeSeriesDataAsync(
-      replays,
+      filteredReplays,
       period,
       (data) => {
         setTimeSeriesData(data);
@@ -225,7 +272,7 @@ export function MetricsTrendsChart({
         setLoading(false);
       }
     );
-  }, [replays, period, userId, replayIds]);
+  }, [filteredReplays, period, userId, replayIds, selectedMatchup]);
 
   // Load data when dependencies change
   useEffect(() => {
@@ -283,17 +330,63 @@ export function MetricsTrendsChart({
     );
   }
 
+  // Filter dropdowns component
+  const FilterControls = () => (
+    <div className="flex flex-wrap items-center gap-2">
+      {/* Matchup Filter */}
+      {matchups.length > 0 && (
+        <Select
+          value={selectedMatchup || 'all'}
+          onValueChange={(v) => setSelectedMatchup(v === 'all' ? null : v)}
+        >
+          <SelectTrigger className="h-8 w-24 text-xs">
+            <SelectValue placeholder="Matchup" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Matchups</SelectItem>
+            {matchups.map((m) => (
+              <SelectItem key={m} value={m || 'unknown'}>{m || 'Unknown'}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {/* Build Filter */}
+      {builds.length > 0 && (
+        <Select
+          value={selectedBuild || 'all'}
+          onValueChange={(v) => setSelectedBuild(v === 'all' ? null : v)}
+        >
+          <SelectTrigger className="h-8 w-32 text-xs">
+            <SelectValue placeholder="Build" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Builds</SelectItem>
+            {builds.map((b) => (
+              <SelectItem key={b} value={b}>{b}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      <PeriodToggle value={period} onChange={setPeriod} />
+    </div>
+  );
+
   // Render empty state
   if (replays.length === 0 || chartData.length === 0) {
     return (
       <Card className={className}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg">{title}</CardTitle>
-          <PeriodToggle value={period} onChange={setPeriod} />
+          <FilterControls />
         </CardHeader>
         <CardContent>
           <div className="flex h-[300px] items-center justify-center text-muted-foreground">
-            No replay data available for this time period
+            {filteredReplays.length === 0 && (selectedMatchup || selectedBuild)
+              ? 'No replays match the selected filters'
+              : 'No replay data available for this time period'
+            }
           </div>
         </CardContent>
       </Card>
@@ -308,8 +401,13 @@ export function MetricsTrendsChart({
           {fromCache && (
             <span className="text-xs text-muted-foreground">(cached)</span>
           )}
+          {(selectedMatchup || selectedBuild) && (
+            <span className="text-xs text-muted-foreground">
+              ({selectedMatchup}{selectedMatchup && selectedBuild ? ', ' : ''}{selectedBuild})
+            </span>
+          )}
         </div>
-        <PeriodToggle value={period} onChange={setPeriod} />
+        <FilterControls />
       </CardHeader>
       <CardContent>
         {/* Summary Stats */}

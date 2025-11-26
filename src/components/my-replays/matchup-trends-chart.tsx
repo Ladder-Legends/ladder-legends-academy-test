@@ -9,7 +9,7 @@
  * - Matchup selector
  */
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -29,6 +29,8 @@ import {
   buildTimeSeriesData,
   type TimePeriod,
 } from '@/lib/replay-time-series';
+import { normalizeMatchup } from '@/lib/metrics-scoring';
+import { useMatchupTrendsPreferences } from '@/hooks/use-chart-preferences';
 
 // ============================================================================
 // Types
@@ -36,6 +38,7 @@ import {
 
 interface MatchupTrendsChartProps {
   replays: ReplayIndexEntry[];
+  playerRace?: string | null;  // Player's main race for matchup normalization
   className?: string;
   title?: string;
 }
@@ -123,20 +126,43 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
 export function MatchupTrendsChart({
   replays,
+  playerRace,
   className,
   title = 'Win Rate by Matchup',
 }: MatchupTrendsChartProps) {
-  const [period, setPeriod] = useState<TimePeriod>('weekly');
+  // Use persisted preferences
+  const { period, setPeriod } = useMatchupTrendsPreferences();
 
-  // Get unique matchups from replays
+  // Normalize replays with consistent matchup format (player race first)
+  const normalizedReplays = useMemo(() => {
+    if (!playerRace) return replays;
+    return replays.map(r => ({
+      ...r,
+      matchup: normalizeMatchup(r.matchup, playerRace),
+    }));
+  }, [replays, playerRace]);
+
+  // Get unique matchups from normalized replays
   const matchups = useMemo(() => {
-    const unique = new Set(replays.map((r) => r.matchup));
-    return Array.from(unique).sort();
-  }, [replays]);
+    const unique = new Set(normalizedReplays.map((r) => r.matchup));
+    // Sort by player's race first (mirror matches first), then opponent race
+    return Array.from(unique).sort((a, b) => {
+      if (!a || !b) return 0;
+      const [aRace1, aRace2] = a.split('v');
+      const [bRace1, bRace2] = b.split('v');
+      // Mirror matches first (TvT, ZvZ, PvP)
+      const aIsMirror = aRace1 === aRace2;
+      const bIsMirror = bRace1 === bRace2;
+      if (aIsMirror && !bIsMirror) return -1;
+      if (!aIsMirror && bIsMirror) return 1;
+      // Then by opponent race
+      return (aRace2 || '').localeCompare(bRace2 || '');
+    });
+  }, [normalizedReplays]);
 
   // Build data for each matchup
   const chartData = useMemo(() => {
-    if (replays.length === 0 || matchups.length === 0) {
+    if (normalizedReplays.length === 0 || matchups.length === 0) {
       return [];
     }
 
@@ -144,7 +170,7 @@ export function MatchupTrendsChart({
     const matchupData: Record<string, Map<string, { winRate: number; count: number }>> = {};
 
     for (const matchup of matchups) {
-      const matchupReplays = replays.filter((r) => r.matchup === matchup);
+      const matchupReplays = normalizedReplays.filter((r) => r.matchup === matchup);
       const ts = buildTimeSeriesData(matchupReplays, period);
 
       matchupData[matchup] = new Map();
@@ -184,14 +210,14 @@ export function MatchupTrendsChart({
 
       return dataPoint;
     });
-  }, [replays, matchups, period]);
+  }, [normalizedReplays, matchups, period]);
 
   // Calculate overall stats per matchup
   const matchupStats = useMemo(() => {
     const stats: Record<string, { wins: number; total: number; winRate: number }> = {};
 
     for (const matchup of matchups) {
-      const matchupReplays = replays.filter((r) => r.matchup === matchup);
+      const matchupReplays = normalizedReplays.filter((r) => r.matchup === matchup);
       const wins = matchupReplays.filter((r) => r.result === 'Win').length;
       const total = matchupReplays.length;
       stats[matchup] = {
@@ -202,10 +228,10 @@ export function MatchupTrendsChart({
     }
 
     return stats;
-  }, [replays, matchups]);
+  }, [normalizedReplays, matchups]);
 
   // Render empty state
-  if (replays.length === 0 || chartData.length === 0) {
+  if (normalizedReplays.length === 0 || chartData.length === 0) {
     return (
       <Card className={className}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">

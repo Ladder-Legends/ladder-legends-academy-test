@@ -3,10 +3,18 @@
 import { useMemo } from 'react';
 import { UserReplayData, ReplayIndexEntry } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, BarChart3, Calendar, Cog, Eye } from 'lucide-react';
+import { Trophy, TrendingUp, BarChart3, Calendar, Eye, Clock, AlertTriangle } from 'lucide-react';
 import { ThreePillars } from './three-pillars';
 import { MetricsTrendsChart } from './metrics-trends-chart';
 import { MatchupTrendsChart } from './matchup-trends-chart';
+import { GamesPlayedChart } from './games-played-chart';
+import {
+  aggregateMetrics,
+  formatTime,
+  getScoreColorClass,
+  getTimeColorClass,
+  getFullMetricsFromReplay,
+} from '@/lib/metrics-scoring';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
@@ -14,65 +22,17 @@ interface MyReplaysOverviewProps {
   userId?: string;
 }
 
-/**
- * Calculate production score for a replay
- */
-function calculateProductionScore(replay: UserReplayData): number | null {
-  if (replay.comparison?.execution_score != null) {
-    return replay.comparison.execution_score;
-  }
-  return null;
-}
-
-/**
- * Calculate supply score for a replay
- */
-function calculateSupplyScore(replay: UserReplayData): number | null {
-  const economy = replay.fingerprint?.economy;
-  if (!economy) return null;
-
-  const blockCount = economy.supply_block_count;
-  const totalBlockTime = economy.total_supply_block_time;
-
-  if (blockCount == null && totalBlockTime == null) return null;
-
-  let score = 100;
-  let penalty = 0;
-
-  if (blockCount != null) penalty += blockCount * 10;
-  if (totalBlockTime != null) penalty += totalBlockTime * 2;
-
-  if (economy.supply_block_periods?.length) {
-    for (const block of economy.supply_block_periods) {
-      if (block.start < 300) {
-        penalty += (block.duration || 0) * 1;
-      }
-    }
-  }
-
-  score = Math.max(0, score - penalty);
-  return Math.min(100, score);
-}
-
 interface MatchupPillarStats {
   total: number;
   wins: number;
   losses: number;
+  // Time-based metrics (primary)
+  supplyBlockTimes: number[];
+  productionIdleTimes: number[];
+  gameDurations: number[];
+  // Derived scores (secondary)
   productionScores: number[];
   supplyScores: number[];
-}
-
-/**
- * Calculate production idle time from fingerprint (total seconds across all buildings)
- */
-function calculateProductionIdleTime(replay: UserReplayData): number | null {
-  const economy = replay.fingerprint?.economy;
-  if (!economy?.production_by_building) return null;
-
-  const totalIdle = Object.values(economy.production_by_building)
-    .reduce((sum, b) => sum + (b.idle_seconds || 0), 0);
-
-  return totalIdle;
 }
 
 /**
@@ -81,6 +41,7 @@ function calculateProductionIdleTime(replay: UserReplayData): number | null {
 function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   const fp = replay.fingerprint;
   const metadata = fp.metadata;
+  const metrics = getFullMetricsFromReplay(replay);
 
   return {
     id: replay.id,
@@ -96,12 +57,12 @@ function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
     reference_id: null,
     reference_alias: null,
     comparison_score: replay.comparison?.execution_score ?? null,
-    production_score: calculateProductionScore(replay),
-    supply_score: calculateSupplyScore(replay),
+    production_score: metrics.productionScore,
+    supply_score: metrics.supplyScore,
     vision_score: null,
-    // Time-based metrics (seconds)
-    supply_block_time: fp.economy?.total_supply_block_time ?? null,
-    production_idle_time: calculateProductionIdleTime(replay),
+    // Time-based metrics (seconds) - PRIMARY
+    supply_block_time: metrics.supplyBlockTime,
+    production_idle_time: metrics.productionIdleTime,
     detected_build: replay.detection?.build_name ?? null,
     detection_confidence: replay.detection?.confidence ?? null,
   };
@@ -140,10 +101,15 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
     return acc;
   }, {} as Record<string, number>);
 
-  const _playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
-  void _playerRace; // Currently unused - prepared for player race display feature
+  const playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
 
-  // Matchup stats with pillar scores - normalize to show player's race first
+  // Aggregate metrics across all replays
+  const overallMetrics = useMemo(
+    () => aggregateMetrics(activeReplays),
+    [activeReplays]
+  );
+
+  // Matchup stats with time-based metrics (primary) and derived scores (secondary)
   const matchupStats = useMemo(() => {
     return activeReplays.reduce((acc, r) => {
       if (!r.fingerprint.all_players) return acc;
@@ -177,17 +143,42 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
       const normalizedMatchup = `${playerRaceInThisGame[0]}v${opponentRace[0]}`;
 
       if (!acc[normalizedMatchup]) {
-        acc[normalizedMatchup] = { total: 0, wins: 0, losses: 0, productionScores: [], supplyScores: [] };
+        acc[normalizedMatchup] = {
+          total: 0,
+          wins: 0,
+          losses: 0,
+          supplyBlockTimes: [],
+          productionIdleTimes: [],
+          gameDurations: [],
+          productionScores: [],
+          supplyScores: [],
+        };
       }
       acc[normalizedMatchup].total++;
       if (r.fingerprint.metadata.result === 'Win') acc[normalizedMatchup].wins++;
       if (r.fingerprint.metadata.result === 'Loss') acc[normalizedMatchup].losses++;
 
-      // Calculate and store pillar scores
-      const prodScore = calculateProductionScore(r);
-      const supplyScore = calculateSupplyScore(r);
-      if (prodScore !== null) acc[normalizedMatchup].productionScores.push(prodScore);
-      if (supplyScore !== null) acc[normalizedMatchup].supplyScores.push(supplyScore);
+      // Get full metrics for this replay (time-based primary, scores secondary)
+      const metrics = getFullMetricsFromReplay(r);
+
+      // Store time-based metrics (primary)
+      if (metrics.supplyBlockTime !== null) {
+        acc[normalizedMatchup].supplyBlockTimes.push(metrics.supplyBlockTime);
+      }
+      if (metrics.productionIdleTime !== null) {
+        acc[normalizedMatchup].productionIdleTimes.push(metrics.productionIdleTime);
+      }
+      if (metrics.gameDuration > 0) {
+        acc[normalizedMatchup].gameDurations.push(metrics.gameDuration);
+      }
+
+      // Store derived scores (secondary)
+      if (metrics.productionScore !== null) {
+        acc[normalizedMatchup].productionScores.push(metrics.productionScore);
+      }
+      if (metrics.supplyScore !== null) {
+        acc[normalizedMatchup].supplyScores.push(metrics.supplyScore);
+      }
 
       return acc;
     }, {} as Record<string, MatchupPillarStats>);
@@ -243,19 +234,10 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
   // Most played matchup
   const mostPlayedMatchup = Object.entries(matchupStats).sort((a, b) => b[1].total - a[1].total)[0];
 
-  // Helper to get score color class
-  const getScoreColor = (score: number | null) => {
-    if (score === null) return 'text-muted-foreground';
-    if (score >= 85) return 'text-green-500';
-    if (score >= 70) return 'text-yellow-500';
-    if (score >= 50) return 'text-orange-500';
-    return 'text-red-500';
-  };
-
-  // Helper to average an array of scores
-  const avgScore = (scores: number[]): number | null => {
-    if (scores.length === 0) return null;
-    return scores.reduce((a, b) => a + b, 0) / scores.length;
+  // Helper to average an array of numbers
+  const avg = (arr: number[]): number | null => {
+    if (arr.length === 0) return null;
+    return arr.reduce((a, b) => a + b, 0) / arr.length;
   };
 
   return (
@@ -263,7 +245,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
       {/* Three Pillars */}
       <ThreePillars replays={replays} confirmedPlayerNames={confirmedPlayerNames} />
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Row 1: Performance Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -318,26 +300,98 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
         </Card>
       </div>
 
-      {/* Performance Trends (Time-Series) */}
+      {/* Summary Cards - Row 2: Time-Based Metrics (Primary) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Avg Supply Block Time */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Supply Block Time</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline gap-3">
+              <span className={`text-2xl font-bold ${
+                overallMetrics.avgSupplyBlockTime !== null
+                  ? getTimeColorClass(overallMetrics.avgSupplyBlockTime, 600)
+                  : 'text-muted-foreground'
+              }`}>
+                {formatTime(overallMetrics.avgSupplyBlockTime)}
+              </span>
+              {overallMetrics.avgSupplyScore !== null && (
+                <span className={`text-sm ${getScoreColorClass(overallMetrics.avgSupplyScore)}`}>
+                  ({Math.round(overallMetrics.avgSupplyScore)}% score)
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {overallMetrics.avgSupplyBlockPercent !== null
+                ? `${overallMetrics.avgSupplyBlockPercent.toFixed(1)}% of game time blocked`
+                : 'No data yet'
+              }
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Avg Production Idle Time */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Production Idle Time</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline gap-3">
+              <span className={`text-2xl font-bold ${
+                overallMetrics.avgProductionIdleTime !== null
+                  ? getTimeColorClass(overallMetrics.avgProductionIdleTime, 600)
+                  : 'text-muted-foreground'
+              }`}>
+                {formatTime(overallMetrics.avgProductionIdleTime)}
+              </span>
+              {overallMetrics.avgProductionScore !== null && (
+                <span className={`text-sm ${getScoreColorClass(overallMetrics.avgProductionScore)}`}>
+                  ({Math.round(overallMetrics.avgProductionScore)}% score)
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {overallMetrics.avgProductionIdlePercent !== null
+                ? `${overallMetrics.avgProductionIdlePercent.toFixed(1)}% of game time idle`
+                : 'No data yet'
+              }
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Performance Trends (Time-Series) - Full Width */}
       {totalGames >= 3 && userId && (
+        <MetricsTrendsChart
+          replays={indexEntries}
+          userId={userId}
+          title="Performance Trends"
+        />
+      )}
+
+      {/* Games Played + Win Rate by Matchup - Same Row */}
+      {totalGames >= 3 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <MetricsTrendsChart
+          <GamesPlayedChart
             replays={indexEntries}
-            userId={userId}
-            title="Performance Trends"
+            title="Games Played"
           />
           <MatchupTrendsChart
             replays={indexEntries}
+            playerRace={playerRace}
             title="Win Rate by Matchup"
           />
         </div>
       )}
 
-      {/* Matchup Breakdown with Pillar Scores */}
+      {/* Matchup Breakdown with Time-Based Metrics */}
       <Card>
         <CardHeader>
           <CardTitle>Matchup Performance</CardTitle>
-          <CardDescription>Win rate and pillar scores by matchup</CardDescription>
+          <CardDescription>Win rate and macro metrics by matchup (time-based)</CardDescription>
         </CardHeader>
         <CardContent>
           {Object.keys(matchupStats).length === 0 ? (
@@ -348,8 +402,15 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
                 .sort((a, b) => b[1].total - a[1].total)
                 .map(([matchup, stats]) => {
                   const matchupWinRate = (stats.wins / stats.total) * 100;
-                  const prodAvg = avgScore(stats.productionScores);
-                  const supplyAvg = avgScore(stats.supplyScores);
+
+                  // Time-based metrics (primary)
+                  const avgSupplyBlockTime = avg(stats.supplyBlockTimes);
+                  const avgProdIdleTime = avg(stats.productionIdleTimes);
+                  const avgDuration = avg(stats.gameDurations) || 600;
+
+                  // Derived scores (secondary)
+                  const prodScoreAvg = avg(stats.productionScores);
+                  const supplyScoreAvg = avg(stats.supplyScores);
 
                   return (
                     <div key={matchup} className="space-y-3 pb-4 border-b last:border-b-0 last:pb-0">
@@ -371,7 +432,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
                         </div>
                       </div>
 
-                      {/* Pillar Scores Row */}
+                      {/* Time-Based Metrics Row (Primary) */}
                       <div className="grid grid-cols-3 gap-4">
                         {/* Vision - Coming Soon */}
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
@@ -382,25 +443,35 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
                           </div>
                         </div>
 
-                        {/* Production */}
+                        {/* Production Idle Time (Primary) */}
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-                          <Cog className="h-4 w-4" />
+                          <Clock className="h-4 w-4" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Production</p>
-                            <p className={`text-sm font-bold ${getScoreColor(prodAvg)}`}>
-                              {prodAvg !== null ? `${Math.round(prodAvg)}%` : '--'}
+                            <p className="text-xs text-muted-foreground">Prod Idle</p>
+                            <p className={`text-sm font-bold ${getTimeColorClass(avgProdIdleTime, avgDuration)}`}>
+                              {formatTime(avgProdIdleTime)}
                             </p>
+                            {prodScoreAvg !== null && (
+                              <p className={`text-xs ${getScoreColorClass(prodScoreAvg)}`}>
+                                {Math.round(prodScoreAvg)}%
+                              </p>
+                            )}
                           </div>
                         </div>
 
-                        {/* Supply */}
+                        {/* Supply Block Time (Primary) */}
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-                          <BarChart3 className="h-4 w-4" />
+                          <AlertTriangle className="h-4 w-4" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Supply</p>
-                            <p className={`text-sm font-bold ${getScoreColor(supplyAvg)}`}>
-                              {supplyAvg !== null ? `${Math.round(supplyAvg)}%` : '--'}
+                            <p className="text-xs text-muted-foreground">Supply Block</p>
+                            <p className={`text-sm font-bold ${getTimeColorClass(avgSupplyBlockTime, avgDuration)}`}>
+                              {formatTime(avgSupplyBlockTime)}
                             </p>
+                            {supplyScoreAvg !== null && (
+                              <p className={`text-xs ${getScoreColorClass(supplyScoreAvg)}`}>
+                                {Math.round(supplyScoreAvg)}%
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
