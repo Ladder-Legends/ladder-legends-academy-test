@@ -1,14 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
-import { UserReplayData } from '@/lib/replay-types';
+import { UserReplayData, ReplayIndexEntry } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, TrendingUp, BarChart3, Calendar, Cog, Eye } from 'lucide-react';
 import { ThreePillars } from './three-pillars';
+import { MetricsTrendsChart } from './metrics-trends-chart';
+import { MatchupTrendsChart } from './matchup-trends-chart';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
   confirmedPlayerNames?: string[];
+  userId?: string;
 }
 
 /**
@@ -59,7 +62,36 @@ interface MatchupPillarStats {
   supplyScores: number[];
 }
 
-export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyReplaysOverviewProps) {
+/**
+ * Convert UserReplayData to ReplayIndexEntry format for time-series charts
+ */
+function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
+  const fp = replay.fingerprint;
+  const metadata = fp.metadata;
+
+  return {
+    id: replay.id,
+    filename: replay.filename,
+    uploaded_at: replay.uploaded_at,
+    game_date: metadata.game_date,
+    game_type: replay.game_type || metadata.game_type || '1v1',
+    matchup: fp.matchup,
+    result: metadata.result as 'Win' | 'Loss',
+    duration: metadata.duration || 0,
+    map_name: metadata.map,
+    opponent_name: '', // Not needed for charts
+    reference_id: null,
+    reference_alias: null,
+    comparison_score: replay.comparison?.execution_score ?? null,
+    production_score: calculateProductionScore(replay),
+    supply_score: calculateSupplyScore(replay),
+    vision_score: null,
+    detected_build: replay.detection?.build_name ?? null,
+    detection_confidence: replay.detection?.confidence ?? null,
+  };
+}
+
+export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }: MyReplaysOverviewProps) {
   // Filter out observer games (games where we didn't actually play)
   const activeReplays = replays.filter((r) => {
     // If we have all_players data, check if the player was an observer
@@ -70,6 +102,12 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
     // If we don't have all_players data (older replays), include them
     return true;
   });
+
+  // Convert to index entries for time-series charts
+  const indexEntries = useMemo(
+    () => activeReplays.map(toIndexEntry),
+    [activeReplays]
+  );
 
   // Calculate stats
   const totalGames = activeReplays.length;
@@ -263,6 +301,21 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
           </CardContent>
         </Card>
       </div>
+
+      {/* Performance Trends (Time-Series) */}
+      {totalGames >= 3 && userId && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <MetricsTrendsChart
+            replays={indexEntries}
+            userId={userId}
+            title="Performance Trends"
+          />
+          <MatchupTrendsChart
+            replays={indexEntries}
+            title="Win Rate by Matchup"
+          />
+        </div>
+      )}
 
       {/* Matchup Breakdown with Pillar Scores */}
       <Card>

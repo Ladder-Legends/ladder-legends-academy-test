@@ -467,6 +467,7 @@ export function MyReplaysContent() {
       <MyReplaysOverview
         replays={sortedReplays}
         confirmedPlayerNames={userSettings?.confirmed_player_names || []}
+        userId={session?.user?.discordId}
       />
     </>
   );
