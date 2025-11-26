@@ -58,6 +58,71 @@ function aggregateScores(scores: (number | null)[]): number | null {
   return validScores.reduce((sum, s) => sum + s, 0) / validScores.length;
 }
 
+// Helper to create a complete fingerprint with all required fields
+function createFingerprint(overrides: Partial<UserReplayData['fingerprint']> = {}): UserReplayData['fingerprint'] {
+  return {
+    matchup: 'TvP',
+    race: 'Terran',
+    player_name: 'TestPlayer',
+    all_players: [
+      { name: 'TestPlayer', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: null, apm: 100 },
+      { name: 'Opponent', race: 'Protoss', result: 'Loss', team: 2, is_observer: false, mmr: null, apm: 100 },
+    ],
+    metadata: {
+      map: 'Test Map',
+      duration: 600,
+      result: 'Win',
+      opponent_race: 'Protoss',
+      game_type: '1v1',
+      category: 'Ladder',
+      game_date: '2025-01-26T00:00:00Z',
+    },
+    economy: {
+      workers_3min: 12,
+      workers_5min: 29,
+      workers_7min: 48,
+      expansion_count: 2,
+      avg_expansion_timing: 180,
+      supply_block_count: 0,
+      total_supply_block_time: 0,
+    },
+    timings: {},
+    sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+    army_composition: {},
+    production_timeline: {},
+    tactical: {
+      moveout_times: [],
+      first_moveout: null,
+      harass_count: 0,
+      engagement_count: 0,
+      first_engagement: null,
+    },
+    micro: {
+      selection_count: 0,
+      avg_selections_per_min: 0,
+      control_groups_used: 0,
+      most_used_control_group: null,
+      camera_movement_count: 0,
+      avg_camera_moves_per_min: 0,
+    },
+    positioning: {
+      proxy_buildings: 0,
+      avg_building_distance_from_main: null,
+    },
+    ratios: {
+      gas_count: 2,
+      production_count: 4,
+      tech_count: 1,
+      reactor_count: 1,
+      techlab_count: 1,
+      expansions: 2,
+      gas_per_base: 1,
+      production_per_base: 2,
+    },
+    ...overrides,
+  };
+}
+
 // Helper to create minimal replay data
 function createReplay(overrides: Partial<UserReplayData> = {}): UserReplayData {
   return {
@@ -67,28 +132,25 @@ function createReplay(overrides: Partial<UserReplayData> = {}): UserReplayData {
     filename: 'test.SC2Replay',
     detection: null,
     comparison: null,
-    fingerprint: {
-      matchup: 'TvP',
-      race: 'Terran',
-      player_name: 'TestPlayer',
-      metadata: {
-        map: 'Test Map',
-        duration: 600,
-        result: 'Win',
-        opponent_race: 'Protoss',
-      },
-      economy: {
-        workers_3min: 12,
-        workers_5min: 29,
-        workers_7min: 48,
-        supply_block_count: 0,
-        total_supply_block_time: 0,
-      },
-      timings: {},
-      sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
-    },
+    fingerprint: createFingerprint(),
     ...overrides,
-  } as UserReplayData;
+  };
+}
+
+// Helper to create a ComparisonResult with the required structure
+function createComparison(executionScore: number): UserReplayData['comparison'] {
+  return {
+    filename: 'test.SC2Replay',
+    build_name: 'Test Build',
+    build_id: 'test',
+    matchup: 'TvP',
+    execution_score: executionScore,
+    tier: 'B' as const,
+    timing_comparison: {},
+    composition_comparison: {},
+    production_comparison: {},
+    replay_fingerprint: createFingerprint(),
+  };
 }
 
 describe('Production Score Calculation', () => {
@@ -99,49 +161,34 @@ describe('Production Score Calculation', () => {
 
   it('uses comparison execution score when available', () => {
     const replay = createReplay({
-      comparison: {
-        execution_score: 85,
-        deviation_summary: { early: 0, late: 0, very_late: 0, missing: 0 },
-        overall_assessment: 'Good',
-        target_build_id: 'test',
-        target_build_name: 'Test Build',
-        deviations: [],
-        timestamp: '2025-01-26T00:00:00Z',
-      },
+      comparison: createComparison(85),
     });
     expect(calculateProductionScore(replay)).toBe(85);
   });
 
   it('handles execution score of 0', () => {
     const replay = createReplay({
-      comparison: {
-        execution_score: 0,
-        deviation_summary: { early: 0, late: 0, very_late: 0, missing: 10 },
-        overall_assessment: 'Poor',
-        target_build_id: 'test',
-        target_build_name: 'Test Build',
-        deviations: [],
-        timestamp: '2025-01-26T00:00:00Z',
-      },
+      comparison: createComparison(0),
     });
     expect(calculateProductionScore(replay)).toBe(0);
   });
 
   it('handles execution score of 100', () => {
     const replay = createReplay({
-      comparison: {
-        execution_score: 100,
-        deviation_summary: { early: 0, late: 0, very_late: 0, missing: 0 },
-        overall_assessment: 'Perfect',
-        target_build_id: 'test',
-        target_build_name: 'Test Build',
-        deviations: [],
-        timestamp: '2025-01-26T00:00:00Z',
-      },
+      comparison: createComparison(100),
     });
     expect(calculateProductionScore(replay)).toBe(100);
   });
 });
+
+// Base economy fields to merge with test-specific overrides
+const baseEconomy = {
+  workers_3min: 12,
+  workers_5min: 29,
+  workers_7min: 48,
+  expansion_count: 2,
+  avg_expansion_timing: 180,
+};
 
 describe('Supply Score Calculation', () => {
   it('returns null when no economy data', () => {
@@ -153,14 +200,15 @@ describe('Supply Score Calculation', () => {
   it('returns null when no supply block metrics', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
-      workers_3min: 12,
-    } as never;
+      ...baseEconomy,
+    };
     expect(calculateSupplyScore(replay)).toBeNull();
   });
 
   it('returns 100 for no supply blocks', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 0,
       total_supply_block_time: 0,
     };
@@ -170,6 +218,7 @@ describe('Supply Score Calculation', () => {
   it('penalizes supply block count (-10 per block)', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 3,
       total_supply_block_time: 0,
     };
@@ -179,6 +228,7 @@ describe('Supply Score Calculation', () => {
   it('penalizes supply block duration (-2 per second)', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 0,
       total_supply_block_time: 20,
     };
@@ -188,6 +238,7 @@ describe('Supply Score Calculation', () => {
   it('combines block count and duration penalties', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 2, // -20
       total_supply_block_time: 15, // -30
     };
@@ -197,6 +248,7 @@ describe('Supply Score Calculation', () => {
   it('applies early block penalty (before 5 minutes)', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 1,
       total_supply_block_time: 10,
       supply_block_periods: [
@@ -210,6 +262,7 @@ describe('Supply Score Calculation', () => {
   it('does not apply early penalty for late blocks', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 1,
       total_supply_block_time: 10,
       supply_block_periods: [
@@ -223,6 +276,7 @@ describe('Supply Score Calculation', () => {
   it('clamps score to minimum of 0', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: 10, // -100
       total_supply_block_time: 60, // -120
     };
@@ -232,6 +286,7 @@ describe('Supply Score Calculation', () => {
   it('clamps score to maximum of 100', () => {
     const replay = createReplay();
     replay.fingerprint.economy = {
+      ...baseEconomy,
       supply_block_count: -5, // Would add +50 if not handled
       total_supply_block_time: 0,
     };

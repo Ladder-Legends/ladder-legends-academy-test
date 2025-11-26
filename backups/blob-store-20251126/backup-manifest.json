@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-11-26T11:57:59.956Z",
+  "stats": {
+    "totalFiles": 5,
+    "totalBytes": 394752,
+    "successCount": 5,
+    "failedCount": 0,
+    "skippedCount": 0,
+    "failedFiles": []
+  },
+  "duration": "2.9s"
+}

@@ -100,6 +100,43 @@ function calculateMatchupStats(
   }, {} as Record<string, MatchupPillarStats>);
 }
 
+// Base fingerprint fields shared across all test replays
+const baseFingerprint = {
+  timings: {},
+  sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+  army_composition: {},
+  production_timeline: {},
+  tactical: {
+    moveout_times: [],
+    first_moveout: null,
+    harass_count: 0,
+    engagement_count: 0,
+    first_engagement: null,
+  },
+  micro: {
+    selection_count: 0,
+    avg_selections_per_min: 0,
+    control_groups_used: 0,
+    most_used_control_group: null,
+    camera_movement_count: 0,
+    avg_camera_moves_per_min: 0,
+  },
+  positioning: {
+    proxy_buildings: 0,
+    avg_building_distance_from_main: null,
+  },
+  ratios: {
+    gas_count: 2,
+    production_count: 4,
+    tech_count: 1,
+    reactor_count: 1,
+    techlab_count: 1,
+    expansions: 2,
+    gas_per_base: 1,
+    production_per_base: 2,
+  },
+};
+
 // Helper to create test replay with all_players
 function createReplayWithPlayers(
   playerRace: string,
@@ -129,13 +166,24 @@ function createReplayWithPlayers(
     player_name: playerName,
     detection: null,
     comparison: executionScore !== undefined ? {
+      filename: 'test.SC2Replay',
+      build_name: 'Test Build',
+      build_id: 'test',
+      matchup: `${playerRace[0]}v${opponentRace[0]}`,
       execution_score: executionScore,
-      deviation_summary: { early: 0, late: 0, very_late: 0, missing: 0 },
-      overall_assessment: 'Test',
-      target_build_id: 'test',
-      target_build_name: 'Test Build',
-      deviations: [],
-      timestamp: '2025-01-26T00:00:00Z',
+      tier: 'B' as const,
+      timing_comparison: {},
+      composition_comparison: {},
+      production_comparison: {},
+      replay_fingerprint: {
+        matchup: `${playerRace[0]}v${opponentRace[0]}`,
+        race: playerRace,
+        player_name: playerName,
+        all_players: [],
+        metadata: { map: 'Test', duration: 600, result, opponent_race: opponentRace, game_type: '1v1', category: 'Ladder', game_date: '2025-01-26T00:00:00Z' },
+        economy: { workers_3min: 12, workers_5min: 29, workers_7min: 48, expansion_count: 2, avg_expansion_timing: 180 },
+        ...baseFingerprint,
+      },
     } : null,
     fingerprint: {
       matchup: `${playerRace[0]}v${opponentRace[0]}`,
@@ -166,15 +214,22 @@ function createReplayWithPlayers(
         duration: 600,
         result,
         opponent_race: opponentRace,
+        game_type: '1v1',
+        category: 'Ladder',
+        game_date: '2025-01-26T00:00:00Z',
       },
       economy: {
+        workers_3min: 12,
+        workers_5min: 29,
+        workers_7min: 48,
+        expansion_count: 2,
+        avg_expansion_timing: 180,
         supply_block_count: supplyBlocks,
         total_supply_block_time: supplyBlockTime,
       },
-      timings: {},
-      sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+      ...baseFingerprint,
     },
-  } as UserReplayData;
+  };
 }
 
 describe('Matchup Stats Calculation', () => {
@@ -194,11 +249,12 @@ describe('Matchup Stats Calculation', () => {
         matchup: 'TvP',
         race: 'Terran',
         player_name: 'Test',
-        metadata: { map: 'Test', duration: 600, result: 'Win', opponent_race: 'Protoss' },
-        timings: {},
-        sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+        all_players: undefined as never, // Explicitly missing
+        metadata: { map: 'Test', duration: 600, result: 'Win', opponent_race: 'Protoss', game_type: '1v1', category: 'Ladder', game_date: '2025-01-26T00:00:00Z' },
+        economy: { workers_3min: 12, workers_5min: 29, workers_7min: 48, expansion_count: 2, avg_expansion_timing: 180 },
+        ...baseFingerprint,
       },
-    } as UserReplayData;
+    };
     expect(calculateMatchupStats([replay])).toEqual({});
   });
 
@@ -296,12 +352,11 @@ describe('Matchup Stats Calculation', () => {
           { name: 'Player2', race: 'Protoss', result: 'Loss', team: 2, is_observer: false, mmr: null, apm: 100 },
           { name: 'Observer', race: 'Terran', result: 'Win', team: 1, is_observer: true, mmr: null, apm: 0 },
         ],
-        metadata: { map: 'Test', duration: 600, result: 'Win', opponent_race: 'Protoss' },
-        economy: { supply_block_count: 0, total_supply_block_time: 0 },
-        timings: {},
-        sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+        metadata: { map: 'Test', duration: 600, result: 'Win', opponent_race: 'Protoss', game_type: '1v1', category: 'Ladder', game_date: '2025-01-26T00:00:00Z' },
+        economy: { workers_3min: 12, workers_5min: 29, workers_7min: 48, expansion_count: 2, avg_expansion_timing: 180, supply_block_count: 0, total_supply_block_time: 0 },
+        ...baseFingerprint,
       },
-    } as UserReplayData;
+    };
 
     // Observer shouldn't find opponents on a different team
     const stats = calculateMatchupStats([replay], ['Observer']);

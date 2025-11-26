@@ -1,12 +1,13 @@
 /**
  * Backup Vercel Blob Store
- * Downloads all replay files from Vercel Blob to a local directory
+ * Downloads ALL files from Vercel Blob to a local directory
+ * Includes: user-replays, metrics, thumbnails, and any other content
  *
  * Usage:
  *   npx tsx scripts/backup-blob-store.ts [output-dir]
  *
  * Example:
- *   npx tsx scripts/backup-blob-store.ts ./backups/replays-2025-01-26
+ *   npx tsx scripts/backup-blob-store.ts ./backups/2025-11-26
  */
 import 'dotenv/config';
 import { config } from 'dotenv';
@@ -26,6 +27,7 @@ interface BackupStats {
   failedCount: number;
   skippedCount: number;
   failedFiles: string[];
+  byCategory: Record<string, { count: number; bytes: number }>;
 }
 
 async function downloadFile(url: string, destPath: string): Promise<boolean> {
@@ -46,9 +48,14 @@ async function downloadFile(url: string, destPath: string): Promise<boolean> {
     fs.writeFileSync(destPath, Buffer.from(buffer));
     return true;
   } catch (error) {
-    console.error(`  ❌ Failed to download: ${error}`);
+    console.error(`  Failed to download: ${error}`);
     return false;
   }
+}
+
+function getCategoryFromPath(pathname: string): string {
+  const parts = pathname.split('/');
+  return parts[0] || 'root';
 }
 
 async function backupBlobStore(outputDir: string): Promise<BackupStats> {
@@ -59,13 +66,14 @@ async function backupBlobStore(outputDir: string): Promise<BackupStats> {
     failedCount: 0,
     skippedCount: 0,
     failedFiles: [],
+    byCategory: {},
   };
 
-  console.log('🔍 Scanning Vercel Blob Store...\n');
+  console.log('Scanning Vercel Blob Store (ALL content)...\n');
 
   // Check token
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.error('❌ BLOB_READ_WRITE_TOKEN not found');
+    console.error('BLOB_READ_WRITE_TOKEN not found');
     console.log('Run: vercel env pull .env.production.local --environment=production');
     process.exit(1);
   }
@@ -75,20 +83,36 @@ async function backupBlobStore(outputDir: string): Promise<BackupStats> {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  // List all blobs (paginated)
+  // List ALL blobs (no prefix filter - gets everything)
   let cursor: string | undefined;
-  const allBlobs: Array<{ url: string; pathname: string; size: number }> = [];
+  const allBlobs: Array<{ url: string; pathname: string; size: number; uploadedAt: Date }> = [];
 
   do {
-    const result = await list({ prefix: 'user-replays/', limit: 1000, cursor });
+    const result = await list({ limit: 1000, cursor });
     allBlobs.push(...result.blobs);
     cursor = result.cursor;
+    console.log(`  Fetched ${allBlobs.length} blobs so far...`);
   } while (cursor);
 
   stats.totalFiles = allBlobs.length;
   stats.totalBytes = allBlobs.reduce((sum, b) => sum + b.size, 0);
 
-  console.log(`📦 Found ${stats.totalFiles} files (${(stats.totalBytes / 1024 / 1024).toFixed(2)} MB)\n`);
+  // Categorize blobs
+  for (const blob of allBlobs) {
+    const category = getCategoryFromPath(blob.pathname);
+    if (!stats.byCategory[category]) {
+      stats.byCategory[category] = { count: 0, bytes: 0 };
+    }
+    stats.byCategory[category].count++;
+    stats.byCategory[category].bytes += blob.size;
+  }
+
+  console.log(`\nFound ${stats.totalFiles} files (${(stats.totalBytes / 1024 / 1024).toFixed(2)} MB)\n`);
+  console.log('Categories:');
+  for (const [category, data] of Object.entries(stats.byCategory).sort((a, b) => b[1].bytes - a[1].bytes)) {
+    console.log(`  ${category}: ${data.count} files (${(data.bytes / 1024 / 1024).toFixed(2)} MB)`);
+  }
+  console.log('');
 
   if (stats.totalFiles === 0) {
     console.log('No files to backup.');
@@ -105,13 +129,13 @@ async function backupBlobStore(outputDir: string): Promise<BackupStats> {
     if (fs.existsSync(destPath)) {
       const existingStat = fs.statSync(destPath);
       if (existingStat.size === blob.size) {
-        console.log(`${progress} ⏭️  Skipping (exists): ${blob.pathname}`);
+        console.log(`${progress} Skipping (exists): ${blob.pathname}`);
         stats.skippedCount++;
         continue;
       }
     }
 
-    console.log(`${progress} 📥 Downloading: ${blob.pathname} (${(blob.size / 1024).toFixed(1)} KB)`);
+    console.log(`${progress} Downloading: ${blob.pathname} (${(blob.size / 1024).toFixed(1)} KB)`);
 
     const success = await downloadFile(blob.url, destPath);
     if (success) {
