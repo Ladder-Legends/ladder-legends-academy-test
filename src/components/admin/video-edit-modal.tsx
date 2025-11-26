@@ -366,7 +366,10 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
             onVideoIdsChange={(videoIds) => updateField('videoIds', videoIds)}
             label="Playlist Videos"
             suggestedTitle={formData.title}
-            allowCreate={false}
+            suggestedRace={formData.race}
+            suggestedCoach={formData.coach}
+            suggestedCoachId={formData.coachId}
+            allowCreate={true}
             allowReorder={true}
           />
         ) : formData.source === 'mux' ? (
