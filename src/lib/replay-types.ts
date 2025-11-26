@@ -317,19 +317,19 @@ export interface PlayerMetrics {
   build_fingerprint: string;
 
   // Production metrics
-  production_score: number;
-  production_idle_total: number;
-  production_idle_percent: number;
+  production_score: number | null;
+  production_idle_total: number | null;
+  production_idle_percent: number | null;
 
   // Supply metrics
-  supply_score: number;
-  supply_block_total: number;
-  supply_block_count: number;
-  supply_block_percent: number;
+  supply_score: number | null;
+  supply_block_total: number | null;
+  supply_block_count: number | null;
+  supply_block_percent: number | null;
 
   // Resource metrics
-  avg_mineral_float: number;
-  avg_gas_float: number;
+  avg_mineral_float: number | null;
+  avg_gas_float: number | null;
 
   // Zerg-specific inject metrics (null for non-Zerg)
   inject_idle_total: number | null;
@@ -345,6 +345,17 @@ export interface PlayerMetrics {
   // Full fingerprint analysis data (includes timings, sequences, tactical, etc.)
   // Uses ReplayFingerprint for compatibility with existing storage format
   fingerprint?: ReplayFingerprint;
+
+  // Enhanced metrics from sc2reader processor (Phase 10-12)
+  // These are used to populate fingerprint.economy for storage
+  supply_block_events?: SupplyBlockEvent[];
+  production_by_building?: Record<string, {
+    count: number;
+    idle_seconds: number;
+  }>;
+  building_timings?: Record<string, number | null>;
+  supply_at_checkpoints?: Record<string, number>;
+  workers_at_checkpoints?: Record<string, number>;
 }
 
 /**
@@ -615,6 +626,7 @@ export interface SupplyBlockEvent {
   time: number;      // timestamp in seconds
   duration: number;  // seconds
   supply: number;    // supply level when blocked
+  cap?: number;      // supply cap when blocked (optional for backwards compat)
 }
 
 /**

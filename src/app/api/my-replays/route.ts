@@ -249,10 +249,34 @@ export async function POST(request: NextRequest) {
     ) as MetricsResponse;
 
     // Transform metrics response to player_fingerprints format for storage
+    // IMPORTANT: Merge production metrics from processor into fingerprint.economy
     const player_fingerprints: Record<string, ReplayFingerprint> = {};
     for (const [_pid, playerData] of Object.entries(metricsResponse.players)) {
       if (playerData.fingerprint) {
-        player_fingerprints[playerData.name] = playerData.fingerprint;
+        const fp = { ...playerData.fingerprint };
+
+        // Merge production_by_building from processor into fingerprint.economy
+        // This data comes from ReplayProcessor but fingerprint.py doesn't include it
+        if (playerData.production_by_building && fp.economy) {
+          fp.economy = {
+            ...fp.economy,
+            production_by_building: playerData.production_by_building,
+          };
+        }
+
+        // Also merge supply_block_events for detailed timeline (convert format)
+        if (playerData.supply_block_events && fp.economy) {
+          fp.economy = {
+            ...fp.economy,
+            supply_block_periods: playerData.supply_block_events.map(e => ({
+              start: e.time,
+              end: e.time + e.duration,
+              duration: e.duration,
+            })),
+          };
+        }
+
+        player_fingerprints[playerData.name] = fp;
       }
     }
 
