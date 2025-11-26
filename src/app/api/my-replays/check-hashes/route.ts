@@ -71,14 +71,21 @@ export async function POST(request: NextRequest) {
     console.log(`📊 [CHECK-HASHES] User ${discordId} checking ${hashes.length} hashes`);
 
     const newHashes = await hashManifestManager.checkHashes(discordId, hashes);
+    const manifestVersion = await hashManifestManager.getManifestVersion(discordId);
 
     const response = {
       new_hashes: newHashes,
       existing_count: hashes.length - newHashes.length,
       total_submitted: hashes.length,
+      /**
+       * Manifest version - incrementing this signals uploaders to clear their local
+       * hash cache and re-upload. This happens when replays are bulk-deleted on the
+       * server and need to be re-uploaded (e.g., after cleanup of non-blob replays).
+       */
+      manifest_version: manifestVersion,
     };
 
-    console.log(`✅ [CHECK-HASHES] Response: ${newHashes.length} new, ${response.existing_count} existing`);
+    console.log(`✅ [CHECK-HASHES] Response: ${newHashes.length} new, ${response.existing_count} existing, version ${manifestVersion}`);
 
     return NextResponse.json(response);
   } catch (error) {

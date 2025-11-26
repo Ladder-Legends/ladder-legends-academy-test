@@ -40,6 +40,10 @@ export interface Replay {
 
   // Access control: undefined or false = premium (default), true = free
   isFree?: boolean;
+
+  // Coach replay fingerprints are stored in Vercel Blob, not in JSON
+  // Path: coach-fingerprints/{replayId}.json
+  // This avoids bloating the JSON file during static rendering
 }
 
 /**

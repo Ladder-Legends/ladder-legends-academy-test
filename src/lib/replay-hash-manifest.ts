@@ -13,6 +13,12 @@ export interface HashManifest {
   updated_at: string;
   hashes: Record<string, ReplayHash>;
   total_count: number;
+  /**
+   * Version number incremented when bulk operations require uploaders to re-sync.
+   * When manifest_version > uploader's local version, uploader should clear local
+   * cache and download fresh manifest.
+   */
+  manifest_version: number;
 }
 
 export class HashManifestManager {
@@ -151,12 +157,64 @@ export class HashManifestManager {
     }
   }
 
+  /**
+   * Remove a hash from the manifest
+   */
+  async removeHash(discordUserId: string, hash: string): Promise<void> {
+    const manifest = await this.loadManifest(discordUserId);
+
+    if (!manifest.hashes[hash]) {
+      console.log(`ℹ️  Hash ${hash} not in manifest, nothing to remove`);
+      return;
+    }
+
+    delete manifest.hashes[hash];
+    await this.saveManifest(manifest);
+    console.log(`🗑️  Removed hash ${hash} from manifest for user ${discordUserId}`);
+  }
+
+  /**
+   * Remove multiple hashes and increment manifest version to trigger uploader re-sync
+   */
+  async removeHashesAndBumpVersion(
+    discordUserId: string,
+    hashes: string[]
+  ): Promise<{ removedCount: number; newVersion: number }> {
+    const manifest = await this.loadManifest(discordUserId);
+
+    let removedCount = 0;
+    for (const hash of hashes) {
+      if (manifest.hashes[hash]) {
+        delete manifest.hashes[hash];
+        removedCount++;
+      }
+    }
+
+    if (removedCount > 0) {
+      // Increment version to signal uploaders to re-sync
+      manifest.manifest_version = (manifest.manifest_version || 0) + 1;
+      await this.saveManifest(manifest);
+      console.log(`🗑️  Removed ${removedCount} hashes and bumped manifest version to ${manifest.manifest_version}`);
+    }
+
+    return { removedCount, newVersion: manifest.manifest_version || 0 };
+  }
+
+  /**
+   * Get current manifest version (for uploader sync check)
+   */
+  async getManifestVersion(discordUserId: string): Promise<number> {
+    const manifest = await this.loadManifest(discordUserId);
+    return manifest.manifest_version || 0;
+  }
+
   private createEmptyManifest(discordUserId: string): HashManifest {
     return {
       discord_user_id: discordUserId,
       updated_at: new Date().toISOString(),
       hashes: {},
       total_count: 0,
+      manifest_version: 0,
     };
   }
 }
