@@ -183,7 +183,10 @@ export function normalizeFingerprint(
     matchup: v0.matchup,
     race: v0.race,
     player_name: v0.player_name || 'Unknown',
-    all_players: v0.all_players || [],
+    all_players: (v0.all_players || []).map((p) => ({
+      ...p,
+      is_observer: p.is_observer ?? false,
+    })),
     metadata: {
       map: v0.metadata.map,
       duration: v0.metadata.duration,

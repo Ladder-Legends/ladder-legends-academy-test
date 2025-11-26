@@ -72,7 +72,7 @@ if errors:
   // Test 2: Invalid fingerprint (bad matchup)
   console.log('\nTest 2: Invalid fingerprint (bad matchup)');
   const invalidMock = createMockFingerprint();
-  // @ts-expect-error - intentionally testing invalid data
+  // TypeScript allows this since matchup is typed as string, but JSON Schema will reject it
   invalidMock.matchup = 'INVALID';
   const tsResult2 = validateFingerprint(invalidMock);
   console.log(`  TypeScript validation: ${tsResult2.valid ? 'FAIL (should be invalid)' : 'PASS (correctly invalid)'}`);

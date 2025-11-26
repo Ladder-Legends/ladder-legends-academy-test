@@ -170,23 +170,29 @@ export function createMockFingerprint(
 /**
  * Deep merge two objects
  */
-function deepMerge<T extends Record<string, unknown>>(
-  target: T,
-  source: Partial<T>
-): T {
+function deepMerge(
+  target: ReplayFingerprint,
+  source: Partial<ReplayFingerprint>
+): ReplayFingerprint {
   const result = { ...target };
-  for (const key in source) {
+  for (const key of Object.keys(source) as Array<keyof ReplayFingerprint>) {
+    const sourceVal = source[key];
     if (
-      source[key] &&
-      typeof source[key] === 'object' &&
-      !Array.isArray(source[key])
+      sourceVal &&
+      typeof sourceVal === 'object' &&
+      !Array.isArray(sourceVal)
     ) {
-      result[key] = deepMerge(
-        (target[key] || {}) as Record<string, unknown>,
-        source[key] as Record<string, unknown>
-      ) as T[typeof key];
-    } else if (source[key] !== undefined) {
-      result[key] = source[key] as T[typeof key];
+      const targetVal = target[key];
+      if (targetVal && typeof targetVal === 'object' && !Array.isArray(targetVal)) {
+        // @ts-expect-error - deep merge of complex nested types
+        result[key] = { ...targetVal, ...sourceVal };
+      } else {
+        // @ts-expect-error - deep merge of complex nested types
+        result[key] = sourceVal;
+      }
+    } else if (sourceVal !== undefined) {
+      // @ts-expect-error - assigning partial override
+      result[key] = sourceVal;
     }
   }
   return result;

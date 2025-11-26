@@ -30,8 +30,7 @@ describe('Fingerprint Schema Validation', () => {
 
     it('fails on invalid matchup format', () => {
       const fingerprint = createMockFingerprint();
-      // @ts-expect-error - intentionally testing invalid data
-      fingerprint.matchup = 'InvalidMatchup';
+      (fingerprint as { matchup: string }).matchup = 'InvalidMatchup';
       const result = validateFingerprint(fingerprint);
       expect(result.valid).toBe(false);
       expect(result.errors?.some((e) => e.includes('matchup'))).toBe(true);
@@ -48,7 +47,7 @@ describe('Fingerprint Schema Validation', () => {
 
     it('fails on invalid race value', () => {
       const fingerprint = createMockFingerprint();
-      // @ts-expect-error - intentionally testing invalid data
+      // TypeScript allows this since race is typed as string, but JSON Schema will reject it
       fingerprint.race = 'InvalidRace';
       const result = validateFingerprint(fingerprint);
       expect(result.valid).toBe(false);
