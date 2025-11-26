@@ -136,6 +136,17 @@ function calculateTotalIdleTime(replays: UserReplayData[]): number | null {
 }
 
 /**
+ * Calculate total game time across all replays
+ * Returns total seconds of gameplay
+ */
+function calculateTotalGameTime(replays: UserReplayData[]): number {
+  return replays.reduce((sum, r) => {
+    const duration = r.fingerprint?.metadata?.duration || 0;
+    return sum + duration;
+  }, 0);
+}
+
+/**
  * Calculate total supply block time
  * Returns total across all games (not average)
  */
@@ -176,10 +187,12 @@ function formatTimeValue(seconds: number): string {
 function ProductionTooltipContent({
   avgScore,
   totalIdleTime,
+  totalGameTime,
   gameCount,
 }: {
   avgScore: number | null;
   totalIdleTime: number | null;
+  totalGameTime: number;
   gameCount: number;
 }) {
   return (
@@ -190,13 +203,17 @@ function ProductionTooltipContent({
           {formatTimeValue(totalIdleTime)} total idle across {gameCount} game{gameCount !== 1 ? 's' : ''}
         </p>
       )}
+      {totalGameTime > 0 && (
+        <p className="text-sm text-muted-foreground">
+          {formatTimeValue(totalGameTime)} total playtime
+        </p>
+      )}
       <div className="border-t pt-2 mt-2">
-        <p className="text-xs font-medium mb-1">Score based on:</p>
+        <p className="text-xs font-medium mb-1">Note:</p>
         <ul className="text-xs text-muted-foreground space-y-0.5">
-          <li>% of game spent with idle production</li>
+          <li>Idle time is summed across ALL production buildings</li>
+          <li>5 idle Barracks for 1 min = 5 min idle</li>
           <li>Lower idle % = higher score</li>
-          <li>10% idle ≈ 80% score</li>
-          <li>20% idle ≈ 60% score</li>
         </ul>
       </div>
     </div>
@@ -267,17 +284,22 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   const totalIdleTime = useMemo(() => calculateTotalIdleTime(activeReplays), [activeReplays]);
   const totalBlockTime = useMemo(() => calculateTotalSupplyBlockTime(activeReplays), [activeReplays]);
   const avgSupplyBlocks = useMemo(() => calculateAvgSupplyBlocks(activeReplays), [activeReplays]);
+  const totalGameTime = useMemo(() => calculateTotalGameTime(activeReplays), [activeReplays]);
 
-  // Production subtitle - show total time if available
+  // Production subtitle - show total time with game time context if available
   const productionSubtitle = totalIdleTime !== null
-    ? `${formatTime(totalIdleTime)} total idle`
+    ? totalGameTime > 0
+      ? `${formatTime(totalIdleTime)} idle / ${formatTime(totalGameTime)} played`
+      : `${formatTime(totalIdleTime)} total idle`
     : productionScore !== null
       ? 'Based on execution'
       : 'No data yet';
 
-  // Supply subtitle - show total time when available
+  // Supply subtitle - show total time with game time context when available
   const supplySubtitle = totalBlockTime !== null
-    ? `${formatTime(totalBlockTime)} total blocked`
+    ? totalGameTime > 0
+      ? `${formatTime(totalBlockTime)} blocked / ${formatTime(totalGameTime)} played`
+      : `${formatTime(totalBlockTime)} total blocked`
     : supplyScore !== null
       ? 'Calculated from replays'
       : 'No data yet';
@@ -304,6 +326,7 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
             <ProductionTooltipContent
               avgScore={productionScore}
               totalIdleTime={totalIdleTime}
+              totalGameTime={totalGameTime}
               gameCount={gameCount}
             />
           }
