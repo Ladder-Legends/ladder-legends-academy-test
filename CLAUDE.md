@@ -4,6 +4,85 @@ This file tracks technical debt, improvements, and future work for the Ladder Le
 
 ---
 
+## ARCHITECTURE PRIORITIES
+
+When making architectural decisions, prioritize in this order:
+
+### 1. Data Storage & Retrieval Costs
+- **Vercel Blob Store**: Minimize read/write operations. Blob storage is charged per operation and bandwidth.
+- **Vercel KV (Redis)**: Use indexes to avoid fetching full data when listing. Single KV read for index vs. N reads for individual items.
+- **Caching Strategy**: Cache expensive computations client-side (IndexedDB) when possible.
+
+### 2. Indexes for Performance
+- **Replay Index Pattern**: Store lightweight index entries (~500 bytes each) separately from full replay data (~10KB each).
+- **Single Read List View**: `GET /api/my-replays/index` returns all entries in one KV read vs. N reads for full data.
+- **Lazy Load Details**: Full replay data fetched only when user drills into detail view.
+- **Version Tracking**: Include `version` and `last_updated` in indexes to detect staleness.
+
+### 3. Speedy UI
+- **Client-side Filtering/Sorting**: Index data is small enough to filter/sort client-side.
+- **Memoization**: Use `useMemo` for expensive aggregation calculations.
+- **Virtual Scrolling**: Implement for lists > 50 items.
+- **Loading Skeletons**: Show skeleton UI while data loads.
+- **Optimistic Updates**: Update UI immediately, sync in background.
+
+### 4. Minimal Vercel Compute Costs
+- **Hobby Tier**: 10s serverless timeout - keep API responses fast.
+- **Incremental Updates**: Index updates are single-entry operations, not full rebuilds.
+- **Client-side Aggregations**: Calculate win rates, averages, etc. from index data in browser.
+- **Offload Heavy Work**: sc2reader (Python) handles replay analysis separately.
+- **Background Jobs**: Use for migrations and non-critical operations.
+
+### 5. Consistency & Maintainability
+- **DRY Code**: Extract reusable hooks, components, and utilities.
+- **Type Safety**: Full TypeScript types for all data structures.
+- **Atomic Operations**: Update related data together (index + full data).
+- **Rollback Support**: On failure, clean up partial writes.
+- **Version Control**: Track schema versions for migrations.
+
+---
+
+## ACTIVE FEATURE DEVELOPMENT
+
+### Phase 10-12: My Replays UI Enhancement ✅ COMPLETE (2025-11-25)
+
+**Detailed Plan:** [`docs/PHASE-10-12-PLAN.md`](docs/PHASE-10-12-PLAN.md)
+
+**Summary:**
+- **Three Pillars Framework**: Vision (TODO), Production, Supply
+- **Reference Replay System**: Upload/select benchmarks per matchup with aliases
+- **Comparison Framework**: Phase-based scoring, timing comparisons, production timeline
+- **Performance**: Replay index for lightweight list view, lazy loading
+
+**Progress (Completed 2025-11-25):**
+- [x] Fix "NaN% confidence" bug in build detection display
+- [x] Create ReplayIndexEntry types in `src/lib/replay-types.ts`
+- [x] Implement replay index API (`GET/POST /api/my-replays/index`)
+- [x] Add tests for replay index API (11 tests passing)
+- [x] Update sc2reader with enhanced metrics
+- [x] Create Reference Replay system types and APIs
+- [x] Build Three Pillars UI components
+- [x] Create Overview Dashboard enhancements
+- [x] Build Replay Detail Page with tabs
+
+**Components Created:**
+- `src/components/my-replays/assign-reference-dropdown.tsx` - Reference build selector by matchup
+- `src/components/my-replays/production-breakdown.tsx` - Per-building production stats, macro ability efficiency
+- `src/components/my-replays/supply-breakdown.tsx` - Supply block events, timeline visualization, checkpoints
+- `src/components/my-replays/build-comparison.tsx` - Side-by-side timing comparison with deviation badges
+
+**Type Extensions:**
+- Extended `ReplayFingerprint.economy` in `src/lib/replay-types.ts` with:
+  - `production_by_building` - Per-structure production tracking
+  - `supply_at_checkpoints` - Supply values at time intervals
+  - `mule_count/mule_possible/mule_efficiency` - Terran macro tracking
+  - `inject_efficiency` - Zerg macro tracking
+  - `chrono_efficiency` - Protoss macro tracking
+
+**All 775 tests passing. 0 lint errors.**
+
+---
+
 ## COMPREHENSIVE CLEANUP PLAN (Updated 2025-11-24)
 
 This plan covers all three interconnected codebases: Academy (Next.js), sc2reader (Python), and Uploader (Tauri/Rust).
@@ -342,6 +421,17 @@ This plan covers all three interconnected codebases: Academy (Next.js), sc2reade
 ## Notes
 
 ### Recent Changes (2025-11-25)
+- ✅ **Phase 10-12: My Replays UI Enhancement (Complete)**
+  - Created 4 new replay analysis components:
+    - `assign-reference-dropdown.tsx` - Reference build selector
+    - `production-breakdown.tsx` - Building production stats, macro efficiency
+    - `supply-breakdown.tsx` - Supply block timeline and checkpoints
+    - `build-comparison.tsx` - Timing deviation comparison
+  - Extended ReplayFingerprint.economy types for enhanced metrics
+  - Integrated components into replay detail page with tabs
+  - Added Reference Replay API and mock functions
+  - All 775 tests passing
+
 - ✅ **Uploader lib.rs module refactor**
   - Reduced lib.rs from 1,348 to 332 lines (76% reduction)
   - Created `commands/` directory with 10 focused modules

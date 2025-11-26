@@ -1,18 +1,18 @@
 /**
  * SC2 Replay Analyzer API Client
  *
- * TypeScript client for interacting with the FastAPI that analyzes SC2 replay files.
- * Returns build orders, metadata, fingerprints, build detection, and comparisons.
+ * TypeScript client for interacting with the sc2reader FastAPI service.
+ * Primary method is extractMetrics() which returns comprehensive analysis data.
  */
 
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import type {
-  ReplayFingerprint,
   BuildDetection,
   ComparisonResult,
   LearnedBuild,
-  AllPlayersFingerprint,
+  MetricsResponse,
+  SinglePlayerMetricsResponse,
 } from './replay-types';
 
 // API Response Types
@@ -106,48 +106,6 @@ export class SC2ReplayAPIClient {
   }
 
   /**
-   * Analyze an SC2 replay file
-   * @param file - The .SC2Replay file to analyze
-   * @returns Promise with replay metadata and build orders
-   */
-  async analyzeReplay(file: File): Promise<SC2AnalysisResponse> {
-    // Validate file extension
-    if (!file.name.endsWith('.SC2Replay')) {
-      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
-    }
-
-    // Convert File to Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Use form-data package (works properly with Next.js)
-    const formData = new FormData();
-    formData.append('file', buffer, {
-      filename: file.name,
-      contentType: 'application/octet-stream',
-    });
-
-    try {
-      const response = await axios.post(`${this.config.apiUrl}/analyze`, formData, {
-        headers: {
-          ...formData.getHeaders(),
-          'X-API-Key': this.config.apiKey,
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-      });
-
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        throw await this.handleAxiosError(error);
-      }
-      if (error instanceof Error) throw error;
-      throw new Error('Failed to analyze replay. Please try again.');
-    }
-  }
-
-  /**
    * Check if the API is healthy
    * @returns Promise<boolean>
    */
@@ -164,22 +122,28 @@ export class SC2ReplayAPIClient {
   }
 
   /**
-   * Extract comprehensive fingerprint from a replay
+   * Extract comprehensive metrics from a replay (UNIFIED ENDPOINT)
+   *
+   * This is the preferred method for getting all replay analysis data.
+   * Returns production, supply, resource metrics AND fingerprint data (timings, sequences, tactical, etc.)
+   *
    * @param blob - The .SC2Replay file as a Blob
-   * @param playerName - Optional player name to analyze
+   * @param playerName - Optional player name to analyze (returns single player if specified)
    * @param filename - Filename for the blob (defaults to 'replay.SC2Replay')
-   * @returns Promise with replay fingerprint
+   * @returns Promise with comprehensive metrics for all players (or single player if playerName specified)
    */
-  async extractFingerprint(blob: Blob, playerName?: string, filename: string = 'replay.SC2Replay'): Promise<ReplayFingerprint> {
+  async extractMetrics(
+    blob: Blob,
+    playerName?: string,
+    filename: string = 'replay.SC2Replay'
+  ): Promise<MetricsResponse | SinglePlayerMetricsResponse> {
     if (!filename.endsWith('.SC2Replay')) {
       throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
     }
 
-    // Convert Blob to Buffer
     const arrayBuffer = await blob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Use form-data package (works properly with Next.js)
     const formData = new FormData();
     formData.append('file', buffer, {
       filename,
@@ -191,7 +155,7 @@ export class SC2ReplayAPIClient {
 
     try {
       const response = await withTimeout(
-        axios.post(`${this.config.apiUrl}/fingerprint`, formData, {
+        axios.post(`${this.config.apiUrl}/metrics`, formData, {
           headers: {
             ...formData.getHeaders(),
             'X-API-Key': this.config.apiKey,
@@ -200,68 +164,16 @@ export class SC2ReplayAPIClient {
           maxBodyLength: Infinity,
         }),
         API_TIMEOUT_MS,
-        'Fingerprint extraction'
+        'Metrics extraction'
       );
 
-      return response.data.fingerprint;
+      return response.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         throw await this.handleAxiosError(error);
       }
       if (error instanceof Error) throw error;
-      throw new Error('Failed to extract fingerprint. Please try again.');
-    }
-  }
-
-  /**
-   * Extract comprehensive fingerprints for ALL players in the replay
-   * @param blob - The .SC2Replay file as a Blob
-   * @param suggestedPlayerName - Optional player name hint for uploader detection
-   * @param filename - Filename for the blob (defaults to 'replay.SC2Replay')
-   * @returns Promise with fingerprints for all players
-   */
-  async extractAllPlayersFingerprints(
-    blob: Blob,
-    suggestedPlayerName?: string,
-    filename: string = 'replay.SC2Replay'
-  ): Promise<AllPlayersFingerprint> {
-    if (!filename.endsWith('.SC2Replay')) {
-      throw new Error('Invalid file type. Only .SC2Replay files are allowed.');
-    }
-
-    const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const formData = new FormData();
-    formData.append('file', buffer, {
-      filename,
-      contentType: 'application/octet-stream',
-    });
-    if (suggestedPlayerName) {
-      formData.append('player_name', suggestedPlayerName);
-    }
-
-    try {
-      const response = await withTimeout(
-        axios.post(`${this.config.apiUrl}/fingerprint-all`, formData, {
-          headers: {
-            ...formData.getHeaders(),
-            'X-API-Key': this.config.apiKey,
-          },
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        }),
-        API_TIMEOUT_MS,
-        'All players fingerprint extraction'
-      );
-
-      return response.data as AllPlayersFingerprint;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        throw await this.handleAxiosError(error);
-      }
-      if (error instanceof Error) throw error;
-      throw new Error('Failed to extract fingerprints. Please try again.');
+      throw new Error('Failed to extract metrics. Please try again.');
     }
   }
 

@@ -104,7 +104,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         },
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [event, isNew, isOpen, userTimezone, timezoneLoading, defaultCoach]);
 
   const updateField = <K extends keyof Event>(field: K, value: Event[K]) => {

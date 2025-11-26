@@ -64,6 +64,24 @@ export interface ReplayFingerprint {
       warning_time: number;
       problem_time: number;
     };
+    // Production breakdown by building type (future: from enhanced sc2reader)
+    production_by_building?: Record<string, {
+      count: number;
+      idle_seconds: number;
+      production_cycles?: number;
+      first_completed?: number;
+    }>;
+    // Supply at checkpoints (time in seconds -> supply)
+    supply_at_checkpoints?: Record<string, number>;
+    // Macro ability efficiency (Terran)
+    mule_count?: number;
+    mule_possible?: number;
+    mule_efficiency?: number;
+    calldown_supply_count?: number;
+    // Macro ability efficiency (Zerg)
+    inject_efficiency?: number;
+    // Macro ability efficiency (Protoss)
+    chrono_efficiency?: number;
   };
   tactical: {
     moveout_times: number[];
@@ -140,24 +158,6 @@ export interface LearnedBuild {
   num_examples: number;
 }
 
-// Response from /fingerprint-all endpoint (all players)
-export interface AllPlayersFingerprint {
-  filename: string;
-  player_fingerprints: Record<string, ReplayFingerprint>; // player_name -> full fingerprint
-  suggested_player: string | null; // Who we think uploaded this
-  all_players: ReplayPlayer[]; // Basic info for all players
-  game_metadata: {
-    map: string;
-    duration: number | null;
-    game_date: string | null;
-    game_type: string | null;
-    category: string | null;
-    patch: string | null;
-    winner: string | null;
-    loser: string | null;
-  };
-}
-
 // KV Storage Types
 export interface UserReplayData {
   id: string; // Unique replay ID
@@ -196,7 +196,16 @@ export interface UserReplayData {
   fingerprint: ReplayFingerprint;
 
   // Shared game metadata
-  game_metadata?: AllPlayersFingerprint['game_metadata'];
+  game_metadata?: {
+    map: string;
+    duration: number | null;
+    game_date: string | null;
+    game_type: string | null;
+    category: string | null;
+    patch: string | null;
+    winner: string | null;
+    loser: string | null;
+  };
 
   // User notes
   notes?: string;
@@ -220,4 +229,427 @@ export interface UserBuildAssignment {
   assigned_by: string; // Coach discord ID
   assigned_at: string;
   notes?: string;
+}
+
+// ============================================================================
+// NEW: Unified Metrics Response Types (from /metrics endpoint)
+// ============================================================================
+
+/**
+ * Player fingerprint data embedded in metrics response.
+ * Contains timings, sequences, tactical, micro, positioning analysis.
+ */
+export interface PlayerFingerprintData {
+  matchup: string;
+  timings: Record<string, number | null>;
+  sequences: {
+    tech_sequence: string[];
+    build_sequence: Array<{ name: string; type: string }>;
+    upgrade_sequence: string[];
+  };
+  army_composition: Record<string, Record<string, number>>;
+  production_timeline: Record<number, Record<string, number>>;
+  economy: {
+    workers_3min: number | null;
+    workers_5min: number | null;
+    workers_7min: number | null;
+    expansion_count: number;
+    avg_expansion_timing: number | null;
+    'avg_mineral_float_5min+'?: number;
+    'avg_gas_float_5min+'?: number;
+    supply_block_count?: number;
+    total_supply_block_time?: number;
+  };
+  tactical: {
+    moveout_times: number[];
+    first_moveout: number | null;
+    harass_count: number;
+    engagement_count: number;
+    first_engagement: number | null;
+  };
+  micro: {
+    selection_count: number;
+    avg_selections_per_min: number;
+    control_groups_used: number;
+    most_used_control_group: string | null;
+    camera_movement_count: number;
+    avg_camera_moves_per_min: number;
+  };
+  positioning: {
+    proxy_buildings: number;
+    avg_building_distance_from_main: number | null;
+  };
+  ratios: {
+    gas_count: number;
+    production_count: number;
+    tech_count: number;
+    reactor_count: number;
+    techlab_count: number;
+    expansions: number;
+    gas_per_base: number;
+    production_per_base: number;
+  };
+  supply_timeline?: Record<number, { current: number; max: number }>;
+  resource_timeline?: Record<number, { minerals: number; gas: number }>;
+}
+
+/**
+ * Build order event in the timeline.
+ */
+export interface BuildOrderEvent {
+  time: number;
+  supply: number;
+  item: string;
+  type: "unit" | "building" | "upgrade";
+}
+
+/**
+ * Player metrics from the /metrics endpoint.
+ * Combines coaching metrics with fingerprint analysis data.
+ */
+export interface PlayerMetrics {
+  pid: number;
+  name: string;
+  race: string;
+  result: string; // "Win" | "Loss"
+
+  // Build order fingerprint (character-encoded string like "T:sbbb...")
+  build_fingerprint: string;
+
+  // Production metrics
+  production_score: number;
+  production_idle_total: number;
+  production_idle_percent: number;
+
+  // Supply metrics
+  supply_score: number;
+  supply_block_total: number;
+  supply_block_count: number;
+  supply_block_percent: number;
+
+  // Resource metrics
+  avg_mineral_float: number;
+  avg_gas_float: number;
+
+  // Zerg-specific inject metrics (null for non-Zerg)
+  inject_idle_total: number | null;
+  inject_efficiency: number | null;
+  inject_count: number | null;
+
+  // Build order timeline
+  build_order: BuildOrderEvent[];
+
+  // Game phases
+  phases: Record<string, unknown>;
+
+  // Full fingerprint analysis data (includes timings, sequences, tactical, etc.)
+  // Uses ReplayFingerprint for compatibility with existing storage format
+  fingerprint?: ReplayFingerprint;
+}
+
+/**
+ * Game metadata from replay.
+ */
+export interface GameMetadata {
+  game_date: string | null;
+  game_type: string | null;
+  category: string | null;
+  patch: string | null;
+}
+
+/**
+ * Response from the unified /metrics endpoint.
+ * Contains everything needed for replay analysis.
+ */
+export interface MetricsResponse {
+  filename: string;
+  map_name: string;
+  duration: number;
+  game_metadata: GameMetadata;
+  all_players: ReplayPlayer[]; // All players with MMR/APM
+  suggested_player: string | null; // Hint for UI
+  players: Record<string, PlayerMetrics>; // pid -> metrics
+}
+
+/**
+ * Response when requesting a single player from /metrics.
+ */
+export interface SinglePlayerMetricsResponse {
+  filename: string;
+  map_name: string;
+  duration: number;
+  game_metadata: GameMetadata;
+  all_players: ReplayPlayer[];
+  player: PlayerMetrics;
+}
+
+// ============================================================================
+// Phase 10-12: Replay Index & Reference System Types
+// ============================================================================
+
+/**
+ * Lightweight replay entry for list view (stored in replay index).
+ * Much smaller than full UserReplayData for performance.
+ */
+export interface ReplayIndexEntry {
+  id: string;
+  filename: string;
+  uploaded_at: string;
+  game_date: string | null;
+
+  // Game info (for filtering/display)
+  game_type: string;             // "1v1-ladder", "2v2-ladder", etc.
+  matchup: string;               // "TvZ"
+  result: 'Win' | 'Loss';
+  duration: number;              // seconds
+  map_name: string;
+  opponent_name: string;
+
+  // Reference comparison (if assigned)
+  reference_id: string | null;
+  reference_alias: string | null;
+  comparison_score: number | null;
+
+  // Pillar scores (for sorting/aggregation)
+  production_score: number | null;
+  supply_score: number | null;
+  vision_score: number | null;   // null until implemented
+
+  // Build detection
+  detected_build: string | null;
+  detection_confidence: number | null;
+}
+
+/**
+ * Replay index with version tracking for synchronization.
+ */
+export interface ReplayIndex {
+  version: number;           // Increment on every change
+  last_updated: string;      // ISO timestamp
+  replay_count: number;      // Quick integrity check
+  entries: ReplayIndexEntry[];
+}
+
+/**
+ * Reference replay/build that user compares against.
+ */
+export interface ReferenceReplay {
+  id: string;                    // UUID
+  user_id: string;               // Discord user ID (owner)
+  alias: string;                 // User-friendly name
+  matchup: string;               // "TvZ", "TvP", "TvT", "ZvT", etc.
+  source_type: 'uploaded_replay' | 'my_replay' | 'site_build_order' | 'site_replay';
+  source_id: string;             // ID of source (blob URL, replay ID, or build order ID)
+
+  // Cached data for comparison (extracted from source)
+  fingerprint: ReplayFingerprint;
+  build_order: BuildOrderEvent[];
+  key_timings: Record<string, number>;  // e.g., { "first_expansion": 120, "factory": 180 }
+
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Per-matchup configuration for a user.
+ */
+export interface UserMatchupConfig {
+  user_id: string;
+  matchup: string;               // "TvZ", "TvP", "TvT"
+  default_reference_id: string | null;  // Which reference to auto-compare
+}
+
+/**
+ * Comparison result stored per replay when compared to a reference.
+ */
+export interface ReferenceComparison {
+  reference_id: string;
+  reference_alias: string;
+  overall_match: number;         // 0-100%
+  timing_deviations: Array<{
+    event: string;
+    target_time: number;
+    actual_time: number;
+    deviation_seconds: number;
+    is_acceptable: boolean;      // Within threshold
+  }>;
+  pillar_scores: {
+    production: number;          // How close to reference production
+    supply: number;              // How close to reference supply
+  };
+}
+
+/**
+ * Game phase for phase-based scoring (using timestamp ranges, not names).
+ */
+export interface GamePhase {
+  name: string;           // "Opening", "Early", "Mid", "Late", "Endgame"
+  start_seconds: number;
+  end_seconds: number;
+}
+
+/**
+ * Standard game phases for phase-based scoring.
+ */
+export const GAME_PHASES: GamePhase[] = [
+  { name: "Opening", start_seconds: 0, end_seconds: 180 },      // 0:00 - 3:00
+  { name: "Early", start_seconds: 180, end_seconds: 360 },      // 3:00 - 6:00
+  { name: "Mid", start_seconds: 360, end_seconds: 600 },        // 6:00 - 10:00
+  { name: "Late", start_seconds: 600, end_seconds: 900 },       // 10:00 - 15:00
+  { name: "Endgame", start_seconds: 900, end_seconds: Infinity } // 15:00+
+];
+
+/**
+ * Per-phase score breakdown.
+ */
+export interface PhaseScore {
+  phase: GamePhase;
+  worker_score: number;      // Worker count vs benchmark
+  supply_score: number;      // Supply vs benchmark
+  timing_score: number;      // Building/unit timings vs benchmark
+  army_comp_score: number;   // Army composition similarity
+  overall: number;           // Weighted average
+}
+
+/**
+ * Detailed comparison data structure for reference comparisons.
+ */
+export interface DetailedComparison {
+  reference_id: string;
+  reference_alias: string;
+  reference_player: string;  // Which player from reference replay
+
+  // Overall scores
+  overall_match: number;     // 0-100%
+
+  // Per-phase breakdown
+  phase_scores: PhaseScore[];
+
+  // Timing comparisons
+  building_timings: Array<{
+    building: string;        // "First Factory", "Natural", etc.
+    reference_time: number;
+    actual_time: number | null;
+    deviation: number;
+    status: 'on_time' | 'early' | 'late' | 'very_late' | 'missing';
+  }>;
+
+  // Production timeline (per minute)
+  production_timeline: Array<{
+    minute: number;
+    units: Array<{
+      unit: string;
+      actual: number;
+      benchmark: number;
+      diff: number;
+    }>;
+  }>;
+
+  // Worker checkpoints
+  worker_checkpoints: Array<{
+    time_seconds: number;
+    actual: number;
+    benchmark: number;
+    diff: number;
+  }>;
+
+  // Supply checkpoints
+  supply_checkpoints: Array<{
+    time_seconds: number;
+    actual: number;
+    benchmark: number;
+    diff: number;
+  }>;
+
+  // Army composition at key moments
+  army_snapshots: Array<{
+    time_seconds: number;
+    actual: Record<string, number>;    // unit -> count
+    benchmark: Record<string, number>;
+  }>;
+}
+
+/**
+ * Build detection result using Levenshtein distance on fingerprints.
+ */
+export interface BuildDetectionResult {
+  detected_reference_id: string | null;
+  detected_alias: string | null;
+  confidence: number;              // 0-100%
+  distance: number;                // Levenshtein distance
+  can_be_overridden: boolean;      // Always true - user can change/remove
+}
+
+/**
+ * Reference player selection result.
+ */
+export interface ReferencePlayerSelection {
+  source_type: 'site_replay' | 'site_build_order' | 'uploaded' | 'my_replay';
+  auto_selected: boolean;
+  player_name: string;
+  selection_reason: string;
+}
+
+// ============================================================================
+// Phase 10-12: Enhanced sc2reader Metrics Types
+// ============================================================================
+
+/**
+ * Per-building production breakdown from sc2reader.
+ */
+export interface BuildingProductionMetrics {
+  count: number;
+  idle_seconds: number;
+  production_cycles: number;
+  first_completed: number;  // timestamp in seconds
+}
+
+/**
+ * Supply block event from sc2reader.
+ */
+export interface SupplyBlockEvent {
+  time: number;      // timestamp in seconds
+  duration: number;  // seconds
+  supply: number;    // supply level when blocked
+}
+
+/**
+ * Enhanced player metrics from sc2reader /metrics endpoint.
+ * Extends PlayerMetrics with additional production and supply details.
+ */
+export interface EnhancedPlayerMetrics extends PlayerMetrics {
+  // Per-building production breakdown
+  production_by_building: Record<string, BuildingProductionMetrics>;
+
+  // Key building timings (seconds)
+  building_timings: Record<string, number | null>;
+
+  // Worker counts at checkpoints (time_seconds -> count)
+  workers_at_checkpoints: Record<number, number>;
+
+  // Supply at checkpoints (time_seconds -> supply)
+  supply_at_checkpoints: Record<number, number>;
+
+  // Supply block events with timestamps
+  supply_block_events: SupplyBlockEvent[];
+
+  // Army composition at key moments (time_seconds -> unit -> count)
+  army_at_checkpoints: Record<number, Record<string, number>>;
+
+  // Cumulative production per minute (minute -> unit -> count)
+  production_by_minute: Record<number, Record<string, number>>;
+
+  // Macro ability tracking (Terran)
+  mule_count?: number;
+  mule_possible?: number;
+  mule_efficiency?: number;
+  calldown_supply_count?: number;
+
+  // Macro ability tracking (Protoss)
+  chrono_count?: number;
+  chrono_possible?: number;
+  chrono_efficiency?: number;
+
+  // Upgrade timings (upgrade_name -> timestamp)
+  upgrade_timings: Record<string, number>;
 }

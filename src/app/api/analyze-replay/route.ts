@@ -9,10 +9,22 @@ const SC2READER_API_KEY = process.env.SC2READER_API_KEY || 'your-secret-key-chan
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 /**
- * Analyze an SC2 replay file using the Flask API
+ * Format duration in seconds to "MM:SS" string
+ */
+function formatDuration(seconds: number | null): string {
+  if (!seconds) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Analyze an SC2 replay file using the unified /metrics endpoint
  *
- * This endpoint acts as a proxy to the Flask API, keeping the API key secure
+ * This endpoint acts as a proxy to the sc2reader API, keeping the API key secure
  * on the server side and requiring authentication from the user.
+ *
+ * Returns: build orders, game metadata, and player metrics for CMS use.
  */
 export async function POST(request: NextRequest) {
   console.log('🔍 [ANALYZE] Received analyze replay request');
@@ -117,8 +129,8 @@ export async function POST(request: NextRequest) {
     });
     console.log('📦 [ANALYZE] Blob created, size:', blob.size, 'type:', blob.type);
 
-    console.log('🚀 [ANALYZE] Sending request to Flask API:', SC2READER_API_URL);
-    const response = await fetch(`${SC2READER_API_URL}/analyze`, {
+    console.log('🚀 [ANALYZE] Sending request to sc2reader /metrics:', SC2READER_API_URL);
+    const response = await fetch(`${SC2READER_API_URL}/metrics`, {
       method: 'POST',
       headers: {
         'X-API-Key': SC2READER_API_KEY,
@@ -151,10 +163,46 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const analysisData = await response.json();
-    console.log('✅ [ANALYZE] Analysis successful, players:', Object.keys(analysisData.build_orders || {}).length);
+    const metricsData = await response.json();
+    console.log('✅ [ANALYZE] Analysis successful, players:', Object.keys(metricsData.players || {}).length);
 
-    return NextResponse.json(analysisData);
+    // Transform /metrics response to legacy /analyze format for CMS compatibility
+    // CMS expects: { build_orders: {playerName: [events]}, metadata: {...} }
+    const buildOrders: Record<string, Array<{time: number; supply: number; item: string; type: string}>> = {};
+    const players: Array<{name: string; race: string; result: string}> = [];
+
+    for (const [_pid, playerData] of Object.entries(metricsData.players || {})) {
+      const player = playerData as {
+        name: string;
+        race: string;
+        result: string;
+        build_order: Array<{time: number; supply: number; item: string; type: string}>;
+      };
+      buildOrders[player.name] = player.build_order || [];
+      players.push({
+        name: player.name,
+        race: player.race,
+        result: player.result,
+      });
+    }
+
+    // Build legacy metadata structure
+    const legacyResponse = {
+      build_orders: buildOrders,
+      metadata: {
+        map_name: metricsData.map_name,
+        game_length: formatDuration(metricsData.duration),
+        players: players,
+        unix_timestamp: metricsData.game_metadata?.game_date
+          ? new Date(metricsData.game_metadata.game_date).getTime() / 1000
+          : null,
+        release_string: metricsData.game_metadata?.patch || null,
+      },
+      // Include new metrics data for future use
+      metrics: metricsData,
+    };
+
+    return NextResponse.json(legacyResponse);
   } catch (error) {
     console.error('Error analyzing replay file:', error);
     return NextResponse.json(

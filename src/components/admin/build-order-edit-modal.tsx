@@ -104,7 +104,7 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         isFree: false,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [buildOrder, isNew, isOpen, allVideos, defaultCoach]);
 
   const updateField = <K extends keyof BuildOrder>(field: K, value: BuildOrder[K]) => {

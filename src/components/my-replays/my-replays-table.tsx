@@ -261,11 +261,20 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
           return <span className="text-sm text-muted-foreground">—</span>;
         }
 
-        const confidence = Math.round(replay.detection.confidence * 100);
+        // Confidence from sc2reader is 0-100, not 0-1
+        const confidence = replay.detection.confidence;
+        const displayConfidence = typeof confidence === 'number' && !isNaN(confidence)
+          ? Math.round(confidence)
+          : null;
+
         return (
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium">{replay.detection.build_name}</span>
-            <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
+            {displayConfidence !== null ? (
+              <span className="text-xs text-muted-foreground">{displayConfidence}% confidence</span>
+            ) : (
+              <span className="text-xs text-muted-foreground">—</span>
+            )}
           </div>
         );
       },

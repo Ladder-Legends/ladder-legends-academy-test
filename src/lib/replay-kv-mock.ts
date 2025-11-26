@@ -6,6 +6,10 @@ import type {
   UserReplayData,
   UserSettings,
   UserBuildAssignment,
+  ReplayIndex,
+  ReplayIndexEntry,
+  ReferenceReplay,
+  UserMatchupConfig,
 } from './replay-types';
 
 // In-memory storage
@@ -18,6 +22,11 @@ const KEYS = {
   userReplays: (userId: string) => `user:${userId}:replays`,
   userReplay: (userId: string, replayId: string) => `user:${userId}:replay:${replayId}`,
   userBuilds: (userId: string) => `user:${userId}:builds`,
+  userReplayIndex: (userId: string) => `user:${userId}:replay_index`,
+  // Reference replay keys
+  userReferences: (userId: string) => `user:${userId}:references`,
+  userReference: (userId: string, refId: string) => `user:${userId}:reference:${refId}`,
+  userMatchupConfigs: (userId: string) => `user:${userId}:matchup_configs`,
 } as const;
 
 export async function getUserSettings(discordUserId: string): Promise<UserSettings | null> {
@@ -213,10 +222,376 @@ export async function clearUserReplays(discordUserId: string): Promise<number> {
     // Clear the replay IDs list
     storage.set(KEYS.userReplays(discordUserId), []);
 
+    // Clear the replay index
+    storage.delete(KEYS.userReplayIndex(discordUserId));
+
     console.log(`🗑️  [MOCK KV] Cleared ${count} replays for user ${discordUserId}`);
     return count;
   } catch (error) {
     console.error('Error clearing replays:', error);
     throw new Error('Failed to clear replays');
+  }
+}
+
+// ============================================================================
+// Replay Index Functions (Phase 10-12)
+// ============================================================================
+
+/**
+ * Create a lightweight index entry from full replay data
+ */
+export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
+  const fingerprint = replay.fingerprint;
+  const metadata = fingerprint.metadata;
+
+  // Find opponent name
+  let opponentName = '';
+  if (fingerprint.all_players) {
+    const playerName = replay.suggested_player || replay.player_name || fingerprint.player_name;
+    const playerData = fingerprint.all_players.find(p => p.name === playerName);
+    if (playerData) {
+      const opponent = fingerprint.all_players.find(
+        p => !p.is_observer && p.team !== playerData.team
+      );
+      opponentName = opponent?.name || '';
+    }
+  }
+
+  return {
+    id: replay.id,
+    filename: replay.filename,
+    uploaded_at: replay.uploaded_at,
+    game_date: metadata.game_date,
+
+    // Game info
+    game_type: replay.game_type || metadata.game_type || '1v1',
+    matchup: fingerprint.matchup,
+    result: metadata.result as 'Win' | 'Loss',
+    duration: metadata.duration || 0,
+    map_name: metadata.map,
+    opponent_name: opponentName,
+
+    // Reference comparison (null until implemented)
+    reference_id: null,
+    reference_alias: null,
+    comparison_score: replay.comparison?.execution_score || null,
+
+    // Pillar scores
+    production_score: null,
+    supply_score: null,
+    vision_score: null,
+
+    // Build detection
+    detected_build: replay.detection?.build_name || null,
+    detection_confidence: replay.detection?.confidence || null,
+  };
+}
+
+/**
+ * Get the replay index for a user
+ */
+export async function getReplayIndex(discordUserId: string): Promise<ReplayIndex | null> {
+  try {
+    return storage.get(KEYS.userReplayIndex(discordUserId)) || null;
+  } catch (error) {
+    console.error('Error fetching replay index:', error);
+    return null;
+  }
+}
+
+/**
+ * Update the entire replay index
+ */
+export async function updateReplayIndex(discordUserId: string, index: ReplayIndex): Promise<void> {
+  try {
+    storage.set(KEYS.userReplayIndex(discordUserId), index);
+  } catch (error) {
+    console.error('Error updating replay index:', error);
+    throw new Error('Failed to update replay index');
+  }
+}
+
+/**
+ * Add a replay to the index
+ */
+export async function addToReplayIndex(
+  discordUserId: string,
+  entry: ReplayIndexEntry
+): Promise<void> {
+  try {
+    let index = await getReplayIndex(discordUserId);
+
+    if (!index) {
+      index = {
+        version: 1,
+        last_updated: new Date().toISOString(),
+        replay_count: 0,
+        entries: [],
+      };
+    }
+
+    const existingIdx = index.entries.findIndex(e => e.id === entry.id);
+    if (existingIdx >= 0) {
+      index.entries[existingIdx] = entry;
+    } else {
+      index.entries.unshift(entry);
+      index.replay_count++;
+    }
+
+    index.version++;
+    index.last_updated = new Date().toISOString();
+
+    await updateReplayIndex(discordUserId, index);
+  } catch (error) {
+    console.error('Error adding to replay index:', error);
+    throw new Error('Failed to add to replay index');
+  }
+}
+
+/**
+ * Remove a replay from the index
+ */
+export async function removeFromReplayIndex(
+  discordUserId: string,
+  replayId: string
+): Promise<void> {
+  try {
+    const index = await getReplayIndex(discordUserId);
+    if (!index) return;
+
+    const initialCount = index.entries.length;
+    index.entries = index.entries.filter(e => e.id !== replayId);
+
+    if (index.entries.length < initialCount) {
+      index.replay_count = index.entries.length;
+      index.version++;
+      index.last_updated = new Date().toISOString();
+      await updateReplayIndex(discordUserId, index);
+    }
+  } catch (error) {
+    console.error('Error removing from replay index:', error);
+    throw new Error('Failed to remove from replay index');
+  }
+}
+
+/**
+ * Rebuild the replay index from all replays
+ */
+export async function rebuildReplayIndex(discordUserId: string): Promise<ReplayIndex> {
+  console.log(`🔄 [MOCK KV] Rebuilding replay index for user ${discordUserId}`);
+
+  try {
+    const replays = await getUserReplays(discordUserId);
+    const entries: ReplayIndexEntry[] = replays.map(replay => createIndexEntry(replay));
+
+    entries.sort((a, b) => {
+      const dateA = a.game_date ? new Date(a.game_date).getTime() : new Date(a.uploaded_at).getTime();
+      const dateB = b.game_date ? new Date(b.game_date).getTime() : new Date(b.uploaded_at).getTime();
+      return dateB - dateA;
+    });
+
+    const index: ReplayIndex = {
+      version: Date.now(),
+      last_updated: new Date().toISOString(),
+      replay_count: entries.length,
+      entries,
+    };
+
+    await updateReplayIndex(discordUserId, index);
+    console.log(`✅ [MOCK KV] Index rebuilt: ${entries.length} entries`);
+
+    return index;
+  } catch (error) {
+    console.error('Error rebuilding replay index:', error);
+    throw new Error('Failed to rebuild replay index');
+  }
+}
+
+/**
+ * Validate the replay index against actual replay data
+ */
+export async function validateReplayIndex(discordUserId: string): Promise<boolean> {
+  try {
+    const index = await getReplayIndex(discordUserId);
+    if (!index) return true;
+
+    const replayIds = await getUserReplayIds(discordUserId);
+
+    if (replayIds.length !== index.replay_count) {
+      console.warn(`Index mismatch: ${replayIds.length} replays, ${index.replay_count} in index`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error validating replay index:', error);
+    return false;
+  }
+}
+
+// =============================================================================
+// Reference Replay Functions
+// =============================================================================
+
+/**
+ * Get all reference replays for a user
+ */
+export async function getUserReferences(discordUserId: string): Promise<ReferenceReplay[]> {
+  try {
+    const refIds = storage.get(KEYS.userReferences(discordUserId)) as Set<string> | undefined;
+    if (!refIds || refIds.size === 0) return [];
+
+    const references: ReferenceReplay[] = [];
+    for (const refId of refIds) {
+      const ref = storage.get(KEYS.userReference(discordUserId, refId)) as ReferenceReplay | undefined;
+      if (ref) references.push(ref);
+    }
+
+    return references;
+  } catch (error) {
+    console.error('Error fetching user references:', error);
+    return [];
+  }
+}
+
+/**
+ * Get a specific reference replay
+ */
+export async function getReference(
+  discordUserId: string,
+  referenceId: string
+): Promise<ReferenceReplay | null> {
+  try {
+    return storage.get(KEYS.userReference(discordUserId, referenceId)) || null;
+  } catch (error) {
+    console.error('Error fetching reference:', error);
+    return null;
+  }
+}
+
+/**
+ * Get reference replays for a specific matchup
+ */
+export async function getReferencesForMatchup(
+  discordUserId: string,
+  matchup: string
+): Promise<ReferenceReplay[]> {
+  const allRefs = await getUserReferences(discordUserId);
+  return allRefs.filter(ref => ref.matchup === matchup);
+}
+
+/**
+ * Save a reference replay
+ */
+export async function saveReference(reference: ReferenceReplay): Promise<void> {
+  try {
+    reference.created_at = reference.created_at || new Date().toISOString();
+    reference.updated_at = new Date().toISOString();
+
+    // Save the reference data
+    storage.set(KEYS.userReference(reference.user_id, reference.id), reference);
+
+    // Add to user's reference set
+    let refIds = storage.get(KEYS.userReferences(reference.user_id)) as Set<string> | undefined;
+    if (!refIds) {
+      refIds = new Set<string>();
+    }
+    refIds.add(reference.id);
+    storage.set(KEYS.userReferences(reference.user_id), refIds);
+
+    console.log(`✅ [MOCK KV] Reference saved: ${reference.id} (${reference.alias})`);
+  } catch (error) {
+    console.error('Error saving reference:', error);
+    throw new Error('Failed to save reference replay');
+  }
+}
+
+/**
+ * Delete a reference replay
+ */
+export async function deleteReference(
+  discordUserId: string,
+  referenceId: string
+): Promise<void> {
+  try {
+    // Delete the reference data
+    storage.delete(KEYS.userReference(discordUserId, referenceId));
+
+    // Remove from user's reference set
+    const refIds = storage.get(KEYS.userReferences(discordUserId)) as Set<string> | undefined;
+    if (refIds) {
+      refIds.delete(referenceId);
+      storage.set(KEYS.userReferences(discordUserId), refIds);
+    }
+
+    console.log(`🗑️ [MOCK KV] Reference deleted: ${referenceId}`);
+  } catch (error) {
+    console.error('Error deleting reference:', error);
+    throw new Error('Failed to delete reference replay');
+  }
+}
+
+/**
+ * Get user's matchup configurations
+ */
+export async function getUserMatchupConfigs(
+  discordUserId: string
+): Promise<UserMatchupConfig[]> {
+  try {
+    const configs = storage.get(KEYS.userMatchupConfigs(discordUserId)) as UserMatchupConfig[] | undefined;
+    return configs || [];
+  } catch (error) {
+    console.error('Error fetching matchup configs:', error);
+    return [];
+  }
+}
+
+/**
+ * Get the default reference for a specific matchup
+ */
+export async function getDefaultReferenceForMatchup(
+  discordUserId: string,
+  matchup: string
+): Promise<ReferenceReplay | null> {
+  try {
+    const configs = await getUserMatchupConfigs(discordUserId);
+    const config = configs.find(c => c.matchup === matchup);
+
+    if (!config?.default_reference_id) return null;
+
+    return await getReference(discordUserId, config.default_reference_id);
+  } catch (error) {
+    console.error('Error fetching default reference:', error);
+    return null;
+  }
+}
+
+/**
+ * Set the default reference for a matchup
+ */
+export async function setDefaultReferenceForMatchup(
+  discordUserId: string,
+  matchup: string,
+  referenceId: string | null
+): Promise<void> {
+  try {
+    const configs = await getUserMatchupConfigs(discordUserId);
+    const existingIndex = configs.findIndex(c => c.matchup === matchup);
+
+    if (existingIndex >= 0) {
+      configs[existingIndex].default_reference_id = referenceId;
+    } else {
+      configs.push({
+        user_id: discordUserId,
+        matchup,
+        default_reference_id: referenceId,
+      });
+    }
+
+    storage.set(KEYS.userMatchupConfigs(discordUserId), configs);
+    console.log(`✅ [MOCK KV] Default reference set for ${matchup}: ${referenceId}`);
+  } catch (error) {
+    console.error('Error setting default reference:', error);
+    throw new Error('Failed to set default reference');
   }
 }

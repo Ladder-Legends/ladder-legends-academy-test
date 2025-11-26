@@ -1,12 +1,11 @@
 /**
- * Tests for new UserReplayData fields and AllPlayersFingerprint type
- * Verifies that multi-player fingerprints and new metadata fields work correctly
+ * Tests for UserReplayData type and fields
+ * Verifies that multi-player fingerprints and metadata fields work correctly
  */
 
 import { describe, it, expect } from 'vitest';
 import type {
   UserReplayData,
-  AllPlayersFingerprint,
   ReplayFingerprint,
 } from '@/lib/replay-types';
 
@@ -75,63 +74,6 @@ function createMockFingerprint(playerName: string, race: string, result: 'Win' |
     },
   };
 }
-
-describe('AllPlayersFingerprint type', () => {
-  it('should hold fingerprints for multiple players', () => {
-    const allPlayersData: AllPlayersFingerprint = {
-      filename: 'test.SC2Replay',
-      player_fingerprints: {
-        Player1: createMockFingerprint('Player1', 'Terran', 'Win'),
-        Player2: createMockFingerprint('Player2', 'Zerg', 'Loss'),
-      },
-      suggested_player: 'Player1',
-      all_players: [
-        { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 180 },
-        { name: 'Player2', race: 'Zerg', result: 'Loss', team: 2, is_observer: false, mmr: 4400, apm: 200 },
-      ],
-      game_metadata: {
-        map: 'Altitude LE',
-        duration: 600,
-        game_date: '2025-01-01',
-        game_type: '1v1',
-        category: 'Ladder',
-        patch: '5.0.12',
-        winner: 'Player1',
-        loser: 'Player2',
-      },
-    };
-
-    expect(Object.keys(allPlayersData.player_fingerprints)).toHaveLength(2);
-    expect(allPlayersData.player_fingerprints['Player1'].race).toBe('Terran');
-    expect(allPlayersData.player_fingerprints['Player2'].race).toBe('Zerg');
-    expect(allPlayersData.suggested_player).toBe('Player1');
-  });
-
-  it('should handle null suggested_player', () => {
-    const allPlayersData: AllPlayersFingerprint = {
-      filename: 'test.SC2Replay',
-      player_fingerprints: {
-        Player1: createMockFingerprint('Player1', 'Terran', 'Win'),
-      },
-      suggested_player: null,
-      all_players: [
-        { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false },
-      ],
-      game_metadata: {
-        map: 'Test Map',
-        duration: null,
-        game_date: null,
-        game_type: null,
-        category: null,
-        patch: null,
-        winner: null,
-        loser: null,
-      },
-    };
-
-    expect(allPlayersData.suggested_player).toBeNull();
-  });
-});
 
 describe('UserReplayData - new fields', () => {
   const createMockReplayData = (overrides?: Partial<UserReplayData>): UserReplayData => ({

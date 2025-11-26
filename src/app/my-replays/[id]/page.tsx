@@ -24,7 +24,11 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { UserReplayData, ReplayFingerprint } from '@/lib/replay-types';
+import type { UserReplayData, ReplayFingerprint, ReferenceReplay } from '@/lib/replay-types';
+import { AssignReferenceDropdown } from '@/components/my-replays/assign-reference-dropdown';
+import { ProductionBreakdown } from '@/components/my-replays/production-breakdown';
+import { SupplyBreakdown } from '@/components/my-replays/supply-breakdown';
+import { BuildComparison } from '@/components/my-replays/build-comparison';
 
 // Helper function to calculate top issues
 interface Issue {
@@ -143,6 +147,9 @@ export default function ReplayDetailPage() {
   // Selected player for viewing fingerprint (null = use legacy fingerprint)
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
+  // Assigned reference build
+  const [assignedReference, setAssignedReference] = useState<ReferenceReplay | null>(null);
+
   const replayId = params.id as string;
 
   // Sync tab changes to URL
@@ -193,6 +200,24 @@ export default function ReplayDetailPage() {
       setError(err instanceof Error ? err.message : 'Failed to load replay');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle reference assignment
+  const handleAssignReference = async (referenceId: string | null) => {
+    if (!referenceId) {
+      setAssignedReference(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/my-replays/references?id=${referenceId}`);
+      const data = await response.json();
+      if (response.ok && data.reference) {
+        setAssignedReference(data.reference);
+      }
+    } catch (err) {
+      console.error('Error fetching reference:', err);
     }
   };
 
@@ -280,6 +305,15 @@ export default function ReplayDetailPage() {
               <Badge variant="outline" className="text-lg px-3 py-1">
                 {fingerprint.race}
               </Badge>
+            </div>
+            {/* Reference Assignment */}
+            <div className="mt-3">
+              <div className="text-xs text-muted-foreground mb-1">Compare against:</div>
+              <AssignReferenceDropdown
+                matchup={fingerprint.matchup}
+                currentReferenceId={assignedReference?.id || null}
+                onAssign={handleAssignReference}
+              />
             </div>
           </div>
         </div>
@@ -444,11 +478,24 @@ export default function ReplayDetailPage() {
                       <p className="text-sm text-muted-foreground">Detected Build Order</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-4xl font-bold text-primary">{Math.round(detection.confidence)}%</div>
-                      <p className="text-sm text-muted-foreground">Confidence</p>
+                      {/* Confidence from sc2reader is 0-100, not 0-1 */}
+                      {typeof detection.confidence === 'number' && !isNaN(detection.confidence) ? (
+                        <>
+                          <div className="text-4xl font-bold text-primary">{Math.round(detection.confidence)}%</div>
+                          <p className="text-sm text-muted-foreground">Confidence</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-4xl font-bold text-muted-foreground">—</div>
+                          <p className="text-sm text-muted-foreground">Confidence</p>
+                        </>
+                      )}
                     </div>
                   </div>
-                  <Progress value={detection.confidence} className="h-3" />
+                  <Progress
+                    value={typeof detection.confidence === 'number' && !isNaN(detection.confidence) ? detection.confidence : 0}
+                    className="h-3"
+                  />
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -673,6 +720,15 @@ export default function ReplayDetailPage() {
                 })()}
               </CardContent>
             </Card>
+          )}
+
+          {/* Build Comparison (when reference assigned) */}
+          {assignedReference && (
+            <BuildComparison
+              fingerprint={fingerprint}
+              reference={assignedReference}
+              comparisonScore={comparison?.execution_score}
+            />
           )}
         </TabsContent>
 
@@ -1005,6 +1061,14 @@ export default function ReplayDetailPage() {
               )}
             </>
           )}
+
+          {/* Supply Breakdown Collapsible Section */}
+          {fingerprint.economy && fingerprint.metadata.duration && (
+            <SupplyBreakdown
+              fingerprint={fingerprint}
+              gameDuration={fingerprint.metadata.duration}
+            />
+          )}
         </TabsContent>
 
         {/* Tab 3: Production - Build order, timings, unit production */}
@@ -1155,6 +1219,14 @@ export default function ReplayDetailPage() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Production Breakdown Collapsible Section */}
+          {fingerprint.economy && fingerprint.metadata.duration && (
+            <ProductionBreakdown
+              fingerprint={fingerprint}
+              gameDuration={fingerprint.metadata.duration}
+            />
           )}
         </TabsContent>
 

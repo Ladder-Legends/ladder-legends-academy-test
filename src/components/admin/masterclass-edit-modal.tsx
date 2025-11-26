@@ -116,7 +116,7 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         isFree: false,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [masterclass, isNew, isOpen, defaultCoach]);
 
   const updateField = <K extends keyof Masterclass>(field: K, value: Masterclass[K]) => {

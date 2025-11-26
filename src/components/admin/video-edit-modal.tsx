@@ -95,7 +95,7 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
       setIsPlaylistMode(false);
     }
     setYoutubeIdInput('');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [video, isNew, isOpen, defaultCoach]);
 
   const updateField = <K extends keyof Video>(field: K, value: Video[K]) => {

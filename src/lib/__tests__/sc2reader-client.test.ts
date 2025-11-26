@@ -76,134 +76,6 @@ describe('SC2ReplayAPIClient', () => {
     });
   });
 
-  describe('analyzeReplay', () => {
-    it('should throw error for non-.SC2Replay files', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow(
-        'Invalid file type. Only .SC2Replay files are allowed.'
-      );
-    });
-
-    it('should successfully analyze a replay file', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const mockResponse = {
-        filename: 'test.SC2Replay',
-        metadata: {
-          map_name: 'Altitude LE',
-          game_length: '10:30',
-          game_length_seconds: 630,
-          date: '2024-01-01',
-          unix_timestamp: 1704067200,
-          expansion: 'LotV',
-          release_string: '5.0.12',
-          game_type: '1v1',
-          category: 'Ladder',
-          winner: 'Player1',
-          loser: 'Player2',
-          players: [
-            {
-              name: 'Player1',
-              race: 'Terran',
-              result: 'Win',
-              mmr: 4500,
-              apm: 180,
-              highest_league: 6,
-              color: 'Red',
-            },
-          ],
-          num_players: 2,
-        },
-        build_orders: {
-          Player1: [],
-        },
-      };
-
-      (axios.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        data: mockResponse,
-      });
-
-      const result = await client.analyzeReplay(file);
-
-      expect(result).toEqual(mockResponse);
-      expect(axios.post).toHaveBeenCalledWith(
-        expect.stringContaining('/analyze'),
-        expect.any(Object),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            'X-API-Key': expect.any(String),
-          }),
-        })
-      );
-    });
-
-    it('should handle 401 authentication error', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const error = createMockAxiosError(401, { error: 'Unauthorized' });
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow(
-        'Authentication failed. Invalid API key.'
-      );
-    });
-
-    it('should handle 422 parse error', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const error = createMockAxiosError(422, { error: 'Parse error', detail: 'Corrupted replay file' });
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow(
-        'Failed to parse replay file: Corrupted replay file'
-      );
-    });
-
-    it('should handle 400 bad request error', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const error = createMockAxiosError(400, { error: 'Invalid request' });
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow('Invalid request');
-    });
-
-    it('should handle generic API errors', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const error = createMockAxiosError(500, { error: 'Internal server error' });
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow('Internal server error');
-    });
-
-    it('should handle network errors', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow('Network error');
-    });
-
-    it('should handle malformed error responses', async () => {
-      const client = new SC2ReplayAPIClient();
-      const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
-
-      const error = createMockAxiosError(500, {}, 'Request failed');
-      (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
-
-      await expect(client.analyzeReplay(file)).rejects.toThrow('Request failed');
-    });
-  });
-
   describe('healthCheck', () => {
     it('should return true when API is healthy', async () => {
       const client = new SC2ReplayAPIClient();
@@ -464,7 +336,7 @@ describe('convertToBuildOrderSteps', () => {
   });
 });
 
-describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
+describe('SC2ReplayAPIClient - extractMetrics', () => {
   beforeEach(() => {
     (fetch as ReturnType<typeof vi.fn>).mockClear();
     vi.spyOn(axios, 'post');
@@ -479,86 +351,99 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await expect(
-      client.extractAllPlayersFingerprints(file, undefined, 'test.txt')
+      client.extractMetrics(file, undefined, 'test.txt')
     ).rejects.toThrow('Invalid file type. Only .SC2Replay files are allowed.');
   });
 
-  it('should successfully extract fingerprints for all players', async () => {
+  it('should successfully extract metrics for all players', async () => {
     const client = new SC2ReplayAPIClient();
     const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
     const mockResponse = {
       filename: 'test.SC2Replay',
-      player_fingerprints: {
-        Player1: {
-          player_name: 'Player1',
-          matchup: 'TvZ',
-          race: 'Terran',
-          all_players: [
-            { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 180 },
-            { name: 'Player2', race: 'Zerg', result: 'Loss', team: 2, is_observer: false, mmr: 4400, apm: 200 },
-          ],
-          metadata: {
-            map: 'Altitude LE',
-            duration: 600,
-            result: 'Win',
-            opponent_race: 'Zerg',
-            game_type: '1v1',
-            category: 'Ladder',
-            game_date: '2024-01-01',
-          },
-          timings: {},
-          sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
-          army_composition: {},
-          production_timeline: {},
-          economy: { workers_3min: 30, workers_5min: 50, workers_7min: 60, expansion_count: 2, avg_expansion_timing: 180 },
-          tactical: { moveout_times: [], first_moveout: null, harass_count: 0, engagement_count: 0, first_engagement: null },
-          micro: { selection_count: 100, avg_selections_per_min: 10, control_groups_used: 5, most_used_control_group: '1', camera_movement_count: 50, avg_camera_moves_per_min: 5 },
-          positioning: { proxy_buildings: 0, avg_building_distance_from_main: 50 },
-          ratios: { gas_count: 4, production_count: 8, tech_count: 2, reactor_count: 2, techlab_count: 2, expansions: 2, gas_per_base: 2, production_per_base: 4 },
-        },
-        Player2: {
-          player_name: 'Player2',
-          matchup: 'ZvT',
-          race: 'Zerg',
-          all_players: [
-            { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 180 },
-            { name: 'Player2', race: 'Zerg', result: 'Loss', team: 2, is_observer: false, mmr: 4400, apm: 200 },
-          ],
-          metadata: {
-            map: 'Altitude LE',
-            duration: 600,
-            result: 'Loss',
-            opponent_race: 'Terran',
-            game_type: '1v1',
-            category: 'Ladder',
-            game_date: '2024-01-01',
-          },
-          timings: {},
-          sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
-          army_composition: {},
-          production_timeline: {},
-          economy: { workers_3min: 32, workers_5min: 55, workers_7min: 65, expansion_count: 3, avg_expansion_timing: 150 },
-          tactical: { moveout_times: [], first_moveout: null, harass_count: 0, engagement_count: 0, first_engagement: null },
-          micro: { selection_count: 120, avg_selections_per_min: 12, control_groups_used: 6, most_used_control_group: '1', camera_movement_count: 60, avg_camera_moves_per_min: 6 },
-          positioning: { proxy_buildings: 0, avg_building_distance_from_main: 40 },
-          ratios: { gas_count: 6, production_count: 0, tech_count: 3, reactor_count: 0, techlab_count: 0, expansions: 3, gas_per_base: 2, production_per_base: 0 },
-        },
+      map_name: 'Altitude LE',
+      duration: 600,
+      game_metadata: {
+        game_date: '2024-01-01T12:00:00',
+        game_type: '1v1',
+        category: 'Ladder',
+        patch: '5.0.12',
       },
-      suggested_player: 'Player1',
       all_players: [
         { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 180 },
         { name: 'Player2', race: 'Zerg', result: 'Loss', team: 2, is_observer: false, mmr: 4400, apm: 200 },
       ],
-      game_metadata: {
-        map: 'Altitude LE',
-        duration: 600,
-        game_date: '2024-01-01',
-        game_type: '1v1',
-        category: 'Ladder',
-        patch: '5.0.12',
-        winner: 'Player1',
-        loser: 'Player2',
+      suggested_player: 'Player1',
+      players: {
+        '1': {
+          pid: 1,
+          name: 'Player1',
+          race: 'Terran',
+          result: 'Win',
+          build_fingerprint: 'T:sbbb...',
+          production_score: 85,
+          production_idle_total: 30,
+          production_idle_percent: 5,
+          supply_score: 90,
+          supply_block_total: 12,
+          supply_block_count: 2,
+          supply_block_percent: 2,
+          avg_mineral_float: 400,
+          avg_gas_float: 200,
+          inject_idle_total: null,
+          inject_efficiency: null,
+          inject_count: null,
+          build_order: [
+            { time: 12, supply: 14, item: 'SCV', type: 'unit' },
+            { time: 35, supply: 15, item: 'SupplyDepot', type: 'building' },
+          ],
+          phases: {},
+          fingerprint: {
+            matchup: 'TvZ',
+            timings: { first_barracks: 60 },
+            sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+            army_composition: {},
+            production_timeline: {},
+            economy: { workers_3min: 30, workers_5min: 50, workers_7min: 60, expansion_count: 2, avg_expansion_timing: 180 },
+            tactical: { moveout_times: [], first_moveout: null, harass_count: 0, engagement_count: 0, first_engagement: null },
+            micro: { selection_count: 100, avg_selections_per_min: 10, control_groups_used: 5, most_used_control_group: '1', camera_movement_count: 50, avg_camera_moves_per_min: 5 },
+            positioning: { proxy_buildings: 0, avg_building_distance_from_main: 50 },
+            ratios: { gas_count: 4, production_count: 8, tech_count: 2, reactor_count: 2, techlab_count: 2, expansions: 2, gas_per_base: 2, production_per_base: 4 },
+          },
+        },
+        '2': {
+          pid: 2,
+          name: 'Player2',
+          race: 'Zerg',
+          result: 'Loss',
+          build_fingerprint: 'Z:hoe...',
+          production_score: 80,
+          production_idle_total: 45,
+          production_idle_percent: 7.5,
+          supply_score: 85,
+          supply_block_total: 18,
+          supply_block_count: 3,
+          supply_block_percent: 3,
+          avg_mineral_float: 500,
+          avg_gas_float: 250,
+          inject_idle_total: 60,
+          inject_efficiency: 75,
+          inject_count: 20,
+          build_order: [],
+          phases: {},
+          fingerprint: {
+            matchup: 'ZvT',
+            timings: {},
+            sequences: { tech_sequence: [], build_sequence: [], upgrade_sequence: [] },
+            army_composition: {},
+            production_timeline: {},
+            economy: { workers_3min: 32, workers_5min: 55, workers_7min: 65, expansion_count: 3, avg_expansion_timing: 150 },
+            tactical: { moveout_times: [], first_moveout: null, harass_count: 0, engagement_count: 0, first_engagement: null },
+            micro: { selection_count: 120, avg_selections_per_min: 12, control_groups_used: 6, most_used_control_group: '1', camera_movement_count: 60, avg_camera_moves_per_min: 6 },
+            positioning: { proxy_buildings: 0, avg_building_distance_from_main: 40 },
+            ratios: { gas_count: 6, production_count: 0, tech_count: 3, reactor_count: 0, techlab_count: 0, expansions: 3, gas_per_base: 2, production_per_base: 0 },
+          },
+        },
       },
     };
 
@@ -566,15 +451,17 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
       data: mockResponse,
     });
 
-    const result = await client.extractAllPlayersFingerprints(file);
+    const result = await client.extractMetrics(file);
 
     expect(result).toEqual(mockResponse);
-    expect(result.player_fingerprints).toHaveProperty('Player1');
-    expect(result.player_fingerprints).toHaveProperty('Player2');
-    expect(result.suggested_player).toBe('Player1');
+    expect(result.map_name).toBe('Altitude LE');
+    expect(result.duration).toBe(600);
+    expect(result.game_metadata.game_type).toBe('1v1');
     expect(result.all_players).toHaveLength(2);
+    expect((result as any).players['1'].production_score).toBe(85);
+    expect((result as any).players['2'].inject_efficiency).toBe(75);
     expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining('/fingerprint-all'),
+      expect.stringContaining('/metrics'),
       expect.any(Object),
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -584,24 +471,44 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
     );
   });
 
-  it('should pass suggested player name when provided', async () => {
+  it('should return single player metrics when player_name is provided', async () => {
     const client = new SC2ReplayAPIClient();
     const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
 
     const mockResponse = {
       filename: 'test.SC2Replay',
-      player_fingerprints: {},
-      suggested_player: 'ProvidedPlayer',
-      all_players: [],
+      map_name: 'Altitude LE',
+      duration: 600,
       game_metadata: {
-        map: 'Test Map',
-        duration: null,
-        game_date: null,
-        game_type: null,
-        category: null,
-        patch: null,
-        winner: null,
-        loser: null,
+        game_date: '2024-01-01T12:00:00',
+        game_type: '1v1',
+        category: 'Ladder',
+        patch: '5.0.12',
+      },
+      all_players: [
+        { name: 'Player1', race: 'Terran', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 180 },
+        { name: 'Player2', race: 'Zerg', result: 'Loss', team: 2, is_observer: false, mmr: 4400, apm: 200 },
+      ],
+      player: {
+        pid: 1,
+        name: 'Player1',
+        race: 'Terran',
+        result: 'Win',
+        build_fingerprint: 'T:sbbb...',
+        production_score: 85,
+        production_idle_total: 30,
+        production_idle_percent: 5,
+        supply_score: 90,
+        supply_block_total: 12,
+        supply_block_count: 2,
+        supply_block_percent: 2,
+        avg_mineral_float: 400,
+        avg_gas_float: 200,
+        inject_idle_total: null,
+        inject_efficiency: null,
+        inject_count: null,
+        build_order: [],
+        phases: {},
       },
     };
 
@@ -609,10 +516,11 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
       data: mockResponse,
     });
 
-    await client.extractAllPlayersFingerprints(file, 'ProvidedPlayer');
+    const result = await client.extractMetrics(file, 'Player1');
 
-    // Verify FormData contains the player_name
-    expect(axios.post).toHaveBeenCalled();
+    expect((result as any).player).toBeDefined();
+    expect((result as any).player.name).toBe('Player1');
+    expect((result as any).players).toBeUndefined();
   });
 
   it('should handle 401 authentication error', async () => {
@@ -622,8 +530,22 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
     const error = createMockAxiosError(401, { error: 'Unauthorized' });
     (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
-    await expect(client.extractAllPlayersFingerprints(file)).rejects.toThrow(
+    await expect(client.extractMetrics(file)).rejects.toThrow(
       'Authentication failed. Invalid API key.'
+    );
+  });
+
+  it('should handle 404 player not found error', async () => {
+    const client = new SC2ReplayAPIClient();
+    const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
+
+    const error = createMockAxiosError(404, {
+      detail: "Player 'Unknown' not found. Available: ['Player1', 'Player2']",
+    });
+    (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
+
+    await expect(client.extractMetrics(file, 'Unknown')).rejects.toThrow(
+      "Player 'Unknown' not found"
     );
   });
 
@@ -637,9 +559,21 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
     });
     (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
-    await expect(client.extractAllPlayersFingerprints(file)).rejects.toThrow(
+    await expect(client.extractMetrics(file)).rejects.toThrow(
       'Failed to parse replay file: Corrupted replay file'
     );
+  });
+
+  it('should handle 503 metrics unavailable error', async () => {
+    const client = new SC2ReplayAPIClient();
+    const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
+
+    const error = createMockAxiosError(503, {
+      detail: 'Metrics processing unavailable: Import error',
+    });
+    (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
+
+    await expect(client.extractMetrics(file)).rejects.toThrow();
   });
 
   it('should handle network errors', async () => {
@@ -648,6 +582,59 @@ describe('SC2ReplayAPIClient - extractAllPlayersFingerprints', () => {
 
     (axios.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
-    await expect(client.extractAllPlayersFingerprints(file)).rejects.toThrow('Network error');
+    await expect(client.extractMetrics(file)).rejects.toThrow('Network error');
+  });
+
+  it('should include Zerg inject metrics for Zerg players', async () => {
+    const client = new SC2ReplayAPIClient();
+    const file = createMockFile('content', 'test.SC2Replay', 'application/octet-stream');
+
+    const mockZergResponse = {
+      filename: 'test.SC2Replay',
+      map_name: 'Altitude LE',
+      duration: 600,
+      game_metadata: {
+        game_date: '2024-01-01T12:00:00',
+        game_type: '1v1',
+        category: 'Ladder',
+        patch: '5.0.12',
+      },
+      all_players: [
+        { name: 'ZergPlayer', race: 'Zerg', result: 'Win', team: 1, is_observer: false, mmr: 4500, apm: 200 },
+      ],
+      player: {
+        pid: 1,
+        name: 'ZergPlayer',
+        race: 'Zerg',
+        result: 'Win',
+        build_fingerprint: 'Z:hoe...',
+        production_score: 80,
+        production_idle_total: 45,
+        production_idle_percent: 7.5,
+        supply_score: 85,
+        supply_block_total: 18,
+        supply_block_count: 3,
+        supply_block_percent: 3,
+        avg_mineral_float: 500,
+        avg_gas_float: 250,
+        inject_idle_total: 60.5,
+        inject_efficiency: 75.2,
+        inject_count: 20,
+        build_order: [],
+        phases: {},
+      },
+    };
+
+    (axios.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: mockZergResponse,
+    });
+
+    const result = await client.extractMetrics(file, 'ZergPlayer');
+    const player = (result as any).player;
+
+    expect(player.race).toBe('Zerg');
+    expect(player.inject_idle_total).toBe(60.5);
+    expect(player.inject_efficiency).toBe(75.2);
+    expect(player.inject_count).toBe(20);
   });
 });

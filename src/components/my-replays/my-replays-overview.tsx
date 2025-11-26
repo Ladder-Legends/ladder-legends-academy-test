@@ -3,6 +3,7 @@
 import { UserReplayData } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, TrendingUp, BarChart3, Lightbulb, Calendar, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { ThreePillars } from './three-pillars';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
@@ -245,6 +246,9 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
 
   return (
     <div className="space-y-6">
+      {/* Three Pillars */}
+      <ThreePillars replays={replays} confirmedPlayerNames={confirmedPlayerNames} />
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>

@@ -31,9 +31,12 @@ const {
   getUserSettings,
   createUserSettings,
   updateUserSettings,
+  createIndexEntry,
+  addToReplayIndex,
+  removeFromReplayIndex,
 } = kvModule;
 
-import type { UserReplayData } from '@/lib/replay-types';
+import type { UserReplayData, ReplayFingerprint, MetricsResponse } from '@/lib/replay-types';
 import { nanoid } from 'nanoid';
 
 // Log which KV implementation is being used (only once at startup)
@@ -65,10 +68,11 @@ async function storeReplayWithRollback(
 ): Promise<{ blobUrl?: string }> {
   let blobUrl: string | undefined;
   let kvSaved = false;
+  let indexUpdated = false;
 
   try {
     // Step 1: Store blob file
-    console.log('📦 [STORE] Step 1/3: Storing replay file in Blob...');
+    console.log('📦 [STORE] Step 1/4: Storing replay file in Blob...');
     try {
       blobUrl = await storeReplayFile(discordId, replayId, filename, buffer);
       replayData.blob_url = blobUrl;
@@ -78,12 +82,23 @@ async function storeReplayWithRollback(
     }
 
     // Step 2: Save to KV
-    console.log('💾 [STORE] Step 2/3: Saving replay metadata to KV...');
+    console.log('💾 [STORE] Step 2/4: Saving replay metadata to KV...');
     await saveReplay(replayData);
     kvSaved = true;
 
-    // Step 3: Save hash to manifest
-    console.log('💾 [STORE] Step 3/3: Saving hash to manifest...');
+    // Step 3: Update replay index
+    console.log('📇 [STORE] Step 3/4: Updating replay index...');
+    try {
+      const indexEntry = createIndexEntry(replayData);
+      await addToReplayIndex(discordId, indexEntry);
+      indexUpdated = true;
+    } catch (err) {
+      // Index update failure is non-critical - log and continue
+      console.warn('⚠️ [STORE] Index update failed (continuing):', err);
+    }
+
+    // Step 4: Save hash to manifest
+    console.log('💾 [STORE] Step 4/4: Saving hash to manifest...');
     await hashManifestManager.addHash(discordId, hash, filename, fileSize, replayId);
 
     console.log('✅ [STORE] All storage steps completed successfully');
@@ -91,6 +106,16 @@ async function storeReplayWithRollback(
 
   } catch (error) {
     console.error('❌ [STORE] Storage failed, initiating rollback...', error);
+
+    // Rollback Step 3: Remove from index if it was updated
+    if (indexUpdated) {
+      try {
+        console.log('🔄 [ROLLBACK] Removing from replay index...');
+        await removeFromReplayIndex(discordId, replayId);
+      } catch (rollbackErr) {
+        console.error('⚠️ [ROLLBACK] Failed to remove from index:', rollbackErr);
+      }
+    }
 
     // Rollback Step 2: Delete KV entry if it was saved
     if (kvSaved) {
@@ -216,16 +241,25 @@ export async function POST(request: NextRequest) {
     console.log(`📊 [ANALYZE] Starting analysis for ${file.name} (hash: ${hash.substring(0, 8)}...)`);
 
     // === ANALYSIS PHASE (read-only, no side effects) ===
-    const allPlayersData = await sc2readerClient.extractAllPlayersFingerprints(
+    // Use unified /metrics endpoint which returns both coaching metrics and fingerprint data
+    const metricsResponse = await sc2readerClient.extractMetrics(
       createReplayBlob(),
       playerName || undefined,
       file.name
-    );
+    ) as MetricsResponse;
 
-    const suggestedPlayer = allPlayersData.suggested_player || playerName || null;
-    const fingerprint = suggestedPlayer && allPlayersData.player_fingerprints[suggestedPlayer]
-      ? allPlayersData.player_fingerprints[suggestedPlayer]
-      : Object.values(allPlayersData.player_fingerprints)[0];
+    // Transform metrics response to player_fingerprints format for storage
+    const player_fingerprints: Record<string, ReplayFingerprint> = {};
+    for (const [_pid, playerData] of Object.entries(metricsResponse.players)) {
+      if (playerData.fingerprint) {
+        player_fingerprints[playerData.name] = playerData.fingerprint;
+      }
+    }
+
+    const suggestedPlayer = metricsResponse.suggested_player || playerName || null;
+    const fingerprint = suggestedPlayer && player_fingerprints[suggestedPlayer]
+      ? player_fingerprints[suggestedPlayer]
+      : Object.values(player_fingerprints)[0];
 
     const detection = await sc2readerClient.detectBuild(
       createReplayBlob(),
@@ -257,9 +291,19 @@ export async function POST(request: NextRequest) {
       target_build_id: buildToCompare || undefined,
       detection,
       comparison,
-      player_fingerprints: allPlayersData.player_fingerprints,
+      player_fingerprints,
       suggested_player: suggestedPlayer,
-      game_metadata: allPlayersData.game_metadata,
+      game_metadata: {
+        map: metricsResponse.map_name,
+        duration: metricsResponse.duration,
+        game_date: metricsResponse.game_metadata.game_date,
+        game_type: metricsResponse.game_metadata.game_type,
+        category: metricsResponse.game_metadata.category,
+        patch: metricsResponse.game_metadata.patch,
+        // Extract winner/loser from all_players
+        winner: metricsResponse.all_players.find(p => p.result === 'Win')?.name || null,
+        loser: metricsResponse.all_players.find(p => p.result === 'Loss')?.name || null,
+      },
       fingerprint,
     };
 
@@ -365,9 +409,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const discordId = session.user.discordId;
+
     // Get replay first to check for blob URL
     const { getReplay } = kvModule;
-    const replay = await getReplay(session.user.discordId, replayId);
+    const replay = await getReplay(discordId, replayId);
 
     // Delete the blob file if it exists
     if (replay?.blob_url) {
@@ -378,7 +424,16 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await deleteReplay(session.user.discordId, replayId);
+    // Delete from KV
+    await deleteReplay(discordId, replayId);
+
+    // Remove from replay index
+    try {
+      await removeFromReplayIndex(discordId, replayId);
+    } catch (err) {
+      // Index update failure is non-critical
+      console.warn('⚠️ Failed to remove from replay index:', err);
+    }
 
     return NextResponse.json({
       success: true,
