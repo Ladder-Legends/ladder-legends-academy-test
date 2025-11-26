@@ -1919,5 +1919,20 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": true
+  },
+  {
+    "id": "a66b7866-aae7-4404-a66a-ca9f478d77fb",
+    "title": "Tip of the week #6: How to Drop while moving ",
+    "description": "Coach nico goes over how to drop whilst moving with transport units",
+    "source": "youtube",
+    "youtubeId": "NKWtsscGAok",
+    "thumbnail": "https://img.youtube.com/vi/NKWtsscGAok/hqdefault.jpg",
+    "date": "2025-11-26",
+    "categories": [],
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": true
   }
 ]
