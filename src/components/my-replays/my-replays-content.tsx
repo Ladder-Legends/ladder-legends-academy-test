@@ -6,9 +6,10 @@ import { useSession } from 'next-auth/react';
 import { FilterableContentLayout } from '@/components/ui/filterable-content-layout';
 import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { MyReplaysTable } from './my-replays-table';
-import { MyReplaysOverview } from './my-replays-overview';
+import { MyReplaysOverview, DateRangeSelector } from './my-replays-overview';
 import { PlayerNameSuggestionCard } from './player-name-suggestion-card';
 import { UserReplayData, UserSettings } from '@/lib/replay-types';
+import { useDateRangePreferences } from '@/hooks/use-chart-preferences';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
@@ -19,6 +20,9 @@ export function MyReplaysContent() {
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [, setError] = useState(''); // error display UI not yet implemented
+
+  // Date range filter (lifted from overview for header placement)
+  const { dateRange, setDateRange } = useDateRangePreferences();
 
   // Filters and search
   const [searchQuery, setSearchQuery] = useState('');
@@ -468,6 +472,7 @@ export function MyReplaysContent() {
         replays={sortedReplays}
         confirmedPlayerNames={userSettings?.confirmed_player_names || []}
         userId={session?.user?.discordId}
+        dateRange={dateRange}
       />
     </>
   );
@@ -487,6 +492,7 @@ export function MyReplaysContent() {
         tableLabel="List"
         gridIcon="chart"
         tableIcon="list"
+        headerActions={<DateRangeSelector value={dateRange} onChange={setDateRange} />}
         filters={filters}
         searchQuery={searchQuery}
         selectedTags={[]}

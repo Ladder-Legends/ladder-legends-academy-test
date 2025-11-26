@@ -293,9 +293,7 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   const gameCount = activeReplays.length;
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">The Three Pillars</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Production Pillar */}
         <PillarCard
           title="Production"
@@ -326,7 +324,6 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
             />
           }
         />
-      </div>
     </div>
   );
 }

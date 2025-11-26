@@ -16,7 +16,6 @@ import {
   getFullMetricsFromReplay,
 } from '@/lib/metrics-scoring';
 import {
-  useDateRangePreferences,
   filterByDateRange,
   type DateRangeOption,
 } from '@/hooks/use-chart-preferences';
@@ -26,6 +25,7 @@ interface MyReplaysOverviewProps {
   replays: UserReplayData[];
   confirmedPlayerNames?: string[];
   userId?: string;
+  dateRange: DateRangeOption;
 }
 
 interface MatchupPillarStats {
@@ -74,7 +74,7 @@ function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   };
 }
 
-// Date range selector component
+// Date range selector component - exported for use in parent header
 const dateRangeOptions: { value: DateRangeOption; label: string }[] = [
   { value: 'all', label: 'All Time' },
   { value: '7', label: 'Last 7 Days' },
@@ -82,7 +82,7 @@ const dateRangeOptions: { value: DateRangeOption; label: string }[] = [
   { value: '90', label: 'Last 90 Days' },
 ];
 
-function DateRangeSelector({
+export function DateRangeSelector({
   value,
   onChange,
 }: {
@@ -109,9 +109,7 @@ function DateRangeSelector({
   );
 }
 
-export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }: MyReplaysOverviewProps) {
-  // Date range filter
-  const { dateRange, setDateRange } = useDateRangePreferences();
+export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId, dateRange }: MyReplaysOverviewProps) {
 
   // Filter out observer games (games where we didn't actually play)
   const nonObserverReplays = replays.filter((r) => {
@@ -142,7 +140,6 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
 
   // Calculate stats
   const totalGames = activeReplays.length;
-  const totalAllTime = nonObserverReplays.length;
 
   // Determine player's race (most common race they play)
   const raceCount = activeReplays.reduce((acc, r) => {
@@ -238,19 +235,6 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
 
   return (
     <div className="space-y-6">
-      {/* Date Range Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Showing {totalGames} game{totalGames !== 1 ? 's' : ''}
-            {dateRange !== 'all' && totalAllTime > totalGames && (
-              <span> of {totalAllTime} total</span>
-            )}
-          </span>
-        </div>
-        <DateRangeSelector value={dateRange} onChange={setDateRange} />
-      </div>
-
       {/* Three Pillars */}
       <ThreePillars replays={activeReplays} confirmedPlayerNames={confirmedPlayerNames} />
 
