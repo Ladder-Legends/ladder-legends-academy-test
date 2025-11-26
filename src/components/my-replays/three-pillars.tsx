@@ -244,15 +244,19 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   const avgSupplyBlocks = useMemo(() => calculateAvgSupplyBlocks(activeReplays), [activeReplays]);
   const avgBlockTime = useMemo(() => calculateAvgBlockTime(activeReplays), [activeReplays]);
 
-  // Production subtitle - always show avg time when available
+  // Production subtitle - show avg time if available, otherwise indicate data source
   const productionSubtitle = avgIdleTime !== null
     ? `${formatTime(avgIdleTime)} avg idle`
-    : 'No data yet';
+    : productionScore !== null
+      ? 'Based on execution'
+      : 'No data yet';
 
   // Supply subtitle - always show avg time when available
   const supplySubtitle = avgBlockTime !== null
     ? `${formatTime(avgBlockTime)} avg blocked`
-    : 'No data yet';
+    : supplyScore !== null
+      ? 'Calculated from replays'
+      : 'No data yet';
 
   // Helper to format time
   function formatTime(seconds: number): string {

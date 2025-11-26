@@ -97,7 +97,7 @@ function PeriodToggle({
           size="sm"
           className={cn(
             'h-7 px-3 text-xs',
-            value === option.value && 'bg-background shadow-sm'
+            value === option.value && 'bg-primary text-primary-foreground shadow-sm'
           )}
           onClick={() => onChange(option.value)}
         >
@@ -423,13 +423,13 @@ export function MetricsTrendsChart({
                 {Number.isFinite(summary.overallWinRate) ? `${summary.overallWinRate.toFixed(1)}%` : '--'}
               </span>
             </div>
-            {summary.avgSupplyBlockTime !== null && (
+            {summary.avgSupplyBlockTime !== null && Number.isFinite(summary.avgSupplyBlockTime) && (
               <div>
                 <span className="text-muted-foreground">Avg Supply Block:</span>{' '}
                 <span className="font-medium">{formatTime(summary.avgSupplyBlockTime)}</span>
               </div>
             )}
-            {summary.avgProductionIdleTime !== null && (
+            {summary.avgProductionIdleTime !== null && Number.isFinite(summary.avgProductionIdleTime) && (
               <div>
                 <span className="text-muted-foreground">Avg Prod Idle:</span>{' '}
                 <span className="font-medium">{formatTime(summary.avgProductionIdleTime)}</span>

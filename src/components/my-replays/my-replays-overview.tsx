@@ -98,7 +98,7 @@ function DateRangeSelector({
           size="sm"
           className={cn(
             'h-7 px-3 text-xs',
-            value === option.value && 'bg-background shadow-sm'
+            value === option.value && 'bg-primary text-primary-foreground shadow-sm'
           )}
           onClick={() => onChange(option.value)}
         >
