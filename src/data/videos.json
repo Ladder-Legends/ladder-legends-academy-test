@@ -1864,5 +1864,26 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "95ecb4e0-4c03-4b7b-8af9-eeb2324edd2b",
+    "title": "Countering Meta-Playstyles with the Nicosystem™ - Stargate",
+    "description": "Hello everyone, in this video I cover the double gas adaptation of viking/cyclone against stargate, why it works and some common mistakes to avoid making when using this on the ladder against Protoss. ",
+    "source": "mux",
+    "muxAssetId": "q6aoLpZ39l01vHERmmjZAx3CjttWSUY4K3hkuqacri9U",
+    "muxPlaybackId": "YbEE02tMRxw1rQ2zeWE7GhsRYK2oAQIZi5udtBDruXVI",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/95ecb4e0-4c03-4b7b-8af9-eeb2324edd2b.jpg",
+    "date": "2025-11-26",
+    "categories": [
+      "builds.timing-attack",
+      "matchups.tvp",
+      "strategy.early-game"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
