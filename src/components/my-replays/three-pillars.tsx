@@ -270,11 +270,15 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   // Production subtitle
   const productionSubtitle = avgIdleTime !== null
     ? `${Math.round(avgIdleTime)}s avg idle`
+    : productionScore !== null
+    ? 'Based on execution'
     : 'No data yet';
 
   // Supply subtitle
   const supplySubtitle = avgSupplyBlocks !== null
     ? `${avgSupplyBlocks.toFixed(1)} blocks avg`
+    : supplyScore !== null
+    ? `${Math.round(avgBlockTime || 0)}s blocked avg`
     : 'No data yet';
 
   return (

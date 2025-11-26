@@ -1,13 +1,62 @@
 'use client';
 
+import { useMemo } from 'react';
 import { UserReplayData } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, BarChart3, Lightbulb, Calendar, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { Trophy, TrendingUp, BarChart3, Calendar, Cog, Eye } from 'lucide-react';
 import { ThreePillars } from './three-pillars';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
   confirmedPlayerNames?: string[];
+}
+
+/**
+ * Calculate production score for a replay
+ */
+function calculateProductionScore(replay: UserReplayData): number | null {
+  if (replay.comparison?.execution_score != null) {
+    return replay.comparison.execution_score;
+  }
+  return null;
+}
+
+/**
+ * Calculate supply score for a replay
+ */
+function calculateSupplyScore(replay: UserReplayData): number | null {
+  const economy = replay.fingerprint?.economy;
+  if (!economy) return null;
+
+  const blockCount = economy.supply_block_count;
+  const totalBlockTime = economy.total_supply_block_time;
+
+  if (blockCount == null && totalBlockTime == null) return null;
+
+  let score = 100;
+  let penalty = 0;
+
+  if (blockCount != null) penalty += blockCount * 10;
+  if (totalBlockTime != null) penalty += totalBlockTime * 2;
+
+  if (economy.supply_block_periods?.length) {
+    for (const block of economy.supply_block_periods) {
+      if (block.start < 300) {
+        penalty += (block.duration || 0) * 1;
+      }
+    }
+  }
+
+  score = Math.max(0, score - penalty);
+  return Math.min(100, score);
+}
+
+interface MatchupPillarStats {
+  total: number;
+  wins: number;
+  losses: number;
+  productionScores: number[];
+  supplyScores: number[];
 }
 
 export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyReplaysOverviewProps) {
@@ -40,46 +89,55 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
   const _playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0];
   void _playerRace; // Currently unused - prepared for player race display feature
 
-  // Matchup stats - normalize to show player's race first (using confirmed/suggested player name)
-  const matchupStats = activeReplays.reduce((acc, r) => {
-    if (!r.fingerprint.all_players) return acc;
+  // Matchup stats with pillar scores - normalize to show player's race first
+  const matchupStats = useMemo(() => {
+    return activeReplays.reduce((acc, r) => {
+      if (!r.fingerprint.all_players) return acc;
 
-    // Find player using confirmed/suggested name priority
-    let playerData = null;
-    for (const confirmedName of confirmedPlayerNames) {
-      playerData = r.fingerprint.all_players.find(p => p.name === confirmedName);
-      if (playerData) break;
-    }
-    if (!playerData && r.player_name) {
-      playerData = r.fingerprint.all_players.find(p => p.name === r.player_name);
-    }
-    if (!playerData && r.fingerprint.player_name) {
-      playerData = r.fingerprint.all_players.find(p => p.name === r.fingerprint.player_name);
-    }
+      // Find player using confirmed/suggested name priority
+      let playerData = null;
+      for (const confirmedName of confirmedPlayerNames) {
+        playerData = r.fingerprint.all_players.find(p => p.name === confirmedName);
+        if (playerData) break;
+      }
+      if (!playerData && r.player_name) {
+        playerData = r.fingerprint.all_players.find(p => p.name === r.player_name);
+      }
+      if (!playerData && r.fingerprint.player_name) {
+        playerData = r.fingerprint.all_players.find(p => p.name === r.fingerprint.player_name);
+      }
 
-    if (!playerData) return acc;
+      if (!playerData) return acc;
 
-    // Find opponent(s)
-    const opponents = r.fingerprint.all_players.filter(
-      p => !p.is_observer && p.team !== playerData.team
-    );
+      // Find opponent(s)
+      const opponents = r.fingerprint.all_players.filter(
+        p => !p.is_observer && p.team !== playerData.team
+      );
 
-    if (opponents.length === 0) return acc;
+      if (opponents.length === 0) return acc;
 
-    const playerRaceInThisGame = playerData.race;
-    const opponentRace = opponents[0].race;
+      const playerRaceInThisGame = playerData.race;
+      const opponentRace = opponents[0].race;
 
-    // Create normalized matchup: PlayerRace[0]vOpponentRace[0] (e.g., "TvZ", "PvT")
-    const normalizedMatchup = `${playerRaceInThisGame[0]}v${opponentRace[0]}`;
+      // Create normalized matchup: PlayerRace[0]vOpponentRace[0] (e.g., "TvZ", "PvT")
+      const normalizedMatchup = `${playerRaceInThisGame[0]}v${opponentRace[0]}`;
 
-    if (!acc[normalizedMatchup]) {
-      acc[normalizedMatchup] = { total: 0, wins: 0, losses: 0 };
-    }
-    acc[normalizedMatchup].total++;
-    if (r.fingerprint.metadata.result === 'Win') acc[normalizedMatchup].wins++;
-    if (r.fingerprint.metadata.result === 'Loss') acc[normalizedMatchup].losses++;
-    return acc;
-  }, {} as Record<string, { total: number; wins: number; losses: number }>);
+      if (!acc[normalizedMatchup]) {
+        acc[normalizedMatchup] = { total: 0, wins: 0, losses: 0, productionScores: [], supplyScores: [] };
+      }
+      acc[normalizedMatchup].total++;
+      if (r.fingerprint.metadata.result === 'Win') acc[normalizedMatchup].wins++;
+      if (r.fingerprint.metadata.result === 'Loss') acc[normalizedMatchup].losses++;
+
+      // Calculate and store pillar scores
+      const prodScore = calculateProductionScore(r);
+      const supplyScore = calculateSupplyScore(r);
+      if (prodScore !== null) acc[normalizedMatchup].productionScores.push(prodScore);
+      if (supplyScore !== null) acc[normalizedMatchup].supplyScores.push(supplyScore);
+
+      return acc;
+    }, {} as Record<string, MatchupPillarStats>);
+  }, [activeReplays, confirmedPlayerNames]);
 
   // Calculate execution score based on available data
   // Priority: 1) comparison.execution_score, 2) calculate from economy metrics
@@ -128,121 +186,23 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
     ? (executionScores.reduce((sum, score) => sum + score, 0) / executionScores.length).toFixed(1)
     : null;
 
-  // Calculate average supply blocks
-  const supplyBlockCounts = activeReplays
-    .map((r) => r.fingerprint?.economy?.supply_block_count)
-    .filter((count): count is number => count != null);
-  const avgSupplyBlocks = supplyBlockCounts.length > 0
-    ? (supplyBlockCounts.reduce((sum, count) => sum + count, 0) / supplyBlockCounts.length).toFixed(1)
-    : null;
-
-  // Calculate progress trends (compare recent 5 games to previous 5 games)
-  const sortedByDate = [...activeReplays].sort((a, b) =>
-    new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime()
-  );
-
-  const recentGames = sortedByDate.slice(-5);
-  const previousGames = sortedByDate.slice(-10, -5);
-
-  // Win rate trend
-  const recentWinRate = recentGames.length > 0
-    ? (recentGames.filter(r => r.fingerprint.metadata.result === 'Win').length / recentGames.length) * 100
-    : 0;
-  const previousWinRate = previousGames.length > 0
-    ? (previousGames.filter(r => r.fingerprint.metadata.result === 'Win').length / previousGames.length) * 100
-    : recentWinRate;
-  const winRateTrend = recentWinRate - previousWinRate;
-
-  // Supply block trend
-  const recentSupplyBlocks = recentGames
-    .map(r => r.fingerprint?.economy?.supply_block_count)
-    .filter((c): c is number => c != null);
-  const previousSupplyBlocks = previousGames
-    .map(r => r.fingerprint?.economy?.supply_block_count)
-    .filter((c): c is number => c != null);
-  const recentAvgBlocks = recentSupplyBlocks.length > 0
-    ? recentSupplyBlocks.reduce((sum, count) => sum + count, 0) / recentSupplyBlocks.length
-    : 0;
-  const previousAvgBlocks = previousSupplyBlocks.length > 0
-    ? previousSupplyBlocks.reduce((sum, count) => sum + count, 0) / previousSupplyBlocks.length
-    : recentAvgBlocks;
-  const supplyBlockTrend = previousAvgBlocks - recentAvgBlocks; // Positive if improving (fewer blocks)
-
-  // Generate personalized tips
-  const tips: string[] = [];
-
-  // Win rate tips
-  if (totalGames < 5) {
-    tips.push("Keep uploading replays! The more games you track, the better insights you'll get.");
-  } else if (parseFloat(winRate) >= 60) {
-    tips.push("Great win rate! You're performing well. Keep up the momentum!");
-  } else if (parseFloat(winRate) < 45) {
-    tips.push("Focus on one matchup at a time to improve your win rate.");
-  }
-
-  // Supply block tips
-  if (avgSupplyBlocks != null) {
-    const avgBlocks = parseFloat(avgSupplyBlocks);
-    if (avgBlocks > 8) {
-      tips.push("Try setting a mental reminder to build supply every time you build production.");
-    } else if (avgBlocks > 4) {
-      tips.push("You're getting supply blocked a bit often. Work on building supply proactively!");
-    } else if (avgBlocks <= 2) {
-      tips.push("Excellent supply management! You're rarely getting blocked.");
-    }
-  }
-
-  // Execution tips
-  if (avgExecution != null) {
-    const execution = parseFloat(avgExecution);
-    if (execution >= 85) {
-      tips.push("Your execution is solid! Focus on decision-making and strategy.");
-    } else if (execution < 70) {
-      tips.push("Work on hitting your build order timings and managing resources.");
-    }
-  }
-
-  // Matchup-specific tips
-  const worstMatchup = Object.entries(matchupStats)
-    .filter(([, stats]) => stats.total >= 3)
-    .sort((a, b) => (a[1].wins / a[1].total) - (b[1].wins / b[1].total))[0];
-  if (worstMatchup) {
-    const matchupWinRate = (worstMatchup[1].wins / worstMatchup[1].total) * 100;
-    if (matchupWinRate < 40) {
-      tips.push(`Your ${worstMatchup[0]} needs work. Review pro builds for this matchup.`);
-    }
-  }
-
-  // Progress tips
-  if (totalGames >= 10) {
-    if (winRateTrend > 10) {
-      tips.push("You're improving! Your recent games show a positive trend.");
-    } else if (winRateTrend < -10) {
-      tips.push("Take a break and watch some replays to see where you can improve.");
-    }
-
-    if (supplyBlockTrend > 2) {
-      tips.push("Nice! You're getting supply blocked less frequently.");
-    }
-  }
-
-  // Ensure we always have at least one tip
-  if (tips.length === 0) {
-    tips.push("Keep playing and tracking your games to unlock personalized tips!");
-  }
-
   // Most played matchup
   const mostPlayedMatchup = Object.entries(matchupStats).sort((a, b) => b[1].total - a[1].total)[0];
 
-  // Best matchup by win rate
-  const bestMatchup = Object.entries(matchupStats)
-    .filter(([, stats]) => stats.total >= 3) // Minimum 3 games
-    .map(([matchup, stats]) => ({
-      matchup,
-      winRate: (stats.wins / stats.total) * 100,
-      games: stats.total,
-    }))
-    .sort((a, b) => b.winRate - a.winRate)[0];
+  // Helper to get score color class
+  const getScoreColor = (score: number | null) => {
+    if (score === null) return 'text-muted-foreground';
+    if (score >= 85) return 'text-green-500';
+    if (score >= 70) return 'text-yellow-500';
+    if (score >= 50) return 'text-orange-500';
+    return 'text-red-500';
+  };
+
+  // Helper to average an array of scores
+  const avgScore = (scores: number[]): number | null => {
+    if (scores.length === 0) return null;
+    return scores.reduce((a, b) => a + b, 0) / scores.length;
+  };
 
   return (
     <div className="space-y-6">
@@ -304,124 +264,76 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
         </Card>
       </div>
 
-      {/* Tips Section */}
-      {tips.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-yellow-500" />
-              <CardTitle>Tips for Improvement</CardTitle>
-            </div>
-            <CardDescription>Personalized suggestions based on your recent games</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {tips.map((tip, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-yellow-500 mt-1">•</span>
-                  <span className="text-sm">{tip}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Recent Progress */}
-      {totalGames >= 10 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Progress</CardTitle>
-            <CardDescription>Your last 5 games vs. previous 5 games</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Win Rate</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{recentWinRate.toFixed(1)}%</span>
-                  {winRateTrend > 5 && (
-                    <div className="flex items-center gap-1 text-green-500">
-                      <ArrowUp className="h-4 w-4" />
-                      <span className="text-xs">+{winRateTrend.toFixed(1)}%</span>
-                    </div>
-                  )}
-                  {winRateTrend < -5 && (
-                    <div className="flex items-center gap-1 text-red-500">
-                      <ArrowDown className="h-4 w-4" />
-                      <span className="text-xs">{winRateTrend.toFixed(1)}%</span>
-                    </div>
-                  )}
-                  {Math.abs(winRateTrend) <= 5 && (
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Minus className="h-4 w-4" />
-                      <span className="text-xs">Steady</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {avgSupplyBlocks != null && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Supply Blocks</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">{recentAvgBlocks.toFixed(1)} avg</span>
-                    {supplyBlockTrend > 1 && (
-                      <div className="flex items-center gap-1 text-green-500">
-                        <ArrowUp className="h-4 w-4" />
-                        <span className="text-xs">Improving!</span>
-                      </div>
-                    )}
-                    {supplyBlockTrend < -1 && (
-                      <div className="flex items-center gap-1 text-red-500">
-                        <ArrowDown className="h-4 w-4" />
-                        <span className="text-xs">Needs work</span>
-                      </div>
-                    )}
-                    {Math.abs(supplyBlockTrend) <= 1 && (
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Minus className="h-4 w-4" />
-                        <span className="text-xs">Steady</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Matchup Breakdown */}
+      {/* Matchup Breakdown with Pillar Scores */}
       <Card>
         <CardHeader>
-          <CardTitle>Matchup Breakdown</CardTitle>
-          <CardDescription>Your performance in each matchup</CardDescription>
+          <CardTitle>Matchup Performance</CardTitle>
+          <CardDescription>Win rate and pillar scores by matchup</CardDescription>
         </CardHeader>
         <CardContent>
           {Object.keys(matchupStats).length === 0 ? (
             <p className="text-sm text-muted-foreground">No games yet. Upload some replays to see your stats!</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {Object.entries(matchupStats)
                 .sort((a, b) => b[1].total - a[1].total)
                 .map(([matchup, stats]) => {
-                  const matchupWinRate = ((stats.wins / stats.total) * 100).toFixed(1);
+                  const matchupWinRate = (stats.wins / stats.total) * 100;
+                  const prodAvg = avgScore(stats.productionScores);
+                  const supplyAvg = avgScore(stats.supplyScores);
+
                   return (
-                    <div key={matchup} className="space-y-2">
+                    <div key={matchup} className="space-y-3 pb-4 border-b last:border-b-0 last:pb-0">
+                      {/* Matchup Header */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{matchup}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl font-bold">{matchup}</span>
                           <span className="text-sm text-muted-foreground">
-                            {stats.wins}W - {stats.losses}L
+                            {stats.total} game{stats.total !== 1 ? 's' : ''}
                           </span>
                         </div>
-                        <span className="text-sm font-medium">{matchupWinRate}%</span>
+                        <div className="text-right">
+                          <span className={`text-lg font-bold ${matchupWinRate >= 50 ? 'text-green-500' : 'text-red-500'}`}>
+                            {matchupWinRate.toFixed(0)}%
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-1">
+                            ({stats.wins}W-{stats.losses}L)
+                          </span>
+                        </div>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all"
-                          style={{ width: `${matchupWinRate}%` }}
-                        />
+
+                      {/* Pillar Scores Row */}
+                      <div className="grid grid-cols-3 gap-4">
+                        {/* Vision - Coming Soon */}
+                        <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Vision</p>
+                            <p className="text-sm font-medium text-muted-foreground">--</p>
+                          </div>
+                        </div>
+
+                        {/* Production */}
+                        <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
+                          <Cog className="h-4 w-4" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Production</p>
+                            <p className={`text-sm font-bold ${getScoreColor(prodAvg)}`}>
+                              {prodAvg !== null ? `${Math.round(prodAvg)}%` : '--'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Supply */}
+                        <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
+                          <BarChart3 className="h-4 w-4" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Supply</p>
+                            <p className={`text-sm font-bold ${getScoreColor(supplyAvg)}`}>
+                              {supplyAvg !== null ? `${Math.round(supplyAvg)}%` : '--'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
@@ -430,28 +342,6 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [] }: MyRepl
           )}
         </CardContent>
       </Card>
-
-      {/* Best Matchup */}
-      {bestMatchup && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Best Matchup</CardTitle>
-            <CardDescription>Your strongest matchup (min. 3 games)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold">{bestMatchup.matchup}</p>
-                <p className="text-sm text-muted-foreground">{bestMatchup.games} games played</p>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-primary">{bestMatchup.winRate.toFixed(1)}%</p>
-                <p className="text-sm text-muted-foreground">win rate</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
