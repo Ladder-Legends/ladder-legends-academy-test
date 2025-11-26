@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { UserReplayData } from '@/lib/replay-types';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SortableTable, ColumnConfig } from '@/components/ui/sortable-table';
 import { Badge } from '@/components/ui/badge';
@@ -306,7 +306,30 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
       sortable: false,
       getValue: () => '',
       render: (replay) => (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-1">
+          {/* Download button */}
+          {replay.blob_url && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Create a temporary link to download the file
+                const link = document.createElement('a');
+                link.href = replay.blob_url!;
+                link.download = replay.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="h-8 w-8 p-0"
+              title="Download replay"
+            >
+              <Download className="h-4 w-4 text-muted-foreground hover:text-primary" />
+            </Button>
+          )}
+          {/* Delete button */}
           {onDelete && (
             <Button
               variant="ghost"
@@ -317,6 +340,7 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
                 onDelete(replay);
               }}
               className="h-8 w-8 p-0"
+              title="Delete replay"
             >
               <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
             </Button>

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { TimezoneSettings } from '@/components/settings/timezone-settings';
+import { PlayerNamesSettings } from '@/components/settings/player-names-settings';
 import { Footer } from '@/components/footer';
 
 export const metadata: Metadata = {
@@ -20,19 +21,17 @@ export default function SettingsPage() {
             </p>
 
             <div className="space-y-6">
+              {/* Gamer Tags Settings */}
+              <div className="bg-card rounded-lg border p-6">
+                <h2 className="text-xl font-semibold mb-4">Gamer Tags</h2>
+                <PlayerNamesSettings />
+              </div>
+
               {/* Timezone Settings */}
               <div className="bg-card rounded-lg border p-6">
                 <h2 className="text-xl font-semibold mb-4">Time & Date</h2>
                 <TimezoneSettings />
               </div>
-
-              {/* Future settings sections can be added here */}
-              {/*
-              <div className="bg-card rounded-lg border p-6">
-                <h2 className="text-xl font-semibold mb-4">Notifications</h2>
-                ... notification settings ...
-              </div>
-              */}
             </div>
           </div>
         </div>

@@ -280,7 +280,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const suggestedPlayer = metricsResponse.suggested_player || playerName || null;
+    // Priority: uploader's player_name > sc2reader's suggested_player
+    // The uploader explicitly sends the player name, so we trust that over sc2reader's guess
+    const suggestedPlayer = playerName || metricsResponse.suggested_player || null;
     const fingerprint = suggestedPlayer && player_fingerprints[suggestedPlayer]
       ? player_fingerprints[suggestedPlayer]
       : Object.values(player_fingerprints)[0];

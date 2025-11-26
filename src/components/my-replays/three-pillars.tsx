@@ -115,16 +115,37 @@ function aggregateSupplyScore(replays: UserReplayData[]): number | null {
 }
 
 /**
- * Calculate average production idle time
+ * Calculate total production idle time from production_by_building
+ * Returns total across all games (not average)
  */
-function calculateAvgIdleTime(replays: UserReplayData[]): number | null {
-  const idleTimes = replays
-    .map(r => (r as { fingerprint?: { production?: { idle_total?: number } } })
-      ?.fingerprint?.production?.idle_total)
+function calculateTotalIdleTime(replays: UserReplayData[]): number | null {
+  let total = 0;
+  let hasData = false;
+
+  for (const replay of replays) {
+    const productionByBuilding = replay.fingerprint?.economy?.production_by_building;
+    if (productionByBuilding) {
+      hasData = true;
+      for (const building of Object.values(productionByBuilding)) {
+        total += building.idle_seconds || 0;
+      }
+    }
+  }
+
+  return hasData ? total : null;
+}
+
+/**
+ * Calculate total supply block time
+ * Returns total across all games (not average)
+ */
+function calculateTotalSupplyBlockTime(replays: UserReplayData[]): number | null {
+  const times = replays
+    .map(r => r.fingerprint?.economy?.total_supply_block_time)
     .filter((t): t is number => t !== null && t !== undefined);
 
-  if (idleTimes.length === 0) return null;
-  return idleTimes.reduce((sum, t) => sum + t, 0) / idleTimes.length;
+  if (times.length === 0) return null;
+  return times.reduce((sum, t) => sum + t, 0);
 }
 
 /**
@@ -140,15 +161,13 @@ function calculateAvgSupplyBlocks(replays: UserReplayData[]): number | null {
 }
 
 /**
- * Calculate average supply block time
+ * Format time for display (exported for tooltips)
  */
-function calculateAvgBlockTime(replays: UserReplayData[]): number | null {
-  const times = replays
-    .map(r => r.fingerprint?.economy?.total_supply_block_time)
-    .filter((t): t is number => t !== null && t !== undefined);
-
-  if (times.length === 0) return null;
-  return times.reduce((sum, t) => sum + t, 0) / times.length;
+function formatTimeValue(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
 }
 
 /**
@@ -156,26 +175,28 @@ function calculateAvgBlockTime(replays: UserReplayData[]): number | null {
  */
 function ProductionTooltipContent({
   avgScore,
-  avgIdleTime,
+  totalIdleTime,
+  gameCount,
 }: {
   avgScore: number | null;
-  avgIdleTime: number | null;
+  totalIdleTime: number | null;
+  gameCount: number;
 }) {
   return (
     <div className="space-y-2">
       <p className="font-semibold">Production Efficiency: {avgScore !== null ? `${Math.round(avgScore)}%` : 'N/A'}</p>
-      {avgIdleTime !== null && (
+      {totalIdleTime !== null && (
         <p className="text-sm text-muted-foreground">
-          {Math.round(avgIdleTime)}s avg idle per game
+          {formatTimeValue(totalIdleTime)} total idle across {gameCount} game{gameCount !== 1 ? 's' : ''}
         </p>
       )}
       <div className="border-t pt-2 mt-2">
-        <p className="text-xs font-medium mb-1">Scoring:</p>
+        <p className="text-xs font-medium mb-1">Score based on:</p>
         <ul className="text-xs text-muted-foreground space-y-0.5">
-          <li>0-10s idle: -1 per second</li>
-          <li>10-30s idle: -2 per second</li>
-          <li>30s+ idle: -3 per second</li>
-          <li>Macro ability: up to -20 points</li>
+          <li>% of game spent with idle production</li>
+          <li>Lower idle % = higher score</li>
+          <li>10% idle ≈ 80% score</li>
+          <li>20% idle ≈ 60% score</li>
         </ul>
       </div>
     </div>
@@ -188,11 +209,13 @@ function ProductionTooltipContent({
 function SupplyTooltipContent({
   avgScore,
   avgBlocks,
-  avgBlockTime,
+  totalBlockTime,
+  gameCount,
 }: {
   avgScore: number | null;
   avgBlocks: number | null;
-  avgBlockTime: number | null;
+  totalBlockTime: number | null;
+  gameCount: number;
 }) {
   return (
     <div className="space-y-2">
@@ -202,17 +225,18 @@ function SupplyTooltipContent({
           {avgBlocks.toFixed(1)} blocks per game avg
         </p>
       )}
-      {avgBlockTime !== null && (
+      {totalBlockTime !== null && (
         <p className="text-sm text-muted-foreground">
-          {Math.round(avgBlockTime)}s avg time blocked
+          {formatTimeValue(totalBlockTime)} total blocked across {gameCount} game{gameCount !== 1 ? 's' : ''}
         </p>
       )}
       <div className="border-t pt-2 mt-2">
-        <p className="text-xs font-medium mb-1">Scoring:</p>
+        <p className="text-xs font-medium mb-1">Score based on:</p>
         <ul className="text-xs text-muted-foreground space-y-0.5">
-          <li>Each block: -10 points</li>
-          <li>Per second blocked: -2 points</li>
-          <li>Early block (&lt;5min): 1.5x penalty</li>
+          <li>% of game spent supply blocked</li>
+          <li>Lower block % = higher score</li>
+          <li>10% blocked ≈ 75% score</li>
+          <li>20% blocked ≈ 50% score</li>
         </ul>
       </div>
     </div>
@@ -239,21 +263,21 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   const productionScore = useMemo(() => aggregateProductionScore(activeReplays), [activeReplays]);
   const supplyScore = useMemo(() => aggregateSupplyScore(activeReplays), [activeReplays]);
 
-  // Calculate additional metrics for tooltips
-  const avgIdleTime = useMemo(() => calculateAvgIdleTime(activeReplays), [activeReplays]);
+  // Calculate total time metrics (summed across all games)
+  const totalIdleTime = useMemo(() => calculateTotalIdleTime(activeReplays), [activeReplays]);
+  const totalBlockTime = useMemo(() => calculateTotalSupplyBlockTime(activeReplays), [activeReplays]);
   const avgSupplyBlocks = useMemo(() => calculateAvgSupplyBlocks(activeReplays), [activeReplays]);
-  const avgBlockTime = useMemo(() => calculateAvgBlockTime(activeReplays), [activeReplays]);
 
-  // Production subtitle - show avg time if available, otherwise indicate data source
-  const productionSubtitle = avgIdleTime !== null
-    ? `${formatTime(avgIdleTime)} avg idle`
+  // Production subtitle - show total time if available
+  const productionSubtitle = totalIdleTime !== null
+    ? `${formatTime(totalIdleTime)} total idle`
     : productionScore !== null
       ? 'Based on execution'
       : 'No data yet';
 
-  // Supply subtitle - always show avg time when available
-  const supplySubtitle = avgBlockTime !== null
-    ? `${formatTime(avgBlockTime)} avg blocked`
+  // Supply subtitle - show total time when available
+  const supplySubtitle = totalBlockTime !== null
+    ? `${formatTime(totalBlockTime)} total blocked`
     : supplyScore !== null
       ? 'Calculated from replays'
       : 'No data yet';
@@ -265,6 +289,8 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
     const secs = Math.round(seconds % 60);
     return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
   }
+
+  const gameCount = activeReplays.length;
 
   return (
     <div className="space-y-4">
@@ -279,7 +305,8 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
           tooltipContent={
             <ProductionTooltipContent
               avgScore={productionScore}
-              avgIdleTime={avgIdleTime}
+              totalIdleTime={totalIdleTime}
+              gameCount={gameCount}
             />
           }
         />
@@ -294,7 +321,8 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
             <SupplyTooltipContent
               avgScore={supplyScore}
               avgBlocks={avgSupplyBlocks}
-              avgBlockTime={avgBlockTime}
+              totalBlockTime={totalBlockTime}
+              gameCount={gameCount}
             />
           }
         />

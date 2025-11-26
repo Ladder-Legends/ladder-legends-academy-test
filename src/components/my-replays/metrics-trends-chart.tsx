@@ -78,7 +78,6 @@ const periodOptions: { value: TimePeriod; label: string }[] = [
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
   { value: 'monthly', label: 'Monthly' },
-  { value: 'all-time', label: 'All Time' },
 ];
 
 function PeriodToggle({

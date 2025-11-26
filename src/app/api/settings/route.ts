@@ -141,6 +141,30 @@ export async function PATCH(request: NextRequest) {
         message: 'Player name rejected',
         settings,
       });
+    } else if (action === 'remove_confirmed_name') {
+      // Remove from confirmed names
+      settings.confirmed_player_names = settings.confirmed_player_names.filter(
+        (name: string) => name !== player_name
+      );
+
+      await updateUserSettings(settings);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Player name removed',
+        settings,
+      });
+    } else if (action === 'clear_all_possible_names') {
+      // Clear all possible/suggested names
+      settings.possible_player_names = {};
+
+      await updateUserSettings(settings);
+
+      return NextResponse.json({
+        success: true,
+        message: 'All suggestions cleared',
+        settings,
+      });
     } else {
       // General update
       Object.assign(settings, body);
