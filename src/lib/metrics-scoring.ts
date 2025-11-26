@@ -456,3 +456,191 @@ export function parseMatchup(matchup: string): { playerRace: string; opponentRac
     opponentRace: expandRaceInitial(parts[1]),
   };
 }
+
+// ============================================================================
+// Nemesis & Player Stats Calculation
+// ============================================================================
+
+import type { NemesisSummary, MatchupStats, PlayerStatsSummary } from './replay-types';
+
+/**
+ * Calculate nemesis (opponent you lose to most) from replay index entries
+ *
+ * @param entries - Replay index entries to analyze
+ * @param minGames - Minimum games against opponent to be considered (default: 3)
+ * @returns Nemesis summary or null if no qualifying opponents
+ */
+export function calculateNemesis(
+  entries: ReplayIndexEntry[],
+  minGames: number = 3
+): NemesisSummary | null {
+  // Group by opponent
+  const opponentStats = new Map<string, {
+    opponent_race: string;
+    games: number;
+    losses: number;
+    wins: number;
+    by_your_race: Record<string, { games: number; losses: number }>;
+  }>();
+
+  for (const entry of entries) {
+    if (!entry.opponent_name) continue;
+
+    const key = entry.opponent_name;
+    if (!opponentStats.has(key)) {
+      opponentStats.set(key, {
+        opponent_race: entry.opponent_race || 'Unknown',
+        games: 0,
+        losses: 0,
+        wins: 0,
+        by_your_race: {},
+      });
+    }
+
+    const stats = opponentStats.get(key)!;
+    stats.games++;
+    if (entry.result === 'Loss') stats.losses++;
+    if (entry.result === 'Win') stats.wins++;
+
+    // Track by player's race
+    const playerRace = entry.player_race || 'Unknown';
+    if (!stats.by_your_race[playerRace]) {
+      stats.by_your_race[playerRace] = { games: 0, losses: 0 };
+    }
+    stats.by_your_race[playerRace].games++;
+    if (entry.result === 'Loss') {
+      stats.by_your_race[playerRace].losses++;
+    }
+  }
+
+  // Find the opponent with highest loss rate (min games threshold)
+  let nemesis: NemesisSummary | null = null;
+  let highestLossRate = 0;
+
+  for (const [opponent_name, stats] of opponentStats) {
+    if (stats.games < minGames) continue;
+
+    const loss_rate = (stats.losses / stats.games) * 100;
+    if (loss_rate > highestLossRate) {
+      highestLossRate = loss_rate;
+      nemesis = {
+        opponent_name,
+        opponent_race: stats.opponent_race,
+        games_played: stats.games,
+        losses: stats.losses,
+        wins: stats.wins,
+        loss_rate,
+        by_your_race: Object.fromEntries(
+          Object.entries(stats.by_your_race).map(([race, data]) => [
+            race,
+            { games: data.games, losses: data.losses, loss_rate: (data.losses / data.games) * 100 },
+          ])
+        ),
+      };
+    }
+  }
+
+  return nemesis;
+}
+
+/**
+ * Calculate matchup statistics from replay index entries
+ */
+export function calculateMatchupStats(entries: ReplayIndexEntry[]): MatchupStats[] {
+  const matchupMap = new Map<string, {
+    games: number;
+    wins: number;
+    losses: number;
+    supplyBlockTimes: number[];
+    productionIdleTimes: number[];
+    durations: number[];
+  }>();
+
+  for (const entry of entries) {
+    if (!entry.matchup) continue;
+
+    if (!matchupMap.has(entry.matchup)) {
+      matchupMap.set(entry.matchup, {
+        games: 0,
+        wins: 0,
+        losses: 0,
+        supplyBlockTimes: [],
+        productionIdleTimes: [],
+        durations: [],
+      });
+    }
+
+    const stats = matchupMap.get(entry.matchup)!;
+    stats.games++;
+    if (entry.result === 'Win') stats.wins++;
+    if (entry.result === 'Loss') stats.losses++;
+    if (entry.supply_block_time !== null) {
+      stats.supplyBlockTimes.push(entry.supply_block_time);
+    }
+    if (entry.production_idle_time !== null) {
+      stats.productionIdleTimes.push(entry.production_idle_time);
+    }
+    stats.durations.push(entry.duration);
+  }
+
+  const avg = (arr: number[]): number | null =>
+    arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+
+  return Array.from(matchupMap.entries())
+    .map(([matchup, stats]) => ({
+      matchup,
+      games: stats.games,
+      wins: stats.wins,
+      losses: stats.losses,
+      win_rate: (stats.wins / stats.games) * 100,
+      avg_supply_block_time: avg(stats.supplyBlockTimes),
+      avg_production_idle_time: avg(stats.productionIdleTimes),
+      avg_duration: avg(stats.durations) || 0,
+    }))
+    .sort((a, b) => b.games - a.games);
+}
+
+/**
+ * Calculate per-player (gamer tag) statistics summary
+ *
+ * Useful for users with multiple SC2 accounts/names
+ */
+export function calculatePlayerStats(entries: ReplayIndexEntry[]): PlayerStatsSummary[] {
+  const playerMap = new Map<string, ReplayIndexEntry[]>();
+
+  for (const entry of entries) {
+    const playerName = entry.player_name || 'Unknown';
+    if (!playerMap.has(playerName)) {
+      playerMap.set(playerName, []);
+    }
+    playerMap.get(playerName)!.push(entry);
+  }
+
+  return Array.from(playerMap.entries())
+    .map(([player_name, playerEntries]) => {
+      const games = playerEntries.length;
+      const wins = playerEntries.filter((e) => e.result === 'Win').length;
+      const losses = playerEntries.filter((e) => e.result === 'Loss').length;
+
+      // Determine primary race (most frequently played)
+      const raceCounts = playerEntries.reduce((acc, e) => {
+        const race = e.player_race || 'Unknown';
+        acc[race] = (acc[race] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      const primary_race = Object.entries(raceCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'Unknown';
+
+      return {
+        player_name,
+        games,
+        wins,
+        losses,
+        win_rate: games > 0 ? (wins / games) * 100 : 0,
+        primary_race,
+        matchups: calculateMatchupStats(playerEntries),
+        nemesis: calculateNemesis(playerEntries),
+      };
+    })
+    .sort((a, b) => b.games - a.games);
+}

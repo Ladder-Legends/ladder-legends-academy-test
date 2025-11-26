@@ -9,6 +9,7 @@
  * - Stores fingerprints in Vercel Blob for coach replays
  * - Deletes entries without blob files (cleanup mode)
  * - Bumps manifest version to signal uploaders to re-sync
+ * - Rebuilds replay index with player/opponent info for nemesis tracking
  *
  * Usage:
  *   npx tsx scripts/remetrics-replays.ts                         # Dry run (user replays)
@@ -20,6 +21,8 @@
  *   npx tsx scripts/remetrics-replays.ts --cleanup --execute     # Actually delete
  *   npx tsx scripts/remetrics-replays.ts --user 123456           # Specific user
  *   npx tsx scripts/remetrics-replays.ts --limit 5               # Process only 5
+ *   npx tsx scripts/remetrics-replays.ts --rebuild-index         # Rebuild replay index (dry run)
+ *   npx tsx scripts/remetrics-replays.ts --rebuild-index --all-users --execute  # Rebuild all indexes
  */
 
 import { config } from 'dotenv';
@@ -38,8 +41,9 @@ import { kv } from '@vercel/kv';
 import axios from 'axios';
 import FormData from 'form-data';
 import { put, list, del } from '@vercel/blob';
-import type { UserReplayData, MetricsResponse, ReplayFingerprint } from '../src/lib/replay-types';
+import type { UserReplayData, MetricsResponse, ReplayFingerprint, ReplayIndex, ReplayIndexEntry } from '../src/lib/replay-types';
 import type { HashManifest } from '../src/lib/replay-hash-manifest';
+import { createIndexEntry } from '../src/lib/replay-kv';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -47,6 +51,7 @@ const DRY_RUN = !args.includes('--execute');
 const CLEANUP_MODE = args.includes('--cleanup');
 const COACH_MODE = args.includes('--coach');
 const ALL_USERS = args.includes('--all-users');
+const REBUILD_INDEX = args.includes('--rebuild-index');
 const LIMIT = args.includes('--limit')
   ? parseInt(args[args.indexOf('--limit') + 1], 10)
   : undefined;
@@ -251,6 +256,57 @@ async function removeHashesAndBumpVersion(
   }
 
   return { removedCount, newVersion: manifest.manifest_version || 0 };
+}
+
+// =============================================================================
+// REPLAY INDEX OPERATIONS
+// =============================================================================
+
+async function rebuildUserReplayIndex(discordUserId: string, dryRun: boolean): Promise<number> {
+  const replayIds = await kv.get<string[]>(KEYS.userReplays(discordUserId)) || [];
+
+  if (replayIds.length === 0) {
+    console.log(`   No replays to index`);
+    return 0;
+  }
+
+  const entries: ReplayIndexEntry[] = [];
+
+  for (const id of replayIds) {
+    const replay = await kv.get<UserReplayData>(KEYS.userReplay(discordUserId, id));
+    if (!replay) continue;
+
+    const entry = createIndexEntry(replay);
+    entries.push(entry);
+  }
+
+  // Sort by game date (newest first), then by upload date
+  entries.sort((a, b) => {
+    const dateA = a.game_date ? new Date(a.game_date).getTime() : new Date(a.uploaded_at).getTime();
+    const dateB = b.game_date ? new Date(b.game_date).getTime() : new Date(b.uploaded_at).getTime();
+    return dateB - dateA;
+  });
+
+  const index: ReplayIndex = {
+    version: Date.now(),
+    last_updated: new Date().toISOString(),
+    replay_count: entries.length,
+    entries,
+  };
+
+  if (dryRun) {
+    console.log(`   Would create index with ${entries.length} entries`);
+    // Show sample entry
+    if (entries.length > 0) {
+      const sample = entries[0];
+      console.log(`   Sample entry: ${sample.player_name} (${sample.player_race}) vs ${sample.opponent_name} (${sample.opponent_race})`);
+    }
+  } else {
+    await kv.set(KEYS.userReplayIndex(discordUserId), index);
+    console.log(`   ✅ Index created with ${entries.length} entries`);
+  }
+
+  return entries.length;
 }
 
 // =============================================================================
@@ -609,12 +665,12 @@ async function processCoachReplays(
 
 async function main() {
   const modeLabel = COACH_MODE ? 'Coach Replays' : 'User Replays';
-  const opLabel = CLEANUP_MODE ? 'Cleanup' : 'Re-Metrics';
+  const opLabel = REBUILD_INDEX ? 'Rebuild Index' : (CLEANUP_MODE ? 'Cleanup' : 'Re-Metrics');
 
   console.log(`\n${'='.repeat(70)}`);
   console.log(`🔬 Unified Re-Metrics Script - ${modeLabel} - ${opLabel}`);
   console.log(`${'='.repeat(70)}`);
-  if (!CLEANUP_MODE) {
+  if (!CLEANUP_MODE && !REBUILD_INDEX) {
     console.log(`SC2Reader API: ${SC2READER_API_URL}`);
   }
   console.log(`Mode: ${DRY_RUN ? '🔎 DRY RUN' : '⚠️  EXECUTE MODE'}`);
@@ -625,6 +681,32 @@ async function main() {
   if (LIMIT) console.log(`Limit: ${LIMIT}`);
   if (REPLAY_ID) console.log(`Specific Replay: ${REPLAY_ID}`);
   console.log(`${'='.repeat(70)}\n`);
+
+  // Handle rebuild-index mode separately (doesn't need sc2reader)
+  if (REBUILD_INDEX && !COACH_MODE) {
+    let userIds: string[];
+    if (ALL_USERS) {
+      console.log('🔍 Scanning for all users in KV...');
+      userIds = await findAllUserIds();
+      console.log(`   Found ${userIds.length} users with replays\n`);
+    } else {
+      userIds = [USER_ID || DEFAULT_USER_ID];
+    }
+
+    let totalIndexed = 0;
+    for (const userId of userIds) {
+      console.log(`\n📑 Rebuilding index for user: ${userId}`);
+      const count = await rebuildUserReplayIndex(userId, DRY_RUN);
+      totalIndexed += count;
+    }
+
+    console.log(`\n${'='.repeat(70)}`);
+    console.log('📊 SUMMARY:');
+    console.log(`${'='.repeat(70)}`);
+    console.log(`  Users: ${userIds.length}`);
+    console.log(`  Total entries ${DRY_RUN ? 'to index' : 'indexed'}: ${totalIndexed}`);
+    return;
+  }
 
   if (COACH_MODE) {
     // Process coach replays

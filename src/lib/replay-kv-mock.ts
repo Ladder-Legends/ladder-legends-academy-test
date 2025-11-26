@@ -318,16 +318,36 @@ export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   const metadata = fingerprint.metadata;
   const economy = fingerprint.economy;
 
-  // Find opponent name
+  // Determine player name (priority: replay.player_name > suggested_player > fingerprint.player_name)
+  const playerName = replay.player_name || replay.suggested_player || fingerprint.player_name || '';
+
+  // Find player and opponent info from all_players
+  let playerRace = fingerprint.race || 'Unknown';
   let opponentName = '';
+  let opponentRace = metadata.opponent_race || 'Unknown';
+
   if (fingerprint.all_players) {
-    const playerName = replay.suggested_player || replay.player_name || fingerprint.player_name;
     const playerData = fingerprint.all_players.find(p => p.name === playerName);
     if (playerData) {
+      playerRace = playerData.race;
       const opponent = fingerprint.all_players.find(
         p => !p.is_observer && p.team !== playerData.team
       );
-      opponentName = opponent?.name || '';
+      if (opponent) {
+        opponentName = opponent.name;
+        opponentRace = opponent.race;
+      }
+    } else {
+      // Fallback: If we can't find player by name, use first non-observer player and their opponent
+      const players = fingerprint.all_players.filter(p => !p.is_observer);
+      if (players.length >= 2) {
+        const firstPlayer = players[0];
+        const opponent = players.find(p => p.team !== firstPlayer.team);
+        if (opponent) {
+          opponentName = opponent.name;
+          opponentRace = opponent.race;
+        }
+      }
     }
   }
 
@@ -348,13 +368,20 @@ export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
     uploaded_at: replay.uploaded_at,
     game_date: metadata.game_date,
 
+    // Player info (for multi-account users)
+    player_name: playerName,
+    player_race: playerRace,
+
     // Game info
     game_type: replay.game_type || metadata.game_type || '1v1',
     matchup: fingerprint.matchup,
     result: metadata.result as 'Win' | 'Loss',
     duration: metadata.duration || 0,
     map_name: metadata.map,
+
+    // Opponent info (for nemesis tracking)
     opponent_name: opponentName,
+    opponent_race: opponentRace,
 
     // Reference comparison (null until implemented)
     reference_id: null,

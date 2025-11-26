@@ -401,6 +401,13 @@ export interface SinglePlayerMetricsResponse {
 /**
  * Lightweight replay entry for list view (stored in replay index).
  * Much smaller than full UserReplayData for performance.
+ *
+ * Design Goals:
+ * - Per-user (discord login) storage via KV key: user:{userId}:replay-index
+ * - Per-player breakdown: player_name tracks which gamer tag was used
+ * - Nemesis tracking: opponent_name + result enables "who do I lose to most"
+ * - Time-series charting: game_date + metrics for trends
+ * - Lightweight: ~600 bytes per entry vs ~10KB for full replay data
  */
 export interface ReplayIndexEntry {
   id: string;
@@ -408,13 +415,20 @@ export interface ReplayIndexEntry {
   uploaded_at: string;
   game_date: string | null;
 
+  // Player info (for multi-account users)
+  player_name: string;           // User's gamer tag in this game (e.g., "Lotus")
+  player_race: string;           // Race played (e.g., "Terran") - for "my games as Terran" filter
+
   // Game info (for filtering/display)
   game_type: string;             // "1v1-ladder", "2v2-ladder", etc.
-  matchup: string;               // "TvZ"
+  matchup: string;               // "TvZ" - canonical format
   result: 'Win' | 'Loss';
   duration: number;              // seconds
   map_name: string;
-  opponent_name: string;
+
+  // Opponent info (for nemesis tracking)
+  opponent_name: string;         // Primary opponent's name
+  opponent_race: string;         // Primary opponent's race (e.g., "Zerg")
 
   // Reference comparison (if assigned)
   reference_id: string | null;
@@ -443,6 +457,51 @@ export interface ReplayIndex {
   last_updated: string;      // ISO timestamp
   replay_count: number;      // Quick integrity check
   entries: ReplayIndexEntry[];
+}
+
+/**
+ * Nemesis summary - opponent you lose to most often.
+ * Calculated client-side from ReplayIndexEntry[].
+ */
+export interface NemesisSummary {
+  opponent_name: string;
+  opponent_race: string;
+  games_played: number;
+  losses: number;
+  wins: number;
+  loss_rate: number;         // 0-100%
+  // Breakdown by your race (for multi-race players)
+  by_your_race?: Record<string, { games: number; losses: number; loss_rate: number }>;
+}
+
+/**
+ * Aggregated stats for a specific matchup.
+ * Calculated client-side from ReplayIndexEntry[].
+ */
+export interface MatchupStats {
+  matchup: string;           // "TvZ", "TvP", etc.
+  games: number;
+  wins: number;
+  losses: number;
+  win_rate: number;          // 0-100%
+  avg_supply_block_time: number | null;
+  avg_production_idle_time: number | null;
+  avg_duration: number;
+}
+
+/**
+ * Per-player (gamer tag) stats summary.
+ * Enables multi-account users to see stats broken down by which name they used.
+ */
+export interface PlayerStatsSummary {
+  player_name: string;
+  games: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  primary_race: string;      // Most frequently played race
+  matchups: MatchupStats[];
+  nemesis: NemesisSummary | null;
 }
 
 /**

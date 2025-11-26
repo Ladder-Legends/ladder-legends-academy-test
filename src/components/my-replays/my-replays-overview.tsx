@@ -49,17 +49,38 @@ function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   const metadata = fp.metadata;
   const metrics = getFullMetricsFromReplay(replay);
 
+  // Get player info
+  const playerName = replay.player_name || replay.suggested_player || fp.player_name || '';
+  const playerRace = fp.race || 'Unknown';
+
+  // Get opponent info
+  let opponentName = '';
+  let opponentRace = metadata.opponent_race || 'Unknown';
+  if (fp.all_players) {
+    const playerData = fp.all_players.find(p => p.name === playerName);
+    if (playerData) {
+      const opponent = fp.all_players.find(p => !p.is_observer && p.team !== playerData.team);
+      if (opponent) {
+        opponentName = opponent.name;
+        opponentRace = opponent.race;
+      }
+    }
+  }
+
   return {
     id: replay.id,
     filename: replay.filename,
     uploaded_at: replay.uploaded_at,
     game_date: metadata.game_date,
+    player_name: playerName,
+    player_race: playerRace,
     game_type: replay.game_type || metadata.game_type || '1v1',
     matchup: fp.matchup,
     result: metadata.result as 'Win' | 'Loss',
     duration: metadata.duration || 0,
     map_name: metadata.map,
-    opponent_name: '', // Not needed for charts
+    opponent_name: opponentName,
+    opponent_race: opponentRace,
     reference_id: null,
     reference_alias: null,
     comparison_score: replay.comparison?.execution_score ?? null,
