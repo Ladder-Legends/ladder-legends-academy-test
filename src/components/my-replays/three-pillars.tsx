@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Eye, Cog, BarChart3 } from 'lucide-react';
+import { Cog, BarChart3 } from 'lucide-react';
 import { PillarCard } from './pillar-card';
 import type { UserReplayData } from '@/lib/replay-types';
 
@@ -220,30 +220,7 @@ function SupplyTooltipContent({
 }
 
 /**
- * Vision Tooltip Content
- */
-function VisionTooltipContent() {
-  return (
-    <div className="space-y-2">
-      <p className="font-semibold">Vision Control</p>
-      <p className="text-sm text-muted-foreground">
-        This feature is coming soon!
-      </p>
-      <div className="border-t pt-2 mt-2">
-        <p className="text-xs font-medium mb-1">Will track:</p>
-        <ul className="text-xs text-muted-foreground space-y-0.5">
-          <li>Creep spread (Zerg)</li>
-          <li>Scan efficiency (Terran)</li>
-          <li>Observer coverage (Protoss)</li>
-          <li>Map vision over time</li>
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-/**
- * ThreePillars - Container component showing Vision, Production, and Supply pillars
+ * ThreePillars - Container component showing Production and Supply pillars
  */
 export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNames }: ThreePillarsProps) {
   // Filter out observer games
@@ -267,34 +244,28 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
   const avgSupplyBlocks = useMemo(() => calculateAvgSupplyBlocks(activeReplays), [activeReplays]);
   const avgBlockTime = useMemo(() => calculateAvgBlockTime(activeReplays), [activeReplays]);
 
-  // Production subtitle
+  // Production subtitle - always show avg time when available
   const productionSubtitle = avgIdleTime !== null
-    ? `${Math.round(avgIdleTime)}s avg idle`
-    : productionScore !== null
-    ? 'Based on execution'
+    ? `${formatTime(avgIdleTime)} avg idle`
     : 'No data yet';
 
-  // Supply subtitle
-  const supplySubtitle = avgSupplyBlocks !== null
-    ? `${avgSupplyBlocks.toFixed(1)} blocks avg`
-    : supplyScore !== null
-    ? `${Math.round(avgBlockTime || 0)}s blocked avg`
+  // Supply subtitle - always show avg time when available
+  const supplySubtitle = avgBlockTime !== null
+    ? `${formatTime(avgBlockTime)} avg blocked`
     : 'No data yet';
+
+  // Helper to format time
+  function formatTime(seconds: number): string {
+    if (seconds < 60) return `${Math.round(seconds)}s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+  }
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">The Three Pillars</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Vision Pillar - Coming Soon */}
-        <PillarCard
-          title="Vision"
-          icon={<Eye className="h-6 w-6" />}
-          score={null}
-          subtitle="Coming Soon"
-          tooltipContent={<VisionTooltipContent />}
-          disabled
-        />
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Production Pillar */}
         <PillarCard
           title="Production"

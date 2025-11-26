@@ -101,7 +101,8 @@ export function getPeriodKeyAndLabel(date: Date, period: TimePeriod): { key: str
       const start = getStartOfWeek(date);
       const weekNum = getWeekNumber(start);
       const key = `${start.getUTCFullYear()}-W${weekNum.toString().padStart(2, '0')}`;
-      const label = `Week ${weekNum}`;
+      // Show the Monday date as the label (e.g., "Nov 25")
+      const label = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return { key, label };
     }
     case 'monthly': {

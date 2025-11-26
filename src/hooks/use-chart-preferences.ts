@@ -5,6 +5,7 @@
  *
  * Saves and restores user preferences for:
  * - Time period selection (daily/weekly/monthly)
+ * - Date range filter (last N days)
  * - Selected matchup filter
  * - Selected build filter
  * - Chart visibility toggles
@@ -16,6 +17,8 @@ import type { TimePeriod } from '@/lib/replay-time-series';
 // ============================================================================
 // Types
 // ============================================================================
+
+export type DateRangeOption = 'all' | '7' | '30' | '90';
 
 export interface ChartPreferences {
   // MetricsTrendsChart
@@ -29,6 +32,9 @@ export interface ChartPreferences {
   // MatchupTrendsChart
   matchupPeriod: TimePeriod;
 
+  // Global date range
+  dateRange: DateRangeOption;
+
   // Visibility toggles
   showWinRate: boolean;
   showSupplyBlockTime: boolean;
@@ -41,6 +47,7 @@ const DEFAULT_PREFERENCES: ChartPreferences = {
   metricsBuild: null,
   gamesPeriod: 'weekly',
   matchupPeriod: 'weekly',
+  dateRange: 'all',
   showWinRate: true,
   showSupplyBlockTime: true,
   showProductionIdleTime: true,
@@ -255,6 +262,74 @@ export function useMatchupTrendsPreferences() {
   }, []);
 
   return { period, setPeriod, isLoaded };
+}
+
+/**
+ * Hook for global date range preferences
+ */
+export function useDateRangePreferences() {
+  const [dateRange, setDateRangeState] = useState<DateRangeOption>('all');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const storageKey = 'ladder-legends-date-range-prefs';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.dateRange) setDateRangeState(parsed.dateRange);
+      }
+    } catch (error) {
+      console.warn('Failed to load date range preferences:', error);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  const setDateRange = useCallback((value: DateRangeOption) => {
+    setDateRangeState(value);
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ dateRange: value }));
+    } catch (error) {
+      console.warn('Failed to save date range preferences:', error);
+    }
+  }, []);
+
+  return { dateRange, setDateRange, isLoaded };
+}
+
+/**
+ * Calculate the cutoff date for a given date range option
+ */
+export function getDateRangeCutoff(dateRange: DateRangeOption): Date | null {
+  if (dateRange === 'all') return null;
+
+  const days = parseInt(dateRange, 10);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  cutoff.setHours(0, 0, 0, 0);
+  return cutoff;
+}
+
+/**
+ * Filter items by date range (works with any item that has game_date or uploaded_at)
+ */
+export function filterByDateRange<T extends { game_date?: string | null; uploaded_at?: string }>(
+  items: T[],
+  dateRange: DateRangeOption
+): T[] {
+  const cutoff = getDateRangeCutoff(dateRange);
+  if (!cutoff) return items;
+
+  return items.filter(item => {
+    const dateStr = item.game_date || item.uploaded_at;
+    if (!dateStr) return true; // Keep items without dates
+    const itemDate = new Date(dateStr);
+    return itemDate >= cutoff;
+  });
 }
 
 export default useChartPreferences;

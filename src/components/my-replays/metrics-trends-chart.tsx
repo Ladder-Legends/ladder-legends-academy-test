@@ -339,7 +339,7 @@ export function MetricsTrendsChart({
           value={selectedMatchup || 'all'}
           onValueChange={(v) => setSelectedMatchup(v === 'all' ? null : v)}
         >
-          <SelectTrigger className="h-8 w-24 text-xs">
+          <SelectTrigger className="h-8 w-[120px] text-xs">
             <SelectValue placeholder="Matchup" />
           </SelectTrigger>
           <SelectContent>
@@ -419,7 +419,9 @@ export function MetricsTrendsChart({
             </div>
             <div>
               <span className="text-muted-foreground">Win Rate:</span>{' '}
-              <span className="font-medium">{summary.overallWinRate.toFixed(1)}%</span>
+              <span className="font-medium">
+                {Number.isFinite(summary.overallWinRate) ? `${summary.overallWinRate.toFixed(1)}%` : '--'}
+              </span>
             </div>
             {summary.avgSupplyBlockTime !== null && (
               <div>

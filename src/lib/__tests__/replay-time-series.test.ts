@@ -167,7 +167,8 @@ describe('Date Utilities', () => {
     it('generates weekly key and label', () => {
       const { key, label } = getPeriodKeyAndLabel(testDate, 'weekly');
       expect(key).toMatch(/2025-W\d+/);
-      expect(label).toMatch(/Week \d+/);
+      // Label now shows the Monday date (e.g., "Nov 25") instead of "Week X"
+      expect(label).toMatch(/[A-Z][a-z]{2} \d+/);
     });
 
     it('generates monthly key and label', () => {

@@ -3,18 +3,24 @@
 import { useMemo } from 'react';
 import { UserReplayData, ReplayIndexEntry } from '@/lib/replay-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, BarChart3, Calendar, Eye, Clock, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, AlertTriangle } from 'lucide-react';
 import { ThreePillars } from './three-pillars';
 import { MetricsTrendsChart } from './metrics-trends-chart';
 import { MatchupTrendsChart } from './matchup-trends-chart';
 import { GamesPlayedChart } from './games-played-chart';
 import {
-  aggregateMetrics,
   formatTime,
   getScoreColorClass,
   getTimeColorClass,
   getFullMetricsFromReplay,
 } from '@/lib/metrics-scoring';
+import {
+  useDateRangePreferences,
+  filterByDateRange,
+  type DateRangeOption,
+} from '@/hooks/use-chart-preferences';
+import { cn } from '@/lib/utils';
 
 interface MyReplaysOverviewProps {
   replays: UserReplayData[];
@@ -68,9 +74,47 @@ function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   };
 }
 
+// Date range selector component
+const dateRangeOptions: { value: DateRangeOption; label: string }[] = [
+  { value: 'all', label: 'All Time' },
+  { value: '7', label: 'Last 7 Days' },
+  { value: '30', label: 'Last 30 Days' },
+  { value: '90', label: 'Last 90 Days' },
+];
+
+function DateRangeSelector({
+  value,
+  onChange,
+}: {
+  value: DateRangeOption;
+  onChange: (value: DateRangeOption) => void;
+}) {
+  return (
+    <div className="flex gap-1 rounded-lg bg-muted p-1">
+      {dateRangeOptions.map((option) => (
+        <Button
+          key={option.value}
+          variant={value === option.value ? 'default' : 'ghost'}
+          size="sm"
+          className={cn(
+            'h-7 px-3 text-xs',
+            value === option.value && 'bg-background shadow-sm'
+          )}
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }: MyReplaysOverviewProps) {
+  // Date range filter
+  const { dateRange, setDateRange } = useDateRangePreferences();
+
   // Filter out observer games (games where we didn't actually play)
-  const activeReplays = replays.filter((r) => {
+  const nonObserverReplays = replays.filter((r) => {
     // If we have all_players data, check if the player was an observer
     if (r.fingerprint.all_players && r.fingerprint.player_name) {
       const playerData = r.fingerprint.all_players.find(p => p.name === r.fingerprint.player_name);
@@ -80,6 +124,16 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
     return true;
   });
 
+  // Apply date range filter
+  const activeReplays = useMemo(() => {
+    // Create a temp array with the required properties for filterByDateRange
+    const withDates = nonObserverReplays.map(r => ({
+      ...r,
+      game_date: r.fingerprint.metadata.game_date,
+    }));
+    return filterByDateRange(withDates, dateRange);
+  }, [nonObserverReplays, dateRange]);
+
   // Convert to index entries for time-series charts
   const indexEntries = useMemo(
     () => activeReplays.map(toIndexEntry),
@@ -88,9 +142,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
 
   // Calculate stats
   const totalGames = activeReplays.length;
-  const wins = activeReplays.filter((r) => r.fingerprint.metadata.result === 'Win').length;
-  const losses = activeReplays.filter((r) => r.fingerprint.metadata.result === 'Loss').length;
-  const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
+  const totalAllTime = nonObserverReplays.length;
 
   // Determine player's race (most common race they play)
   const raceCount = activeReplays.reduce((acc, r) => {
@@ -102,12 +154,6 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
   }, {} as Record<string, number>);
 
   const playerRace = Object.entries(raceCount).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-
-  // Aggregate metrics across all replays
-  const overallMetrics = useMemo(
-    () => aggregateMetrics(activeReplays),
-    [activeReplays]
-  );
 
   // Matchup stats with time-based metrics (primary) and derived scores (secondary)
   const matchupStats = useMemo(() => {
@@ -184,56 +230,6 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
     }, {} as Record<string, MatchupPillarStats>);
   }, [activeReplays, confirmedPlayerNames]);
 
-  // Calculate execution score based on available data
-  // Priority: 1) comparison.execution_score, 2) calculate from economy metrics
-  const executionScores = activeReplays.map((r) => {
-    // Use comparison execution score if available
-    if (r.comparison?.execution_score != null) {
-      return r.comparison.execution_score;
-    }
-
-    // Otherwise calculate from economy metrics (if available)
-    const economy = r.fingerprint?.economy;
-    if (!economy) {
-      return 100; // Default score when economy data is not available
-    }
-
-    let score = 100;
-
-    // Penalize supply blocks (0-30 points)
-    if (economy.supply_block_count != null) {
-      const blockPenalty = Math.min(30, economy.supply_block_count * 3);
-      score -= blockPenalty;
-    }
-
-    // Penalize resource float (0-30 points)
-    if (economy['avg_mineral_float_5min+'] != null) {
-      const mineralFloat = economy['avg_mineral_float_5min+'];
-      // Ideal is ~500, penalize if over 800
-      if (mineralFloat > 800) {
-        const floatPenalty = Math.min(15, (mineralFloat - 800) / 100);
-        score -= floatPenalty;
-      }
-    }
-    if (economy['avg_gas_float_5min+'] != null) {
-      const gasFloat = economy['avg_gas_float_5min+'];
-      // Ideal is ~200, penalize if over 400
-      if (gasFloat > 400) {
-        const floatPenalty = Math.min(15, (gasFloat - 400) / 50);
-        score -= floatPenalty;
-      }
-    }
-
-    return Math.max(0, Math.min(100, score));
-  });
-
-  const avgExecution = executionScores.length > 0
-    ? (executionScores.reduce((sum, score) => sum + score, 0) / executionScores.length).toFixed(1)
-    : null;
-
-  // Most played matchup
-  const mostPlayedMatchup = Object.entries(matchupStats).sort((a, b) => b[1].total - a[1].total)[0];
-
   // Helper to average an array of numbers
   const avg = (arr: number[]): number | null => {
     if (arr.length === 0) return null;
@@ -242,126 +238,21 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
 
   return (
     <div className="space-y-6">
+      {/* Date Range Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            Showing {totalGames} game{totalGames !== 1 ? 's' : ''}
+            {dateRange !== 'all' && totalAllTime > totalGames && (
+              <span> of {totalAllTime} total</span>
+            )}
+          </span>
+        </div>
+        <DateRangeSelector value={dateRange} onChange={setDateRange} />
+      </div>
+
       {/* Three Pillars */}
-      <ThreePillars replays={replays} confirmedPlayerNames={confirmedPlayerNames} />
-
-      {/* Summary Cards - Row 1: Performance Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{winRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              {wins}W - {losses}L
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Games</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalGames}</div>
-            <p className="text-xs text-muted-foreground">
-              {totalGames === 0 ? 'Upload replays to start' : 'replays tracked'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Most Played</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mostPlayedMatchup?.[0] || 'N/A'}</div>
-            <p className="text-xs text-muted-foreground">
-              {mostPlayedMatchup ? `${mostPlayedMatchup[1].total} games` : 'No games yet'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Execution</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgExecution !== null ? `${avgExecution}%` : 'N/A'}</div>
-            <p className="text-xs text-muted-foreground">
-              {avgExecution !== null ? 'Based on mechanics' : 'No data yet'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Summary Cards - Row 2: Time-Based Metrics (Primary) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Avg Supply Block Time */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Supply Block Time</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-3">
-              <span className={`text-2xl font-bold ${
-                overallMetrics.avgSupplyBlockTime !== null
-                  ? getTimeColorClass(overallMetrics.avgSupplyBlockTime, 600)
-                  : 'text-muted-foreground'
-              }`}>
-                {formatTime(overallMetrics.avgSupplyBlockTime)}
-              </span>
-              {overallMetrics.avgSupplyScore !== null && (
-                <span className={`text-sm ${getScoreColorClass(overallMetrics.avgSupplyScore)}`}>
-                  ({Math.round(overallMetrics.avgSupplyScore)}% score)
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {overallMetrics.avgSupplyBlockPercent !== null
-                ? `${overallMetrics.avgSupplyBlockPercent.toFixed(1)}% of game time blocked`
-                : 'No data yet'
-              }
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Avg Production Idle Time */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Production Idle Time</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-3">
-              <span className={`text-2xl font-bold ${
-                overallMetrics.avgProductionIdleTime !== null
-                  ? getTimeColorClass(overallMetrics.avgProductionIdleTime, 600)
-                  : 'text-muted-foreground'
-              }`}>
-                {formatTime(overallMetrics.avgProductionIdleTime)}
-              </span>
-              {overallMetrics.avgProductionScore !== null && (
-                <span className={`text-sm ${getScoreColorClass(overallMetrics.avgProductionScore)}`}>
-                  ({Math.round(overallMetrics.avgProductionScore)}% score)
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {overallMetrics.avgProductionIdlePercent !== null
-                ? `${overallMetrics.avgProductionIdlePercent.toFixed(1)}% of game time idle`
-                : 'No data yet'
-              }
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <ThreePillars replays={activeReplays} confirmedPlayerNames={confirmedPlayerNames} />
 
       {/* Performance Trends (Time-Series) - Full Width */}
       {totalGames >= 3 && userId && (
@@ -433,16 +324,7 @@ export function MyReplaysOverview({ replays, confirmedPlayerNames = [], userId }
                       </div>
 
                       {/* Time-Based Metrics Row (Primary) */}
-                      <div className="grid grid-cols-3 gap-4">
-                        {/* Vision - Coming Soon */}
-                        <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">Vision</p>
-                            <p className="text-sm font-medium text-muted-foreground">--</p>
-                          </div>
-                        </div>
-
+                      <div className="grid grid-cols-2 gap-4">
                         {/* Production Idle Time (Primary) */}
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
                           <Clock className="h-4 w-4" />
