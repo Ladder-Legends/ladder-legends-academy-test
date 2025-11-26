@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { Modal } from '@/components/ui/modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
@@ -9,7 +10,8 @@ import { Video } from '@/types/video';
 import { BuildOrder } from '@/types/build-order';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { replays, coaches, videos as videosJson } from '@/lib/data';
+import { replays, videos as videosJson } from '@/lib/data';
+import { getDefaultCoachForSession, getCoachSelectOptions } from '@/lib/coach-utils';
 import type { SC2AnalysisResponse } from '@/lib/sc2reader-client';
 import { VideoSelector } from './video-selector-enhanced';
 import { MultiCategorySelector } from './multi-category-selector';
@@ -49,9 +51,16 @@ const resultOptions = [
 ];
 
 export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: ReplayEditModalProps) {
+  const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Replay>>({});
+
+  // Get default coach for logged-in user
+  const defaultCoach = useMemo(() =>
+    getDefaultCoachForSession(session?.user?.discordId, session?.user?.name ?? undefined),
+    [session?.user?.discordId, session?.user?.name]
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -144,7 +153,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
         uploadDate: new Date().toISOString().split('T')[0],
         downloadUrl: '',
         videoIds: [],
-        coach: '',
+        coach: defaultCoach, // Auto-populate with logged-in coach
         tags: [],
         patch: getLatestPatch,
         notes: '',
@@ -155,7 +164,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
       player2Search.setSearch('');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [replay, isNew, isOpen, getLatestPatch]);
+  }, [replay, isNew, isOpen, getLatestPatch, defaultCoach]);
 
   const updateField = <K extends keyof Replay>(field: K, value: Replay[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -368,12 +377,7 @@ export function ReplayEditModal({ replay, isOpen, onClose, isNew = false }: Repl
     onClose();
   };
 
-  const coachOptions = [
-    { value: '', label: '-- No Coach --' },
-    ...coaches
-      .filter(coach => coach.isActive !== false)
-      .map(coach => ({ value: coach.name, label: `${coach.displayName} (${coach.race})` })),
-  ];
+  const coachOptions = getCoachSelectOptions();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isNew ? 'New Replay' : 'Edit Replay'} size="xl">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { Modal } from '@/components/ui/modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useMergedContent } from '@/hooks/use-merged-content';
@@ -24,6 +25,7 @@ import { TagInput } from './tag-input';
 import { EditModalFooter } from './edit-modal-footer';
 import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
 import { useAutocompleteSearch } from '@/hooks/use-autocomplete-search';
+import { getCoachForUser } from '@/lib/coach-utils';
 
 interface MasterclassEditModalProps {
   masterclass: Masterclass | null;
@@ -47,8 +49,15 @@ const difficultyOptions = [
 ];
 
 export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = false }: MasterclassEditModalProps) {
+  const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<Masterclass>>({});
+
+  // Get default coach for logged-in user
+  const defaultCoach = useMemo(() =>
+    getCoachForUser(session?.user?.discordId, session?.user?.name ?? undefined),
+    [session?.user?.discordId, session?.user?.name]
+  );
 
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
   const allReplays = useMergedContent(replaysJson as Replay[], 'replays');
@@ -96,8 +105,8 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         id: uuidv4(),
         title: '',
         description: '',
-        coach: '',
-        coachId: '',
+        coach: defaultCoach?.displayName ?? '',
+        coachId: defaultCoach?.id ?? '',
         race: 'all',
         videoIds: [],
         difficulty: 'basic',
@@ -107,7 +116,8 @@ export function MasterclassEditModal({ masterclass, isOpen, onClose, isNew = fal
         isFree: false,
       });
     }
-  }, [masterclass, isNew, isOpen]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [masterclass, isNew, isOpen, defaultCoach]);
 
   const updateField = <K extends keyof Masterclass>(field: K, value: Masterclass[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));

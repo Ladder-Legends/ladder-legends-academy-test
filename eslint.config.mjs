@@ -33,6 +33,8 @@ const eslintConfig = [
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      // Prevent `as any` and `as unknown` type casts that bypass type safety
+      "@typescript-eslint/no-explicit-any": "error",
     },
   },
   {

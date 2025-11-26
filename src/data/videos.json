@@ -1230,8 +1230,8 @@
     "date": "2025-11-08",
     "tags": [],
     "race": "zerg",
-    "coach": "",
-    "coachId": "",
+    "coach": "eon",
+    "coachId": "eon",
     "isFree": false,
     "categories": [
       "builds.cheese",
@@ -1312,8 +1312,8 @@
     "date": "2025-11-10",
     "tags": [],
     "race": "zerg",
-    "coach": "",
-    "coachId": "",
+    "coach": "eon",
+    "coachId": "eon",
     "isFree": false,
     "categories": [
       "matchups.zvt"
@@ -1406,8 +1406,8 @@
       "macro"
     ],
     "race": "terran",
-    "coach": "",
-    "coachId": "",
+    "coach": "gamerrichy",
+    "coachId": "gamerrichy",
     "isFree": false
   },
   {
@@ -1595,8 +1595,8 @@
     "date": "2025-11-15",
     "tags": [],
     "race": "protoss",
-    "coach": "",
-    "coachId": "",
+    "coach": "groovy",
+    "coachId": "groovy",
     "isFree": false
   },
   {
@@ -1652,8 +1652,8 @@
     "categories": [],
     "tags": [],
     "race": "zerg",
-    "coach": "",
-    "coachId": "",
+    "coach": "fairespiter",
+    "coachId": "d391998b-1c4e-4474-94f6-26aa4b46edc8",
     "isFree": true
   },
   {

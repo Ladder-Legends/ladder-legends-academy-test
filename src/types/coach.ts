@@ -11,6 +11,8 @@ export interface Coach {
   pricePerHour?: string; // e.g., "£30/hr" or "$25/hr"
   isActive?: boolean; // If false, coach is hidden from filters/UI but content remains
   battleTags?: string[]; // SC2 battle tags for identifying replays featuring this coach
+  discordId?: string; // Discord user ID for auto-populating coach field in CMS
+  discordUsername?: string; // Discord username for matching by name
   socialLinks?: {
     twitch?: string;
     youtube?: string;

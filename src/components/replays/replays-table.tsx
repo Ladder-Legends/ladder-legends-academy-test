@@ -11,6 +11,7 @@ import { PremiumBadge } from '@/components/shared/premium-badge';
 import { AdminActions } from '@/components/shared/admin-actions';
 import { videos as videosData } from '@/lib/data';
 import { Video as VideoType } from '@/types/video';
+import { getCoachDisplayName } from '@/lib/coach-utils';
 
 interface ReplaysTableProps {
   replays: Replay[];
@@ -115,6 +116,17 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       ),
     },
     {
+      id: 'coach',
+      label: 'Coach',
+      sortable: true,
+      getValue: (replay) => getCoachDisplayName(replay.coachId, replay.coach).toLowerCase(),
+      render: (replay) => (
+        <span className="text-sm text-muted-foreground">
+          {getCoachDisplayName(replay.coachId, replay.coach)}
+        </span>
+      ),
+    },
+    {
       id: 'actions',
       label: 'Actions',
       sortable: false,
@@ -162,7 +174,7 @@ export function ReplaysTable({ replays, hasSubscriberRole, onEdit, onDelete }: R
       items={replays}
       columns={columns}
       getRowKey={(replay) => replay.id}
-      minWidth="900px"
+      minWidth="1000px"
     />
   );
 }

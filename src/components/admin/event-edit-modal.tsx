@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { Modal } from '@/components/ui/modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
 import { useTheme } from '@/hooks/use-theme';
@@ -15,6 +16,7 @@ import { MultiCategorySelector } from './multi-category-selector';
 import { FormField } from './form-field';
 import { EditModalFooter } from './edit-modal-footer';
 import { TIMEZONES, getTimezoneDisplayName } from '@/lib/timezone-utils';
+import { getCoachForUser } from '@/lib/coach-utils';
 import dynamic from 'next/dynamic';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
@@ -61,11 +63,18 @@ const dayOfWeekOptions = [
 ];
 
 export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventEditModalProps) {
+  const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const { theme } = useTheme();
   const { timezone: userTimezone, isLoading: timezoneLoading } = useUserTimezone();
 
   const [formData, setFormData] = useState<Partial<Event>>({});
+
+  // Get default coach for logged-in user
+  const defaultCoach = useMemo(() =>
+    getCoachForUser(session?.user?.discordId, session?.user?.name ?? undefined),
+    [session?.user?.discordId, session?.user?.name]
+  );
 
   const timezoneOptions = TIMEZONES.map(tz => ({
     value: tz,
@@ -86,7 +95,7 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         time: '18:00',
         timezone: userTimezone,
         duration: 60,
-        coach: '',
+        coach: defaultCoach?.id ?? '', // Events use coach ID
         isFree: false,
         tags: [],
         recurring: {
@@ -95,7 +104,8 @@ export function EventEditModal({ event, isOpen, onClose, isNew = false }: EventE
         },
       });
     }
-  }, [event, isNew, isOpen, userTimezone, timezoneLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event, isNew, isOpen, userTimezone, timezoneLoading, defaultCoach]);
 
   const updateField = <K extends keyof Event>(field: K, value: Event[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));

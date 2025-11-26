@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
@@ -20,6 +21,7 @@ import { FileUpload } from './file-upload';
 import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
 import { FormField } from './form-field';
 import { EditModalFooter } from './edit-modal-footer';
+import { getCoachForUser } from '@/lib/coach-utils';
 
 interface BuildOrderEditModalProps {
   buildOrder: BuildOrder | null;
@@ -29,6 +31,7 @@ interface BuildOrderEditModalProps {
 }
 
 export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false }: BuildOrderEditModalProps) {
+  const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const [formData, setFormData] = useState<Partial<BuildOrder>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -36,6 +39,12 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
   const [selectedPlayerForImport, setSelectedPlayerForImport] = useState<string | null>(null);
   const [uploadedReplayFile, setUploadedReplayFile] = useState<File | null>(null);
   const [replayLinkMode, setReplayLinkMode] = useState<'existing' | 'upload'>('existing');
+
+  // Get default coach for logged-in user
+  const defaultCoach = useMemo(() =>
+    getCoachForUser(session?.user?.discordId, session?.user?.name ?? undefined),
+    [session?.user?.discordId, session?.user?.name]
+  );
 
   // Merge static videos with pending changes for validation
   const allVideos = useMergedContent(videosJson as Video[], 'videos');
@@ -84,8 +93,8 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         race: 'terran',
         vsRace: 'terran',
         difficulty: 'basic',
-        coach: '',
-        coachId: '',
+        coach: defaultCoach?.name ?? '',
+        coachId: defaultCoach?.id ?? '',
         description: '',
         videoIds: [],
         steps: [],
@@ -95,7 +104,8 @@ export function BuildOrderEditModal({ buildOrder, isOpen, onClose, isNew = false
         isFree: false,
       });
     }
-  }, [buildOrder, isNew, isOpen, allVideos]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buildOrder, isNew, isOpen, allVideos, defaultCoach]);
 
   const updateField = <K extends keyof BuildOrder>(field: K, value: BuildOrder[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));

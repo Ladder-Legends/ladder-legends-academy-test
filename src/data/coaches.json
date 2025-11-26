@@ -59,6 +59,10 @@
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/81934680/calendar/12364368?appointmentTypeIds[]=81934680",
     "pricePerHour": "£30/hr",
     "isActive": true,
+    "battleTags": [
+      "GamerRichy",
+      "Mengsk"
+    ],
     "socialLinks": {}
   },
   {
@@ -92,6 +96,10 @@
     "bookingUrl": "https://app.acuityscheduling.com/schedule/fb9650f6/appointment/84352373/calendar/12406706",
     "pricePerHour": "£20/hr",
     "isActive": true,
+    "battleTags": [
+      "EON",
+      "EONs"
+    ],
     "socialLinks": {}
   },
   {

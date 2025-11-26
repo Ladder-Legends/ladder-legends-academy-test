@@ -7,6 +7,7 @@ import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../ty
 import { createFilterField } from '../types';
 import { createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
 import { getCategoryFilterOptions } from '@/lib/taxonomy';
+import { getCoachId, getActiveCoaches } from '@/lib/coach-utils';
 
 // Helper function to parse duration string (e.g., "12.34" or "12:34" or "1:02:34") into minutes
 function parseDuration(duration: string): number {
@@ -120,6 +121,24 @@ const fields: FilterFieldConfig<Replay>[] = [
     urlParam: 'categories',
     predicate: createCategoryPredicate('categories', 'categories'),
   }),
+
+  // Coach filter
+  {
+    id: 'coaches',
+    urlParam: 'coaches',
+    predicate: (replay, filters) => {
+      const selectedCoaches = filters.coaches;
+      if (!selectedCoaches || (Array.isArray(selectedCoaches) && selectedCoaches.length === 0)) {
+        return true;
+      }
+
+      const coaches = Array.isArray(selectedCoaches) ? selectedCoaches : [String(selectedCoaches)];
+      const replayCoachId = getCoachId(replay.coachId, replay.coach);
+
+      // Match if replay's coach is in the selected coaches
+      return replayCoachId !== null && coaches.includes(replayCoachId);
+    },
+  },
 ];
 
 /**
@@ -139,6 +158,12 @@ const sections: FilterSectionConfig<Replay>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'coaches',
+    title: 'Coach',
+    type: 'checkbox',
+    getOptions: () => getActiveCoaches().map(c => ({ id: c.id, label: c.displayName })),
   },
   {
     id: 'matchups',

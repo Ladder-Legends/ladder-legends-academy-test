@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { Modal } from '@/components/ui/modal';
 import { usePendingChanges } from '@/hooks/use-pending-changes';
@@ -17,6 +18,7 @@ import { FileUpload } from './file-upload';
 import { FormField } from './form-field';
 import { EditModalFooter } from './edit-modal-footer';
 import { CoachSearchDropdown } from '@/components/shared/coach-search-dropdown';
+import { getCoachForUser } from '@/lib/coach-utils';
 
 interface VideoEditModalProps {
   video: Video | null;
@@ -34,12 +36,19 @@ const raceOptions = [
 ];
 
 export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoEditModalProps) {
+  const { data: session } = useSession();
   const { addChange } = usePendingChanges();
   const mergedVideos = useMergedContent(videos as Video[], 'videos');
   const [formData, setFormData] = useState<Partial<Video>>({});
   const [youtubeIdInput, setYoutubeIdInput] = useState('');
   const [customThumbnail, setCustomThumbnail] = useState<string | null>(null);
   const [isPlaylistMode, setIsPlaylistMode] = useState(false);
+
+  // Get default coach for logged-in user
+  const defaultCoach = useMemo(() =>
+    getCoachForUser(session?.user?.discordId, session?.user?.name ?? undefined),
+    [session?.user?.discordId, session?.user?.name]
+  );
 
   const freePlaylistWarning = useMemo(() => {
     if (!isPlaylistMode || !formData.isFree || !formData.videoIds || formData.videoIds.length === 0) {
@@ -79,14 +88,15 @@ export function VideoEditModal({ video, isOpen, onClose, isNew = false }: VideoE
         date: new Date().toISOString().split('T')[0],
         tags: [],
         race: 'terran',
-        coach: '',
-        coachId: '',
+        coach: defaultCoach?.name ?? '',
+        coachId: defaultCoach?.id ?? '',
         isFree: false,
       });
       setIsPlaylistMode(false);
     }
     setYoutubeIdInput('');
-  }, [video, isNew, isOpen]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [video, isNew, isOpen, defaultCoach]);
 
   const updateField = <K extends keyof Video>(field: K, value: Video[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));

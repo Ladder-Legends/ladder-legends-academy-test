@@ -275,7 +275,9 @@
     "categories": [
       "analysis",
       "matchups.tvp"
-    ]
+    ],
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "replay-cc3ee635-88f1-4fd9-b53e-82f2d7a4beb0",
@@ -303,7 +305,9 @@
     "categories": [
       "analysis",
       "matchups.tvt"
-    ]
+    ],
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "replay-216edeea-a1da-4fae-834f-6d08e98761a8",
@@ -331,7 +335,9 @@
     "categories": [
       "analysis",
       "matchups.tvz"
-    ]
+    ],
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "8225f0a6-e432-4a37-9785-37308dfbdf2f",
@@ -674,7 +680,9 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false,
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20Viking%20Tank%20push%20no%20ravens-Fxbpc1it8ZYIi78A5XL7thUIdd4ltc.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20Viking%20Tank%20push%20no%20ravens-Fxbpc1it8ZYIi78A5XL7thUIdd4ltc.SC2Replay",
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "0c318abf-fa57-405a-a24e-27d7d4eec185",
@@ -842,7 +850,9 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false,
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Incorporeal%20LE%20%2893%29-kKVywyRTm4AQ9fJISAO2YeR9ENQkEC.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Incorporeal%20LE%20%2893%29-kKVywyRTm4AQ9fJISAO2YeR9ENQkEC.SC2Replay",
+    "coach": "eon",
+    "coachId": "eon"
   },
   {
     "id": "replay-79e861e8-a15b-47c6-a841-df77be35539e",
@@ -866,7 +876,9 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false,
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-ND7eqKXmpke9FNQEDFj8ekl2ctQFPt.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-ND7eqKXmpke9FNQEDFj8ekl2ctQFPt.SC2Replay",
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "replay-692aab23-85dd-4a59-9ee3-eed28d8b5423",
@@ -890,7 +902,9 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false,
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-8UQUnUfdFQqZgWfrhP6g5g8CYW1z4J.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/TvT%20tank%20push%20vs%20AI-8UQUnUfdFQqZgWfrhP6g5g8CYW1z4J.SC2Replay",
+    "coach": "coach nico",
+    "coachId": "coach-nico"
   },
   {
     "id": "d6683cce-f2e9-4c80-b510-aa83ef1e3d03",
@@ -943,6 +957,8 @@
     "tags": [],
     "patch": "5.0.15.95299",
     "isFree": false,
-    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Ruby%20Rock%20LE%20%283%29-AaNBVDVz8GfhbYYDaLb5vsqJYsewBl.SC2Replay"
+    "downloadUrl": "https://8hmp7utaer4z3mma.public.blob.vercel-storage.com/Ruby%20Rock%20LE%20%283%29-AaNBVDVz8GfhbYYDaLb5vsqJYsewBl.SC2Replay",
+    "coach": "gamerrichy",
+    "coachId": "gamerrichy"
   }
 ]

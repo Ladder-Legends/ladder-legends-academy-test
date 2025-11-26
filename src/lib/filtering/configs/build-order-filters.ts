@@ -7,6 +7,7 @@ import type { FilterConfig, FilterFieldConfig, FilterSectionConfig } from '../ty
 import { createFilterField } from '../types';
 import { createBooleanPredicate, createCategoryPredicate } from '../filter-engine';
 import { getCategoryFilterOptions } from '@/lib/taxonomy';
+import { getCoachId, getActiveCoaches } from '@/lib/coach-utils';
 
 /**
  * Filter field configurations
@@ -68,6 +69,23 @@ const fields: FilterFieldConfig<BuildOrder>[] = [
     urlParam: 'categories',
     predicate: createCategoryPredicate('categories', 'categories'),
   }),
+
+  // Coach filter
+  {
+    id: 'coaches',
+    urlParam: 'coaches',
+    predicate: (buildOrder, filters) => {
+      const selectedCoaches = filters.coaches;
+      if (!selectedCoaches || (Array.isArray(selectedCoaches) && selectedCoaches.length === 0)) {
+        return true;
+      }
+
+      const coaches = Array.isArray(selectedCoaches) ? selectedCoaches : [String(selectedCoaches)];
+      const buildOrderCoachId = getCoachId(buildOrder.coachId, buildOrder.coach);
+
+      return buildOrderCoachId !== null && coaches.includes(buildOrderCoachId);
+    },
+  },
 ];
 
 /**
@@ -87,6 +105,12 @@ const sections: FilterSectionConfig<BuildOrder>[] = [
       { id: 'free', label: 'Free' },
       { id: 'premium', label: 'Premium' },
     ],
+  },
+  {
+    id: 'coaches',
+    title: 'Coach',
+    type: 'checkbox',
+    getOptions: () => getActiveCoaches().map(c => ({ id: c.id, label: c.displayName })),
   },
   {
     id: 'matchups',
