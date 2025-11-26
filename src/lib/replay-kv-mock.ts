@@ -238,11 +238,85 @@ export async function clearUserReplays(discordUserId: string): Promise<number> {
 // ============================================================================
 
 /**
+ * Calculate supply score from fingerprint economy data
+ */
+function calculateSupplyScoreFromFingerprint(economy: UserReplayData['fingerprint']['economy']): number | null {
+  const blockCount = economy.supply_block_count;
+  const totalBlockTime = economy.total_supply_block_time;
+
+  if (blockCount == null && totalBlockTime == null) return null;
+
+  let score = 100;
+  let penalty = 0;
+
+  if (blockCount != null) penalty += blockCount * 10;
+  if (totalBlockTime != null) penalty += totalBlockTime * 2;
+
+  // Early block penalty
+  if (economy.supply_block_periods?.length) {
+    for (const block of economy.supply_block_periods) {
+      if (block.start < 300) {
+        penalty += (block.duration || 0) * 1;
+      }
+    }
+  }
+
+  score = Math.max(0, score - penalty);
+  return Math.min(100, score);
+}
+
+/**
+ * Calculate production score from fingerprint economy data
+ */
+function calculateProductionScoreFromFingerprint(
+  economy: UserReplayData['fingerprint']['economy'],
+  comparisonScore: number | null
+): number | null {
+  // Use comparison execution_score if available (most accurate)
+  if (comparisonScore != null) {
+    return comparisonScore;
+  }
+
+  // Otherwise calculate from production_by_building idle times
+  if (economy.production_by_building) {
+    const totalIdle = Object.values(economy.production_by_building)
+      .reduce((sum, b) => sum + (b.idle_seconds || 0), 0);
+
+    // Scoring formula from sc2reader: First 15s free, 15-60s = 0.5pt/s, >60s = 1pt/s
+    let penalty = 0;
+    if (totalIdle <= 15) {
+      penalty = 0;
+    } else if (totalIdle <= 60) {
+      penalty = (totalIdle - 15) * 0.5;
+    } else {
+      penalty = 22.5 + (totalIdle - 60) * 1.0;
+    }
+
+    return Math.max(0, Math.round(100 - penalty));
+  }
+
+  return null;
+}
+
+/**
+ * Calculate total production idle time from fingerprint
+ */
+function calculateProductionIdleTime(economy: UserReplayData['fingerprint']['economy']): number | null {
+  if (!economy.production_by_building) return null;
+
+  const totalIdle = Object.values(economy.production_by_building)
+    .reduce((sum, b) => sum + (b.idle_seconds || 0), 0);
+
+  return totalIdle;
+}
+
+/**
  * Create a lightweight index entry from full replay data
  */
 export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
   const fingerprint = replay.fingerprint;
   const metadata = fingerprint.metadata;
+  const economy = fingerprint.economy;
 
   // Find opponent name
   let opponentName = '';
@@ -256,6 +330,17 @@ export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
       opponentName = opponent?.name || '';
     }
   }
+
+  // Calculate pillar scores
+  const supplyScore = calculateSupplyScoreFromFingerprint(economy);
+  const productionScore = calculateProductionScoreFromFingerprint(
+    economy,
+    replay.comparison?.execution_score ?? null
+  );
+
+  // Get time-based metrics
+  const supplyBlockTime = economy.total_supply_block_time ?? null;
+  const productionIdleTime = calculateProductionIdleTime(economy);
 
   return {
     id: replay.id,
@@ -276,10 +361,14 @@ export function createIndexEntry(replay: UserReplayData): ReplayIndexEntry {
     reference_alias: null,
     comparison_score: replay.comparison?.execution_score || null,
 
-    // Pillar scores
-    production_score: null,
-    supply_score: null,
+    // Pillar scores (0-100)
+    production_score: productionScore,
+    supply_score: supplyScore,
     vision_score: null,
+
+    // Time-based metrics (seconds)
+    supply_block_time: supplyBlockTime,
+    production_idle_time: productionIdleTime,
 
     // Build detection
     detected_build: replay.detection?.build_name || null,

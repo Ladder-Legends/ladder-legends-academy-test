@@ -1,0 +1,254 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "replay-fingerprint-schema",
+  "title": "ReplayFingerprint",
+  "description": "Schema for SC2 replay fingerprint data - shared between TypeScript (Academy) and Python (sc2reader). Version 1.0",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "matchup",
+    "race",
+    "player_name",
+    "all_players",
+    "metadata",
+    "timings",
+    "sequences",
+    "army_composition",
+    "production_timeline",
+    "economy",
+    "tactical",
+    "micro",
+    "positioning",
+    "ratios"
+  ],
+  "properties": {
+    "_schema_version": {
+      "type": "string",
+      "description": "Schema version for backward compatibility",
+      "const": "1.0.0"
+    },
+    "matchup": {
+      "type": "string",
+      "pattern": "^[TZP]v[TZP]$",
+      "description": "Matchup string like TvP, ZvZ, etc."
+    },
+    "race": {
+      "type": "string",
+      "enum": ["Terran", "Zerg", "Protoss", "Random"],
+      "description": "Player's race"
+    },
+    "player_name": {
+      "type": "string",
+      "description": "Name of the player this fingerprint is for"
+    },
+    "all_players": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ReplayPlayer" },
+      "description": "All players in the game"
+    },
+    "metadata": { "$ref": "#/$defs/GameMetadata" },
+    "timings": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "number" },
+          { "type": "null" }
+        ]
+      },
+      "description": "Key building/unit timings in seconds"
+    },
+    "sequences": { "$ref": "#/$defs/Sequences" },
+    "army_composition": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number" }
+      },
+      "description": "Army composition at time checkpoints (3min, 5min, etc.)"
+    },
+    "production_timeline": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number" }
+      },
+      "description": "Cumulative production by minute"
+    },
+    "economy": { "$ref": "#/$defs/Economy" },
+    "tactical": { "$ref": "#/$defs/Tactical" },
+    "micro": { "$ref": "#/$defs/Micro" },
+    "positioning": { "$ref": "#/$defs/Positioning" },
+    "ratios": { "$ref": "#/$defs/Ratios" }
+  },
+  "$defs": {
+    "ReplayPlayer": {
+      "type": "object",
+      "required": ["name", "race", "result", "team", "is_observer"],
+      "properties": {
+        "name": { "type": "string" },
+        "race": { "type": "string" },
+        "result": { "type": "string", "enum": ["Win", "Loss", "Unknown"] },
+        "team": { "type": "integer" },
+        "is_observer": { "type": "boolean" },
+        "mmr": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "apm": { "oneOf": [{ "type": "number" }, { "type": "null" }] }
+      }
+    },
+    "GameMetadata": {
+      "type": "object",
+      "required": ["map", "duration", "result", "opponent_race"],
+      "properties": {
+        "map": { "type": "string" },
+        "duration": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "result": { "type": "string" },
+        "opponent_race": { "type": "string" },
+        "game_type": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "category": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "game_date": { "oneOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }] }
+      }
+    },
+    "Sequences": {
+      "type": "object",
+      "required": ["tech_sequence", "build_sequence", "upgrade_sequence"],
+      "properties": {
+        "tech_sequence": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object", "properties": { "name": { "type": "string" }, "type": { "type": "string" } } }
+            ]
+          }
+        },
+        "build_sequence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        },
+        "upgrade_sequence": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Economy": {
+      "type": "object",
+      "required": ["workers_3min", "workers_5min", "workers_7min", "expansion_count", "avg_expansion_timing"],
+      "properties": {
+        "workers_3min": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "workers_5min": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "workers_7min": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "expansion_count": { "type": "number" },
+        "avg_expansion_timing": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "avg_mineral_float_5min+": { "type": "number" },
+        "avg_gas_float_5min+": { "type": "number" },
+        "max_mineral_float_5min+": { "type": "number" },
+        "max_gas_float_5min+": { "type": "number" },
+        "supply_block_count": { "type": "number" },
+        "total_supply_block_time": { "type": "number" },
+        "supply_block_periods": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SupplyBlockPeriod" }
+        },
+        "supply_block_categorization": { "$ref": "#/$defs/SupplyBlockCategorization" },
+        "production_by_building": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ProductionByBuilding" }
+        },
+        "supply_at_checkpoints": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "mule_count": { "type": "number" },
+        "mule_possible": { "type": "number" },
+        "mule_efficiency": { "type": "number" },
+        "calldown_supply_count": { "type": "number" },
+        "inject_efficiency": { "type": "number" },
+        "chrono_efficiency": { "type": "number" }
+      }
+    },
+    "SupplyBlockPeriod": {
+      "type": "object",
+      "required": ["start", "end", "duration"],
+      "properties": {
+        "start": { "type": "number" },
+        "end": { "type": "number" },
+        "duration": { "type": "number" },
+        "severity": { "type": "string", "enum": ["minor", "warning", "problem"] }
+      }
+    },
+    "SupplyBlockCategorization": {
+      "type": "object",
+      "properties": {
+        "minor": { "type": "array", "items": { "$ref": "#/$defs/SupplyBlockPeriod" } },
+        "warning": { "type": "array", "items": { "$ref": "#/$defs/SupplyBlockPeriod" } },
+        "problem": { "type": "array", "items": { "$ref": "#/$defs/SupplyBlockPeriod" } },
+        "minor_count": { "type": "number" },
+        "warning_count": { "type": "number" },
+        "problem_count": { "type": "number" },
+        "minor_time": { "type": "number" },
+        "warning_time": { "type": "number" },
+        "problem_time": { "type": "number" }
+      }
+    },
+    "ProductionByBuilding": {
+      "type": "object",
+      "properties": {
+        "count": { "type": "number" },
+        "idle_seconds": { "type": "number" },
+        "production_cycles": { "type": "number" },
+        "first_completed": { "type": "number" }
+      }
+    },
+    "Tactical": {
+      "type": "object",
+      "required": ["moveout_times", "first_moveout", "harass_count", "engagement_count", "first_engagement"],
+      "properties": {
+        "moveout_times": { "type": "array", "items": { "type": "number" } },
+        "first_moveout": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+        "harass_count": { "type": "number" },
+        "engagement_count": { "type": "number" },
+        "first_engagement": { "oneOf": [{ "type": "number" }, { "type": "null" }] }
+      }
+    },
+    "Micro": {
+      "type": "object",
+      "required": ["selection_count", "avg_selections_per_min", "control_groups_used", "most_used_control_group", "camera_movement_count", "avg_camera_moves_per_min"],
+      "properties": {
+        "selection_count": { "type": "number" },
+        "avg_selections_per_min": { "type": "number" },
+        "control_groups_used": { "type": "number" },
+        "most_used_control_group": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "camera_movement_count": { "type": "number" },
+        "avg_camera_moves_per_min": { "type": "number" }
+      }
+    },
+    "Positioning": {
+      "type": "object",
+      "required": ["proxy_buildings", "avg_building_distance_from_main"],
+      "properties": {
+        "proxy_buildings": { "type": "number" },
+        "avg_building_distance_from_main": { "oneOf": [{ "type": "number" }, { "type": "null" }] }
+      }
+    },
+    "Ratios": {
+      "type": "object",
+      "required": ["gas_count", "production_count", "tech_count", "reactor_count", "techlab_count", "expansions", "gas_per_base", "production_per_base"],
+      "properties": {
+        "gas_count": { "type": "number" },
+        "production_count": { "type": "number" },
+        "tech_count": { "type": "number" },
+        "reactor_count": { "type": "number" },
+        "techlab_count": { "type": "number" },
+        "expansions": { "type": "number" },
+        "gas_per_base": { "type": "number" },
+        "production_per_base": { "type": "number" }
+      }
+    }
+  }
+}

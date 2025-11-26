@@ -79,7 +79,74 @@ When making architectural decisions, prioritize in this order:
   - `inject_efficiency` - Zerg macro tracking
   - `chrono_efficiency` - Protoss macro tracking
 
-**All 775 tests passing. 0 lint errors.**
+**All 922 tests passing. 0 lint errors.**
+
+---
+
+## UNIFIED METRICS INTEGRATION (Updated 2025-11-26)
+
+### Overview
+
+All replay analysis in the Academy uses the unified `/metrics` endpoint from sc2reader. This ensures consistent metrics across:
+- Desktop uploader uploads
+- Web-based replay uploads
+- Build order extraction
+- Replay analysis pages
+
+### Key Files
+
+**SC2Reader Client:**
+- `src/lib/sc2reader-client.ts` - TypeScript client with methods:
+  - `extractMetrics()` - Primary endpoint for all replay analysis
+  - `detectBuild()` - Build order detection
+  - `compareReplay()` - Compare against learned builds
+  - `listBuilds()` - Get available builds
+
+**Type Definitions:**
+- `src/lib/replay-types.ts` - All TypeScript types matching sc2reader responses
+  - `MetricsResponse` - Full /metrics endpoint response
+  - `ReplayFingerprint` - Player fingerprint with economy, tactical, micro data
+  - `ReplayIndexEntry` - Lightweight index entries for list views
+
+**Integration Tests:**
+- `src/lib/__tests__/sc2reader-integration.test.ts` - 42 tests covering:
+  - Response schema validation
+  - CMS extraction logic
+  - Build order structure
+  - Time-based metrics
+
+### Time-Based Metrics (Production/Supply)
+
+Charts and trends show TIME-based metrics, not scores:
+- `supply_block_time` - Total seconds spent supply blocked
+- `production_idle_time` - Total seconds production buildings were idle
+
+**Important:** Idle time per building is currently NOT aggregated for overlapping windows.
+Example: If 2 Barracks and 1 Factory are all idle from 2:00-3:00, this currently counts as 3 minutes total, not 1 minute. This is a future improvement for sc2reader.
+
+### Data Flow
+
+```
+Uploader/Web Upload
+        ↓
+POST /api/my-replays (route.ts)
+        ↓
+SC2ReplayAPIClient.extractMetrics()
+        ↓
+sc2reader /metrics endpoint
+        ↓
+Response stored in:
+  - Full replay data (KV)
+  - Index entry (KV)
+  - Hash manifest (Blob)
+        ↓
+UI renders from index + lazy loads details
+```
+
+### Test Fixtures
+
+- `src/__fixtures__/lotus_vs_deathbringer.SC2Replay` - Test replay file
+- `src/__fixtures__/replay-fingerprint.schema.json` - JSON Schema for fingerprints
 
 ---
 

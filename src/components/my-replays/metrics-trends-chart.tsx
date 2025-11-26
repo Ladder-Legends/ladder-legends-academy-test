@@ -47,16 +47,16 @@ interface MetricsTrendsChartProps {
   className?: string;
   title?: string;
   showWinRate?: boolean;
-  showSupplyScore?: boolean;
-  showProductionScore?: boolean;
+  showSupplyBlockTime?: boolean;
+  showProductionIdleTime?: boolean;
 }
 
 interface ChartDataPoint {
   label: string;
   date: string;
   winRate: number | null;
-  supplyScore: number | null;
-  productionScore: number | null;
+  supplyBlockTime: number | null;      // seconds
+  productionIdleTime: number | null;   // seconds
   replayCount: number;
 }
 
@@ -113,6 +113,18 @@ interface CustomTooltipProps {
   label?: string;
 }
 
+/**
+ * Format seconds as human-readable time string
+ */
+function formatTime(seconds: number): string {
+  if (seconds < 60) {
+    return `${Math.round(seconds)}s`;
+  }
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+}
+
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) {
     return null;
@@ -124,22 +136,27 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     <div className="rounded-lg border bg-background p-3 shadow-lg">
       <p className="mb-2 font-medium">{label}</p>
       <p className="mb-2 text-xs text-muted-foreground">{replayCount} games</p>
-      {payload.map((entry) => (
-        <div key={entry.dataKey} className="flex items-center gap-2 text-sm">
-          <div
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-muted-foreground">{entry.name}:</span>
-          <span className="font-medium">
-            {entry.value !== null
-              ? entry.dataKey === 'winRate'
-                ? `${entry.value.toFixed(1)}%`
-                : entry.value.toFixed(1)
-              : 'N/A'}
-          </span>
-        </div>
-      ))}
+      {payload.map((entry) => {
+        let formattedValue = 'N/A';
+        if (entry.value !== null) {
+          if (entry.dataKey === 'winRate') {
+            formattedValue = `${entry.value.toFixed(1)}%`;
+          } else {
+            // Time-based metrics (supplyBlockTime, productionIdleTime)
+            formattedValue = formatTime(entry.value);
+          }
+        }
+        return (
+          <div key={entry.dataKey} className="flex items-center gap-2 text-sm">
+            <div
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground">{entry.name}:</span>
+            <span className="font-medium">{formattedValue}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -154,8 +171,8 @@ export function MetricsTrendsChart({
   className,
   title = 'Performance Trends',
   showWinRate = true,
-  showSupplyScore = true,
-  showProductionScore = true,
+  showSupplyBlockTime = true,
+  showProductionIdleTime = true,
 }: MetricsTrendsChartProps) {
   const [period, setPeriod] = useState<TimePeriod>('weekly');
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData | null>(null);
@@ -223,11 +240,21 @@ export function MetricsTrendsChart({
       label: dp.label,
       date: dp.date,
       winRate: dp.winRate,
-      supplyScore: dp.avgSupplyScore,
-      productionScore: dp.avgProductionScore,
+      supplyBlockTime: dp.avgSupplyBlockTime,
+      productionIdleTime: dp.avgProductionIdleTime,
       replayCount: dp.replayCount,
     }));
   }, [timeSeriesData]);
+
+  // Calculate max time for Y-axis scale
+  const maxTimeValue = useMemo(() => {
+    if (!chartData.length) return 60;
+    const maxSupply = Math.max(...chartData.map(d => d.supplyBlockTime ?? 0));
+    const maxProd = Math.max(...chartData.map(d => d.productionIdleTime ?? 0));
+    const max = Math.max(maxSupply, maxProd);
+    // Round up to nearest 30 seconds
+    return Math.max(60, Math.ceil(max / 30) * 30);
+  }, [chartData]);
 
   // Summary stats
   const summary = useMemo(() => {
@@ -236,8 +263,8 @@ export function MetricsTrendsChart({
     return {
       totalGames: timeSeriesData.totals.replayCount,
       overallWinRate: timeSeriesData.totals.winRate,
-      avgSupply: timeSeriesData.totals.avgSupplyScore,
-      avgProduction: timeSeriesData.totals.avgProductionScore,
+      avgSupplyBlockTime: timeSeriesData.totals.avgSupplyBlockTime,
+      avgProductionIdleTime: timeSeriesData.totals.avgProductionIdleTime,
     };
   }, [timeSeriesData]);
 
@@ -287,7 +314,7 @@ export function MetricsTrendsChart({
       <CardContent>
         {/* Summary Stats */}
         {summary && (
-          <div className="mb-4 flex gap-6 text-sm">
+          <div className="mb-4 flex flex-wrap gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Games:</span>{' '}
               <span className="font-medium">{summary.totalGames}</span>
@@ -296,16 +323,16 @@ export function MetricsTrendsChart({
               <span className="text-muted-foreground">Win Rate:</span>{' '}
               <span className="font-medium">{summary.overallWinRate.toFixed(1)}%</span>
             </div>
-            {summary.avgSupply !== null && (
+            {summary.avgSupplyBlockTime !== null && (
               <div>
-                <span className="text-muted-foreground">Avg Supply:</span>{' '}
-                <span className="font-medium">{summary.avgSupply.toFixed(1)}</span>
+                <span className="text-muted-foreground">Avg Supply Block:</span>{' '}
+                <span className="font-medium">{formatTime(summary.avgSupplyBlockTime)}</span>
               </div>
             )}
-            {summary.avgProduction !== null && (
+            {summary.avgProductionIdleTime !== null && (
               <div>
-                <span className="text-muted-foreground">Avg Production:</span>{' '}
-                <span className="font-medium">{summary.avgProduction.toFixed(1)}</span>
+                <span className="text-muted-foreground">Avg Prod Idle:</span>{' '}
+                <span className="font-medium">{formatTime(summary.avgProductionIdleTime)}</span>
               </div>
             )}
           </div>
@@ -316,7 +343,7 @@ export function MetricsTrendsChart({
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
@@ -325,22 +352,35 @@ export function MetricsTrendsChart({
                 tickLine={false}
                 axisLine={{ className: 'stroke-muted' }}
               />
+              {/* Left Y-axis for Win Rate (0-100%) */}
               <YAxis
+                yAxisId="left"
                 domain={[0, 100]}
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={{ className: 'stroke-muted' }}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value) => `${value}%`}
+              />
+              {/* Right Y-axis for Time (seconds) */}
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                domain={[0, maxTimeValue]}
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={{ className: 'stroke-muted' }}
+                tickFormatter={(value) => `${value}s`}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
 
-              {/* Reference lines */}
-              <ReferenceLine y={50} stroke="#666" strokeDasharray="3 3" />
+              {/* Reference line at 50% win rate */}
+              <ReferenceLine yAxisId="left" y={50} stroke="#666" strokeDasharray="3 3" />
 
-              {/* Win Rate Line */}
+              {/* Win Rate Line (left axis) */}
               {showWinRate && (
                 <Line
+                  yAxisId="left"
                   type="monotone"
                   dataKey="winRate"
                   name="Win Rate %"
@@ -352,12 +392,13 @@ export function MetricsTrendsChart({
                 />
               )}
 
-              {/* Supply Score Line */}
-              {showSupplyScore && (
+              {/* Supply Block Time Line (right axis) - lower is better */}
+              {showSupplyBlockTime && (
                 <Line
+                  yAxisId="right"
                   type="monotone"
-                  dataKey="supplyScore"
-                  name="Supply Score"
+                  dataKey="supplyBlockTime"
+                  name="Supply Block (s)"
                   stroke="#3b82f6"
                   strokeWidth={2}
                   dot={{ r: 4 }}
@@ -366,12 +407,13 @@ export function MetricsTrendsChart({
                 />
               )}
 
-              {/* Production Score Line */}
-              {showProductionScore && (
+              {/* Production Idle Time Line (right axis) - lower is better */}
+              {showProductionIdleTime && (
                 <Line
+                  yAxisId="right"
                   type="monotone"
-                  dataKey="productionScore"
-                  name="Production Score"
+                  dataKey="productionIdleTime"
+                  name="Prod Idle (s)"
                   stroke="#f59e0b"
                   strokeWidth={2}
                   dot={{ r: 4 }}

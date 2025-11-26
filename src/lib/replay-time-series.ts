@@ -41,6 +41,8 @@ export interface TimeSeriesData {
     winRate: number;
     avgSupplyScore: number | null;
     avgProductionScore: number | null;
+    avgSupplyBlockTime: number | null;
+    avgProductionIdleTime: number | null;
   };
 }
 
@@ -167,6 +169,8 @@ export function aggregateMetrics(entries: ReplayIndexEntry[]): {
   winRate: number;
   avgSupplyScore: number | null;
   avgProductionScore: number | null;
+  avgSupplyBlockTime: number | null;
+  avgProductionIdleTime: number | null;
 } {
   const replayCount = entries.length;
   const wins = entries.filter(e => e.result === 'Win').length;
@@ -189,6 +193,22 @@ export function aggregateMetrics(entries: ReplayIndexEntry[]): {
     ? productionScores.reduce((a, b) => a + b, 0) / productionScores.length
     : null;
 
+  // Calculate average supply block time (seconds)
+  const supplyBlockTimes = entries
+    .map(e => e.supply_block_time)
+    .filter((t): t is number => t !== null);
+  const avgSupplyBlockTime = supplyBlockTimes.length > 0
+    ? supplyBlockTimes.reduce((a, b) => a + b, 0) / supplyBlockTimes.length
+    : null;
+
+  // Calculate average production idle time (seconds)
+  const productionIdleTimes = entries
+    .map(e => e.production_idle_time)
+    .filter((t): t is number => t !== null);
+  const avgProductionIdleTime = productionIdleTimes.length > 0
+    ? productionIdleTimes.reduce((a, b) => a + b, 0) / productionIdleTimes.length
+    : null;
+
   return {
     replayCount,
     wins,
@@ -196,6 +216,8 @@ export function aggregateMetrics(entries: ReplayIndexEntry[]): {
     winRate,
     avgSupplyScore,
     avgProductionScore,
+    avgSupplyBlockTime,
+    avgProductionIdleTime,
   };
 }
 
@@ -225,8 +247,8 @@ export function buildTimeSeriesData(
       winRate: metrics.winRate,
       avgSupplyScore: metrics.avgSupplyScore,
       avgProductionScore: metrics.avgProductionScore,
-      avgSupplyBlockTime: null, // Requires full fingerprint data
-      avgProductionIdleTime: null, // Requires full fingerprint data
+      avgSupplyBlockTime: metrics.avgSupplyBlockTime,
+      avgProductionIdleTime: metrics.avgProductionIdleTime,
       replayIds: group.entries.map(e => e.id),
     });
   }

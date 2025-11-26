@@ -63,6 +63,19 @@ interface MatchupPillarStats {
 }
 
 /**
+ * Calculate production idle time from fingerprint (total seconds across all buildings)
+ */
+function calculateProductionIdleTime(replay: UserReplayData): number | null {
+  const economy = replay.fingerprint?.economy;
+  if (!economy?.production_by_building) return null;
+
+  const totalIdle = Object.values(economy.production_by_building)
+    .reduce((sum, b) => sum + (b.idle_seconds || 0), 0);
+
+  return totalIdle;
+}
+
+/**
  * Convert UserReplayData to ReplayIndexEntry format for time-series charts
  */
 function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
@@ -86,6 +99,9 @@ function toIndexEntry(replay: UserReplayData): ReplayIndexEntry {
     production_score: calculateProductionScore(replay),
     supply_score: calculateSupplyScore(replay),
     vision_score: null,
+    // Time-based metrics (seconds)
+    supply_block_time: fp.economy?.total_supply_block_time ?? null,
+    production_idle_time: calculateProductionIdleTime(replay),
     detected_build: replay.detection?.build_name ?? null,
     detection_confidence: replay.detection?.confidence ?? null,
   };

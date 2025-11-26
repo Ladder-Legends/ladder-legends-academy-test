@@ -40,6 +40,8 @@ function createIndexEntry(overrides: Partial<ReplayIndexEntry> = {}): ReplayInde
     production_score: 80,
     supply_score: 75,
     vision_score: null,
+    supply_block_time: 15,        // seconds
+    production_idle_time: 30,     // seconds
     detected_build: null,
     detection_confidence: null,
     ...overrides,

@@ -410,10 +410,14 @@ export interface ReplayIndexEntry {
   reference_alias: string | null;
   comparison_score: number | null;
 
-  // Pillar scores (for sorting/aggregation)
+  // Pillar scores (for sorting/aggregation) - 0-100 scores
   production_score: number | null;
   supply_score: number | null;
   vision_score: number | null;   // null until implemented
+
+  // Time-based metrics (in seconds) - for charting trends
+  supply_block_time: number | null;      // Total seconds supply blocked
+  production_idle_time: number | null;   // Total seconds production buildings idle
 
   // Build detection
   detected_build: string | null;
