@@ -82,6 +82,22 @@ export interface ReplayFingerprint {
     inject_efficiency?: number;
     // Macro ability efficiency (Protoss)
     chrono_efficiency?: number;
+    // Phase data for army supply tracking
+    phases?: Record<string, {
+      phase: string;
+      end_time: number;
+      worker_count: number;
+      base_count: number;
+      gas_buildings: number;
+      total_army_supply_produced: number;
+      units_produced: Record<string, number>;
+      production_buildings: Record<string, number>;
+      tech_buildings: string[];
+      upgrades_completed: string[];
+      upgrades_in_progress: string[];
+      supply_blocks_in_phase: number;
+      supply_block_time_in_phase: number;
+    }>;
   };
   tactical: {
     moveout_times: number[];

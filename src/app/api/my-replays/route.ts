@@ -276,6 +276,15 @@ export async function POST(request: NextRequest) {
           };
         }
 
+        // Merge phases data for army supply tracking
+        // Cast to expected type - sc2reader returns this structure
+        if (playerData.phases && fp.economy) {
+          fp.economy = {
+            ...fp.economy,
+            phases: playerData.phases as ReplayFingerprint['economy']['phases'],
+          };
+        }
+
         player_fingerprints[playerData.name] = fp;
       }
     }

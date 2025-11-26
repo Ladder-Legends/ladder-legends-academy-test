@@ -10,16 +10,82 @@ interface ThreePillarsProps {
   confirmedPlayerNames?: string[];
 }
 
+// Supply rate constants: supply per minute per building type
+// Based on fastest common unit for each building
+const SUPPLY_RATE_PER_BUILDING: Record<string, number> = {
+  // Terran
+  'Barracks': 2.4,      // Marine: 1 supply / 25s = 2.4/min
+  'Factory': 4.0,       // Hellion: 2 supply / 30s = 4.0/min
+  'Starport': 2.9,      // Viking: 2 supply / 42s = 2.9/min
+  // Protoss
+  'Gateway': 3.2,       // Zealot: 2 supply / 38s = 3.2/min
+  'WarpGate': 4.3,      // Zealot warp: 2 supply / 28s = 4.3/min
+  'RoboticsFacility': 4.4, // Immortal: 4 supply / 55s = 4.4/min
+  'Stargate': 3.4,      // Phoenix: 2 supply / 35s = 3.4/min
+  // Zerg (Hatchery-based, approximate with inject)
+  'Hatchery': 6.0,
+  'Lair': 6.0,
+  'Hive': 6.0,
+};
+
+interface ProductionMetrics {
+  score: number;
+  supplyPerMin: number;
+  theoreticalMax: number;
+  totalArmySupply: number;
+}
+
 /**
- * Calculate production score as inverse percentage of game time spent idle
- * Score = 100 - (idle_time / game_duration * 100)
- * Note: idle_time is summed across all production buildings
+ * Calculate production score as percentage of theoretical max supply production
+ * Uses phases data for army supply tracking
  */
-function calculateProductionScore(replay: UserReplayData): number | null {
+function calculateProductionScore(replay: UserReplayData): ProductionMetrics | null {
   const duration = replay.fingerprint?.metadata?.duration;
   if (!duration || duration === 0) return null;
 
-  // Calculate total idle time from production_by_building
+  const durationMin = duration / 60;
+
+  // Get phases data from economy
+  const phases = replay.fingerprint?.economy?.phases;
+  if (phases) {
+    // Get the latest phase with data
+    const latestPhase = phases.late || phases.mid || phases.early || phases.opening;
+    if (latestPhase) {
+      const totalArmySupply = latestPhase.total_army_supply_produced || 0;
+      const supplyPerMin = totalArmySupply / durationMin;
+
+      // Calculate theoretical max from production buildings
+      const prodBuildings = latestPhase.production_buildings || {};
+      let theoreticalMax = 0;
+      for (const [building, count] of Object.entries(prodBuildings)) {
+        const rate = SUPPLY_RATE_PER_BUILDING[building] || 0;
+        theoreticalMax += count * rate;
+      }
+
+      // If we have both actual and theoretical, calculate efficiency
+      if (theoreticalMax > 0) {
+        const efficiency = Math.min(100, (supplyPerMin / theoreticalMax) * 100);
+        return {
+          score: efficiency,
+          supplyPerMin,
+          theoreticalMax,
+          totalArmySupply,
+        };
+      }
+
+      // If no production buildings tracked, use a benchmark
+      // Good production is ~8 supply/min
+      const benchmarkScore = Math.min(100, (supplyPerMin / 8) * 100);
+      return {
+        score: benchmarkScore,
+        supplyPerMin,
+        theoreticalMax: 8,
+        totalArmySupply,
+      };
+    }
+  }
+
+  // Fallback: use old idle time calculation if no phases data
   const productionByBuilding = replay.fingerprint?.economy?.production_by_building;
   if (!productionByBuilding) return null;
 
@@ -28,9 +94,14 @@ function calculateProductionScore(replay: UserReplayData): number | null {
     totalIdleTime += (building as { idle_seconds?: number }).idle_seconds || 0;
   }
 
-  // Score = 100 - idle percentage
+  // Score = 100 - idle percentage (clamped, as idle can exceed duration with multiple buildings)
   const idlePercent = (totalIdleTime / duration) * 100;
-  return Math.max(0, Math.min(100, 100 - idlePercent));
+  return {
+    score: Math.max(0, Math.min(100, 100 - idlePercent)),
+    supplyPerMin: 0,
+    theoreticalMax: 0,
+    totalArmySupply: 0,
+  };
 }
 
 /**
@@ -49,16 +120,29 @@ function calculateSupplyScore(replay: UserReplayData): number | null {
   return Math.max(0, Math.min(100, 100 - blockPercent));
 }
 
-/**
- * Aggregate production scores across multiple replays
- */
-function aggregateProductionScore(replays: UserReplayData[]): number | null {
-  const scores = replays
-    .map(r => calculateProductionScore(r))
-    .filter((s): s is number => s !== null);
+interface AggregatedProductionMetrics {
+  avgScore: number;
+  avgSupplyPerMin: number;
+  totalArmySupply: number;
+  gameCount: number;
+}
 
-  if (scores.length === 0) return null;
-  return scores.reduce((sum, s) => sum + s, 0) / scores.length;
+/**
+ * Aggregate production metrics across multiple replays
+ */
+function aggregateProductionMetrics(replays: UserReplayData[]): AggregatedProductionMetrics | null {
+  const metrics = replays
+    .map(r => calculateProductionScore(r))
+    .filter((m): m is ProductionMetrics => m !== null);
+
+  if (metrics.length === 0) return null;
+
+  return {
+    avgScore: metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length,
+    avgSupplyPerMin: metrics.reduce((sum, m) => sum + m.supplyPerMin, 0) / metrics.length,
+    totalArmySupply: metrics.reduce((sum, m) => sum + m.totalArmySupply, 0),
+    gameCount: metrics.length,
+  };
 }
 
 /**
@@ -71,27 +155,6 @@ function aggregateSupplyScore(replays: UserReplayData[]): number | null {
 
   if (scores.length === 0) return null;
   return scores.reduce((sum, s) => sum + s, 0) / scores.length;
-}
-
-/**
- * Calculate total production idle time from production_by_building
- * Returns total across all games (not average)
- */
-function calculateTotalIdleTime(replays: UserReplayData[]): number | null {
-  let total = 0;
-  let hasData = false;
-
-  for (const replay of replays) {
-    const productionByBuilding = replay.fingerprint?.economy?.production_by_building;
-    if (productionByBuilding) {
-      hasData = true;
-      for (const building of Object.values(productionByBuilding)) {
-        total += building.idle_seconds || 0;
-      }
-    }
-  }
-
-  return hasData ? total : null;
 }
 
 /**
@@ -145,21 +208,28 @@ function formatTimeValue(seconds: number): string {
  */
 function ProductionTooltipContent({
   avgScore,
-  totalIdleTime,
+  avgSupplyPerMin,
+  totalArmySupply,
   totalGameTime,
   gameCount,
 }: {
   avgScore: number | null;
-  totalIdleTime: number | null;
+  avgSupplyPerMin: number;
+  totalArmySupply: number;
   totalGameTime: number;
   gameCount: number;
 }) {
   return (
     <div className="space-y-2">
       <p className="font-semibold">Production Efficiency: {avgScore !== null ? `${Math.round(avgScore)}%` : 'N/A'}</p>
-      {totalIdleTime !== null && (
+      {avgSupplyPerMin > 0 && (
         <p className="text-sm text-muted-foreground">
-          {formatTimeValue(totalIdleTime)} total idle across {gameCount} game{gameCount !== 1 ? 's' : ''}
+          {avgSupplyPerMin.toFixed(1)} supply/min average
+        </p>
+      )}
+      {totalArmySupply > 0 && (
+        <p className="text-sm text-muted-foreground">
+          {totalArmySupply} total army supply across {gameCount} game{gameCount !== 1 ? 's' : ''}
         </p>
       )}
       {totalGameTime > 0 && (
@@ -168,11 +238,11 @@ function ProductionTooltipContent({
         </p>
       )}
       <div className="border-t pt-2 mt-2">
-        <p className="text-xs font-medium mb-1">Note:</p>
+        <p className="text-xs font-medium mb-1">How it works:</p>
         <ul className="text-xs text-muted-foreground space-y-0.5">
-          <li>Idle time is summed across ALL production buildings</li>
-          <li>5 idle Barracks for 1 min = 5 min idle</li>
-          <li>Lower idle % = higher score</li>
+          <li>Measures army supply produced per minute</li>
+          <li>Compared to your production capacity</li>
+          <li>Higher = better production utilization</li>
         </ul>
       </div>
     </div>
@@ -235,24 +305,21 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
     [replays]
   );
 
-  // Calculate aggregate scores
-  const productionScore = useMemo(() => aggregateProductionScore(activeReplays), [activeReplays]);
+  // Calculate aggregate metrics
+  const productionMetrics = useMemo(() => aggregateProductionMetrics(activeReplays), [activeReplays]);
   const supplyScore = useMemo(() => aggregateSupplyScore(activeReplays), [activeReplays]);
 
   // Calculate total time metrics (summed across all games)
-  const totalIdleTime = useMemo(() => calculateTotalIdleTime(activeReplays), [activeReplays]);
   const totalBlockTime = useMemo(() => calculateTotalSupplyBlockTime(activeReplays), [activeReplays]);
   const avgSupplyBlocks = useMemo(() => calculateAvgSupplyBlocks(activeReplays), [activeReplays]);
   const totalGameTime = useMemo(() => calculateTotalGameTime(activeReplays), [activeReplays]);
 
-  // Production subtitle - show total time with game time context if available
-  const productionSubtitle = totalIdleTime !== null
-    ? totalGameTime > 0
-      ? `${formatTime(totalIdleTime)} idle / ${formatTime(totalGameTime)} played`
-      : `${formatTime(totalIdleTime)} total idle`
-    : productionScore !== null
-      ? 'Based on execution'
-      : 'No data yet';
+  // Production subtitle - show supply/min if available
+  const productionSubtitle = productionMetrics
+    ? productionMetrics.avgSupplyPerMin > 0
+      ? `${productionMetrics.avgSupplyPerMin.toFixed(1)} supply/min avg`
+      : 'Based on execution'
+    : 'No data yet';
 
   // Supply subtitle - show total time with game time context when available
   const supplySubtitle = totalBlockTime !== null
@@ -279,12 +346,13 @@ export function ThreePillars({ replays, confirmedPlayerNames: _confirmedPlayerNa
         <PillarCard
           title="Production"
           icon={<Cog className="h-6 w-6" />}
-          score={productionScore}
+          score={productionMetrics?.avgScore ?? null}
           subtitle={productionSubtitle}
           tooltipContent={
             <ProductionTooltipContent
-              avgScore={productionScore}
-              totalIdleTime={totalIdleTime}
+              avgScore={productionMetrics?.avgScore ?? null}
+              avgSupplyPerMin={productionMetrics?.avgSupplyPerMin ?? 0}
+              totalArmySupply={productionMetrics?.totalArmySupply ?? 0}
               totalGameTime={totalGameTime}
               gameCount={gameCount}
             />
