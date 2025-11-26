@@ -1843,5 +1843,26 @@
     "coach": "GamerRichy",
     "coachId": "gamerrichy",
     "isFree": false
+  },
+  {
+    "id": "0131e0b0-cde4-4a74-b098-823f62f92c9b",
+    "title": "A mini Nicosystem™ to Snowballing a reaper lead in TvT",
+    "description": "Hello everyone, this mini-guide is about snowballing the reaper lead in TvT and how to avoid losing a critical number of workers should you lose the first reaper battle. ",
+    "source": "mux",
+    "muxAssetId": "Bv1vdyzLZ8X4LJ00oWx0201jOm02mYAB8xfZXd9IO1vCA1E",
+    "muxPlaybackId": "w4102S00tk302zo902Y00sreuM014x47W0201AqMWvrxHrsGAQk",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/0131e0b0-cde4-4a74-b098-823f62f92c9b.jpg",
+    "date": "2025-11-26",
+    "categories": [
+      "matchups.tvt",
+      "strategy.early-game",
+      "mechanics.micro"
+    ],
+    "tags": [],
+    "race": "terran",
+    "coach": "Nico",
+    "coachId": "coach-nico",
+    "isFree": false
   }
 ]
