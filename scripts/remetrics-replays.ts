@@ -174,6 +174,14 @@ function buildFingerprints(
         };
       }
 
+      // Merge phases data for army supply tracking (total_army_supply_produced, production_buildings)
+      if (playerData.phases && fp.economy) {
+        fp.economy = {
+          ...fp.economy,
+          phases: playerData.phases as ReplayFingerprint['economy']['phases'],
+        };
+      }
+
       playerFingerprints[playerData.name] = fp;
 
       if (playerData.name === winningPlayerName) {
