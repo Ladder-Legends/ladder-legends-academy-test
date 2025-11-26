@@ -26,6 +26,7 @@ export function MyReplaysContent() {
     matchup: [],
     result: [],
     build: [],
+    gameType: [],
   });
 
   // Delete dialog
@@ -157,18 +158,49 @@ export function MyReplaysContent() {
   };
 
   // Extract unique values for filters
-  const uniqueMatchups = useMemo(() => {
-    return Array.from(new Set(replays.map((r) => r.fingerprint.matchup))).sort();
+  const uniqueGameTypes = useMemo(() => {
+    return Array.from(new Set(replays.map((r) => r.game_type).filter(Boolean))).sort() as string[];
+  }, [replays]);
+
+  // Build counts for the filter display
+  const buildCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    replays.forEach((r) => {
+      if (r.detection) {
+        counts[r.detection.build_name] = (counts[r.detection.build_name] || 0) + 1;
+      }
+    });
+    return counts;
   }, [replays]);
 
   const uniqueBuilds = useMemo(() => {
-    return Array.from(
-      new Set(
-        replays
-          .filter((r) => r.detection)
-          .map((r) => r.detection!.build_name)
-      )
-    ).sort();
+    return Object.keys(buildCounts).sort();
+  }, [buildCounts]);
+
+  const undetectedCount = useMemo(() => {
+    return replays.filter((r) => !r.detection).length;
+  }, [replays]);
+
+  const detectedCount = useMemo(() => {
+    return replays.filter((r) => r.detection).length;
+  }, [replays]);
+
+  // Get matchup counts and available races for dynamic filtering
+  const matchupData = useMemo(() => {
+    const matchupCounts: Record<string, number> = {};
+    replays.forEach((r) => {
+      const matchup = r.fingerprint.matchup;
+      matchupCounts[matchup] = (matchupCounts[matchup] || 0) + 1;
+    });
+
+    // Determine which races have replays (checking the first letter of matchups)
+    const hasRace = {
+      terran: Object.keys(matchupCounts).some((m) => m.startsWith('T')),
+      zerg: Object.keys(matchupCounts).some((m) => m.startsWith('Z')),
+      protoss: Object.keys(matchupCounts).some((m) => m.startsWith('P')),
+    };
+
+    return { matchupCounts, hasRace };
   }, [replays]);
 
   // Filtering logic
@@ -184,33 +216,64 @@ export function MyReplaysContent() {
         if (!matchesSearch) return false;
       }
 
-      // Matchup filter
-      if (filters.matchup.length > 0 && !filters.matchup.includes(replay.fingerprint.matchup)) {
-        return false;
-      }
-
-      // Result filter
-      if (filters.result.length > 0 && !filters.result.includes(replay.fingerprint.metadata.result)) {
-        return false;
-      }
-
-      // Build filter
-      if (filters.build.length > 0) {
-        if (filters.build.includes('detected') && !replay.detection) return false;
-        if (filters.build.includes('undetected') && replay.detection) return false;
-        if (replay.detection && !filters.build.includes(replay.detection.build_name) && !filters.build.includes('detected') && !filters.build.includes('undetected')) {
+      // Game type filter
+      if (filters.gameType.length > 0) {
+        if (!replay.game_type || !filters.gameType.includes(replay.game_type)) {
           return false;
         }
+      }
+
+      // Matchup filter (hierarchical: supports both parent race and specific matchup)
+      if (filters.matchup.length > 0) {
+        const replayMatchup = replay.fingerprint.matchup;
+        const matchesFilter = filters.matchup.some((selected) => {
+          // Direct matchup match (e.g., "TvP")
+          if (selected === replayMatchup) return true;
+          // Parent race match (e.g., "terran" matches "TvP", "TvZ", "TvT")
+          if (selected === 'terran' && replayMatchup.startsWith('T')) return true;
+          if (selected === 'zerg' && replayMatchup.startsWith('Z')) return true;
+          if (selected === 'protoss' && replayMatchup.startsWith('P')) return true;
+          return false;
+        });
+        if (!matchesFilter) return false;
+      }
+
+      // Result filter (singular: Won or Lost)
+      if (filters.result.length > 0) {
+        const result = replay.fingerprint.metadata.result;
+        // Map "Win" -> "won", "Loss" -> "lost" for filter matching
+        const normalizedResult = result === 'Win' ? 'won' : 'lost';
+        if (!filters.result.includes(normalizedResult)) {
+          return false;
+        }
+      }
+
+      // Build filter (hierarchical: undetected, detected, or specific build names)
+      if (filters.build.length > 0) {
+        const hasDetection = !!replay.detection;
+        const buildName = replay.detection?.build_name;
+
+        // Check if any filter matches
+        const matchesBuildFilter = filters.build.some((selected) => {
+          if (selected === 'undetected') return !hasDetection;
+          if (selected === 'detected') return hasDetection;
+          // Specific build name match
+          return buildName === selected;
+        });
+        if (!matchesBuildFilter) return false;
       }
 
       return true;
     });
   }, [replays, searchQuery, filters]);
 
-  // Sort replays by date (newest first)
+  // Sort replays by date played (newest first)
   const sortedReplays = useMemo(() => {
     return [...filteredReplays].sort((a, b) => {
-      return new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime();
+      // Use game_date from fingerprint metadata, fall back to uploaded_at
+      const dateA = a.fingerprint.metadata.game_date || a.game_metadata?.game_date || a.uploaded_at;
+      const dateB = b.fingerprint.metadata.game_date || b.game_metadata?.game_date || b.uploaded_at;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
     });
   }, [filteredReplays]);
 
@@ -220,31 +283,94 @@ export function MyReplaysContent() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setFilters({ matchup: [], result: [], build: [] });
+    setFilters({ matchup: [], result: [], build: [], gameType: [] });
   };
 
   // Filter sections configuration
   const filterSections = [
+    // Game Type filter
+    ...(uniqueGameTypes.length > 0
+      ? [
+          {
+            id: 'gameType',
+            label: 'Game Type',
+            items: uniqueGameTypes.map((gt) => ({
+              id: gt,
+              label: gt.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            })),
+          },
+        ]
+      : []),
+    // Hierarchical Matchup filter (only show races/matchups that have replays)
     {
       id: 'matchup',
-      label: 'Matchup',
-      items: uniqueMatchups.map((m) => ({ id: m, label: m })),
+      label: 'Race',
+      items: [
+        ...(matchupData.hasRace.terran
+          ? [
+              {
+                id: 'terran',
+                label: 'Terran',
+                children: [
+                  ...(matchupData.matchupCounts['TvT'] ? [{ id: 'TvT', label: `vs Terran (${matchupData.matchupCounts['TvT']})` }] : []),
+                  ...(matchupData.matchupCounts['TvZ'] ? [{ id: 'TvZ', label: `vs Zerg (${matchupData.matchupCounts['TvZ']})` }] : []),
+                  ...(matchupData.matchupCounts['TvP'] ? [{ id: 'TvP', label: `vs Protoss (${matchupData.matchupCounts['TvP']})` }] : []),
+                ],
+              },
+            ]
+          : []),
+        ...(matchupData.hasRace.zerg
+          ? [
+              {
+                id: 'zerg',
+                label: 'Zerg',
+                children: [
+                  ...(matchupData.matchupCounts['ZvT'] ? [{ id: 'ZvT', label: `vs Terran (${matchupData.matchupCounts['ZvT']})` }] : []),
+                  ...(matchupData.matchupCounts['ZvZ'] ? [{ id: 'ZvZ', label: `vs Zerg (${matchupData.matchupCounts['ZvZ']})` }] : []),
+                  ...(matchupData.matchupCounts['ZvP'] ? [{ id: 'ZvP', label: `vs Protoss (${matchupData.matchupCounts['ZvP']})` }] : []),
+                ],
+              },
+            ]
+          : []),
+        ...(matchupData.hasRace.protoss
+          ? [
+              {
+                id: 'protoss',
+                label: 'Protoss',
+                children: [
+                  ...(matchupData.matchupCounts['PvT'] ? [{ id: 'PvT', label: `vs Terran (${matchupData.matchupCounts['PvT']})` }] : []),
+                  ...(matchupData.matchupCounts['PvZ'] ? [{ id: 'PvZ', label: `vs Zerg (${matchupData.matchupCounts['PvZ']})` }] : []),
+                  ...(matchupData.matchupCounts['PvP'] ? [{ id: 'PvP', label: `vs Protoss (${matchupData.matchupCounts['PvP']})` }] : []),
+                ],
+              },
+            ]
+          : []),
+      ],
     },
+    // Singular Result filter
     {
       id: 'result',
       label: 'Result',
+      singleSelect: true,
       items: [
-        { id: 'Win', label: 'Wins' },
-        { id: 'Loss', label: 'Losses' },
+        { id: 'won', label: 'Won' },
+        { id: 'lost', label: 'Lost' },
       ],
     },
+    // Build Detection filter (Undetected first, then Detected with children)
     {
       id: 'build',
       label: 'Build Detection',
       items: [
-        { id: 'detected', label: 'Detected Builds' },
-        { id: 'undetected', label: 'Undetected Builds' },
-        ...uniqueBuilds.map((b) => ({ id: b, label: b })),
+        { id: 'undetected', label: `Undetected Build${undetectedCount > 0 ? ` (${undetectedCount})` : ''}` },
+        {
+          id: 'detected',
+          label: `Detected Build${detectedCount > 0 ? ` (${detectedCount})` : ''}`,
+          children: uniqueBuilds.map((b) => ({
+            id: b,
+            label: `${b} (${buildCounts[b]})`,
+          })),
+        },
       ],
     },
   ];

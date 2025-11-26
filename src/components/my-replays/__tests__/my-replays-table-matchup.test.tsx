@@ -115,56 +115,56 @@ describe('MyReplaysTable - Matchup Normalization', () => {
     };
   };
 
-  it('should display Terran v Zerg with player as Terran', () => {
+  it('should display TvZ with player as Terran', () => {
     const replays = [createMockReplay('Terran', 'Zerg')];
 
     render(<MyReplaysTable replays={replays} />);
 
-    // Component renders full race names: "Terran v Zerg"
-    expect(screen.getByText('Terran')).toBeInTheDocument();
+    // Component renders abbreviated race names: "T v Z"
+    expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('v')).toBeInTheDocument();
-    expect(screen.getByText('Zerg')).toBeInTheDocument();
+    expect(screen.getByText('Z')).toBeInTheDocument();
   });
 
-  it('should display Terran v Protoss with player as Terran', () => {
+  it('should display TvP with player as Terran', () => {
     const replays = [createMockReplay('Terran', 'Protoss')];
 
     render(<MyReplaysTable replays={replays} />);
 
-    expect(screen.getByText('Terran')).toBeInTheDocument();
+    expect(screen.getByText('T')).toBeInTheDocument();
     expect(screen.getByText('v')).toBeInTheDocument();
-    expect(screen.getByText('Protoss')).toBeInTheDocument();
+    expect(screen.getByText('P')).toBeInTheDocument();
   });
 
-  it('should display Terran v Terran for mirror matchup', () => {
+  it('should display TvT for mirror matchup', () => {
     const replays = [createMockReplay('Terran', 'Terran')];
 
     render(<MyReplaysTable replays={replays} />);
 
-    // Both players are Terran, so we should see two "Terran" texts
-    const terranElements = screen.getAllByText('Terran');
+    // Both players are Terran, so we should see two "T" texts
+    const terranElements = screen.getAllByText('T');
     expect(terranElements.length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('v')).toBeInTheDocument();
   });
 
-  it('should display Zerg v Terran with player as Zerg', () => {
+  it('should display ZvT with player as Zerg', () => {
     const replays = [createMockReplay('Zerg', 'Terran')];
 
     render(<MyReplaysTable replays={replays} />);
 
-    expect(screen.getByText('Zerg')).toBeInTheDocument();
+    expect(screen.getByText('Z')).toBeInTheDocument();
     expect(screen.getByText('v')).toBeInTheDocument();
-    expect(screen.getByText('Terran')).toBeInTheDocument();
+    expect(screen.getByText('T')).toBeInTheDocument();
   });
 
-  it('should display Protoss v Terran with player as Protoss', () => {
+  it('should display PvT with player as Protoss', () => {
     const replays = [createMockReplay('Protoss', 'Terran')];
 
     render(<MyReplaysTable replays={replays} />);
 
-    expect(screen.getByText('Protoss')).toBeInTheDocument();
+    expect(screen.getByText('P')).toBeInTheDocument();
     expect(screen.getByText('v')).toBeInTheDocument();
-    expect(screen.getByText('Terran')).toBeInTheDocument();
+    expect(screen.getByText('T')).toBeInTheDocument();
   });
 
   it('should display dash when all_players is empty', () => {
@@ -199,8 +199,8 @@ describe('MyReplaysTable - Matchup Normalization', () => {
 
     render(<MyReplaysTable replays={replays} />);
 
-    // All should show Terran (player's race) - should appear multiple times
-    const terranElements = screen.getAllByText('Terran');
+    // All should show T (player's race abbreviated) - should appear multiple times
+    const terranElements = screen.getAllByText('T');
     expect(terranElements.length).toBeGreaterThanOrEqual(3);
   });
 });

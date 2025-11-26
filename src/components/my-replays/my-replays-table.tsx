@@ -218,15 +218,17 @@ export function MyReplaysTable({ replays, onDelete, confirmedPlayerNames = [] }:
           return <span className="text-sm text-muted-foreground">—</span>;
         }
 
-        // Show player's race first, then opponent's race
+        // Show player's race first, then opponent's race (abbreviated: TvZ, ZvP, etc.)
         const playerRace = playerData.race;
         const opponentRace = opponents[0].race;
+        const playerAbbrev = playerRace.charAt(0).toUpperCase();
+        const opponentAbbrev = opponentRace.charAt(0).toUpperCase();
 
         return (
-          <div className="flex items-center gap-1">
-            <span className={`font-bold ${getRaceColor(playerRace)}`}>{playerRace}</span>
+          <div className="flex items-center gap-0.5">
+            <span className={`font-bold ${getRaceColor(playerRace)}`}>{playerAbbrev}</span>
             <span className="text-muted-foreground">v</span>
-            <span className={`font-bold ${getRaceColor(opponentRace)}`}>{opponentRace}</span>
+            <span className={`font-bold ${getRaceColor(opponentRace)}`}>{opponentAbbrev}</span>
           </div>
         );
       },

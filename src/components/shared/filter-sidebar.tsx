@@ -8,6 +8,7 @@ export interface FilterSection {
   label?: string;  // legacy field
   title?: string;  // new field
   type?: 'search' | 'checkbox' | 'radio';  // new field for filter type
+  singleSelect?: boolean;  // if true, only one item can be selected at a time
   icon?: string;
   items: FilterItem[];
 }
@@ -68,16 +69,24 @@ export function FilterSidebar({
   };
 
   // Handle item toggle - support both legacy and new APIs
-  const handleItemToggle = (sectionId: string, itemId: string) => {
+  const handleItemToggle = (sectionId: string, itemId: string, singleSelect?: boolean) => {
     if (onItemToggle) {
       // Legacy API
       onItemToggle(sectionId, itemId);
     } else if (onSelectionChange) {
-      // New API - toggle the item in the current selection
       const currentSectionItems = selectedItems[sectionId] || [];
-      const newSectionItems = currentSectionItems.includes(itemId)
-        ? currentSectionItems.filter(id => id !== itemId)
-        : [...currentSectionItems, itemId];
+      const isCurrentlySelected = currentSectionItems.includes(itemId);
+
+      let newSectionItems: string[];
+      if (singleSelect) {
+        // Single select: clicking selected item deselects, clicking unselected replaces
+        newSectionItems = isCurrentlySelected ? [] : [itemId];
+      } else {
+        // Multi select: toggle the item in the current selection
+        newSectionItems = isCurrentlySelected
+          ? currentSectionItems.filter(id => id !== itemId)
+          : [...currentSectionItems, itemId];
+      }
 
       onSelectionChange({
         ...selectedItems,
@@ -118,7 +127,7 @@ export function FilterSidebar({
     });
   };
 
-  const renderItem = (sectionId: string, item: FilterItem, depth: number = 0) => {
+  const renderItem = (sectionId: string, item: FilterItem, depth: number = 0, singleSelect?: boolean) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
     const isSelected = selectedItems[sectionId]?.includes(item.id) || false;
@@ -145,7 +154,7 @@ export function FilterSidebar({
 
           {/* Selection Button */}
           <button
-            onClick={() => handleItemToggle(sectionId, item.id)}
+            onClick={() => handleItemToggle(sectionId, item.id, singleSelect)}
             className={`flex-1 text-left px-3 py-2 rounded-md text-sm transition-colors cursor-pointer ${
               isSelected
                 ? 'bg-primary text-primary-foreground font-medium'
@@ -168,7 +177,7 @@ export function FilterSidebar({
           <div className="mt-1 space-y-1 ml-1">
             {item.children!.map(child => (
               <div key={`${sectionId}-${child.id}`}>
-                {renderItem(sectionId, child, depth + 1)}
+                {renderItem(sectionId, child, depth + 1, singleSelect)}
               </div>
             ))}
           </div>
@@ -271,7 +280,7 @@ export function FilterSidebar({
                 <div className="space-y-1">
                   {section.items.map(item => (
                     <div key={`${section.id}-${item.id}`}>
-                      {renderItem(section.id, item)}
+                      {renderItem(section.id, item, 0, section.singleSelect)}
                     </div>
                   ))}
                 </div>
