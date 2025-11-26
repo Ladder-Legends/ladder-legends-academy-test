@@ -1902,5 +1902,22 @@
     "coach": "Groovy",
     "coachId": "groovy",
     "isFree": false
+  },
+  {
+    "id": "5ca8dab6-0e9b-434c-a5fe-9b1c611a53bb",
+    "title": "Sc2 Tools for Improvement #4: Micro Trainer",
+    "description": "This video goes over a micro training game that has tons of different scenarios for each race. good for learning how to micro different real game scenarios.",
+    "source": "youtube",
+    "youtubeId": "O2oQrOxZTNk",
+    "thumbnail": "https://img.youtube.com/vi/O2oQrOxZTNk/hqdefault.jpg",
+    "date": "2025-11-26",
+    "categories": [
+      "mechanics.micro"
+    ],
+    "tags": [],
+    "race": "all",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": true
   }
 ]
