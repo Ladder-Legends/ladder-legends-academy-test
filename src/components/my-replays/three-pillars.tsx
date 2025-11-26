@@ -11,83 +11,42 @@ interface ThreePillarsProps {
 }
 
 /**
- * Calculate production score based on idle time and macro efficiency
- * Formula:
- * - Start at 100
- * - First 10s idle: -1 per second
- * - 10-30s idle: -2 per second
- * - 30s+ idle: -3 per second
- * - Macro ability inefficiency: up to -20 points
+ * Calculate production score as inverse percentage of game time spent idle
+ * Score = 100 - (idle_time / game_duration * 100)
+ * Note: idle_time is summed across all production buildings
  */
 function calculateProductionScore(replay: UserReplayData): number | null {
-  // Check if we have production metrics
-  const productionIdlePercent = (replay as { fingerprint?: { production?: { idle_percent?: number } } })
-    ?.fingerprint?.production?.idle_percent;
+  const duration = replay.fingerprint?.metadata?.duration;
+  if (!duration || duration === 0) return null;
 
-  // If we have explicit production score from metrics, use that
-  const metricsProductionScore = (replay as { production_score?: number }).production_score;
-  if (typeof metricsProductionScore === 'number') {
-    return metricsProductionScore;
+  // Calculate total idle time from production_by_building
+  const productionByBuilding = replay.fingerprint?.economy?.production_by_building;
+  if (!productionByBuilding) return null;
+
+  let totalIdleTime = 0;
+  for (const building of Object.values(productionByBuilding)) {
+    totalIdleTime += (building as { idle_seconds?: number }).idle_seconds || 0;
   }
 
-  // If we have comparison execution score, use that as a proxy
-  if (replay.comparison?.execution_score != null) {
-    return replay.comparison.execution_score;
-  }
-
-  // Fallback: calculate from idle percent if available
-  if (typeof productionIdlePercent === 'number') {
-    // Rough conversion: 0% idle = 100 score, 20% idle = 0 score
-    return Math.max(0, 100 - productionIdlePercent * 5);
-  }
-
-  return null;
+  // Score = 100 - idle percentage
+  const idlePercent = (totalIdleTime / duration) * 100;
+  return Math.max(0, Math.min(100, 100 - idlePercent));
 }
 
 /**
- * Calculate supply score based on supply blocks
- * Formula:
- * - Start at 100
- * - Each block: -10 points
- * - Per second blocked: -2 points
- * - Early block (<5min): 1.5x penalty
+ * Calculate supply score as inverse percentage of game time spent blocked
+ * Score = 100 - (block_time / game_duration * 100)
  */
 function calculateSupplyScore(replay: UserReplayData): number | null {
-  const economy = replay.fingerprint?.economy;
-  if (!economy) return null;
+  const duration = replay.fingerprint?.metadata?.duration;
+  if (!duration || duration === 0) return null;
 
-  const blockCount = economy.supply_block_count;
-  const totalBlockTime = economy.total_supply_block_time;
+  const totalBlockTime = replay.fingerprint?.economy?.total_supply_block_time;
+  if (totalBlockTime == null) return null;
 
-  // If neither metric is available, can't calculate
-  if (blockCount == null && totalBlockTime == null) return null;
-
-  let score = 100;
-  let penalty = 0;
-
-  // Block count penalty
-  if (blockCount != null) {
-    penalty += blockCount * 10;
-  }
-
-  // Block duration penalty
-  if (totalBlockTime != null) {
-    penalty += totalBlockTime * 2;
-  }
-
-  // Early block penalty would require block_events with timestamps
-  // For now, use a simple calculation
-  if (economy.supply_block_periods?.length) {
-    for (const block of economy.supply_block_periods) {
-      if (block.start < 300) { // Before 5 minutes
-        // Add 50% more penalty for early blocks
-        penalty += (block.duration || 0) * 1;
-      }
-    }
-  }
-
-  score = Math.max(0, score - penalty);
-  return Math.min(100, score);
+  // Score = 100 - block percentage
+  const blockPercent = (totalBlockTime / duration) * 100;
+  return Math.max(0, Math.min(100, 100 - blockPercent));
 }
 
 /**
