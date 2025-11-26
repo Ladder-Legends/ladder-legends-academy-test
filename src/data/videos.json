@@ -1885,5 +1885,22 @@
     "coach": "Nico",
     "coachId": "coach-nico",
     "isFree": false
+  },
+  {
+    "id": "3d7d6fa2-c14c-43ba-a6fc-cd9175f98680",
+    "title": "How to Defend 1 Base BattleMech as Zerg ",
+    "description": "In this video we go over the correct counter to 1 base battle mech which is burrow. Burrow buys you enough time to keep droning behind and make sure you get enough units to overwhelm the opponent ",
+    "source": "mux",
+    "muxAssetId": "Fn3y029JfE2TrHeglzHj3SNahySpkjzklXKDpxB1Xlpw",
+    "muxPlaybackId": "gicHYkj4F5fP9d6pTCcG3IoN5DVC4PCCNrPjc95ZL024",
+    "muxAssetStatus": "ready",
+    "thumbnail": "/thumbnails/3d7d6fa2-c14c-43ba-a6fc-cd9175f98680.jpg",
+    "date": "2025-11-26",
+    "categories": [],
+    "tags": [],
+    "race": "zerg",
+    "coach": "Groovy",
+    "coachId": "groovy",
+    "isFree": false
   }
 ]
