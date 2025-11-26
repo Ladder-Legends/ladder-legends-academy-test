@@ -28,41 +28,38 @@
 
 ## Solution Architecture
 
-### Phase 1: Fix Production Idle Time in sc2reader (Priority: HIGH)
+### Phase 1: Fix Production Idle Time ✅ COMPLETE (2025-11-26)
 
-**Location**: `/Users/chadfurman/projects/sc2reader/fingerprint.py`
+**Solution**: Merge production metrics in Academy API (instead of modifying sc2reader)
 
-The production tracking infrastructure already exists in:
-- `src/sc2analysis/metrics/production.py` - ProductionSummary, idle calculations
-- `src/sc2analysis/models/production.py` - Per-building idle tracking
+The sc2reader `/metrics` endpoint already returns `production_by_building` and
+`supply_block_events` at the player level (from `ReplayProcessor`), but this data
+wasn't being merged into `fingerprint.economy` when storing replays.
 
-**Changes needed**:
+**Changes made**:
+1. Updated `PlayerMetrics` type in `src/lib/replay-types.ts` to include:
+   - `production_by_building` - Per-building idle times
+   - `supply_block_events` - Supply block timestamps
+   - Other enhanced metrics
 
-```python
-# In fingerprint.py, update extract_comprehensive_fingerprint()
+2. Modified `/api/my-replays/route.ts` to merge processor data into fingerprint:
+   ```typescript
+   // Merge production_by_building from processor into fingerprint.economy
+   if (playerData.production_by_building && fp.economy) {
+     fp.economy = {
+       ...fp.economy,
+       production_by_building: playerData.production_by_building,
+     };
+   }
+   ```
 
-# 1. Import production tracking
-from src.sc2analysis.metrics.production import analyze_production
+**Result**: New replay uploads will include production idle time data.
+Existing replays need to be re-uploaded to get this data.
 
-# 2. Track production buildings and calculate idle time
-# (Add production tracking alongside existing building tracking)
-
-# 3. Add to economy output:
-economy_features.update({
-    'production_by_building': {
-        'Barracks': { 'count': 2, 'idle_seconds': 45 },
-        'Factory': { 'count': 1, 'idle_seconds': 20 },
-        ...
-    },
-    'total_production_idle_time': 65,  # Sum of all idle
-    'merged_production_idle_time': 50,  # Overlapping periods merged
-})
-```
-
-**After sc2reader update**:
-1. Re-upload test replays to verify new fields
-2. Update Academy types if needed
-3. Flush user replay cache to get fresh data
+**UI graceful handling** (also completed):
+- Three Pillars shows "Based on execution" when score exists but no time data
+- Performance Trends hides NaN values with `Number.isFinite()` checks
+- Toggle buttons now use `bg-primary text-primary-foreground` for visibility
 
 ---
 
