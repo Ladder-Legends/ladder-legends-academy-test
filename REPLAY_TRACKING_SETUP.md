@@ -48,9 +48,9 @@ pip3 install -r requirements.txt
 
 ### 3. Configure environment
 
-Create `.env` file (already exists):
+Create `.env` file (copy from `.env.example`):
 ```env
-API_SECRET=***REDACTED_API_KEY***
+API_SECRET=<your-api-secret-here>
 ```
 
 ### 4. Start the API server
@@ -65,7 +65,7 @@ Server will run on `http://localhost:8000`
 
 ```bash
 curl -X GET "http://localhost:8000/builds" \
-  -H "X-API-Key: ***REDACTED_API_KEY***"
+  -H "X-API-Key: $SC2READER_API_KEY"
 ```
 
 Should return:
@@ -106,7 +106,7 @@ Add to `.env.local`:
 ```env
 # sc2reader API
 NEXT_PUBLIC_SC2READER_API_URL=http://localhost:8000
-SC2READER_API_KEY=***REDACTED_API_KEY***
+SC2READER_API_KEY=<your-api-key-here>
 
 # Vercel KV (for local development, use mock or skip)
 # These will be added automatically when deploying to Vercel

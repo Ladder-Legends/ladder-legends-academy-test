@@ -7,7 +7,12 @@ import { readFile } from 'fs/promises';
 
 const REPLAY_PATH = process.env.HOME + "/Library/Application Support/Blizzard/StarCraft II/Accounts/766657/1-S2-1-802768/Replays/Multiplayer/Tokamak LE (31).SC2Replay";
 const API_URL = "https://sc2-replay-analyzer-gold.vercel.app/fingerprint";
-const API_KEY = "***REDACTED_API_KEY***";
+const API_KEY = process.env.SC2READER_API_KEY;
+
+if (!API_KEY) {
+  console.error("Error: SC2READER_API_KEY environment variable is required");
+  process.exit(1);
+}
 
 console.log("Testing File() constructor approach...\n");
 

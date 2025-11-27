@@ -11,7 +11,15 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local' });
 
-const DISCORD_TOKEN = '***REDACTED_DISCORD_TOKEN***';
+const DISCORD_TOKEN = process.env.DISCORD_BOT_TOKEN as string;
+if (!DISCORD_TOKEN) {
+  throw new Error('DISCORD_BOT_TOKEN environment variable is required');
+}
+
+const SC2READER_API_KEY = process.env.SC2READER_API_KEY as string;
+if (!SC2READER_API_KEY) {
+  throw new Error('SC2READER_API_KEY environment variable is required');
+}
 const SCRAPED_REPLAYS_PATH = '/Users/chadfurman/projects/ladder-legends-bot/scraped-data/replays.json';
 const OUTPUT_PATH = join(process.cwd(), 'src', 'data', 'replays.json');
 const TEMP_DIR = join(process.cwd(), 'temp-replays');
@@ -122,7 +130,7 @@ async function analyzeReplay(filepath: string): Promise<Record<string, unknown> 
 
     // Use curl since we know it works
     const { stdout } = await execAsync(
-      `curl -X POST http://localhost:8000/analyze -H "X-API-Key: ***REDACTED_API_KEY***" -F "file=@${filepath}" -s`
+      `curl -X POST http://localhost:8000/analyze -H "X-API-Key: ${SC2READER_API_KEY}" -F "file=@${filepath}" -s`
     );
 
     const result = JSON.parse(stdout) as Record<string, unknown>;
