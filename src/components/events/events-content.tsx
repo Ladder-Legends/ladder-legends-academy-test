@@ -14,10 +14,13 @@ import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/auth/permission-gate';
 import { EventEditModal } from '@/components/admin/event-edit-modal';
 import { useSession } from 'next-auth/react';
+import { usePendingChanges } from '@/hooks/use-pending-changes';
+import { toast } from 'sonner';
 
 export function EventsContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const { addChange } = usePendingChanges();
   const hasSubscriberRole = session?.user?.hasSubscriberRole ?? false;
 
   // Initialize state from URL parameters
@@ -174,8 +177,13 @@ export function EventsContent() {
 
   const handleDelete = (event: Event) => {
     if (confirm(`Are you sure you want to delete "${event.title}"?`)) {
-      // Would add pending change here
-      console.log('Delete event:', event.id);
+      addChange({
+        id: event.id,
+        contentType: 'events',
+        operation: 'delete',
+        data: event,
+      });
+      toast.success(`Event "${event.title}" deleted (pending commit)`);
     }
   };
 
