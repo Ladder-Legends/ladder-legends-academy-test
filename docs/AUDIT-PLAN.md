@@ -169,67 +169,267 @@ UI Display
 
 ## Audit Findings (2025-11-26)
 
-### CRITICAL: Remetrics Script Missing Phases Merge
+### Summary
 
-**Issue:** `scripts/remetrics-replays.ts` `buildFingerprints()` function does NOT merge `phases` data.
+| Severity | Count | Categories |
+|----------|-------|------------|
+| CRITICAL | 5 | Security, Type Safety, Performance |
+| HIGH | 4 | Security, Reliability, Maintainability |
+| MEDIUM | 8 | Performance, Type Safety, Code Quality |
+| LOW | 4 | Code Quality, UX |
+| **Total** | **21** | |
 
-**Impact:** Existing replays re-processed by remetrics won't get the new army supply/min metric.
+---
 
+### CRITICAL Issues
+
+#### 1. ✅ FIXED: Remetrics Script Missing Phases Merge
 **Location:** `scripts/remetrics-replays.ts:146-190`
+**Status:** Fixed in commit 5747358
 
-**Current code merges:**
-- ✅ `production_by_building`
-- ✅ `supply_block_events` → `supply_block_periods`
-- ❌ `phases` (MISSING!)
+---
 
-**route.ts has this (lines 279-286):**
+#### 2. Authorization Bypass - Missing Ownership Checks
+**Location:** `src/app/api/my-replays/route.ts:167, 388, 429`
+
+**Issue:** GET/PATCH/DELETE endpoints don't verify replay ownership:
+- GET (line 167): Any authenticated user can fetch other users' replays
+- PATCH (line 388): Updates replays without ownership verification
+- DELETE (line 429): Only validates user exists, not replay ownership
+
+**Risk:** Users can read, modify, or delete other users' replay data.
+
+**Fix:** Add ownership check before returning/modifying data:
 ```typescript
-if (playerData.phases && fp.economy) {
-  fp.economy = {
-    ...fp.economy,
-    phases: playerData.phases as ReplayFingerprint['economy']['phases'],
-  };
+if (replay.discord_user_id !== session.user.discordId) {
+  return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 }
 ```
 
-**Fix:** Add the same block to remetrics buildFingerprints()
+---
+
+#### 3. Missing File Size Validation
+**Location:** `src/app/api/my-replays/route.ts:225-236`
+
+**Issue:** No file size check before processing upload. User could upload 10GB file.
+
+**Risk:** Memory exhaustion, resource denial.
+
+**Fix:** Add size check:
+```typescript
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+if (file.size > MAX_FILE_SIZE) {
+  return NextResponse.json({ error: 'File too large' }, { status: 413 });
+}
+```
 
 ---
 
-### MEDIUM: Duplicate Constants
+#### 4. Unsafe Type Casts Without Validation
+**Location:** `src/app/api/my-replays/route.ts:249, 284`
 
-**Issue:** `SUPPLY_RATE_PER_BUILDING` defined in two places.
+**Issue:** `as` casts assume sc2reader returns expected structure without runtime validation.
 
-**Locations:**
-- `src/components/my-replays/three-pillars.tsx:15`
-- `scripts/inspect-production.ts:9`
+**Risk:** Silent failures if sc2reader response changes.
 
-**Fix:** Extract to `src/lib/constants/production.ts`
-
----
-
-### LOW: Type Safety in Tests
-
-**Issue:** 20+ `as any` casts in test files (acceptable for mocking)
-
-**Production code:** Only 1 cast in `metrics-trends-chart.tsx:142` - minor
+**Fix:** Add Zod schema validation before casting.
 
 ---
 
-### LOW: Large Files
+#### 5. Error Message Information Leakage
+**Location:** `src/app/api/my-replays/route.ts:370-373`
 
-Files over 500 lines (consider splitting):
-- `my-replays-content.tsx`: 531 lines
-- `metrics-trends-chart.tsx`: 531 lines
+**Issue:** Raw error messages exposed to client, revealing system details.
+
+**Fix:** Map errors to generic user-facing messages, log details server-side only.
+
+---
+
+### HIGH Issues
+
+#### 6. N+1 Query Pattern in Replay Loading
+**Location:** `src/lib/replay-kv.ts:105-122`
+
+**Issue:** `getUserReplays()` does 1 + N KV reads (1 for list, N for each replay).
+- 100 replays = 101 operations = ~$0.10 per fetch
+
+**Fix:** Use `getReplayIndex()` for list views, lazy load full data.
+
+---
+
+#### 7. Inconsistent Error Handling in Rollback
+**Location:** `src/app/api/my-replays/route.ts:107-141`
+
+**Issue:** Rollback errors are swallowed. If rollback fails, client sees "success" but data is inconsistent.
+
+**Fix:** Collect rollback errors and return error response if any fail.
+
+---
+
+#### 8. Duplicate Player Detection Logic
+**Location:** `src/components/my-replays/my-replays-table.tsx:105-168`
+
+**Issue:** ~50 lines of player/opponent lookup logic duplicated 4+ times across components.
+
+**Fix:** Extract to `src/lib/replay-player-detection.ts`.
+
+---
+
+#### 9. N+1 Query in Reference Loading
+**Location:** `src/lib/replay-kv.ts:614-631`
+
+**Issue:** Same N+1 pattern as replays. 10 references = 11 KV operations.
+
+**Fix:** Batch operations or cache reference metadata.
+
+---
+
+### MEDIUM Issues
+
+#### 10. Large Component (531 lines)
+**Location:** `src/components/my-replays/my-replays-content.tsx`
+
+**Issue:** 11 useMemo calls, 5 state variables, mixed responsibilities.
+
+**Fix:** Extract `useReplayFilters()`, `useReplayStats()` hooks.
+
+---
+
+#### 11. Missing Memoization for Player Lookups
+**Location:** `src/components/my-replays/my-replays-table.tsx:105-134`
+
+**Issue:** Linear search O(n*m) runs on every row render.
+
+**Fix:** Use `useMemo` with Map for O(1) lookups.
+
+---
+
+#### 12. Missing Null Safety Checks
+**Location:** `src/lib/replay-kv.ts:364-452`
+
+**Issue:** Destructures `replay.fingerprint` without null check.
+
+**Fix:** Add upfront validation or optional chaining.
+
+---
+
+#### 13. Session Type Casting
+**Location:** `src/lib/api-auth.ts:115-117`
+
+**Issue:** Creates incomplete Session object and casts as Session.
+
+**Fix:** Change `checkPermission` to accept roles directly.
+
+---
+
+#### 14. Index Rebuild on Every Entry
+**Location:** `src/lib/replay-kv.ts:483-520`
+
+**Issue:** Every upload increments index version, forcing full re-read.
+
+**Fix:** Use atomic increment, only bump on bulk operations.
+
+---
+
+#### 15. Synchronous DOM Manipulation
+**Location:** `src/components/my-replays/my-replays-table.tsx:315-325`
+
+**Issue:** Download handler uses DOM manipulation with non-null assertion.
+
+**Fix:** Add error handling, use `link.remove()`.
+
+---
+
+#### 16. Optional Chaining Hiding Logic Errors
+**Location:** `src/components/my-replays/my-replays-content.tsx:43-55`
+
+**Issue:** Role check could fail silently if undefined.
+
+**Fix:** Explicit null checks with logging.
+
+---
+
+#### 17. Duplicate Constants
+**Location:** `three-pillars.tsx:15`, `inspect-production.ts:9`
+
+**Issue:** `SUPPLY_RATE_PER_BUILDING` defined twice.
+
+**Fix:** Extract to `src/lib/constants/production.ts`.
+
+---
+
+### LOW Issues
+
+#### 18. Race Condition in Concurrent Uploads
+**Location:** `src/lib/replay-kv.ts:127-142`
+
+**Issue:** Two concurrent uploads could lose one due to last-write-wins.
+
+**Fix:** Use atomic operations or document serial requirement.
+
+---
+
+#### 19. Browser Locale-Dependent Dates
+**Location:** `src/components/my-replays/my-replays-table.tsx:71-74`
+
+**Issue:** Hardcoded 'en-US' despite user locale.
+
+**Fix:** Use consistent date formatting library.
+
+---
+
+#### 20. Unused getRaceColor Function
+**Location:** `src/components/my-replays/my-replays-table.tsx:26-29`
+
+**Issue:** Always returns same value, ignores parameter.
+
+**Fix:** Implement or remove.
+
+---
+
+#### 21. Analytics Infrastructure Leakage
+**Location:** `src/app/api/my-replays/route.ts:45-50`
+
+**Issue:** Console logs reveal dev vs prod environment.
+
+**Fix:** Use structured logging, hide in production.
+
+---
+
+## Priority Remediation Plan
+
+### Phase 1: Security (Do Today)
+- [ ] Add ownership checks to GET/PATCH/DELETE endpoints
+- [ ] Add file size validation to upload
+- [ ] Replace error message exposure with generic messages
+- [ ] Add Zod validation for sc2reader responses
+
+### Phase 2: Performance (This Week)
+- [ ] Replace N+1 query patterns with index-based loading
+- [ ] Implement incremental index updates
+- [ ] Add memoization for player lookups
+
+### Phase 3: Maintainability (This Sprint)
+- [ ] Extract duplicate player detection logic to shared lib
+- [ ] Extract filter/stats hooks from my-replays-content
+- [ ] Fix rollback error handling
+- [ ] Add null safety checks
+
+### Phase 4: Cleanup (When Time Permits)
+- [ ] Extract SUPPLY_RATE constants
+- [ ] Fix date formatting consistency
+- [ ] Remove/implement getRaceColor
+- [ ] Address remaining LOW issues
 
 ---
 
 ## Next Actions
 
-1. [ ] **FIX CRITICAL:** Add phases merge to remetrics script
-2. [ ] **FEATURE:** Add download button to my-replays-table.tsx
-3. [ ] **CLEANUP:** Extract SUPPLY_RATE_PER_BUILDING to shared constants
-4. [ ] **DOCS:** Update CLAUDE.md to reference new docs structure
+1. [x] **FIXED:** Add phases merge to remetrics script
+2. [x] **VERIFIED:** Download button exists in my-replays-table.tsx
+3. [ ] **SECURITY:** Fix authorization bypass (ownership checks)
+4. [ ] **SECURITY:** Add file size validation
+5. [ ] **CLEANUP:** Extract SUPPLY_RATE_PER_BUILDING to shared constants
 
 ---
 
